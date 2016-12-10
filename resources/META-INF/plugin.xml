@@ -1,0 +1,62 @@
+<idea-plugin version="2">
+    <id>org.exbin.deltahex.intellij</id>
+    <name>DeltaHex Editor</name>
+    <version>0.1.0</version>
+    <vendor email="hajdam@users.sf.net" url="http://deltahex.exbin.org">ExBin Project</vendor>
+
+    <description><![CDATA[
+Hexadecimal editor based on deltahex library. Use "Open as Hex" context menu item to edit files in projects.
+
+<h1>Preview</h1>
+<img src="http://deltahex.exbin.org/images/deltahex-netbeans-preview-0.1.2.png" alt="deltahex-netbeans-preview"/>
+
+<h1>Features</h1>
+<ul><li>Show data as hexadecimal codes and text preview</li>
+<li>Insert and overwrite edit modes</li>
+<li>Support for selection and clipboard actions</li>
+<li>Support for undo/redo</li>
+<li>Support for encoding selection</li>
+<li>Support for showing unprintable/whitespace characters</li>
+<li>Codes can be also binary, octal or decimal</li></ul>
+    ]]></description>
+
+    <change-notes><![CDATA[
+      First release.
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="145.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.lang</depends>
+
+    <project-components>
+    </project-components>
+
+    <application-components>
+<!--        <component>
+            <implementation-class>org.exbin.deltahex.intellij.Configuration</implementation-class>
+        </component> -->
+    </application-components>
+
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
+
+    <actions>
+        <action class="org.exbin.deltahex.intellij.OpenAsHexAction" id="DeltaHexEditor.OpenAsHexAction"
+                text="Open As Hex" description="Opens file in hexadecimal viewer/editor"/>
+
+        <group>
+            <reference id="DeltaHexEditor.OpenAsHexAction"/>
+            <add-to-group group-id="ProjectViewPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
+        </group>
+
+        <!-- <group>
+            <reference id="DeltaHexEditor.OpenAsHexAction"/>
+            <add-to-group group-id="EditorPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
+        </group> -->
+    </actions>
+
+</idea-plugin>
