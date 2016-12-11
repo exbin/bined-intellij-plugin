@@ -27,7 +27,6 @@ import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
 import org.exbin.xbup.operation.Command;
-import org.exbin.xbup.operation.undo.XBUndoHandler;
 import org.exbin.xbup.operation.undo.XBUndoUpdateListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,11 +35,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * File editor using DeltaHex editor component.
@@ -52,12 +54,14 @@ public class DeltaHexFileEditor implements FileEditor {
 
     private JPanel editorPanel;
     private final CodeArea codeArea;
-//    private final UndoRedo.Manager undoRedo;
+    private final CodeAreaUndoHandler undoHandler;
     private final int metaMask;
+    private final PropertyChangeSupport propertyChangeSupport;
+    private final List<PropertyChangeListener> changeListeners = new ArrayList<>();
 
     private boolean opened = false;
     private boolean modified = false;
-    protected String displayName;
+    private String displayName;
 
     public DeltaHexFileEditor() {
         editorPanel = new JPanel();
@@ -68,7 +72,8 @@ public class DeltaHexFileEditor implements FileEditor {
 
 //        undoRedo = new UndoRedo.Manager();
 //        HexUndoSwingHandler undoHandler = new HexUndoSwingHandler(codeArea, undoRedo);
-        XBUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
+        propertyChangeSupport = new PropertyChangeSupport(this);
+        undoHandler = new CodeAreaUndoHandler(codeArea);
 
         codeArea.setData(new PagedData());
         CodeCommandHandler commandHandler = new CodeCommandHandler(codeArea, undoHandler);
@@ -98,11 +103,12 @@ public class DeltaHexFileEditor implements FileEditor {
             @Override
             public void undoCommandPositionChanged() {
                 codeArea.repaint();
+                notifyModified();
             }
 
             @Override
             public void undoCommandAdded(final Command command) {
-//                setModified(true);
+                notifyModified();
             }
         });
 
@@ -195,7 +201,7 @@ public class DeltaHexFileEditor implements FileEditor {
         controlToolBar.add(showUnprintablesToggleButton);
         controlToolBar.add(jSeparator1);
 
-        codeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BIN", "OCT", "DEC", "HEX" }));
+        codeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BIN", "OCT", "DEC", "HEX"}));
         codeTypeComboBox.setMaximumSize(new java.awt.Dimension(58, 25));
         codeTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -243,7 +249,7 @@ public class DeltaHexFileEditor implements FileEditor {
     @NotNull
     @Override
     public String getName() {
-        return "Test";
+        return displayName;
     }
 
     @Override
@@ -253,12 +259,12 @@ public class DeltaHexFileEditor implements FileEditor {
 
     @Override
     public boolean isModified() {
-        return false;
+        return modified;
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        return true;
     }
 
     @Override
@@ -273,12 +279,20 @@ public class DeltaHexFileEditor implements FileEditor {
 
     @Override
     public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {
-
+        propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     @Override
     public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
 
+    private void notifyModified() {
+        boolean modified = undoHandler.getCommandPosition() != undoHandler.getSyncPoint();
+        if (modified != this.modified) {
+            this.modified = modified;
+            propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
+        }
     }
 
     @Nullable
@@ -291,6 +305,7 @@ public class DeltaHexFileEditor implements FileEditor {
     @Override
     public FileEditorLocation getCurrentLocation() {
         return null;
+//        return new TextEditorLocation(codeArea.getCaretPosition(), this);
     }
 
     @Override
@@ -322,6 +337,10 @@ public class DeltaHexFileEditor implements FileEditor {
 
     private void codeTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {
         codeArea.setCodeType(CodeType.values()[codeTypeComboBox.getSelectedIndex()]);
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     private String[] getSupportedEncodings() {

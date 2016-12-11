@@ -24,7 +24,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Editor listener for hexadecimal editor.
+ * Window provider for hexadecimal editor.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.0 2016/12/08

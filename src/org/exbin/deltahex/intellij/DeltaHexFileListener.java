@@ -26,11 +26,11 @@ import javax.swing.*;
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.0 2016/12/08
  */
-public class FileListener extends VirtualFileAdapter {
+public class DeltaHexFileListener extends VirtualFileAdapter {
 
     private JPanel editor;
 
-    public FileListener(JPanel viewer) {
+    public DeltaHexFileListener(JPanel viewer) {
         this.editor = viewer;
     }
 

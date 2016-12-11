@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * File listener for hexadecimal editor.
+ * Virtual file for hexadecimal editor.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.0 2016/12/11
@@ -59,7 +59,7 @@ public class DeltaHexVirtualFile extends VirtualFile {
 
     @Override
     public boolean isWritable() {
-        return false;
+        return true;
     }
 
     @Override

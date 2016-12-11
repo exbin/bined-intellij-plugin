@@ -19,7 +19,7 @@ import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 
 /**
- * File listener for hexadecimal editor.
+ * File editor state for hexadecimal editor.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.0 2016/12/08

@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 
 /**
- * File listener for hexadecimal editor.
+ * File system for hexadecimal editor.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.0 2016/12/11
@@ -107,7 +107,7 @@ public class DeltaHexFileSystem extends VirtualFileSystem implements Application
 
     @Override
     public boolean isReadOnly() {
-        return true;
+        return false;
     }
 
     @Override
