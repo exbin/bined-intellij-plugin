@@ -19,6 +19,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 
 /**
@@ -34,8 +35,14 @@ public class OpenAsHexAction extends AnAction {
     }
 
     @Override
-    public void update(AnActionEvent e) {
-        super.update(e);
+    public void update(AnActionEvent event) {
+        super.update(event);
+        final Project project = event.getProject();
+        if (project == null) {
+            return;
+        }
+
+        event.getPresentation().setEnabled(true);
     }
 
     @Override
@@ -46,7 +53,9 @@ public class OpenAsHexAction extends AnAction {
         }
         FileEditor fileEditor = new DeltaHexFileEditor();
 //        FileEditorManager.getInstance(project).getSelectedEditor(event.getDataContext().)
-        FileEditorManager.getInstance(project).addTopComponent(fileEditor, fileEditor.getComponent());
+//        FileEditorManager.getInstance(project).addTopComponent(fileEditor, fileEditor.getComponent());
+        OpenFileDescriptor descriptor = new OpenFileDescriptor(project, new DeltaHexVirtualFile("test"), 0);
+        FileEditorManager.getInstance(project).openEditor(descriptor, true);
 
 //        Project project = event.getData(PlatformDataKeys.PROJECT);
 //        String txt = Messages.showInputDialog(project, "What is your name?", "Input your name", Messages.getQuestionIcon());

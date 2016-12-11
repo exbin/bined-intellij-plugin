@@ -6,13 +6,6 @@
     </constraints>
     <properties/>
     <border type="none"/>
-    <children>
-      <component id="a345d" class="javax.swing.JButton" binding="button1" default-binding="true">
-        <constraints border-constraint="North"/>
-        <properties>
-          <text value="Button"/>
-        </properties>
-      </component>
-    </children>
+    <children/>
   </grid>
 </form>

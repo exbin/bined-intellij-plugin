@@ -36,7 +36,9 @@ Hexadecimal editor based on deltahex library. Use "Open as Hex" context menu ite
     </project-components>
 
     <application-components>
-<!--        <component>
+        <component><implementation-class>org.exbin.deltahex.intellij.DeltaHexFileSystem</implementation-class></component>
+        <component><implementation-class>org.exbin.deltahex.intellij.DeltaHexWindowProvider</implementation-class></component>
+        <!--        <component>
             <implementation-class>org.exbin.deltahex.intellij.Configuration</implementation-class>
         </component> -->
     </application-components>
