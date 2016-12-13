@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.exbin.deltahex.intellij</id>
     <name>DeltaHex Editor</name>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
     <vendor email="hajdam@users.sf.net" url="http://deltahex.exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
