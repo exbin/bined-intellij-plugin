@@ -18,12 +18,12 @@ package org.exbin.deltahex.delta;
 /**
  * Data segment pointing to memory block.
  *
- * @version 0.1.0 2016/06/21
+ * @version 0.1.2 2016/12/12
  * @author ExBin Project (http://exbin.org)
  */
 public class MemorySegment extends DataSegment {
 
-    private final MemoryDataSource source;
+    private MemoryDataSource source;
     private long startPosition;
     private long length;
 
@@ -35,6 +35,10 @@ public class MemorySegment extends DataSegment {
 
     public MemoryDataSource getSource() {
         return source;
+    }
+
+    public void setSource(MemoryDataSource source) {
+        this.source = source;
     }
 
     @Override

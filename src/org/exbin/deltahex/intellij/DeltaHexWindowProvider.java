@@ -56,7 +56,8 @@ public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationCo
     @Override
     public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         DeltaHexVirtualFile deltaHexVirtualFile = (DeltaHexVirtualFile) virtualFile;
-        DeltaHexFileEditor deltaHexFileEditor = new DeltaHexFileEditor();
+        DeltaHexFileEditor deltaHexFileEditor = new DeltaHexFileEditor(project);
+        deltaHexFileEditor.setDisplayName(deltaHexVirtualFile.getDisplayName());
         return deltaHexFileEditor;
     }
 
@@ -69,6 +70,6 @@ public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationCo
     @NotNull
     @Override
     public FileEditorPolicy getPolicy() {
-        return FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR;
+        return FileEditorPolicy.HIDE_DEFAULT_EDITOR;
     }
 }

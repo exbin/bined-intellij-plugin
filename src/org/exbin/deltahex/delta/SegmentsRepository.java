@@ -33,7 +33,7 @@ import org.exbin.utils.binary_data.OutOfBoundsException;
 /**
  * Repository of delta segments.
  *
- * @version 0.1.1 2016/12/01
+ * @version 0.1.2 2016/12/12
  * @author ExBin Project (http://exbin.org)
  */
 public class SegmentsRepository {
@@ -586,9 +586,7 @@ public class SegmentsRepository {
     public void setMemoryByte(MemorySegment memorySegment, long segmentPosition, byte value) {
         MemoryDataSource memorySource = memorySegment.getSource();
         DataSegmentsMap segmentsMap = memorySources.get(memorySource);
-        if (segmentsMap.hasMoreSegments()) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+        detachMemoryArea(memorySegment, memorySegment.getStartPosition() + segmentPosition, 1);
 
         if (segmentPosition >= memorySegment.getLength()) {
             segmentsMap.updateSegmentLength(memorySegment, segmentPosition + 1);
@@ -602,7 +600,8 @@ public class SegmentsRepository {
     public void insertMemoryData(MemorySegment memorySegment, long position, BinaryData insertedData) {
         MemoryDataSource memorySource = memorySegment.getSource();
         DataSegmentsMap segmentsMap = memorySources.get(memorySource);
-        detachMemoryArea(memorySegment, position, insertedData.getDataSize());
+        detachMemoryArea(memorySegment, position, 0);
+        shiftSegments(memorySegment, position, insertedData.getDataSize());
         memorySegment.getSource().insert(position, insertedData);
         segmentsMap.updateSegmentLength(memorySegment, memorySegment.getLength() + insertedData.getDataSize());
     }
@@ -610,7 +609,8 @@ public class SegmentsRepository {
     public void insertMemoryData(MemorySegment memorySegment, long position, BinaryData insertedData, long insertedDataOffset, long insertedDataLength) {
         MemoryDataSource memorySource = memorySegment.getSource();
         DataSegmentsMap segmentsMap = memorySources.get(memorySource);
-        detachMemoryArea(memorySegment, position, insertedData.getDataSize());
+        detachMemoryArea(memorySegment, position, 0);
+        shiftSegments(memorySegment, position, insertedDataLength);
         memorySegment.getSource().insert(position, insertedData, insertedDataOffset, insertedDataLength);
         segmentsMap.updateSegmentLength(memorySegment, memorySegment.getLength() + insertedDataLength);
     }
@@ -618,7 +618,8 @@ public class SegmentsRepository {
     public void insertMemoryData(MemorySegment memorySegment, long position, byte[] insertedData) {
         MemoryDataSource memorySource = memorySegment.getSource();
         DataSegmentsMap segmentsMap = memorySources.get(memorySource);
-        detachMemoryArea(memorySegment, position, insertedData.length);
+        detachMemoryArea(memorySegment, position, 0);
+        shiftSegments(memorySegment, position, insertedData.length);
         memorySegment.getSource().insert(position, insertedData);
         segmentsMap.updateSegmentLength(memorySegment, memorySegment.getLength() + insertedData.length);
     }
@@ -626,7 +627,8 @@ public class SegmentsRepository {
     public void insertMemoryData(MemorySegment memorySegment, long position, byte[] insertedData, int insertedDataOffset, int insertedDataLength) {
         MemoryDataSource memorySource = memorySegment.getSource();
         DataSegmentsMap segmentsMap = memorySources.get(memorySource);
-        detachMemoryArea(memorySegment, position, insertedData.length);
+        detachMemoryArea(memorySegment, position, 0);
+        shiftSegments(memorySegment, position, insertedDataLength);
         memorySegment.getSource().insert(position, insertedData, insertedDataOffset, insertedDataLength);
         segmentsMap.updateSegmentLength(memorySegment, memorySegment.getLength() + insertedDataLength);
     }
@@ -634,7 +636,8 @@ public class SegmentsRepository {
     public void insertMemoryData(MemorySegment memorySegment, long position, long length) {
         MemoryDataSource memorySource = memorySegment.getSource();
         DataSegmentsMap segmentsMap = memorySources.get(memorySource);
-        detachMemoryArea(memorySegment, position, length);
+        detachMemoryArea(memorySegment, position, 0);
+        shiftSegments(memorySegment, position, length);
         memorySegment.getSource().insert(position, length);
         segmentsMap.updateSegmentLength(memorySegment, memorySegment.getLength() + length);
     }
@@ -642,7 +645,8 @@ public class SegmentsRepository {
     public void insertUninitializedMemoryData(MemorySegment memorySegment, long position, long length) {
         MemoryDataSource memorySource = memorySegment.getSource();
         DataSegmentsMap segmentsMap = memorySources.get(memorySource);
-        detachMemoryArea(memorySegment, position, length);
+        detachMemoryArea(memorySegment, position, 0);
+        shiftSegments(memorySegment, position, length);
         memorySegment.getSource().insertUninitialized(position, length);
         segmentsMap.updateSegmentLength(memorySegment, memorySegment.getLength() + length);
     }
@@ -657,15 +661,57 @@ public class SegmentsRepository {
      */
     public void detachMemoryArea(MemorySegment memorySegment, long position, long length) {
         DataSegmentsMap segmentsMap = memorySources.get(memorySegment.getSource());
-        // TODO
-//        for (MemorySegment segment : segmentsMap.getAllSegments()) {
-//            if (segment != memorySegment) {
-//                if (position >= segment.getStartPosition() && position < segment.getStartPosition() + segment.getLength()) {
-//                    // TODO: If segments collide, copy on write
-//                    throw new UnsupportedOperationException("Not supported yet.");
-//                }
-//            }
-//        }
+        if (!segmentsMap.hasMoreSegments()) {
+            return;
+        }
+
+        SegmentRecord record = segmentsMap.focusFirstOverlay(position, length);
+        while (record != null) {
+            if (record.getStartPosition() > position + length) {
+                break;
+            }
+            if (record.getStartPosition() + record.getLength() > position) {
+                DataSegment segment = record.dataSegment;
+                record = record.getNext();
+                detachSegment((MemorySegment) segment);
+            } else {
+                record = record.getNext();
+            }
+        }
+    }
+
+    public void detachSegment(MemorySegment memorySegment) {
+        MemoryDataSource source = memorySegment.getSource();
+        MemoryDataSource newMemorySource = openMemorySource();
+        newMemorySource.insert(0, source.copy(memorySegment.getStartPosition(), memorySegment.getLength()));
+        DataSegmentsMap segmentsMap = memorySources.get(source);
+        segmentsMap.remove(memorySegment);
+        memorySegment.setSource(newMemorySource);
+        DataSegmentsMap newSegmentsMap = memorySources.get(newMemorySource);
+        newSegmentsMap.add(memorySegment);
+    }
+
+    /**
+     * Shift all segments after given position in given direction.
+     * 
+     * Operation assumes there are no collisions.
+     *
+     * @param memorySegment memory segment to keep
+     * @param position position of the shift
+     * @param shift direction of the shift
+     */
+    public void shiftSegments(MemorySegment memorySegment, long position, long shift) {
+        MemoryDataSource source = memorySegment.getSource();
+        DataSegmentsMap segmentsMap = memorySources.get(memorySegment.getSource());
+        SegmentRecord record = segmentsMap.focusFirstOverlay(position, source.getDataSize() - position);
+        while (record != null) {
+            if (record.getStartPosition() >= position) {
+                MemorySegment segment = (MemorySegment) record.dataSegment;
+                segment.setStartPosition(segment.getStartPosition() + shift);
+                record.maxPosition += shift;
+            }
+            record = record.getNext();
+        }
     }
 
     /**

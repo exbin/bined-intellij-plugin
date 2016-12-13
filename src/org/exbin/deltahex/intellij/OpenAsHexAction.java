@@ -24,14 +24,13 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import java.io.File;
 import java.util.List;
 
 /**
  * Open file in hexadecimal editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.0 2016/12/08
+ * @version 0.1.0 2016/12/13
  */
 public class OpenAsHexAction extends AnAction {
 
@@ -57,19 +56,12 @@ public class OpenAsHexAction extends AnAction {
             return;
         }
         VirtualFile virtualFile = event.getDataContext().getData(PlatformDataKeys.VIRTUAL_FILE);
-        if (virtualFile != null) {
-            OpenFileDescriptor descriptor = new OpenFileDescriptor(project, new DeltaHexVirtualFile("test"), 0);
+        if (virtualFile != null && virtualFile.isValid() && !virtualFile.isDirectory()) {
+            DeltaHexVirtualFile deltaHexVirtualFile = new DeltaHexVirtualFile(virtualFile);
+            OpenFileDescriptor descriptor = new OpenFileDescriptor(project, deltaHexVirtualFile, 0);
             List<FileEditor> editors = FileEditorManager.getInstance(project).openEditor(descriptor, true);
-            Object selectedItem = event.getDataContext().getData(PlatformDataKeys.SELECTED_ITEM);
-            Object contextComponent = event.getDataContext().getData(PlatformDataKeys.CONTEXT_COMPONENT);
-            File file = new File(virtualFile.getPath());
             DeltaHexFileEditor fileEditor = ((DeltaHexFileEditor) editors.get(0));
-            fileEditor.setDisplayName(virtualFile.getName());
-            fileEditor.openFile(file);
+            fileEditor.openFile(deltaHexVirtualFile);
         }
-
-//        Project project = event.getData(PlatformDataKeys.PROJECT);
-//        String txt = Messages.showInputDialog(project, "What is your name?", "Input your name", Messages.getQuestionIcon());
-//        Messages.showMessageDialog(project, "Hello, " + txt + "!\n I am glad to see you.", "Information", Messages.getInformationIcon());
     }
 }

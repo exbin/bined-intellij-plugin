@@ -16,13 +16,17 @@
 package org.exbin.deltahex.intellij;
 
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.undo.*;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.exbin.deltahex.CodeType;
-import org.exbin.deltahex.operation.CodeAreaUndoHandler;
-import org.exbin.deltahex.operation.CodeCommandHandler;
+import org.exbin.deltahex.operation.swing.CodeAreaUndoHandler;
+import org.exbin.deltahex.operation.swing.CodeCommandHandler;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
@@ -36,44 +40,98 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.0 2016/12/11
+ * @version 0.1.0 2016/12/13
  */
 public class DeltaHexFileEditor implements FileEditor {
 
+    private final Project project;
     private JPanel editorPanel;
     private final CodeArea codeArea;
     private final CodeAreaUndoHandler undoHandler;
     private final int metaMask;
     private final PropertyChangeSupport propertyChangeSupport;
-    private final List<PropertyChangeListener> changeListeners = new ArrayList<>();
 
     private boolean opened = false;
     private boolean modified = false;
     private String displayName;
+    private DeltaHexVirtualFile virtualFile;
+    private UndoableAction undoableAction;
 
-    public DeltaHexFileEditor() {
+    public DeltaHexFileEditor(Project project) {
+        this.project = project;
         editorPanel = new JPanel();
+        UndoManager undoManager = UndoManager.getGlobalInstance();
         initComponents();
         codeArea = new CodeArea();
         codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
 
-//        undoRedo = new UndoRedo.Manager();
-//        HexUndoSwingHandler undoHandler = new HexUndoSwingHandler(codeArea, undoRedo);
         propertyChangeSupport = new PropertyChangeSupport(this);
         undoHandler = new CodeAreaUndoHandler(codeArea);
+        undoableAction = new UndoableAction() {
+            @Override
+            public void undo() throws UnexpectedUndoException {
+                try {
+                    undoHandler.performUndo();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void redo() throws UnexpectedUndoException {
+                try {
+                    undoHandler.performRedo();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Nullable
+            @Override
+            public DocumentReference[] getAffectedDocuments() {
+                DocumentReference documentReference = DocumentReferenceManager.getInstance().create(virtualFile);
+                return new DocumentReference[]{documentReference};
+            }
+
+            @Override
+            public boolean isGlobal() {
+                return false;
+            }
+        };
+
+        undoHandler.addUndoUpdateListener(new XBUndoUpdateListener() {
+            @Override
+            public void undoCommandPositionChanged() {
+                codeArea.repaint();
+                updateUndoState();
+                notifyModified();
+            }
+
+            @Override
+            public void undoCommandAdded(final Command command) {
+                updateUndoState();
+                notifyModified();
+                // Doesn't work :-(
+//                CommandProcessor commandProcessor = CommandProcessor.getInstance();
+//                commandProcessor.executeCommand(project, new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        undoManager.undoableActionPerformed(undoableAction);
+//                    }
+//                }, command.getCaption(), "DeltaHex");
+            }
+        });
+        updateUndoState();
 
         codeArea.setData(new PagedData());
         CodeCommandHandler commandHandler = new CodeCommandHandler(codeArea, undoHandler);
@@ -96,19 +154,6 @@ public class DeltaHexFileEditor implements FileEditor {
                     JPopupMenu popupMenu = createContextMenu();
                     popupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
-            }
-        });
-
-        undoHandler.addUndoUpdateListener(new XBUndoUpdateListener() {
-            @Override
-            public void undoCommandPositionChanged() {
-                codeArea.repaint();
-                notifyModified();
-            }
-
-            @Override
-            public void undoCommandAdded(final Command command) {
-                notifyModified();
             }
         });
 
@@ -153,6 +198,11 @@ public class DeltaHexFileEditor implements FileEditor {
     private javax.swing.JLabel encodingLabel;
     private javax.swing.JPanel infoToolbar;
     private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JToolBar.Separator jSeparator3;
+    private javax.swing.JButton saveFileButton;
+    private javax.swing.JButton undoEditButton;
+    private javax.swing.JButton redoEditButton;
     private javax.swing.JToggleButton lineWrappingToggleButton;
     private javax.swing.JToggleButton showUnprintablesToggleButton;
 
@@ -162,9 +212,14 @@ public class DeltaHexFileEditor implements FileEditor {
         encodingLabel = new javax.swing.JLabel();
         encodingComboBox = new javax.swing.JComboBox<String>();
         controlToolBar = new javax.swing.JToolBar();
+        saveFileButton = new javax.swing.JButton();
+        undoEditButton = new javax.swing.JButton();
+        redoEditButton = new javax.swing.JButton();
         lineWrappingToggleButton = new javax.swing.JToggleButton();
         showUnprintablesToggleButton = new javax.swing.JToggleButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
         codeTypeComboBox = new javax.swing.JComboBox<String>();
 
         editorPanel.setLayout(new java.awt.BorderLayout());
@@ -181,6 +236,36 @@ public class DeltaHexFileEditor implements FileEditor {
         controlToolBar.setBorder(null);
         controlToolBar.setFloatable(false);
         controlToolBar.setRollover(true);
+
+        saveFileButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/deltahex/intellij/resources/icons/document-save.png")));
+        saveFileButton.setToolTipText("Save current file");
+        saveFileButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveFileButtonActionPerformed(evt);
+            }
+        });
+        saveFileButton.setEnabled(false);
+        controlToolBar.add(saveFileButton);
+        controlToolBar.add(jSeparator1);
+
+        undoEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/deltahex/intellij/resources/icons/edit-undo.png")));
+        undoEditButton.setToolTipText("Undo last operation");
+        undoEditButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                undoEditButtonActionPerformed(evt);
+            }
+        });
+        controlToolBar.add(undoEditButton);
+
+        redoEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/deltahex/intellij/resources/icons/edit-redo.png")));
+        redoEditButton.setToolTipText("Redo last undid operation");
+        redoEditButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                redoEditButtonActionPerformed(evt);
+            }
+        });
+        controlToolBar.add(redoEditButton);
+        controlToolBar.add(jSeparator2);
 
         lineWrappingToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/deltahex/intellij/resources/icons/deltahex-linewrap.png")));
         lineWrappingToggleButton.setToolTipText("Wrap line to window size");
@@ -199,7 +284,7 @@ public class DeltaHexFileEditor implements FileEditor {
             }
         });
         controlToolBar.add(showUnprintablesToggleButton);
-        controlToolBar.add(jSeparator1);
+        controlToolBar.add(jSeparator3);
 
         codeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BIN", "OCT", "DEC", "HEX"}));
         codeTypeComboBox.setMaximumSize(new java.awt.Dimension(58, 25));
@@ -293,6 +378,12 @@ public class DeltaHexFileEditor implements FileEditor {
             this.modified = modified;
             propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
         }
+        saveFileButton.setEnabled(modified);
+    }
+
+    private void updateUndoState() {
+        undoEditButton.setEnabled(undoHandler.canUndo());
+        redoEditButton.setEnabled(undoHandler.canRedo());
     }
 
     @Nullable
@@ -327,6 +418,43 @@ public class DeltaHexFileEditor implements FileEditor {
         codeArea.setCharset(Charset.forName(encodingComboBox.getSelectedItem().toString()));
     }
 
+    private void saveFileButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        Application application = ApplicationManager.getApplication();
+        application.runWriteAction(new Runnable() {
+            @Override
+            public void run() {
+                try (OutputStream stream = virtualFile.getOutputStream(this)) {
+                    codeArea.getData().saveToStream(stream);
+                    undoHandler.setSyncPoint();
+                    updateUndoState();
+                    saveFileButton.setEnabled(false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void undoEditButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            undoHandler.performUndo();
+            codeArea.repaint();
+            updateUndoState();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void redoEditButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            undoHandler.performRedo();
+            codeArea.repaint();
+            updateUndoState();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void lineWrappingToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {
         codeArea.setWrapMode(lineWrappingToggleButton.isSelected());
     }
@@ -347,20 +475,14 @@ public class DeltaHexFileEditor implements FileEditor {
         return Charset.availableCharsets().keySet().toArray(new String[0]);
     }
 
-    public void openFile(File file) {
-        InputStream stream = null;
-        try {
-            stream = new FileInputStream(file);
-            if (stream != null) {
-                ((EditableBinaryData) codeArea.getData()).loadFromStream(stream);
-                // codeArea.setEditable(dataObject.getPrimaryFile().canWrite());
-            }
-        } catch (IOException ex) {
-            // Exceptions.printStackTrace(ex);
-        } finally {
-            try {
+    public void openFile(DeltaHexVirtualFile virtualFile) {
+        if (!virtualFile.isDirectory() && virtualFile.isValid()) {
+            this.virtualFile = virtualFile;
+            try (InputStream stream = virtualFile.getInputStream()) {
+                ;
                 if (stream != null) {
-                    stream.close();
+                    ((EditableBinaryData) codeArea.getData()).loadFromStream(stream);
+                    codeArea.setEditable(virtualFile.isWritable());
                 }
             } catch (IOException ex) {
                 // Exceptions.printStackTrace(ex);

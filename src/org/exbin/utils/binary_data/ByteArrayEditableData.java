@@ -24,7 +24,7 @@ import java.util.Arrays;
 /**
  * Basic implementation of editable binary data interface using byte array.
  *
- * @version 0.1.0 2016/11/02
+ * @version 0.1.2 2016/12/13
  * @author ExBin Project (http://exbin.org)
  */
 public class ByteArrayEditableData extends ByteArrayData implements EditableBinaryData {
@@ -251,6 +251,22 @@ public class ByteArrayEditableData extends ByteArrayData implements EditableBina
             System.arraycopy(data, (int) (startFrom + length), newData, (int) startFrom, (int) (data.length - startFrom - length));
             data = newData;
         }
+    }
+
+    @Override
+    public BinaryData copy() {
+        byte[] copy = Arrays.copyOf(data, data.length);
+        return new ByteArrayEditableData(copy);
+    }
+
+    @Override
+    public BinaryData copy(long startFrom, long length) {
+        if (startFrom + length > data.length) {
+            throw new OutOfBoundsException("Attemt to copy outside of data");
+        }
+
+        byte[] copy = Arrays.copyOfRange(data, (int) startFrom, (int) (startFrom + length));
+        return new ByteArrayEditableData(copy);
     }
 
     @Override

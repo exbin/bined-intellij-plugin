@@ -20,7 +20,6 @@ import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,20 +28,33 @@ import java.io.OutputStream;
  * Virtual file for hexadecimal editor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.0 2016/12/11
+ * @version 0.1.0 2016/12/13
  */
 public class DeltaHexVirtualFile extends VirtualFile {
 
-    private String fileUrl;
+    private final VirtualFile parentFile;
+    private String displayName;
+    private boolean modified = false;
 
-    public DeltaHexVirtualFile(String fileUrl) {
-        this.fileUrl = fileUrl;
+    public DeltaHexVirtualFile(VirtualFile parentFile) {
+        this.parentFile = parentFile;
+        String path = parentFile.getPath();
+        int lastIndexOf = path.lastIndexOf('/');
+        if (lastIndexOf >= 0) {
+            this.displayName = path.substring(lastIndexOf + 1);
+        } else {
+            this.displayName = "";
+        }
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "Test";
+        return parentFile.getName();
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 
     @NotNull
@@ -54,68 +66,73 @@ public class DeltaHexVirtualFile extends VirtualFile {
     @NotNull
     @Override
     public String getPath() {
-        return fileUrl;
+        return parentFile.getPath();
     }
 
     @Override
     public boolean isWritable() {
-        return true;
+        return parentFile.isWritable();
     }
 
     @Override
     public boolean isDirectory() {
-        return false;
+        return parentFile.isDirectory();
     }
 
     @Override
     public boolean isValid() {
-        return true;
+        return parentFile.isValid();
     }
 
     @Override
     public VirtualFile getParent() {
-        return null;
+        return parentFile.getParent();
     }
 
     @Override
     public VirtualFile[] getChildren() {
-        return new VirtualFile[0];
+        return parentFile.getChildren();
     }
 
     @NotNull
     @Override
     public OutputStream getOutputStream(Object requestor, long newModificationStamp, long newTimeStamp) throws IOException {
-        return new ByteArrayOutputStream();
+        return parentFile.getOutputStream(requestor, newModificationStamp, newTimeStamp);
     }
 
     @NotNull
     @Override
     public byte[] contentsToByteArray() throws IOException {
-        return new byte[0];
+        return parentFile.contentsToByteArray();
     }
 
     @Override
     public long getTimeStamp() {
-        return 0;
+        return parentFile.getTimeStamp();
     }
 
     @Override
     public long getLength() {
-        return 0;
+        return parentFile.getLength();
     }
 
     @Override
     public void refresh(boolean asynchronous, boolean recursive, @Nullable Runnable postRunnable) {
-
+        parentFile.refresh(asynchronous, recursive, postRunnable);
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return null;
+        return parentFile.getInputStream();
     }
 
     public long getModificationStamp() {
-        return 0;
+        return parentFile.getModificationStamp();
+    }
+
+    @Override
+    public long getModificationCount() {
+        return parentFile.getModificationCount();
     }
 
     @Override
@@ -124,14 +141,13 @@ public class DeltaHexVirtualFile extends VirtualFile {
         if (o == null || getClass() != o.getClass()) return false;
 
         DeltaHexVirtualFile that = (DeltaHexVirtualFile) o;
-
-        if (fileUrl != null ? !fileUrl.equals(that.fileUrl) : that.fileUrl != null) return false;
-
-        return true;
+        String path = getPath();
+        return path != null ? path.equals(that.getPath()) : that.getPath() == null;
     }
 
     @Override
     public int hashCode() {
-        return fileUrl != null ? fileUrl.hashCode() : 0;
+        String path = getPath();
+        return path != null ? path.hashCode() : 0;
     }
 }
