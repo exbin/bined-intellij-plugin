@@ -69,7 +69,6 @@ public class DeltaHexFileEditor implements FileEditor {
     public DeltaHexFileEditor(Project project) {
         this.project = project;
         editorPanel = new JPanel();
-        UndoManager undoManager = UndoManager.getGlobalInstance();
         initComponents();
         codeArea = new CodeArea();
         codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -488,6 +487,10 @@ public class DeltaHexFileEditor implements FileEditor {
                 // Exceptions.printStackTrace(ex);
             }
         }
+    }
+
+    public DeltaHexVirtualFile getVirtualFile() {
+        return virtualFile;
     }
 
     private JPopupMenu createContextMenu() {

@@ -5,19 +5,20 @@
     <vendor email="hajdam@users.sf.net" url="http://deltahex.exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
-Hexadecimal editor based on deltahex library. Use "Open as Hex" context menu item to edit files in projects.
+<p>Hexadecimal editor based on deltahex library. Use "Open as Hex" context menu item to edit files in projects.</p>
 
 <h1>Preview</h1>
-<img src="http://deltahex.exbin.org/images/deltahex-intellij-plugin-preview-0.1.0.png" alt="deltahex-intellij-plugin-preview"/>
+<p><img src="http://deltahex.exbin.org/images/deltahex-intellij-plugin-preview-0.1.0.png" alt="deltahex-intellij-plugin-preview"/></p>
 
 <h1>Features</h1>
-<ul><li>Show data as hexadecimal codes and text preview</li>
+<p><ul><li>Show data as hexadecimal codes and text preview</li>
 <li>Insert and overwrite edit modes</li>
 <li>Support for selection and clipboard actions</li>
 <li>Support for undo/redo</li>
 <li>Support for encoding selection</li>
 <li>Support for showing unprintable/whitespace characters</li>
 <li>Codes can be also binary, octal or decimal</li></ul>
+</p>
     ]]></description>
 
     <change-notes><![CDATA[
