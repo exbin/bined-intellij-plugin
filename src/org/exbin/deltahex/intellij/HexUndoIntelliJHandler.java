@@ -15,12 +15,12 @@
  */
 package org.exbin.deltahex.intellij;
 
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.undo.DocumentReference;
+import com.intellij.openapi.command.undo.DocumentReferenceManager;
 import com.intellij.openapi.command.undo.UndoManager;
 import com.intellij.openapi.command.undo.UndoableAction;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.xbup.operation.Command;
 import org.exbin.xbup.operation.undo.XBUndoHandler;
@@ -35,16 +35,17 @@ import java.util.List;
 /**
  * Undo handler for hexadecimal editor using IntelliJ Idea's undo.
  *
- * @version 0.1.1 2016/12/16
  * @author ExBin Project (http://exbin.org)
+ * @version 0.1.1 2016/12/16
  */
-public class HexUndoSwingHandler implements XBUndoHandler {
+public class HexUndoIntelliJHandler implements XBUndoHandler {
 
     private final CodeArea codeArea;
     private final List<XBUndoUpdateListener> listeners = new ArrayList<>();
     private final UndoManager undoManager;
     private final DeltaHexFileEditor fileEditor;
     private final Project project;
+    private DocumentReference documentReference;
     private long commandPosition;
     private long syncPointPosition = -1;
 
@@ -53,7 +54,7 @@ public class HexUndoSwingHandler implements XBUndoHandler {
      *
      * @param codeArea hexadecimal component
      */
-    public HexUndoSwingHandler(CodeArea codeArea, Project project, DeltaHexFileEditor fileEditor) {
+    public HexUndoIntelliJHandler(CodeArea codeArea, Project project, DeltaHexFileEditor fileEditor) {
         this.codeArea = codeArea;
         this.fileEditor = fileEditor;
         this.project = project;
@@ -112,28 +113,25 @@ public class HexUndoSwingHandler implements XBUndoHandler {
             @Nullable
             @Override
             public DocumentReference[] getAffectedDocuments() {
-                return new DocumentReference[] { new DocumentReference() {
-                    @Nullable
-                    @Override
-                    public Document getDocument() {
-                        return null;
-                    }
+                if (documentReference == null) {
+                    documentReference = DocumentReferenceManager.getInstance().create(fileEditor.getVirtualFile());
+                }
 
-                    @Nullable
-                    @Override
-                    public VirtualFile getFile() {
-                        return fileEditor.getVirtualFile();
-                    }
-                }};
+                return new DocumentReference[]{documentReference};
             }
 
             @Override
             public boolean isGlobal() {
                 return false;
             }
-
         };
-        undoManager.undoableActionPerformed(action);
+        CommandProcessor commandProcessor = CommandProcessor.getInstance();
+        commandProcessor.executeCommand(project, new Runnable() {
+            @Override
+            public void run() {
+                undoManager.undoableActionPerformed(action);
+            }
+        }, command.getCaption(), "DeltaHex");
 
         commandPosition++;
         undoUpdated();

@@ -18,19 +18,18 @@ package org.exbin.deltahex.intellij;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.undo.*;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.exbin.deltahex.CodeType;
-import org.exbin.deltahex.operation.swing.CodeAreaUndoHandler;
 import org.exbin.deltahex.operation.swing.CodeCommandHandler;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
 import org.exbin.xbup.operation.Command;
+import org.exbin.xbup.operation.undo.XBUndoHandler;
 import org.exbin.xbup.operation.undo.XBUndoUpdateListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,14 +48,14 @@ import java.nio.charset.Charset;
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.0 2016/12/13
+ * @version 0.1.1 2016/12/17
  */
 public class DeltaHexFileEditor implements FileEditor {
 
     private final Project project;
     private JPanel editorPanel;
     private final CodeArea codeArea;
-    private final CodeAreaUndoHandler undoHandler;
+    private final XBUndoHandler undoHandler;
     private final int metaMask;
     private final PropertyChangeSupport propertyChangeSupport;
 
@@ -64,7 +63,6 @@ public class DeltaHexFileEditor implements FileEditor {
     private boolean modified = false;
     private String displayName;
     private DeltaHexVirtualFile virtualFile;
-    private UndoableAction undoableAction;
 
     public DeltaHexFileEditor(Project project) {
         this.project = project;
@@ -75,38 +73,8 @@ public class DeltaHexFileEditor implements FileEditor {
         codeArea.getCaret().setBlinkRate(300);
 
         propertyChangeSupport = new PropertyChangeSupport(this);
-        undoHandler = new CodeAreaUndoHandler(codeArea);
-        undoableAction = new UndoableAction() {
-            @Override
-            public void undo() throws UnexpectedUndoException {
-                try {
-                    undoHandler.performUndo();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void redo() throws UnexpectedUndoException {
-                try {
-                    undoHandler.performRedo();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Nullable
-            @Override
-            public DocumentReference[] getAffectedDocuments() {
-                DocumentReference documentReference = DocumentReferenceManager.getInstance().create(virtualFile);
-                return new DocumentReference[]{documentReference};
-            }
-
-            @Override
-            public boolean isGlobal() {
-                return false;
-            }
-        };
+        // CodeAreaUndoHandler(codeArea);
+        undoHandler = new HexUndoIntelliJHandler(codeArea, project, this);
 
         undoHandler.addUndoUpdateListener(new XBUndoUpdateListener() {
             @Override
@@ -120,14 +88,6 @@ public class DeltaHexFileEditor implements FileEditor {
             public void undoCommandAdded(final Command command) {
                 updateUndoState();
                 notifyModified();
-                // Doesn't work :-(
-//                CommandProcessor commandProcessor = CommandProcessor.getInstance();
-//                commandProcessor.executeCommand(project, new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        undoManager.undoableActionPerformed(undoableAction);
-//                    }
-//                }, command.getCaption(), "DeltaHex");
             }
         });
         updateUndoState();
