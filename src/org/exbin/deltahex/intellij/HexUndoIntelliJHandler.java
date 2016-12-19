@@ -36,7 +36,7 @@ import java.util.List;
  * Undo handler for hexadecimal editor using IntelliJ Idea's undo.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.1 2016/12/16
+ * @version 0.1.1 2016/12/19
  */
 public class HexUndoIntelliJHandler implements XBUndoHandler {
 

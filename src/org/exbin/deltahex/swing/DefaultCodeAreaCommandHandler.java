@@ -99,7 +99,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
     }
 
     @Override
-    public void caretMoved() {
+    public void sequenceBreak() {
         // Do nothing
     }
 
@@ -129,7 +129,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                     codeArea.repaint();
                 } else {
                     codeArea.moveLeft(keyEvent.getModifiersEx());
-                    caretMoved();
+                    sequenceBreak();
                     codeArea.revealCursor();
                 }
                 keyEvent.consume();
@@ -155,7 +155,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                     codeArea.repaint();
                 } else {
                     codeArea.moveRight(keyEvent.getModifiersEx());
-                    caretMoved();
+                    sequenceBreak();
                     codeArea.revealCursor();
                 }
                 keyEvent.consume();
@@ -180,7 +180,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                         }
                         codeArea.updateSelection(keyEvent.getModifiersEx(), caretPosition);
                     }
-                    caretMoved();
+                    sequenceBreak();
                     codeArea.revealCursor();
                 }
                 keyEvent.consume();
@@ -207,7 +207,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                         }
                         codeArea.updateSelection(keyEvent.getModifiersEx(), caretPosition);
                     }
-                    caretMoved();
+                    sequenceBreak();
                     codeArea.revealCursor();
                 }
                 keyEvent.consume();
@@ -228,7 +228,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                         }
                     }
                     codeArea.setCaretPosition(targetPosition);
-                    caretMoved();
+                    sequenceBreak();
                     codeArea.notifyCaretMoved();
                     codeArea.updateSelection(keyEvent.getModifiersEx(), caretPosition);
                 }
@@ -251,7 +251,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                         long newPosition = (((caretPosition.getDataPosition() + scrollPosition.getLineByteShift()) / bytesPerLine) + 1) * bytesPerLine - 1 - scrollPosition.getLineByteShift();
                         codeArea.setCaretPosition(newPosition < dataSize ? newPosition : dataSize);
                     }
-                    caretMoved();
+                    sequenceBreak();
                     codeArea.updateSelection(keyEvent.getModifiersEx(), caretPosition);
                 }
                 codeArea.revealCursor();
@@ -273,7 +273,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                     } else if (caretPosition.getDataPosition() >= codeArea.getBytesPerLine()) {
                         codeArea.setCaretPosition(caretPosition.getDataPosition() % codeArea.getBytesPerLine(), caretPosition.getCodeOffset());
                     }
-                    caretMoved();
+                    sequenceBreak();
                     codeArea.updateSelection(keyEvent.getModifiersEx(), caretPosition);
                 }
                 codeArea.revealCursor();
@@ -300,7 +300,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                                 + (caretPosition.getDataPosition() % codeArea.getBytesPerLine());
                         codeArea.setCaretPosition(dataPosition, dataPosition == dataSize ? 0 : caretPosition.getCodeOffset());
                     }
-                    caretMoved();
+                    sequenceBreak();
                     codeArea.updateSelection(keyEvent.getModifiersEx(), caretPosition);
                 }
                 codeArea.revealCursor();

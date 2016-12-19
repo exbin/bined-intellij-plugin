@@ -49,7 +49,7 @@
 
     <actions>
         <action class="org.exbin.deltahex.intellij.OpenAsHexAction" id="DeltaHexEditor.OpenAsHexAction"
-                text="Open As Hex" description="Opens file in hexadecimal viewer/editor"/>
+                text="Open As Hex" description="Opens file in hexadecimal viewer/editor" icon="/images/icon.png"/>
 
         <group>
             <reference id="DeltaHexEditor.OpenAsHexAction"/>

@@ -20,17 +20,15 @@ import java.awt.event.KeyEvent;
 /**
  * Interface for code area data manipulation.
  *
- * @version 0.1.1 2016/07/31
+ * @version 0.1.2 2016/12/19
  * @author ExBin Project (http://exbin.org)
  */
 public interface CodeAreaCommandHandler {
 
     /**
-     * Notifies command handler about caret movement.
-     *
-     * Useful for building combined undo actions.
+     * Notifies command handler about end of sequence appendable commands.
      */
-    void caretMoved();
+    void sequenceBreak();
 
     /**
      * Keyboard key was pressed.
@@ -38,7 +36,7 @@ public interface CodeAreaCommandHandler {
      * @param keyEvent key event
      */
     void keyPressed(KeyEvent keyEvent);
-    
+
     /**
      * Keyboard key was typed.
      *

@@ -28,7 +28,7 @@ import java.util.List;
  * Data are stored using paging. Last page might be shorter than page size, but
  * not empty.
  *
- * @version 0.1.0 2016/05/24
+ * @version 0.1.2 2016/12/19
  * @author ExBin Project (http://exbin.org)
  */
 public class PagedData implements EditableBinaryData {
@@ -175,15 +175,14 @@ public class PagedData implements EditableBinaryData {
 
     @Override
     public void insert(long startFrom, BinaryData insertedData) {
-        long dataSize = insertedData.getDataSize();
-        insertUninitialized(startFrom, dataSize);
-        replace(startFrom, insertedData, 0, dataSize);
+        long length = insertedData.getDataSize();
+        insertUninitialized(startFrom, length);
+        replace(startFrom, insertedData, 0, length);
     }
 
     @Override
     public void insert(long startFrom, BinaryData insertedData, long insertedDataOffset, long insertedDataLength) {
-        long dataSize = insertedData.getDataSize();
-        insertUninitialized(startFrom, dataSize);
+        insertUninitialized(startFrom, insertedDataLength);
         replace(startFrom, insertedData, insertedDataOffset, insertedDataLength);
     }
 
@@ -486,7 +485,7 @@ public class PagedData implements EditableBinaryData {
         if (startFrom > getDataSize()) {
             setDataSize(startFrom);
         }
-        
+
         long loadedData = 0;
         int pageOffset = (int) (startFrom % pageSize);
         byte[] buffer = new byte[pageSize];

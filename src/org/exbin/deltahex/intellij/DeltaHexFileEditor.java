@@ -59,7 +59,6 @@ public class DeltaHexFileEditor implements FileEditor {
     private final int metaMask;
     private final PropertyChangeSupport propertyChangeSupport;
 
-    private boolean opened = false;
     private boolean modified = false;
     private String displayName;
     private DeltaHexVirtualFile virtualFile;

@@ -388,7 +388,7 @@ public class CodeArea extends JComponent {
         CaretPosition caretPosition = caret.getCaretPosition();
         caret.setCaretPosition(dataPosition, codeOffset);
         notifyCaretMoved();
-        commandHandler.caretMoved();
+        commandHandler.sequenceBreak();
 
         updateSelection(modifiers, caretPosition);
     }
@@ -1755,7 +1755,7 @@ public class CodeArea extends JComponent {
         notifyScrolled();
         caret.setCaretPosition(0);
         notifyCaretMoved();
-        commandHandler.caretMoved();
+        commandHandler.sequenceBreak();
         computePaintData();
         clearSelection();
     }
