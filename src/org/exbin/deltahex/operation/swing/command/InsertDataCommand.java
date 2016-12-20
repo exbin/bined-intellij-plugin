@@ -16,14 +16,15 @@
  */
 package org.exbin.deltahex.operation.swing.command;
 
-import org.exbin.deltahex.swing.CodeArea;
+import org.exbin.deltahex.operation.BinaryDataOperationException;
 import org.exbin.deltahex.operation.swing.InsertDataOperation;
+import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.EditableBinaryData;
 
 /**
  * Command for inserting data.
  *
- * @version 0.1.1 2016/09/26
+ * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
 public class InsertDataCommand extends OpCodeAreaCommand {
@@ -44,13 +45,13 @@ public class InsertDataCommand extends OpCodeAreaCommand {
     }
 
     @Override
-    public void redo() throws Exception {
+    public void redo() throws BinaryDataOperationException {
         super.redo();
         codeArea.getCaretPosition().setDataPosition(position + dataLength);
     }
 
     @Override
-    public void undo() throws Exception {
+    public void undo() throws BinaryDataOperationException {
         super.undo();
         codeArea.getCaretPosition().setDataPosition(position);
     }

@@ -24,13 +24,13 @@ import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.exbin.deltahex.CodeType;
+import org.exbin.deltahex.operation.BinaryDataCommand;
 import org.exbin.deltahex.operation.swing.CodeCommandHandler;
+import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
+import org.exbin.deltahex.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
-import org.exbin.xbup.operation.Command;
-import org.exbin.xbup.operation.undo.XBUndoHandler;
-import org.exbin.xbup.operation.undo.XBUndoUpdateListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,14 +48,14 @@ import java.nio.charset.Charset;
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.1 2016/12/17
+ * @version 0.1.1 2016/12/20
  */
 public class DeltaHexFileEditor implements FileEditor {
 
     private final Project project;
     private JPanel editorPanel;
     private final CodeArea codeArea;
-    private final XBUndoHandler undoHandler;
+    private final BinaryDataUndoHandler undoHandler;
     private final int metaMask;
     private final PropertyChangeSupport propertyChangeSupport;
 
@@ -75,7 +75,7 @@ public class DeltaHexFileEditor implements FileEditor {
         // CodeAreaUndoHandler(codeArea);
         undoHandler = new HexUndoIntelliJHandler(codeArea, project, this);
 
-        undoHandler.addUndoUpdateListener(new XBUndoUpdateListener() {
+        undoHandler.addUndoUpdateListener(new BinaryDataUndoUpdateListener() {
             @Override
             public void undoCommandPositionChanged() {
                 codeArea.repaint();
@@ -84,7 +84,7 @@ public class DeltaHexFileEditor implements FileEditor {
             }
 
             @Override
-            public void undoCommandAdded(final Command command) {
+            public void undoCommandAdded(final BinaryDataCommand command) {
                 updateUndoState();
                 notifyModified();
             }

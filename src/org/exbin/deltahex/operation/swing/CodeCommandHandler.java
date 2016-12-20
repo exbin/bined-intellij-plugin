@@ -34,21 +34,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.exbin.deltahex.CaretPosition;
 import org.exbin.deltahex.CharsetStreamTranslator;
-import org.exbin.deltahex.swing.CodeArea;
-import org.exbin.deltahex.swing.CodeAreaCaret;
-import org.exbin.deltahex.operation.swing.command.CodeAreaCommandType;
-import org.exbin.deltahex.operation.swing.command.EditCharDataCommand;
-import org.exbin.deltahex.operation.swing.command.EditDataCommand;
-import org.exbin.deltahex.operation.swing.command.EditCodeDataCommand;
-import org.exbin.deltahex.operation.swing.command.CodeAreaCommand;
-import org.exbin.deltahex.operation.swing.command.HexCompoundCommand;
-import org.exbin.deltahex.operation.swing.command.InsertDataCommand;
-import org.exbin.deltahex.operation.swing.command.ModifyDataCommand;
-import org.exbin.deltahex.operation.swing.command.RemoveDataCommand;
-import org.exbin.utils.binary_data.BinaryData;
-import org.exbin.utils.binary_data.EditableBinaryData;
-import org.exbin.xbup.operation.undo.XBUndoHandler;
-import org.exbin.deltahex.swing.CodeAreaCommandHandler;
 import org.exbin.deltahex.CodeAreaUtils;
 import org.exbin.deltahex.CodeType;
 import org.exbin.deltahex.EditationAllowed;
@@ -56,13 +41,29 @@ import org.exbin.deltahex.EditationMode;
 import org.exbin.deltahex.Section;
 import org.exbin.deltahex.SelectionRange;
 import org.exbin.deltahex.ViewMode;
+import org.exbin.deltahex.operation.BinaryDataOperationException;
+import org.exbin.deltahex.operation.swing.command.CodeAreaCommand;
+import org.exbin.deltahex.operation.swing.command.CodeAreaCommandType;
+import org.exbin.deltahex.operation.swing.command.EditCharDataCommand;
+import org.exbin.deltahex.operation.swing.command.EditCodeDataCommand;
+import org.exbin.deltahex.operation.swing.command.EditDataCommand;
+import org.exbin.deltahex.operation.swing.command.HexCompoundCommand;
+import org.exbin.deltahex.operation.swing.command.InsertDataCommand;
+import org.exbin.deltahex.operation.swing.command.ModifyDataCommand;
+import org.exbin.deltahex.operation.swing.command.RemoveDataCommand;
+import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
+import org.exbin.deltahex.swing.CodeArea;
+import org.exbin.deltahex.swing.CodeAreaCaret;
+import org.exbin.deltahex.swing.CodeAreaCommandHandler;
+import org.exbin.utils.binary_data.BinaryData;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
+import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
 
 /**
  * Command handler for undo/redo aware hexadecimal editor editing.
  *
- * @version 0.1.2 2016/12/19
+ * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
 public class CodeCommandHandler implements CodeAreaCommandHandler {
@@ -81,10 +82,10 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
     private boolean canPaste = false;
     private DataFlavor deltahexDataFlavor;
 
-    private final XBUndoHandler undoHandler;
+    private final BinaryDataUndoHandler undoHandler;
     private EditDataCommand editCommand = null;
 
-    public CodeCommandHandler(CodeArea codeArea, XBUndoHandler undoHandler) {
+    public CodeCommandHandler(CodeArea codeArea, BinaryDataUndoHandler undoHandler) {
         this.codeArea = codeArea;
         this.undoHandler = undoHandler;
 
@@ -101,11 +102,7 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
             clipboard.addFlavorListener(new FlavorListener() {
                 @Override
                 public void flavorsChanged(FlavorEvent e) {
-                    try {
-                        canPaste = clipboard.isDataFlavorAvailable(deltahexDataFlavor) || clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor);
-                    } catch (IllegalStateException ex) {
-                        canPaste = false;
-                    }
+                    updateCanPaste();
                 }
             });
             try {
@@ -113,11 +110,20 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(CodeCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
+            updateCanPaste();
             canPaste = clipboard.isDataFlavorAvailable(deltahexDataFlavor) || clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor);
         } catch (IllegalStateException ex) {
             canPaste = false;
         } catch (java.awt.HeadlessException ex) {
             Logger.getLogger(CodeCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void updateCanPaste() {
+        try {
+            canPaste = clipboard.isDataFlavorAvailable(deltahexDataFlavor) || clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor);
+        } catch (IllegalStateException ex) {
+            canPaste = false;
         }
     }
 
@@ -641,7 +647,7 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
             CodeDataClipboardData binaryData = new CodeDataClipboardData(copy);
             try {
                 clipboard.setContents(binaryData, binaryData);
-            } catch (java.lang.IllegalStateException ex) {
+            } catch (IllegalStateException ex) {
                 // Clipboard not available - ignore
             }
         }
@@ -675,7 +681,7 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
             if (!clipboard.isDataFlavorAvailable(deltahexDataFlavor) && !clipboard.isDataFlavorAvailable(DataFlavor.getTextPlainUnicodeFlavor())) {
                 return;
             }
-        } catch (java.lang.IllegalStateException ex) {
+        } catch (IllegalStateException ex) {
             return;
         }
 
@@ -805,7 +811,7 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
                     Logger.getLogger(CodeCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        } catch (java.lang.IllegalStateException ex) {
+        } catch (IllegalStateException ex) {
             // Clipboard not available - ignore
         }
     }
@@ -820,7 +826,7 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
             if (!clipboard.isDataFlavorAvailable(deltahexDataFlavor) && !clipboard.isDataFlavorAvailable(DataFlavor.getTextPlainUnicodeFlavor())) {
                 return;
             }
-        } catch (java.lang.IllegalStateException ex) {
+        } catch (IllegalStateException ex) {
             return;
         }
 
@@ -947,7 +953,7 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
                     Logger.getLogger(CodeCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        } catch (java.lang.IllegalStateException ex) {
+        } catch (IllegalStateException ex) {
             // Clipboard not available - ignore
         }
     }
@@ -1056,12 +1062,12 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
         }
 
         @Override
-        public void execute() throws Exception {
+        public void execute() throws BinaryDataOperationException {
             super.execute();
         }
 
         @Override
-        public void redo() throws Exception {
+        public void redo() throws BinaryDataOperationException {
             removeCommand.redo();
             codeArea.clearSelection();
             CodeAreaCaret caret = codeArea.getCaret();
@@ -1072,7 +1078,7 @@ public class CodeCommandHandler implements CodeAreaCommandHandler {
         }
 
         @Override
-        public void undo() throws Exception {
+        public void undo() throws BinaryDataOperationException {
             removeCommand.undo();
             codeArea.clearSelection();
             CodeAreaCaret caret = codeArea.getCaret();

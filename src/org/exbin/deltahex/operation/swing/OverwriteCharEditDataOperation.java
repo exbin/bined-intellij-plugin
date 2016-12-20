@@ -15,6 +15,7 @@
  */
 package org.exbin.deltahex.operation.swing;
 
+import org.exbin.deltahex.operation.BinaryDataOperationException;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.EditableBinaryData;
 
@@ -41,12 +42,12 @@ public class OverwriteCharEditDataOperation extends CharEditDataOperation {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws BinaryDataOperationException {
         execute(false);
     }
 
     @Override
-    public CodeAreaOperation executeWithUndo() throws Exception {
+    public CodeAreaOperation executeWithUndo() throws BinaryDataOperationException {
         return execute(true);
     }
 

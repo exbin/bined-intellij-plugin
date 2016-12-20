@@ -18,19 +18,20 @@ package org.exbin.deltahex.operation.swing.command;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.exbin.deltahex.operation.BinaryDataCommand;
+import org.exbin.deltahex.operation.BinaryDataCompoundCommand;
+import org.exbin.deltahex.operation.BinaryDataOperationException;
 import org.exbin.deltahex.swing.CodeArea;
-import org.exbin.xbup.operation.Command;
-import org.exbin.xbup.operation.CompoundCommand;
 
 /**
  * Class for compound command on hexadecimal document.
  *
- * @version 0.1.1 2016/09/26
+ * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
-public class HexCompoundCommand extends CodeAreaCommand implements CompoundCommand {
+public class HexCompoundCommand extends CodeAreaCommand implements BinaryDataCompoundCommand {
 
-    private final List<Command> commands = new ArrayList<>();
+    private final List<BinaryDataCommand> commands = new ArrayList<>();
 
     public HexCompoundCommand(CodeArea codeArea) {
         super(codeArea);
@@ -62,23 +63,23 @@ public class HexCompoundCommand extends CodeAreaCommand implements CompoundComma
     }
 
     @Override
-    public void execute() throws Exception {
-        for (Command command : commands) {
+    public void execute() throws BinaryDataOperationException {
+        for (BinaryDataCommand command : commands) {
             command.execute();
         }
     }
 
     @Override
-    public void redo() throws Exception {
-        for (Command command : commands) {
+    public void redo() throws BinaryDataOperationException {
+        for (BinaryDataCommand command : commands) {
             command.redo();
         }
     }
 
     @Override
-    public void undo() throws Exception {
+    public void undo() throws BinaryDataOperationException {
         for (int i = commands.size() - 1; i >= 0; i--) {
-            Command command = commands.get(i);
+            BinaryDataCommand command = commands.get(i);
             command.undo();
         }
     }
@@ -86,7 +87,7 @@ public class HexCompoundCommand extends CodeAreaCommand implements CompoundComma
     @Override
     public boolean canUndo() {
         boolean canUndo = true;
-        for (Command command : commands) {
+        for (BinaryDataCommand command : commands) {
             if (!command.canUndo()) {
                 canUndo = false;
                 break;
@@ -97,17 +98,17 @@ public class HexCompoundCommand extends CodeAreaCommand implements CompoundComma
     }
 
     @Override
-    public void appendCommand(Command command) {
+    public void appendCommand(BinaryDataCommand command) {
         commands.add(command);
     }
 
     @Override
-    public void appendCommands(Collection<Command> commands) {
+    public void appendCommands(Collection<BinaryDataCommand> commands) {
         commands.addAll(commands);
     }
 
     @Override
-    public List<Command> getCommands() {
+    public List<BinaryDataCommand> getCommands() {
         return commands;
     }
 
@@ -117,9 +118,9 @@ public class HexCompoundCommand extends CodeAreaCommand implements CompoundComma
     }
 
     @Override
-    public void dispose() throws Exception {
+    public void dispose() throws BinaryDataOperationException {
         super.dispose();
-        for (Command command : commands) {
+        for (BinaryDataCommand command : commands) {
             command.dispose();
         }
     }

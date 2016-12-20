@@ -15,7 +15,6 @@
  */
 package org.exbin.deltahex.swing;
 
-import org.exbin.deltahex.CaretPosition;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -50,6 +49,7 @@ import javax.swing.JScrollBar;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import org.exbin.deltahex.CaretMovedListener;
+import org.exbin.deltahex.CaretPosition;
 import org.exbin.deltahex.CodeAreaLineNumberLength;
 import org.exbin.deltahex.CodeType;
 import org.exbin.deltahex.DataChangedListener;

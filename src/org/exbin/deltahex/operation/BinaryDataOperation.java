@@ -13,52 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.deltahex.operation.swing;
-
-import org.exbin.deltahex.operation.BinaryDataOperation;
-import org.exbin.deltahex.operation.BinaryDataOperationException;
-import org.exbin.deltahex.swing.CodeArea;
+package org.exbin.deltahex.operation;
 
 /**
- * Abstract class for operation on code area component.
+ * Interface for binary data operation.
  *
  * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
-public abstract class CodeAreaOperation implements BinaryDataOperation {
-
-    protected final CodeArea codeArea;
-
-    public CodeAreaOperation(CodeArea codeArea) {
-        this.codeArea = codeArea;
-    }
-
-    /**
-     * Returns type of the operation.
-     *
-     * @return operation type
-     */
-    public abstract CodeAreaOperationType getType();
-
-    public CodeArea getCodeArea() {
-        return codeArea;
-    }
+public interface BinaryDataOperation {
 
     /**
      * Returns caption as text.
      *
      * @return text caption
      */
-    public String getCaption() {
-        return getType().getCaption();
-    }
+    public String getCaption();
 
     /**
      * Performs operation on given document.
      *
      * @throws BinaryDataOperationException for operation handling issues
      */
-    public abstract void execute() throws BinaryDataOperationException;
+    public void execute() throws BinaryDataOperationException;
 
     /**
      * Performs operation on given document and returns undo operation.
@@ -66,15 +43,12 @@ public abstract class CodeAreaOperation implements BinaryDataOperation {
      * @return undo operation or null if not available
      * @throws BinaryDataOperationException for operation handling issues
      */
-    public abstract CodeAreaOperation executeWithUndo() throws BinaryDataOperationException;
+    public BinaryDataOperation executeWithUndo() throws BinaryDataOperationException;
 
     /**
-     * Performs dispose of the operation.
-     *
-     * Default dispose is empty.
+     * Disposes command.
      *
      * @throws BinaryDataOperationException for operation handling issues
      */
-    public void dispose() throws BinaryDataOperationException {
-    }
+    public void dispose() throws BinaryDataOperationException;
 }

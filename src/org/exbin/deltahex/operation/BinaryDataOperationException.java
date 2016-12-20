@@ -13,34 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.deltahex.operation.swing.command;
-
-import org.exbin.deltahex.operation.BinaryDataAbstractCommand;
-import org.exbin.deltahex.swing.CodeArea;
+package org.exbin.deltahex.operation;
 
 /**
- * Abstract class for operation on code area component.
+ * Exception for code are command handling.
  *
  * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
-public abstract class CodeAreaCommand extends BinaryDataAbstractCommand {
+public class BinaryDataOperationException extends Exception {
 
-    protected final CodeArea codeArea;
-
-    public CodeAreaCommand(CodeArea codeArea) {
-        this.codeArea = codeArea;
+    public BinaryDataOperationException() {
     }
 
-    /**
-     * Returns type of the command.
-     *
-     * @return command type
-     */
-    public abstract CodeAreaCommandType getType();
-
-    @Override
-    public String getCaption() {
-        return getType().getCaption();
+    public BinaryDataOperationException(String message) {
+        super(message);
     }
+
+    public BinaryDataOperationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public BinaryDataOperationException(Throwable cause) {
+        super(cause);
+    }
+
+    public BinaryDataOperationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
 }

@@ -15,7 +15,6 @@
  */
 package org.exbin.deltahex.swing;
 
-import org.exbin.deltahex.CaretPosition;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -31,6 +30,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.exbin.deltahex.CaretPosition;
 import org.exbin.deltahex.CodeAreaUtils;
 import org.exbin.deltahex.CodeType;
 import org.exbin.deltahex.EditationAllowed;
@@ -45,11 +45,12 @@ import org.exbin.utils.binary_data.EditableBinaryData;
 /**
  * Default hexadecimal editor command handler.
  *
- * @version 0.1.1 2016/10/05
+ * @version 0.1.2 2016/12/19
  * @author ExBin Project (http://exbin.org)
  */
 public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
 
+    public static final String MIME_CLIPBOARD_BINARY = "application/octet-stream";
     private static final int CODE_BUFFER_LENGTH = 16;
 
     private final int metaMask;
@@ -76,24 +77,30 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
             // Create clipboard if system one not available
             clipboard = new Clipboard("clipboard");
         }
-        clipboard.addFlavorListener(new FlavorListener() {
-            @Override
-            public void flavorsChanged(FlavorEvent e) {
-                updateCanPaste();
-            }
-        });
         try {
-            binaryDataFlavor = new DataFlavor("application/octet-stream");
-        } catch (ClassNotFoundException ex) {
+            clipboard.addFlavorListener(new FlavorListener() {
+                @Override
+                public void flavorsChanged(FlavorEvent e) {
+                    updateCanPaste();
+                }
+            });
+            try {
+                binaryDataFlavor = new DataFlavor(MIME_CLIPBOARD_BINARY);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(DefaultCodeAreaCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            updateCanPaste();
+        } catch (IllegalStateException ex) {
+            canPaste = false;
+        } catch (java.awt.HeadlessException ex) {
             Logger.getLogger(DefaultCodeAreaCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        updateCanPaste();
     }
 
     private void updateCanPaste() {
         try {
             canPaste = clipboard.isDataFlavorAvailable(binaryDataFlavor) || clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor);
-        } catch (java.lang.IllegalStateException ex) {
+        } catch (IllegalStateException ex) {
             canPaste = false;
         }
     }
@@ -643,8 +650,8 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
             BinaryDataClipboardData binaryData = new BinaryDataClipboardData(copy);
             try {
                 clipboard.setContents(binaryData, binaryData);
-            } catch (java.lang.IllegalStateException ex) {
-                // Cannot copy
+            } catch (IllegalStateException ex) {
+                // Clipboard not available - ignore
             }
         }
     }
@@ -661,8 +668,8 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
             CodeDataClipboardData binaryData = new CodeDataClipboardData(copy);
             try {
                 clipboard.setContents(binaryData, binaryData);
-            } catch (java.lang.IllegalStateException ex) {
-                // Cannot copy
+            } catch (IllegalStateException ex) {
+                // Clipboard not available - ignore
             }
         }
     }
@@ -754,8 +761,8 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                     Logger.getLogger(DefaultCodeAreaCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        } catch (java.lang.IllegalStateException ex) {
-            // ignore
+        } catch (IllegalStateException ex) {
+            // Clipboard not available - ignore
         }
     }
 
@@ -765,89 +772,101 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
             return;
         }
 
-        if (clipboard.isDataFlavorAvailable(binaryDataFlavor)) {
-            paste();
-        } else if (clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
-            if (codeArea.hasSelection()) {
-                deleteSelection();
-                codeArea.notifyDataChanged();
+        try {
+            if (!clipboard.isDataFlavorAvailable(binaryDataFlavor) && !clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+                return;
             }
+        } catch (IllegalStateException ex) {
+            return;
+        }
 
-            Object insertedData;
-            try {
-                insertedData = clipboard.getData(DataFlavor.stringFlavor);
-                if (insertedData instanceof String) {
-                    CodeAreaCaret caret = codeArea.getCaret();
-                    long dataPosition = caret.getDataPosition();
-
-                    CodeType codeType = codeArea.getCodeType();
-                    int maxDigits = codeType.getMaxDigits();
-                    String insertedString = (String) insertedData;
-                    ByteArrayEditableData data = new ByteArrayEditableData();
-                    byte[] buffer = new byte[CODE_BUFFER_LENGTH];
-                    int bufferUsage = 0;
-                    int offset = 0;
-                    for (int i = 0; i < insertedString.length(); i++) {
-                        char charAt = insertedString.charAt(i);
-                        if ((charAt == ' ' || charAt == '\t') && offset == i) {
-                            offset++;
-                        } else if (charAt == ' ' || charAt == '\t' || charAt == ',' || charAt == ';' || charAt == ':') {
-                            byte value = CodeAreaUtils.stringCodeToByte(insertedString.substring(offset, i), codeType);
-                            if (bufferUsage < CODE_BUFFER_LENGTH) {
-                                buffer[bufferUsage] = value;
-                                bufferUsage++;
-                            } else {
-                                data.insert(data.getDataSize(), buffer, 0, bufferUsage);
-                                bufferUsage = 0;
-                            }
-                            offset = i + 1;
-                        } else if (i == offset + maxDigits) {
-                            byte value = CodeAreaUtils.stringCodeToByte(insertedString.substring(offset, i), codeType);
-                            if (bufferUsage < CODE_BUFFER_LENGTH) {
-                                buffer[bufferUsage] = value;
-                                bufferUsage++;
-                            } else {
-                                data.insert(data.getDataSize(), buffer, 0, bufferUsage);
-                                bufferUsage = 0;
-                            }
-                            offset = i;
-                        }
-                    }
-
-                    if (offset < insertedString.length()) {
-                        byte value = CodeAreaUtils.stringCodeToByte(insertedString.substring(offset), codeType);
-                        if (bufferUsage < CODE_BUFFER_LENGTH) {
-                            buffer[bufferUsage] = value;
-                            bufferUsage++;
-                        } else {
-                            data.insert(data.getDataSize(), buffer, 0, bufferUsage);
-                            bufferUsage = 0;
-                        }
-                    }
-
-                    if (bufferUsage > 0) {
-                        data.insert(data.getDataSize(), buffer, 0, bufferUsage);
-                    }
-
-                    long length = data.getDataSize();
-                    if (codeArea.getEditationMode() == EditationMode.OVERWRITE) {
-                        long toRemove = length;
-                        if (dataPosition + toRemove > codeArea.getDataSize()) {
-                            toRemove = codeArea.getDataSize() - dataPosition;
-                        }
-                        ((EditableBinaryData) codeArea.getData()).remove(dataPosition, toRemove);
-                    }
-                    ((EditableBinaryData) codeArea.getData()).insert(codeArea.getDataPosition(), data);
+        try {
+            if (clipboard.isDataFlavorAvailable(binaryDataFlavor)) {
+                paste();
+            } else if (clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+                if (codeArea.hasSelection()) {
+                    deleteSelection();
                     codeArea.notifyDataChanged();
-
-                    caret.setCaretPosition(caret.getDataPosition() + length);
-                    caret.setCodeOffset(0);
-                    codeArea.updateScrollBars();
-                    codeArea.revealCursor();
                 }
-            } catch (UnsupportedFlavorException | IOException ex) {
-                Logger.getLogger(DefaultCodeAreaCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
+
+                Object insertedData;
+                try {
+                    insertedData = clipboard.getData(DataFlavor.stringFlavor);
+                    if (insertedData instanceof String) {
+                        CodeAreaCaret caret = codeArea.getCaret();
+                        long dataPosition = caret.getDataPosition();
+
+                        CodeType codeType = codeArea.getCodeType();
+                        int maxDigits = codeType.getMaxDigits();
+                        String insertedString = (String) insertedData;
+                        ByteArrayEditableData data = new ByteArrayEditableData();
+                        byte[] buffer = new byte[CODE_BUFFER_LENGTH];
+                        int bufferUsage = 0;
+                        int offset = 0;
+                        for (int i = 0; i < insertedString.length(); i++) {
+                            char charAt = insertedString.charAt(i);
+                            if ((charAt == ' ' || charAt == '\t') && offset == i) {
+                                offset++;
+                            } else if (charAt == ' ' || charAt == '\t' || charAt == ',' || charAt == ';' || charAt == ':') {
+                                byte value = CodeAreaUtils.stringCodeToByte(insertedString.substring(offset, i), codeType);
+                                if (bufferUsage < CODE_BUFFER_LENGTH) {
+                                    buffer[bufferUsage] = value;
+                                    bufferUsage++;
+                                } else {
+                                    data.insert(data.getDataSize(), buffer, 0, bufferUsage);
+                                    bufferUsage = 0;
+                                }
+                                offset = i + 1;
+                            } else if (i == offset + maxDigits) {
+                                byte value = CodeAreaUtils.stringCodeToByte(insertedString.substring(offset, i), codeType);
+                                if (bufferUsage < CODE_BUFFER_LENGTH) {
+                                    buffer[bufferUsage] = value;
+                                    bufferUsage++;
+                                } else {
+                                    data.insert(data.getDataSize(), buffer, 0, bufferUsage);
+                                    bufferUsage = 0;
+                                }
+                                offset = i;
+                            }
+                        }
+
+                        if (offset < insertedString.length()) {
+                            byte value = CodeAreaUtils.stringCodeToByte(insertedString.substring(offset), codeType);
+                            if (bufferUsage < CODE_BUFFER_LENGTH) {
+                                buffer[bufferUsage] = value;
+                                bufferUsage++;
+                            } else {
+                                data.insert(data.getDataSize(), buffer, 0, bufferUsage);
+                                bufferUsage = 0;
+                            }
+                        }
+
+                        if (bufferUsage > 0) {
+                            data.insert(data.getDataSize(), buffer, 0, bufferUsage);
+                        }
+
+                        long length = data.getDataSize();
+                        if (codeArea.getEditationMode() == EditationMode.OVERWRITE) {
+                            long toRemove = length;
+                            if (dataPosition + toRemove > codeArea.getDataSize()) {
+                                toRemove = codeArea.getDataSize() - dataPosition;
+                            }
+                            ((EditableBinaryData) codeArea.getData()).remove(dataPosition, toRemove);
+                        }
+                        ((EditableBinaryData) codeArea.getData()).insert(codeArea.getDataPosition(), data);
+                        codeArea.notifyDataChanged();
+
+                        caret.setCaretPosition(caret.getDataPosition() + length);
+                        caret.setCodeOffset(0);
+                        codeArea.updateScrollBars();
+                        codeArea.revealCursor();
+                    }
+                } catch (UnsupportedFlavorException | IOException ex) {
+                    Logger.getLogger(DefaultCodeAreaCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+        } catch (IllegalStateException ex) {
+            // Clipboard not available - ignore
         }
     }
 

@@ -17,16 +17,18 @@ package org.exbin.deltahex.operation.swing.command;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.exbin.deltahex.swing.CodeArea;
+import org.exbin.deltahex.operation.BinaryDataOperationException;
+import org.exbin.deltahex.operation.BinaryDataOperationListener;
 import org.exbin.deltahex.operation.swing.CodeAreaOperation;
 import org.exbin.deltahex.operation.swing.CodeAreaOperationEvent;
-import org.exbin.xbup.operation.OperationListener;
 import org.exbin.deltahex.operation.swing.CodeAreaOperationListener;
+import org.exbin.deltahex.swing.CodeArea;
+
 
 /**
  * Abstract class for operation on hexadecimal document.
  *
- * @version 0.1.1 2016/09/26
+ * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
 public abstract class OpCodeAreaCommand extends CodeAreaCommand {
@@ -59,11 +61,11 @@ public abstract class OpCodeAreaCommand extends CodeAreaCommand {
     }
 
     @Override
-    public void undo() throws Exception {
+    public void undo() throws BinaryDataOperationException {
         if (operationPerformed) {
             CodeAreaOperation redoOperation = operation.executeWithUndo();
             operation.dispose();
-            if (codeArea instanceof OperationListener) {
+            if (codeArea instanceof BinaryDataOperationListener) {
                 ((CodeAreaOperationListener) codeArea).notifyChange(new CodeAreaOperationEvent(operation));
             }
 
@@ -75,11 +77,11 @@ public abstract class OpCodeAreaCommand extends CodeAreaCommand {
     }
 
     @Override
-    public void redo() throws Exception {
+    public void redo() throws BinaryDataOperationException {
         if (!operationPerformed) {
             CodeAreaOperation undoOperation = operation.executeWithUndo();
             operation.dispose();
-            if (codeArea instanceof OperationListener) {
+            if (codeArea instanceof BinaryDataOperationListener) {
                 ((CodeAreaOperationListener) codeArea).notifyChange(new CodeAreaOperationEvent(operation));
             }
 
@@ -91,7 +93,7 @@ public abstract class OpCodeAreaCommand extends CodeAreaCommand {
     }
 
     @Override
-    public void dispose() throws Exception {
+    public void dispose() throws BinaryDataOperationException {
         super.dispose();
         if (operation != null) {
             operation.dispose();

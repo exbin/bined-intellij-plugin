@@ -16,8 +16,8 @@
  */
 package org.exbin.deltahex.operation.swing.command;
 
-import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.deltahex.operation.swing.ModifyDataOperation;
+import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.BinaryData;
 
 /**

@@ -14,44 +14,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along this application.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exbin.xbup.operation;
+package org.exbin.deltahex.operation.undo;
 
-import java.util.Collection;
-import java.util.List;
+import org.exbin.deltahex.operation.BinaryDataCommand;
 
 /**
- * Interface for compound XBUP editor command.
+ * Code area undo update listener.
  *
- * @version 0.1.25 2015/04/13
+ * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
-public interface CompoundCommand extends Command {
+public interface BinaryDataUndoUpdateListener {
 
     /**
-     * Append command to the list of commands.
-     *
-     * @param command appended command
+     * Notifies about change in undo state.
      */
-    public void appendCommand(Command command);
+    void undoCommandPositionChanged();
 
     /**
-     * Append list of commands to the list of commands.
+     * Reports new command added to undo sequence.
      *
-     * @param commands appended commands
+     * @param command added command
      */
-    public void appendCommands(Collection<Command> commands);
-
-    /**
-     * Returns list of commands.
-     *
-     * @return list of commands
-     */
-    public List<Command> getCommands();
-
-    /**
-     * Returns true if compound command is empty.
-     *
-     * @return true if command is empty
-     */
-    public boolean isEmpty();
+    void undoCommandAdded(BinaryDataCommand command);
 }

@@ -13,34 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.deltahex.operation.swing.command;
-
-import org.exbin.deltahex.operation.BinaryDataAbstractCommand;
-import org.exbin.deltahex.swing.CodeArea;
+package org.exbin.deltahex.operation;
 
 /**
- * Abstract class for operation on code area component.
+ * Operation execution listener.
  *
  * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
-public abstract class CodeAreaCommand extends BinaryDataAbstractCommand {
-
-    protected final CodeArea codeArea;
-
-    public CodeAreaCommand(CodeArea codeArea) {
-        this.codeArea = codeArea;
-    }
+public interface BinaryDataOperationListener {
 
     /**
-     * Returns type of the command.
+     * Notifies about change in document content.
      *
-     * @return command type
+     * @param event change event
      */
-    public abstract CodeAreaCommandType getType();
-
-    @Override
-    public String getCaption() {
-        return getType().getCaption();
-    }
+    void notifyChange(BinaryDataOperationEvent event);
 }

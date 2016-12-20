@@ -16,13 +16,14 @@
 package org.exbin.deltahex.operation.swing;
 
 import org.exbin.deltahex.CodeType;
+import org.exbin.deltahex.operation.BinaryDataOperationException;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.EditableBinaryData;
 
 /**
  * Operation for editing data unsing insert mode.
  *
- * @version 0.1.1 2016/09/21
+ * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
 public class InsertCodeEditDataOperation extends CodeEditDataOperation {
@@ -53,12 +54,12 @@ public class InsertCodeEditDataOperation extends CodeEditDataOperation {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws BinaryDataOperationException {
         execute(false);
     }
 
     @Override
-    public CodeAreaOperation executeWithUndo() throws Exception {
+    public CodeAreaOperation executeWithUndo() throws BinaryDataOperationException {
         return execute(true);
     }
 

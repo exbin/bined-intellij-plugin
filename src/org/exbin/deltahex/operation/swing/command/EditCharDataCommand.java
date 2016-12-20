@@ -16,20 +16,21 @@
  */
 package org.exbin.deltahex.operation.swing.command;
 
-import org.exbin.deltahex.swing.CodeArea;
+import org.exbin.deltahex.operation.BinaryDataOperationException;
+import org.exbin.deltahex.operation.BinaryDataOperationListener;
 import org.exbin.deltahex.operation.swing.CharEditDataOperation;
-import org.exbin.deltahex.operation.swing.DeleteCharEditDataOperation;
 import org.exbin.deltahex.operation.swing.CodeAreaOperation;
 import org.exbin.deltahex.operation.swing.CodeAreaOperationEvent;
+import org.exbin.deltahex.operation.swing.CodeAreaOperationListener;
+import org.exbin.deltahex.operation.swing.DeleteCharEditDataOperation;
 import org.exbin.deltahex.operation.swing.InsertCharEditDataOperation;
 import org.exbin.deltahex.operation.swing.OverwriteCharEditDataOperation;
-import org.exbin.xbup.operation.OperationListener;
-import org.exbin.deltahex.operation.swing.CodeAreaOperationListener;
+import org.exbin.deltahex.swing.CodeArea;
 
 /**
  * Command for editing data in text mode.
  *
- * @version 0.1.1 2016/09/26
+ * @version 0.1.2 2016/12/20
  * @author ExBin Project (http://exbin.org)
  */
 public class EditCharDataCommand extends EditDataCommand {
@@ -64,7 +65,7 @@ public class EditCharDataCommand extends EditDataCommand {
     }
 
     @Override
-    public void undo() throws Exception {
+    public void undo() throws BinaryDataOperationException {
         if (operations.length == 1 && operations[0] instanceof CharEditDataOperation) {
             CharEditDataOperation operation = (CharEditDataOperation) operations[0];
             operations = operation.generateUndo();
@@ -76,7 +77,7 @@ public class EditCharDataCommand extends EditDataCommand {
                 CodeAreaOperation operation = operations[i];
                 CodeAreaOperation redoOperation = operation.executeWithUndo();
                 operation.dispose();
-                if (codeArea instanceof OperationListener) {
+                if (codeArea instanceof BinaryDataOperationListener) {
                     ((CodeAreaOperationListener) codeArea).notifyChange(new CodeAreaOperationEvent(operations[i]));
                 }
                 operations[i] = redoOperation;
@@ -88,13 +89,13 @@ public class EditCharDataCommand extends EditDataCommand {
     }
 
     @Override
-    public void redo() throws Exception {
+    public void redo() throws BinaryDataOperationException {
         if (!operationPerformed) {
             for (int i = 0; i < operations.length; i++) {
                 CodeAreaOperation operation = operations[i];
                 CodeAreaOperation undoOperation = operation.executeWithUndo();
                 operation.dispose();
-                if (codeArea instanceof OperationListener) {
+                if (codeArea instanceof BinaryDataOperationListener) {
                     ((CodeAreaOperationListener) codeArea).notifyChange(new CodeAreaOperationEvent(operation));
                 }
 
@@ -135,7 +136,7 @@ public class EditCharDataCommand extends EditDataCommand {
     }
 
     @Override
-    public void dispose() throws Exception {
+    public void dispose() throws BinaryDataOperationException {
         super.dispose();
         if (operations != null) {
             for (CodeAreaOperation operation : operations) {

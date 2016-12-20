@@ -15,12 +15,12 @@
  */
 package org.exbin.deltahex.swing;
 
-import org.exbin.deltahex.CaretPosition;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
+import org.exbin.deltahex.CaretPosition;
 import org.exbin.deltahex.EditationMode;
 import org.exbin.deltahex.Section;
 
