@@ -45,7 +45,7 @@ import org.exbin.utils.binary_data.EditableBinaryData;
 /**
  * Default hexadecimal editor command handler.
  *
- * @version 0.1.2 2016/12/19
+ * @version 0.1.2 2017/01/06
  * @author ExBin Project (http://exbin.org)
  */
 public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
@@ -59,6 +59,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
     private Clipboard clipboard;
     private boolean canPaste = false;
     private DataFlavor binaryDataFlavor;
+    private ClipboardData currentClipboardData = null;
 
     public DefaultCodeAreaCommandHandler(CodeArea codeArea) {
         this.codeArea = codeArea;
@@ -371,7 +372,8 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
     @Override
     public void keyTyped(KeyEvent keyEvent) {
         char keyValue = keyEvent.getKeyChar();
-        if (keyValue == 0xffff) {
+        // TODO Add support for high unicode codes
+        if (keyValue == KeyEvent.CHAR_UNDEFINED) {
             return;
         }
         if (!codeArea.isEditable()) {
@@ -602,6 +604,9 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
         if (codeArea.hasSelection()) {
             deleteSelection();
             codeArea.notifyDataChanged();
+            codeArea.updateScrollBars();
+            codeArea.notifyCaretMoved();
+            codeArea.revealCursor();
         } else {
             CodeAreaCaret caret = codeArea.getCaret();
             long dataPosition = caret.getDataPosition();
@@ -612,6 +617,8 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                     caret.setCodeOffset(0);
                 }
                 codeArea.updateScrollBars();
+                codeArea.notifyCaretMoved();
+                codeArea.revealCursor();
             }
         }
     }
@@ -648,11 +655,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
             BinaryData copy = ((EditableBinaryData) codeArea.getData()).copy(first, last - first + 1);
 
             BinaryDataClipboardData binaryData = new BinaryDataClipboardData(copy);
-            try {
-                clipboard.setContents(binaryData, binaryData);
-            } catch (IllegalStateException ex) {
-                // Clipboard not available - ignore
-            }
+            setClipboardContent(binaryData);
         }
     }
 
@@ -666,11 +669,25 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
             BinaryData copy = ((EditableBinaryData) codeArea.getData()).copy(first, last - first + 1);
 
             CodeDataClipboardData binaryData = new CodeDataClipboardData(copy);
-            try {
-                clipboard.setContents(binaryData, binaryData);
-            } catch (IllegalStateException ex) {
-                // Clipboard not available - ignore
-            }
+            setClipboardContent(binaryData);
+        }
+    }
+
+    private void setClipboardContent(ClipboardData content) {
+        clearClipboardData();
+        try {
+            currentClipboardData = content;
+            clipboard.setContents(content, content);
+        } catch (IllegalStateException ex) {
+            // Clipboard not available - ignore and clear
+            clearClipboardData();
+        }
+    }
+
+    private void clearClipboardData() {
+        if (currentClipboardData != null) {
+            currentClipboardData.dispose();
+            currentClipboardData = null;
         }
     }
 
@@ -722,6 +739,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                         caret.setCaretPosition(caret.getDataPosition() + dataSize);
                         caret.setCodeOffset(0);
                         codeArea.updateScrollBars();
+                        codeArea.notifyCaretMoved();
                         codeArea.revealCursor();
                     }
                 } catch (UnsupportedFlavorException | IOException ex) {
@@ -755,6 +773,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                         caret.setCaretPosition(caret.getDataPosition() + length);
                         caret.setCodeOffset(0);
                         codeArea.updateScrollBars();
+                        codeArea.notifyCaretMoved();
                         codeArea.revealCursor();
                     }
                 } catch (UnsupportedFlavorException | IOException ex) {
@@ -859,6 +878,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
                         caret.setCaretPosition(caret.getDataPosition() + length);
                         caret.setCodeOffset(0);
                         codeArea.updateScrollBars();
+                        codeArea.notifyCaretMoved();
                         codeArea.revealCursor();
                     }
                 } catch (UnsupportedFlavorException | IOException ex) {
@@ -875,7 +895,7 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
         return canPaste;
     }
 
-    public class BinaryDataClipboardData implements Transferable, ClipboardOwner {
+    public class BinaryDataClipboardData implements ClipboardData {
 
         private final BinaryData data;
 
@@ -908,9 +928,14 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
         public void lostOwnership(Clipboard clipboard, Transferable contents) {
             // do nothing
         }
+
+        @Override
+        public void dispose() {
+            data.dispose();
+        }
     }
 
-    public class CodeDataClipboardData implements Transferable, ClipboardOwner {
+    public class CodeDataClipboardData implements ClipboardData {
 
         private final BinaryData data;
 
@@ -952,5 +977,15 @@ public class DefaultCodeAreaCommandHandler implements CodeAreaCommandHandler {
         public void lostOwnership(Clipboard clipboard, Transferable contents) {
             // do nothing
         }
+
+        @Override
+        public void dispose() {
+            data.dispose();
+        }
+    }
+
+    public static interface ClipboardData extends Transferable, ClipboardOwner {
+
+        void dispose();
     }
 }

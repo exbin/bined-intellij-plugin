@@ -22,7 +22,7 @@ import org.exbin.utils.binary_data.OutOfBoundsException;
 /**
  * Access window for delta document.
  *
- * @version 0.1.2 2016/12/07
+ * @version 0.1.2 2017/01/07
  * @author ExBin Project (http://exbin.org)
  */
 public class DeltaDocumentWindow {
@@ -52,9 +52,9 @@ public class DeltaDocumentWindow {
         focusSegment(position);
 
         if (pointer.segment instanceof FileSegment) {
-            return ((FileSegment) pointer.segment).getByte(((FileSegment) pointer.segment).getStartPosition() + (position - pointer.position));
+            return ((FileSegment) pointer.segment).getByte(pointer.segment.getStartPosition() + (position - pointer.position));
         } else {
-            return ((MemorySegment) pointer.segment).getByte(position - pointer.position);
+            return ((MemorySegment) pointer.segment).getByte(pointer.segment.getStartPosition() + (position - pointer.position));
         }
     }
 
@@ -330,7 +330,13 @@ public class DeltaDocumentWindow {
         document.notifyChangeListeners(this);
     }
 
-    public void insert(long startFrom, DataSegment insertedSegment) {
+    /**
+     * Directly inserts segment into given position.
+     *
+     * @param startFrom start position
+     * @param insertedSegment inserted segment
+     */
+    public void insertSegment(long startFrom, DataSegment insertedSegment) {
         DefaultDoublyLinkedList<DataSegment> segments = document.getSegments();
         long targetLength = document.getDataSize() + insertedSegment.getLength();
         focusSegment(startFrom);
@@ -424,17 +430,20 @@ public class DeltaDocumentWindow {
             }
 
             if (offset == 0 && copyLength == segmentLength) {
-                copy.getSegments().add(repository.copySegment(pointer.segment));
-            } else if (pointer.segment instanceof MemorySegment) {
-                MemorySegment memorySegment = (MemorySegment) pointer.segment;
+                copy.getSegments().add(repository.copySegment(segment));
+            } else if (segment instanceof MemorySegment) {
+                MemorySegment memorySegment = (MemorySegment) segment;
                 copy.getSegments().add(repository.createMemorySegment(memorySegment.getSource(), memorySegment.getStartPosition() + offset, copyLength));
             } else {
-                FileSegment fileSegment = (FileSegment) pointer.segment;
+                FileSegment fileSegment = (FileSegment) segment;
                 copy.getSegments().add(repository.createFileSegment(fileSegment.getSource(), fileSegment.getStartPosition() + offset, copyLength));
             }
             length -= copyLength;
             offset = 0;
             segment = segments.nextTo(segment);
+            if (length > 0 && segment == null) {
+                throw new NullPointerException("Unexpected end of segments sequence");
+            }
         }
 
         return copy;

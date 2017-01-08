@@ -535,4 +535,8 @@ public class PagedData implements EditableBinaryData {
     public InputStream getDataInputStream() {
         return new PagedDataInputStream(this);
     }
+
+    @Override
+    public void dispose() {
+    }
 }

@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 /**
  * Data source for access to file resource locking it for exclusive access.
  *
- * @version 0.1.1 2016/09/21
+ * @version 0.1.2 2017/01/01
  * @author ExBin Project (http://exbin.org)
  */
 public class FileDataSource {
@@ -37,7 +37,7 @@ public class FileDataSource {
     private final DeltaDataPageWindow window;
     private boolean closed = false;
 
-    private List<CacheClearListener> listeners = new ArrayList<>();
+    private final List<CacheClearListener> listeners = new ArrayList<>();
 
     public FileDataSource(File sourceFile) throws FileNotFoundException, IOException {
         file = sourceFile;
@@ -48,6 +48,11 @@ public class FileDataSource {
     public long getFileLength() throws IOException {
         checkClosed();
         return accessFile.length();
+    }
+
+    public void setFileLength(long length) throws IOException {
+        checkClosed();
+        accessFile.setLength(length);
     }
 
     public File getFile() {
@@ -72,7 +77,7 @@ public class FileDataSource {
             listener.clearCache();
         }
     }
-    
+
     public void close() {
         checkClosed();
         try {
@@ -92,11 +97,11 @@ public class FileDataSource {
     public void addCacheClearListener(CacheClearListener listener) {
         listeners.add(listener);
     }
-            
+
     public void removeCacheClearListener(CacheClearListener listener) {
         listeners.remove(listener);
     }
-            
+
     public static interface CacheClearListener {
 
         public void clearCache();

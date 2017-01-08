@@ -22,7 +22,7 @@ import org.exbin.deltahex.swing.CodeArea;
 /**
  * Abstract class for operation on code area component.
  *
- * @version 0.1.2 2016/12/20
+ * @version 0.1.2 2017/01/01
  * @author ExBin Project (http://exbin.org)
  */
 public abstract class CodeAreaOperation implements BinaryDataOperation {
@@ -49,6 +49,7 @@ public abstract class CodeAreaOperation implements BinaryDataOperation {
      *
      * @return text caption
      */
+    @Override
     public String getCaption() {
         return getType().getCaption();
     }
@@ -58,6 +59,7 @@ public abstract class CodeAreaOperation implements BinaryDataOperation {
      *
      * @throws BinaryDataOperationException for operation handling issues
      */
+    @Override
     public abstract void execute() throws BinaryDataOperationException;
 
     /**
@@ -66,6 +68,7 @@ public abstract class CodeAreaOperation implements BinaryDataOperation {
      * @return undo operation or null if not available
      * @throws BinaryDataOperationException for operation handling issues
      */
+    @Override
     public abstract CodeAreaOperation executeWithUndo() throws BinaryDataOperationException;
 
     /**
@@ -75,6 +78,7 @@ public abstract class CodeAreaOperation implements BinaryDataOperation {
      *
      * @throws BinaryDataOperationException for operation handling issues
      */
+    @Override
     public void dispose() throws BinaryDataOperationException {
     }
 }

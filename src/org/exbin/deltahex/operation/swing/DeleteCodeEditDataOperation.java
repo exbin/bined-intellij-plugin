@@ -23,7 +23,7 @@ import org.exbin.utils.binary_data.EditableBinaryData;
 /**
  * Operation for editing data in delete mode.
  *
- * @version 0.1.2 2016/12/20
+ * @version 0.1.2 2017/01/02
  * @author ExBin Project (http://exbin.org)
  */
 public class DeleteCodeEditDataOperation extends CodeEditDataOperation {
@@ -73,7 +73,9 @@ public class DeleteCodeEditDataOperation extends CodeEditDataOperation {
                     if (undoData == null) {
                         undoData = (EditableBinaryData) data.copy(position, 1);
                     } else {
-                        undoData.insert(0, new byte[]{data.getByte(position)});
+                        EditableBinaryData dataCopy = (EditableBinaryData) data.copy(position, 1);
+                        undoData.insert(0, dataCopy);
+                        dataCopy.dispose();
                     }
                     data.remove(position, 1);
                 }
@@ -84,7 +86,9 @@ public class DeleteCodeEditDataOperation extends CodeEditDataOperation {
                     if (undoData == null) {
                         undoData = (EditableBinaryData) data.copy(position, 1);
                     } else {
-                        undoData.insert(0, new byte[]{data.getByte(position)});
+                        EditableBinaryData dataCopy = (EditableBinaryData) data.copy(position, 1);
+                        undoData.insert(0, dataCopy);
+                        dataCopy.dispose();
                     }
                     data.remove(position, 1);
                 }
@@ -100,11 +104,19 @@ public class DeleteCodeEditDataOperation extends CodeEditDataOperation {
 
     @Override
     public CodeAreaOperation[] generateUndo() {
-        InsertDataOperation insertOperation = new InsertDataOperation(codeArea, position, 0, undoData);
+        InsertDataOperation insertOperation = new InsertDataOperation(codeArea, position, 0, (EditableBinaryData) undoData.copy());
         return new CodeAreaOperation[]{insertOperation};
     }
 
     public long getPosition() {
         return position;
+    }
+
+    @Override
+    public void dispose() throws BinaryDataOperationException {
+        super.dispose();
+        if (undoData != null) {
+            undoData.dispose();
+        }
     }
 }

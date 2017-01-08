@@ -142,4 +142,8 @@ public class ByteArrayData implements BinaryData {
         final ByteArrayData other = (ByteArrayData) obj;
         return Arrays.equals(this.data, other.data);
     }
+
+    @Override
+    public void dispose() {
+    }
 }

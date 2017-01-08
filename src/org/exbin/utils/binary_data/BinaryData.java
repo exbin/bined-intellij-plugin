@@ -22,7 +22,7 @@ import java.io.OutputStream;
 /**
  * Interface for binary data.
  *
- * @version 0.1.0 2016/05/24
+ * @version 0.1.2 2017/01/01
  * @author ExBin Project (http://exbin.org)
  */
 public interface BinaryData {
@@ -89,4 +89,9 @@ public interface BinaryData {
      * @return new instance of input stream
      */
     InputStream getDataInputStream();
+
+    /**
+     * Disposes all allocated data if possible.
+     */
+    void dispose();
 }

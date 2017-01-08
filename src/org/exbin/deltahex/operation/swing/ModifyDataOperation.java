@@ -23,7 +23,7 @@ import org.exbin.utils.binary_data.EditableBinaryData;
 /**
  * Operation for modifying data.
  *
- * @version 0.1.2 2016/12/20
+ * @version 0.1.2 2017/01/02
  * @author ExBin Project (http://exbin.org)
  */
 public class ModifyDataOperation extends CodeAreaOperation {
@@ -64,5 +64,11 @@ public class ModifyDataOperation extends CodeAreaOperation {
 
     public void appendData(BinaryData appendData) {
         ((EditableBinaryData) data).insert(data.getDataSize(), appendData);
+    }
+
+    @Override
+    public void dispose() throws BinaryDataOperationException {
+        super.dispose();
+        data.dispose();
     }
 }

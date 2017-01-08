@@ -1,0 +1,90 @@
+iso-8859-1
+Western Europe
+af sq eu ca da nl en fo fi fr gl de is ga it no pt es sv gd
+iso-8859-2
+Western and Central Europe
+hr cs hu pl ro sr sk sl
+iso-8859-3
+Western Europe and South European (Turkish, Maltese plus Esperanto)
+eo mt
+iso-8859-4
+Western Europe and Baltic countries (Lithuania, Estonia, Latvia and Lapp)
+
+iso-8859-5
+Cyrillic alphabet
+bg be uk mk
+iso-8859-6
+Arabic
+ar
+iso-8859-7
+Greek
+el
+iso-8859-8
+Hebrew
+iw
+iso-8859-9
+Western Europe with amended Turkish character set
+tr
+iso-8859-10
+Western Europe with rationalised character set for Nordic languages, including complete Icelandic set
+
+iso-8859-11
+Thai
+
+iso-8859-13
+Baltic languages plus Polish
+lv lt
+iso-8859-14
+Celtic languages (Irish Gaelic, Scottish, Welsh)
+
+iso-8859-15
+Added the Euro sign and other rationalisations to ISO 8859-1
+et
+iso-8859-16
+Central, Eastern and Southern European languages (Albanian, Bosnian, Croatian, Hungarian, Polish, Romanian, Serbian and Slovenian, but also French, German, Italian and Irish Gaelic)
+
+windows-1250
+Central European languages that use Latin script
+hr cs sr sl
+windows-1251
+Cyrillic alphabets
+mk
+windows-1252
+Western languages
+af sq eu ca da nl en fo fi fr gl de is ga it no pt es sv gd
+windows-1253
+Greek
+
+windows-1254
+Turkish
+tr
+windows-1255
+Hebrew
+
+windows-1256
+Arabic
+
+windows-1257
+Baltic languages
+lv lt
+windows-1258
+Vietnamese
+
+shift_jis
+
+jp
+iso-2022-jp
+
+jp
+euc-jp
+
+jp
+euc-kr
+
+ko
+koi8-r
+
+ru
+iso-8859-5
+
+ru

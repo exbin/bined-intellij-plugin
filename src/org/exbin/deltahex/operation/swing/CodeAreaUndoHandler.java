@@ -28,7 +28,7 @@ import org.exbin.deltahex.swing.CodeArea;
 /**
  * Undo handler for hexadecimal editor.
  *
- * @version 0.1.2 2016/12/20
+ * @version 0.1.2 2017/01/01
  * @author ExBin Project (http://exbin.org)
  */
 public class CodeAreaUndoHandler implements BinaryDataUndoHandler {
@@ -85,7 +85,7 @@ public class CodeAreaUndoHandler implements BinaryDataUndoHandler {
             BinaryDataCommand command = commands.get((int) commandPosition);
             try {
                 command.dispose();
-            } catch (Exception ex) {
+            } catch (BinaryDataOperationException ex) {
                 Logger.getLogger(CodeAreaUndoHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
             commands.remove(command);
@@ -174,12 +174,13 @@ public class CodeAreaUndoHandler implements BinaryDataUndoHandler {
         for (BinaryDataCommand command : commands) {
             try {
                 command.dispose();
-            } catch (Exception ex) {
+            } catch (BinaryDataOperationException ex) {
                 Logger.getLogger(CodeAreaUndoHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         commands.clear();
         init();
+        undoUpdated();
     }
 
     @Override

@@ -1,3 +1,12 @@
+0.1.1
+- Fixed issue on Android Studio
+- Added status panel
+- Added go-to position dialog
+- Added crude search panel
+- Adding charset now support basic filtering
+- Enabled delta mode, switchable to memory mode
+- Most settings are now persistent
+
 0.1.0
 - Released
 

@@ -25,7 +25,7 @@ import org.exbin.utils.binary_data.PagedData;
 /**
  * Data source for binary data stored in memory.
  *
- * @version 0.1.1 2016/11/02
+ * @version 0.1.2 2017/01/02
  * @author ExBin Project (http://exbin.org)
  */
 public class MemoryDataSource implements EditableBinaryData {
@@ -178,5 +178,10 @@ public class MemoryDataSource implements EditableBinaryData {
     @Override
     public InputStream getDataInputStream() {
         return data.getDataInputStream();
+    }
+
+    @Override
+    public void dispose() {
+        data.dispose();
     }
 }

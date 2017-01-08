@@ -25,10 +25,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.exbin.deltahex.CodeType;
 import org.exbin.deltahex.operation.BinaryDataCommand;
-import org.exbin.deltahex.operation.swing.CodeCommandHandler;
+import org.exbin.deltahex.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
 import org.exbin.deltahex.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.deltahex.swing.CodeArea;
+import org.exbin.framework.deltahex.HexStatusApi;
+import org.exbin.framework.deltahex.panel.HexStatusPanel;
+import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
 import org.jetbrains.annotations.NotNull;
@@ -43,24 +46,44 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.prefs.Preferences;
 
 /**
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.1 2016/12/20
+ * @version 0.1.1 2017/01/08
  */
 public class DeltaHexFileEditor implements FileEditor {
 
+    public static final String PREFERENCES_DELTA_MODE = "deltaMode";
+    public static final String PREFERENCES_CODE_TYPE = "codeType";
+    public static final String PREFERENCES_LINE_WRAPPING = "lineWrapping";
+    public static final String PREFERENCES_SHOW_NONPRINTABLES = "showNonpritables";
+    public static final String PREFERENCES_ENCODING_SELECTED = "selectedEncoding";
+    public static final String PREFERENCES_ENCODING_PREFIX = "textEncoding.";
+
     private final Project project;
+    private final Preferences preferences = null;
     private JPanel editorPanel;
     private final CodeArea codeArea;
     private final BinaryDataUndoHandler undoHandler;
     private final int metaMask;
     private final PropertyChangeSupport propertyChangeSupport;
 
+    private HexStatusPanel statusPanel;
+    private HexStatusApi hexStatus;
+    private TextEncodingStatusApi encodingStatus;
+    private CharsetChangeListener charsetChangeListener = null;
+    private GoToHandler goToHandler;
+    private EncodingsHandler encodingsHandler;
+    private boolean findTextPanelVisible = false;
+
+    private boolean opened = false;
     private boolean modified = false;
+    private boolean deltaMemoryMode = false;
     private String displayName;
+    private long documentOriginalSize;
     private DeltaHexVirtualFile virtualFile;
 
     public DeltaHexFileEditor(Project project) {
@@ -92,7 +115,7 @@ public class DeltaHexFileEditor implements FileEditor {
         updateUndoState();
 
         codeArea.setData(new PagedData());
-        CodeCommandHandler commandHandler = new CodeCommandHandler(codeArea, undoHandler);
+        CodeAreaOperationCommandHandler commandHandler = new CodeAreaOperationCommandHandler(codeArea, undoHandler);
         codeArea.setCommandHandler(commandHandler);
         editorPanel.add(codeArea, BorderLayout.CENTER);
 
@@ -540,7 +563,187 @@ public class DeltaHexFileEditor implements FileEditor {
             }
         });
         result.add(selectAllMenuItem);
+        result.addSeparator();
+
+        final JMenuItem goToMenuItem = new JMenuItem("Go To...");
+        goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, metaMask));
+        goToMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                goToHandler.getGoToLineAction().actionPerformed(null);
+            }
+        });
+        result.add(goToMenuItem);
+
+        final JMenuItem findMenuItem = new JMenuItem("Find...");
+        findMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, metaMask));
+        findMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showSearchPanel(false);
+            }
+        });
+        result.add(findMenuItem);
+
+        final JMenuItem replaceMenuItem = new JMenuItem("Replace...");
+        replaceMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, metaMask));
+        replaceMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showSearchPanel(true);
+            }
+        });
+        result.add(replaceMenuItem);
 
         return result;
+    }
+
+    public void showSearchPanel(boolean replace) {
+//        if (hexSearchPanel == null) {
+//            hexSearchPanel = new HexSearchPanel(new HexSearchPanelApi() {
+//                @Override
+//                public void performFind(SearchParameters searchParameters) {
+//                    HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
+//                    SearchCondition condition = searchParameters.getCondition();
+//                    hexSearchPanel.clearStatus();
+//                    if (condition.isEmpty()) {
+//                        painter.clearMatches();
+//                        codeArea.repaint();
+//                        return;
+//                    }
+//
+//                    long position;
+//                    if (searchParameters.isSearchFromCursor()) {
+//                        position = codeArea.getCaretPosition().getDataPosition();
+//                    } else {
+//                        switch (searchParameters.getSearchDirection()) {
+//                            case FORWARD: {
+//                                position = 0;
+//                                break;
+//                            }
+//                            case BACKWARD: {
+//                                position = codeArea.getDataSize() - 1;
+//                                break;
+//                            }
+//                            default:
+//                                throw new IllegalStateException("Illegal search type " + searchParameters.getSearchDirection().name());
+//                        }
+//                    }
+//                    searchParameters.setStartPosition(position);
+//
+//                    switch (condition.getSearchMode()) {
+//                        case TEXT: {
+//                            searchForText(searchParameters);
+//                            break;
+//                        }
+//                        case BINARY: {
+//                            searchForBinaryData(searchParameters);
+//                            break;
+//                        }
+//                        default:
+//                            throw new IllegalStateException("Unexpected search mode " + condition.getSearchMode().name());
+//                    }
+//                }
+//
+//                @Override
+//                public void setMatchPosition(int matchPosition) {
+//                    HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
+//                    painter.setCurrentMatchIndex(matchPosition);
+//                    HighlightCodeAreaPainter.SearchMatch currentMatch = painter.getCurrentMatch();
+//                    codeArea.revealPosition(currentMatch.getPosition(), codeArea.getActiveSection());
+//                    codeArea.repaint();
+//                }
+//
+//                @Override
+//                public void updatePosition() {
+//                    hexSearchPanel.updatePosition(codeArea.getCaretPosition().getDataPosition(), codeArea.getDataSize());
+//                }
+//
+//                @Override
+//                public void performReplace(SearchParameters searchParameters, ReplaceParameters replaceParameters) {
+//                    SearchCondition replaceCondition = replaceParameters.getCondition();
+//                    HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
+//                    HighlightCodeAreaPainter.SearchMatch currentMatch = painter.getCurrentMatch();
+//                    if (currentMatch != null) {
+//                        EditableBinaryData editableData = ((EditableBinaryData) codeArea.getData());
+//                        editableData.remove(currentMatch.getPosition(), currentMatch.getLength());
+//                        if (replaceCondition.getSearchMode() == SearchCondition.SearchMode.BINARY) {
+//                            editableData.insert(currentMatch.getPosition(), replaceCondition.getBinaryData());
+//                        } else {
+//                            editableData.insert(currentMatch.getPosition(), replaceCondition.getSearchText().getBytes(codeArea.getCharset()));
+//                        }
+//                        painter.getMatches().remove(currentMatch);
+//                        codeArea.repaint();
+//                    }
+//                }
+//
+//                @Override
+//                public void clearMatches() {
+//                    HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
+//                    painter.clearMatches();
+//                }
+//            });
+//            hexSearchPanel.setHexCodePopupMenuHandler(new CodeAreaPopupMenuHandler() {
+//                @Override
+//                public JPopupMenu createPopupMenu(CodeArea codeArea, String menuPostfix) {
+//                    return createCodeAreaPopupMenu(codeArea, menuPostfix);
+//                }
+//
+//                @Override
+//                public void dropPopupMenu(String menuPostfix) {
+//                }
+//            });
+//            hexSearchPanel.setClosePanelListener(new HexSearchPanel.ClosePanelListener() {
+//                @Override
+//                public void panelClosed() {
+//                    hideSearchPanel();
+//                }
+//            });
+//        }
+//
+//        if (!findTextPanelVisible) {
+//            codeAreaPanel.add(hexSearchPanel, BorderLayout.SOUTH);
+//            codeAreaPanel.revalidate();
+//            revalidate();
+//            findTextPanelVisible = true;
+//            hexSearchPanel.requestSearchFocus();
+//        }
+//        hexSearchPanel.switchReplaceMode(replace);
+    }
+
+    public void hideSearchPanel() {
+//        if (findTextPanelVisible) {
+//            hexSearchPanel.cancelSearch();
+//            hexSearchPanel.clearSearch();
+//            codeAreaPanel.remove(hexSearchPanel);
+//            codeAreaPanel.revalidate();
+//            revalidate();
+//            findTextPanelVisible = false;
+//        }
+    }
+
+    private void loadFromPreferences() {
+        deltaMemoryMode = preferences.getBoolean(PREFERENCES_DELTA_MODE, true);
+        CodeType codeType = CodeType.valueOf(preferences.get(PREFERENCES_CODE_TYPE, "HEXADECIMAL"));
+        codeArea.setCodeType(codeType);
+        codeTypeComboBox.setSelectedIndex(codeType.ordinal());
+        String selectedEncoding = preferences.get(PREFERENCES_ENCODING_SELECTED, "UTF-8");
+        statusPanel.setEncoding(selectedEncoding);
+        codeArea.setCharset(Charset.forName(selectedEncoding));
+
+        boolean showNonprintables = preferences.getBoolean(PREFERENCES_SHOW_NONPRINTABLES, false);
+        showUnprintablesToggleButton.setSelected(showNonprintables);
+        codeArea.setShowUnprintableCharacters(showNonprintables);
+
+        boolean lineWrapping = preferences.getBoolean(PREFERENCES_LINE_WRAPPING, false);
+        codeArea.setWrapMode(lineWrapping);
+        lineWrappingToggleButton.setSelected(lineWrapping);
+
+        encodingsHandler.loadFromPreferences(preferences);
+    }
+
+    public static interface CharsetChangeListener {
+
+        public void charsetChanged();
     }
 }

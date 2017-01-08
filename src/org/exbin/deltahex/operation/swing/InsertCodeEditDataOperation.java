@@ -212,4 +212,12 @@ public class InsertCodeEditDataOperation extends CodeEditDataOperation {
     public long getLength() {
         return length;
     }
+
+    @Override
+    public void dispose() throws BinaryDataOperationException {
+        super.dispose();
+        if (trailingValue != null) {
+            trailingValue.dispose();
+        }
+    }
 }
