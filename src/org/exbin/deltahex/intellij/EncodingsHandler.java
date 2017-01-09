@@ -15,12 +15,18 @@
  */
 package org.exbin.deltahex.intellij;
 
+import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.ui.DialogWrapper;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
+import org.exbin.framework.editor.text.panel.AddEncodingPanel;
 import org.exbin.framework.editor.text.panel.TextEncodingPanel;
 import org.exbin.framework.editor.text.panel.TextEncodingPanelApi;
 import org.exbin.framework.gui.utils.ActionUtils;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
+import org.exbin.framework.gui.utils.handler.OptionsControlHandler;
+import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
 import org.exbin.framework.gui.utils.panel.OptionsControlPanel;
 
 import javax.swing.*;
@@ -31,12 +37,11 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.prefs.Preferences;
 
 /**
  * Encodings handler.
  *
- * @version 0.1.4 2017/01/08
+ * @version 0.1.1 2017/01/09
  * @author ExBin Project (http://exbin.org)
  */
 public class EncodingsHandler implements TextEncodingPanelApi {
@@ -57,7 +62,7 @@ public class EncodingsHandler implements TextEncodingPanelApi {
     public static final String UTF_ENCODING_TOOLTIP = "Set encoding UTF-8";
 
     private Action manageEncodingsAction;
-    private Preferences preferences;
+    private PropertiesComponent preferences;
 
     public EncodingsHandler(TextEncodingStatusApi textEncodingStatus) {
         resourceBundle = LanguageUtils.getResourceBundleByClass(EncodingsHandler.class);
@@ -98,51 +103,49 @@ public class EncodingsHandler implements TextEncodingPanelApi {
                 textEncodingPanel.setEncodingList(encodings);
                 final OptionsControlPanel controlPanel = new OptionsControlPanel();
                 JPanel dialogPanel = WindowUtils.createDialogPanel(textEncodingPanel, controlPanel);
-//                DialogDescriptor dialogDescriptor = new DialogDescriptor(dialogPanel, "Manage Encodings", true, new Object[0], null, 0, null, null);
-//                final Dialog dialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-//                controlPanel.setHandler(new OptionsControlHandler() {
-//                    @Override
-//                    public void controlActionPerformed(OptionsControlHandler.ControlActionType actionType) {
-//                        if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
-//                            encodings = textEncodingPanel.getEncodingList();
-//                            rebuildEncodings();
-//                            if (actionType == OptionsControlHandler.ControlActionType.SAVE) {
-//                                // Save encodings
-//                                for (int i = 0; i < encodings.size(); i++) {
-//                                    preferences.put(HexEditorTopComponent.PREFERENCES_ENCODING_PREFIX + Integer.toString(i), encodings.get(i));
-//                                }
-//                                preferences.remove(HexEditorTopComponent.PREFERENCES_ENCODING_PREFIX + Integer.toString(encodings.size()));
-//                            }
-//                        }
-//
-//                        WindowUtils.closeWindow(dialog);
-//                    }
-//                });
-//                textEncodingPanel.setAddEncodingsOperation(new TextEncodingPanel.AddEncodingsOperation() {
-//                    @Override
-//                    public List<String> run(List<String> usedEncodings) {
-//                        final List<String> result = new ArrayList<>();
-//                        final AddEncodingPanel addEncodingPanel = new AddEncodingPanel();
-//                        addEncodingPanel.setUsedEncodings(usedEncodings);
-//                        DefaultControlPanel controlPanel = new DefaultControlPanel(addEncodingPanel.getResourceBundle());
-//                        JPanel dialogPanel = WindowUtils.createDialogPanel(addEncodingPanel, controlPanel);
-//                        DialogDescriptor dialogDescriptor = new DialogDescriptor(dialogPanel, "Add Encodings", true, new Object[0], null, 0, null, null);
-//                        final Dialog addEncodingDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-//                        controlPanel.setHandler(new DefaultControlHandler() {
-//                            @Override
-//                            public void controlActionPerformed(DefaultControlHandler.ControlActionType actionType) {
-//                                if (actionType == DefaultControlHandler.ControlActionType.OK) {
-//                                    result.addAll(addEncodingPanel.getEncodings());
-//                                }
-//
-//                                WindowUtils.closeWindow(addEncodingDialog);
-//                            }
-//                        });
-//                        addEncodingDialog.setVisible(true);
-//                        return result;
-//                    }
-//                });
-//                dialog.setVisible(true);
+                DialogWrapper dialog = DialogUtils.createDialog(dialogPanel, "Manage Encodings");
+                controlPanel.setHandler(new OptionsControlHandler() {
+                    @Override
+                    public void controlActionPerformed(OptionsControlHandler.ControlActionType actionType) {
+                        if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
+                            encodings = textEncodingPanel.getEncodingList();
+                            rebuildEncodings();
+                            if (actionType == OptionsControlHandler.ControlActionType.SAVE) {
+                                // Save encodings
+                                for (int i = 0; i < encodings.size(); i++) {
+                                    preferences.setValue(DeltaHexFileEditor.PREFERENCES_ENCODING_PREFIX + Integer.toString(i), encodings.get(i));
+                                }
+                                preferences.unsetValue(DeltaHexFileEditor.PREFERENCES_ENCODING_PREFIX + Integer.toString(encodings.size()));
+                            }
+                        }
+
+                        dialog.close(0);
+                    }
+                });
+                textEncodingPanel.setAddEncodingsOperation(new TextEncodingPanel.AddEncodingsOperation() {
+                    @Override
+                    public List<String> run(List<String> usedEncodings) {
+                        final List<String> result = new ArrayList<>();
+                        final AddEncodingPanel addEncodingPanel = new AddEncodingPanel();
+                        addEncodingPanel.setUsedEncodings(usedEncodings);
+                        DefaultControlPanel controlPanel = new DefaultControlPanel(addEncodingPanel.getResourceBundle());
+                        JPanel dialogPanel = WindowUtils.createDialogPanel(addEncodingPanel, controlPanel);
+                        DialogWrapper addEncodingDialog = DialogUtils.createDialog(dialogPanel, "Add Encodings");
+                        controlPanel.setHandler(new DefaultControlHandler() {
+                            @Override
+                            public void controlActionPerformed(DefaultControlHandler.ControlActionType actionType) {
+                                if (actionType == DefaultControlHandler.ControlActionType.OK) {
+                                    result.addAll(addEncodingPanel.getEncodings());
+                                }
+
+                                addEncodingDialog.close(0);
+                            }
+                        });
+                        addEncodingDialog.showAndGet();
+                        return result;
+                    }
+                });
+                dialog.showAndGet();
             }
         };
         ActionUtils.setupAction(manageEncodingsAction, resourceBundle, "manageEncodingsAction");
@@ -223,19 +226,19 @@ public class EncodingsHandler implements TextEncodingPanelApi {
         item.setSelected(true);
     }
 
-    public void loadFromPreferences(Preferences preferences) {
+    public void loadFromPreferences(PropertiesComponent preferences) {
         this.preferences = preferences;
-        setSelectedEncoding(preferences.get(DeltaHexFileEditor.PREFERENCES_ENCODING_SELECTED, ENCODING_UTF8));
+        setSelectedEncoding(preferences.getValue(DeltaHexFileEditor.PREFERENCES_ENCODING_SELECTED, ENCODING_UTF8));
         encodings.clear();
         String value;
         int i = 0;
         do {
-            value = preferences.get(DeltaHexFileEditor.PREFERENCES_ENCODING_PREFIX + Integer.toString(i), null);
-            if (value != null) {
+            value = preferences.getValue(DeltaHexFileEditor.PREFERENCES_ENCODING_PREFIX + Integer.toString(i), "");
+            if (!value.isEmpty()) {
                 encodings.add(value);
                 i++;
             }
-        } while (value != null);
+        } while (!value.isEmpty());
         rebuildEncodings();
     }
 

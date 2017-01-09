@@ -16,14 +16,19 @@
 package org.exbin.deltahex.intellij;
 
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.Key;
-import org.exbin.deltahex.CodeType;
+import org.exbin.deltahex.*;
+import org.exbin.deltahex.delta.DeltaDocument;
+import org.exbin.deltahex.delta.FileDataSource;
+import org.exbin.deltahex.delta.SegmentsRepository;
 import org.exbin.deltahex.operation.BinaryDataCommand;
 import org.exbin.deltahex.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
@@ -32,6 +37,7 @@ import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.framework.deltahex.HexStatusApi;
 import org.exbin.framework.deltahex.panel.HexStatusPanel;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
+import org.exbin.utils.binary_data.BinaryData;
 import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
 import org.jetbrains.annotations.NotNull;
@@ -42,17 +48,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.Charset;
-import java.util.prefs.Preferences;
 
 /**
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.1 2017/01/08
+ * @version 0.1.1 2017/01/09
  */
 public class DeltaHexFileEditor implements FileEditor {
 
@@ -63,9 +66,10 @@ public class DeltaHexFileEditor implements FileEditor {
     public static final String PREFERENCES_ENCODING_SELECTED = "selectedEncoding";
     public static final String PREFERENCES_ENCODING_PREFIX = "textEncoding.";
 
+    private PropertiesComponent preferences;
     private final Project project;
-    private final Preferences preferences = null;
     private JPanel editorPanel;
+    private static SegmentsRepository segmentsRepository = null;
     private final CodeArea codeArea;
     private final BinaryDataUndoHandler undoHandler;
     private final int metaMask;
@@ -81,7 +85,7 @@ public class DeltaHexFileEditor implements FileEditor {
 
     private boolean opened = false;
     private boolean modified = false;
-    private boolean deltaMemoryMode = false;
+    private boolean deltaMemoryMode = true;
     private String displayName;
     private long documentOriginalSize;
     private DeltaHexVirtualFile virtualFile;
@@ -90,9 +94,28 @@ public class DeltaHexFileEditor implements FileEditor {
         this.project = project;
         editorPanel = new JPanel();
         initComponents();
+
+        preferences = PropertiesComponent.getInstance();
+
         codeArea = new CodeArea();
         codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
+        statusPanel = new HexStatusPanel();
+        registerEncodingStatus(statusPanel);
+        encodingsHandler = new EncodingsHandler(new TextEncodingStatusApi() {
+            @Override
+            public String getEncoding() {
+                return encodingStatus.getEncoding();
+            }
+
+            @Override
+            public void setEncoding(String encodingName) {
+                codeArea.setCharset(Charset.forName(encodingName));
+                encodingStatus.setEncoding(encodingName);
+                preferences.setValue(PREFERENCES_ENCODING_SELECTED, encodingName);
+            }
+        });
+        loadFromPreferences();
 
         propertyChangeSupport = new PropertyChangeSupport(this);
         // CodeAreaUndoHandler(codeArea);
@@ -114,10 +137,14 @@ public class DeltaHexFileEditor implements FileEditor {
         });
         updateUndoState();
 
-        codeArea.setData(new PagedData());
+        getSegmentsRepository();
+        setNewData();
         CodeAreaOperationCommandHandler commandHandler = new CodeAreaOperationCommandHandler(codeArea, undoHandler);
         codeArea.setCommandHandler(commandHandler);
         editorPanel.add(codeArea, BorderLayout.CENTER);
+        editorPanel.add(statusPanel, BorderLayout.SOUTH);
+        registerHexStatus(statusPanel);
+        goToHandler = new GoToHandler(codeArea);
 
         codeArea.addMouseListener(new MouseAdapter() {
             @Override
@@ -138,11 +165,6 @@ public class DeltaHexFileEditor implements FileEditor {
             }
         });
 
-//        setName(NbBundle.getMessage(HexEditorTopComponent.class, "CTL_HexEditorTopComponent"));
-//        setToolTipText(NbBundle.getMessage(HexEditorTopComponent.class, "HINT_HexEditorTopComponent"));
-
-        encodingComboBox.setModel(new DefaultComboBoxModel<>(getSupportedEncodings()));
-        encodingComboBox.setSelectedItem(codeArea.getCharset().name());
         codeTypeComboBox.setSelectedIndex(codeArea.getCodeType().ordinal());
 
         editorPanel.getActionMap().put("copy-to-clipboard", new AbstractAction() {
@@ -173,10 +195,8 @@ public class DeltaHexFileEditor implements FileEditor {
         metaMask = metaMaskValue;
     }
 
-    private javax.swing.JComboBox<String> codeTypeComboBox;
+    private ComboBox<String> codeTypeComboBox;
     private javax.swing.JToolBar controlToolBar;
-    private javax.swing.JComboBox<String> encodingComboBox;
-    private javax.swing.JLabel encodingLabel;
     private javax.swing.JPanel infoToolbar;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
@@ -190,8 +210,6 @@ public class DeltaHexFileEditor implements FileEditor {
     private void initComponents() {
 
         infoToolbar = new javax.swing.JPanel();
-        encodingLabel = new javax.swing.JLabel();
-        encodingComboBox = new javax.swing.JComboBox<String>();
         controlToolBar = new javax.swing.JToolBar();
         saveFileButton = new javax.swing.JButton();
         undoEditButton = new javax.swing.JButton();
@@ -201,18 +219,9 @@ public class DeltaHexFileEditor implements FileEditor {
         jSeparator1 = new javax.swing.JToolBar.Separator();
         jSeparator2 = new javax.swing.JToolBar.Separator();
         jSeparator3 = new javax.swing.JToolBar.Separator();
-        codeTypeComboBox = new javax.swing.JComboBox<String>();
+        codeTypeComboBox = new ComboBox<String>();
 
         editorPanel.setLayout(new java.awt.BorderLayout());
-
-        encodingLabel.setText("Encoding");
-
-        encodingComboBox.setPreferredSize(new java.awt.Dimension(200, 20));
-        encodingComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                encodingComboBoxActionPerformed(evt);
-            }
-        });
 
         controlToolBar.setBorder(null);
         controlToolBar.setFloatable(false);
@@ -281,20 +290,11 @@ public class DeltaHexFileEditor implements FileEditor {
         infoToolbarLayout.setHorizontalGroup(
                 infoToolbarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(infoToolbarLayout.createSequentialGroup()
-                                .addComponent(controlToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(encodingLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(encodingComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
+                                .addComponent(controlToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
         );
         infoToolbarLayout.setVerticalGroup(
                 infoToolbarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(controlToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addGroup(infoToolbarLayout.createSequentialGroup()
-                                .addComponent(encodingComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                        .addComponent(encodingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(controlToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 25, Short.MAX_VALUE)
         );
 
         editorPanel.add(infoToolbar, java.awt.BorderLayout.NORTH);
@@ -328,6 +328,54 @@ public class DeltaHexFileEditor implements FileEditor {
         return modified;
     }
 
+    private void setNewData() {
+        if (deltaMemoryMode) {
+            codeArea.setData(segmentsRepository.createDocument());
+        } else {
+            codeArea.setData(new PagedData());
+        }
+    }
+
+    /**
+     * Attempts to release current file and warn if document was modified.
+     *
+     * @return true if successful
+     */
+    private boolean releaseFile() {
+
+        if (virtualFile == null) {
+            return true;
+        }
+
+        while (isModified()) {
+            Object[] options = {
+                    "Save",
+                    "Discard",
+                    "Cancel"
+            };
+            int result = JOptionPane.showOptionDialog(editorPanel,
+                    "Document was modified! Do you wish to save it?",
+                    "Save File?",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[0]);
+            if (result == JOptionPane.NO_OPTION) {
+                return true;
+            }
+            if (result == JOptionPane.CANCEL_OPTION || result == JOptionPane.CLOSED_OPTION) {
+                return false;
+            }
+
+            try {
+                saveFile(virtualFile);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public boolean isValid() {
         return true;
@@ -341,6 +389,109 @@ public class DeltaHexFileEditor implements FileEditor {
     @Override
     public void deselectNotify() {
 
+    }
+
+    public void registerHexStatus(HexStatusApi hexStatusApi) {
+        this.hexStatus = hexStatusApi;
+        codeArea.addCaretMovedListener(new CaretMovedListener() {
+            @Override
+            public void caretMoved(CaretPosition caretPosition, Section section) {
+                String position = String.valueOf(caretPosition.getDataPosition());
+                position += ":" + caretPosition.getCodeOffset();
+                hexStatus.setCursorPosition(position);
+            }
+        });
+
+        codeArea.addEditationModeChangedListener(new EditationModeChangedListener() {
+            @Override
+            public void editationModeChanged(EditationMode mode) {
+                hexStatus.setEditationMode(mode);
+            }
+        });
+        hexStatus.setEditationMode(codeArea.getEditationMode());
+
+        hexStatus.setControlHandler(new HexStatusApi.StatusControlHandler() {
+            @Override
+            public void changeEditationMode(EditationMode editationMode) {
+                codeArea.setEditationMode(editationMode);
+            }
+
+            @Override
+            public void changeCursorPosition() {
+                goToHandler.getGoToLineAction().actionPerformed(null);
+            }
+
+            @Override
+            public void cycleEncodings() {
+                if (encodingsHandler != null) {
+                    encodingsHandler.cycleEncodings();
+                }
+            }
+
+            @Override
+            public void popupEncodingsMenu(MouseEvent mouseEvent) {
+                if (encodingsHandler != null) {
+                    encodingsHandler.popupEncodingsMenu(mouseEvent);
+                }
+            }
+
+            @Override
+            public void changeMemoryMode(HexStatusApi.MemoryMode memoryMode) {
+                boolean newDeltaMode = memoryMode == HexStatusApi.MemoryMode.DELTA_MODE;
+                if (newDeltaMode != deltaMemoryMode) {
+                    // Switch memory mode
+                    if (virtualFile != null) {
+                        // If document is connected to file, attempt to release first if modified and then simply reload
+                        if (isModified()) {
+                            if (releaseFile()) {
+                                deltaMemoryMode = newDeltaMode;
+                                openFile(virtualFile);
+                                codeArea.clearSelection();
+                                codeArea.setCaretPosition(0);
+                            }
+                        } else {
+                            deltaMemoryMode = newDeltaMode;
+                            openFile(virtualFile);
+                        }
+                    } else {
+                        // If document unsaved in memory, switch data in code area
+                        if (codeArea.getData() instanceof DeltaDocument) {
+                            PagedData data = new PagedData();
+                            data.insert(0, codeArea.getData());
+                            codeArea.setData(data);
+                            codeArea.getData().dispose();
+                        } else {
+                            BinaryData oldData = codeArea.getData();
+                            DeltaDocument document = segmentsRepository.createDocument();
+                            document.insert(0, oldData);
+                            codeArea.setData(document);
+                            oldData.dispose();
+                        }
+                        undoHandler.clear();
+                        codeArea.notifyDataChanged();
+                        updateCurrentMemoryMode();
+                        deltaMemoryMode = newDeltaMode;
+                    }
+                    deltaMemoryMode = newDeltaMode;
+                    preferences.setValue(PREFERENCES_DELTA_MODE, deltaMemoryMode);
+                }
+            }
+        });
+    }
+
+    public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi) {
+        this.encodingStatus = encodingStatusApi;
+        setCharsetChangeListener(new CharsetChangeListener() {
+            @Override
+            public void charsetChanged() {
+                String selectedEncoding = codeArea.getCharset().name();
+                encodingStatus.setEncoding(selectedEncoding);
+            }
+        });
+    }
+
+    public void setCharsetChangeListener(CharsetChangeListener charsetChangeListener) {
+        this.charsetChangeListener = charsetChangeListener;
     }
 
     @Override
@@ -393,10 +544,6 @@ public class DeltaHexFileEditor implements FileEditor {
 
     @Override
     public <T> void putUserData(@NotNull Key<T> key, @Nullable T value) {
-    }
-
-    private void encodingComboBoxActionPerformed(java.awt.event.ActionEvent evt) {
-        codeArea.setCharset(Charset.forName(encodingComboBox.getSelectedItem().toString()));
     }
 
     private void saveFileButtonActionPerformed(java.awt.event.ActionEvent evt) {
@@ -459,20 +606,115 @@ public class DeltaHexFileEditor implements FileEditor {
     public void openFile(DeltaHexVirtualFile virtualFile) {
         if (!virtualFile.isDirectory() && virtualFile.isValid()) {
             this.virtualFile = virtualFile;
-            try (InputStream stream = virtualFile.getInputStream()) {
-                ;
-                if (stream != null) {
-                    ((EditableBinaryData) codeArea.getData()).loadFromStream(stream);
+            File file = new File(virtualFile.getPath());
+            if (file.isFile() && file.exists()) {
+                try {
+                    BinaryData oldData = codeArea.getData();
+                    if (deltaMemoryMode) {
+                        FileDataSource fileSource = segmentsRepository.openFileSource(file);
+                        DeltaDocument document = segmentsRepository.createDocument(fileSource);
+                        codeArea.setData(document);
+                        oldData.dispose();
+                    } else {
+                        try (FileInputStream fileStream = new FileInputStream(file)) {
+                            BinaryData data = codeArea.getData();
+                            if (!(data instanceof PagedData)) {
+                                data = new PagedData();
+                                oldData.dispose();
+                            }
+                            ((EditableBinaryData) data).loadFromStream(fileStream);
+                            codeArea.setData(data);
+                        }
+                    }
                     codeArea.setEditable(virtualFile.isWritable());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
-            } catch (IOException ex) {
-                // Exceptions.printStackTrace(ex);
+            } else {
+                try (InputStream stream = virtualFile.getInputStream()) {
+                    if (stream != null) {
+                        if (codeArea.getData() instanceof DeltaDocument) {
+                            ((DeltaDocument) codeArea.getData()).dispose();
+                            codeArea.setData(new PagedData());
+                        }
+                        ((EditableBinaryData) codeArea.getData()).loadFromStream(stream);
+                        opened = true;
+                        documentOriginalSize = codeArea.getDataSize();
+                        updateCurrentDocumentSize();
+                        updateCurrentMemoryMode();
+                        codeArea.setEditable(virtualFile.isWritable());
+                    }
+                } catch (IOException ex) {
+                    // Exceptions.printStackTrace(ex);
+                }
             }
+
+            opened = true;
+            documentOriginalSize = codeArea.getDataSize();
+            updateCurrentDocumentSize();
+            updateCurrentMemoryMode();
+        }
+    }
+
+    public void saveFile(DeltaHexVirtualFile virtualFile) throws IOException {
+        BinaryData data = codeArea.getData();
+        if (data instanceof DeltaDocument) {
+            segmentsRepository.saveDocument((DeltaDocument) data);
+            undoHandler.setSyncPoint();
+        } else {
+            try (OutputStream stream = virtualFile.getOutputStream(this)) {
+                codeArea.getData().saveToStream(stream);
+                stream.flush();
+                undoHandler.setSyncPoint();
+                updateUndoState();
+                saveFileButton.setEnabled(false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        notifyModified();
+        documentOriginalSize = codeArea.getDataSize();
+        updateCurrentDocumentSize();
+        updateCurrentMemoryMode();
+    }
+
+    private void updateCurrentDocumentSize() {
+        long dataSize = codeArea.getData().getDataSize();
+        long difference = dataSize - documentOriginalSize;
+        hexStatus.setCurrentDocumentSize(dataSize + " (" + (difference > 0 ? "+" + difference : difference) + ")");
+    }
+
+    public boolean isDeltaMemoryMode() {
+        return deltaMemoryMode;
+    }
+
+    public void setDeltaMemoryMode(boolean deltaMemoryMode) {
+        this.deltaMemoryMode = deltaMemoryMode;
+    }
+
+    private void updateCurrentMemoryMode() {
+        HexStatusApi.MemoryMode memoryMode = HexStatusApi.MemoryMode.RAM_MEMORY;
+        if (codeArea.getEditationAllowed() == EditationAllowed.READ_ONLY) {
+            memoryMode = HexStatusApi.MemoryMode.READ_ONLY;
+        } else if (codeArea.getData() instanceof DeltaDocument) {
+            memoryMode = HexStatusApi.MemoryMode.DELTA_MODE;
+        }
+
+        if (hexStatus != null) {
+            hexStatus.setMemoryMode(memoryMode);
         }
     }
 
     public DeltaHexVirtualFile getVirtualFile() {
         return virtualFile;
+    }
+
+    public static synchronized SegmentsRepository getSegmentsRepository() {
+        if (segmentsRepository == null) {
+            segmentsRepository = new SegmentsRepository();
+        }
+
+        return segmentsRepository;
     }
 
     private JPopupMenu createContextMenu() {
@@ -533,7 +775,7 @@ public class DeltaHexFileEditor implements FileEditor {
                 try {
                     codeArea.pasteFromCode();
                 } catch (IllegalArgumentException ex) {
-                    JOptionPane.showMessageDialog(codeArea, ex.getMessage(), "Unable to Paste Code", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(editorPanel, ex.getMessage(), "Unable to Paste Code", JOptionPane.ERROR_MESSAGE);
                 }
                 result.setVisible(false);
             }
@@ -724,10 +966,10 @@ public class DeltaHexFileEditor implements FileEditor {
 
     private void loadFromPreferences() {
         deltaMemoryMode = preferences.getBoolean(PREFERENCES_DELTA_MODE, true);
-        CodeType codeType = CodeType.valueOf(preferences.get(PREFERENCES_CODE_TYPE, "HEXADECIMAL"));
+        CodeType codeType = CodeType.valueOf(preferences.getValue(PREFERENCES_CODE_TYPE, "HEXADECIMAL"));
         codeArea.setCodeType(codeType);
         codeTypeComboBox.setSelectedIndex(codeType.ordinal());
-        String selectedEncoding = preferences.get(PREFERENCES_ENCODING_SELECTED, "UTF-8");
+        String selectedEncoding = preferences.getValue(PREFERENCES_ENCODING_SELECTED, "UTF-8");
         statusPanel.setEncoding(selectedEncoding);
         codeArea.setCharset(Charset.forName(selectedEncoding));
 
