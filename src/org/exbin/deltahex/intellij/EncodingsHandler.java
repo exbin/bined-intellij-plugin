@@ -130,7 +130,7 @@ public class EncodingsHandler implements TextEncodingPanelApi {
                         addEncodingPanel.setUsedEncodings(usedEncodings);
                         DefaultControlPanel controlPanel = new DefaultControlPanel(addEncodingPanel.getResourceBundle());
                         JPanel dialogPanel = WindowUtils.createDialogPanel(addEncodingPanel, controlPanel);
-                        DialogWrapper addEncodingDialog = DialogUtils.createDialog(dialogPanel, "Add Encodings");
+                        final DialogWrapper addEncodingDialog = DialogUtils.createDialog(dialogPanel, "Add Encodings");
                         controlPanel.setHandler(new DefaultControlHandler() {
                             @Override
                             public void controlActionPerformed(DefaultControlHandler.ControlActionType actionType) {
@@ -141,10 +141,12 @@ public class EncodingsHandler implements TextEncodingPanelApi {
                                 addEncodingDialog.close(0);
                             }
                         });
+                        WindowUtils.assignGlobalKeyListener(addEncodingDialog.getWindow(), controlPanel.createOkCancelListener());
                         addEncodingDialog.showAndGet();
                         return result;
                     }
                 });
+                WindowUtils.assignGlobalKeyListener(dialog.getWindow(), controlPanel.createOkCancelListener());
                 dialog.showAndGet();
             }
         };

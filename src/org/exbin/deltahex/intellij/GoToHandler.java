@@ -15,10 +15,12 @@
  */
 package org.exbin.deltahex.intellij;
 
+import com.intellij.openapi.ui.DialogWrapper;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.framework.deltahex.panel.GoToHexPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
 
 import javax.swing.*;
@@ -58,24 +60,27 @@ public class GoToHandler {
                     goToPanel.setMaxPosition(codeArea.getDataSize());
                     goToPanel.setVisible(true);
                     JPanel dialogPanel = WindowUtils.createDialogPanel(goToPanel, goToControlPanel);
+                    WindowUtils.assignGlobalKeyListener(dialogPanel, goToControlPanel.createOkCancelListener());
                     dialogPanel.setVisible(true);
-//                    DialogDescriptor dialogDescriptor = new DialogDescriptor(dialogPanel, "Go To Position", true, new Object[0], null, 0, null, null);
-//
-//                    final Dialog dialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-//                    goToPanel.initFocus();
-//                    goToControlPanel.setHandler(new DefaultControlHandler() {
-//                        @Override
-//                        public void controlActionPerformed(DefaultControlHandler.ControlActionType actionType) {
-//                            if (actionType == DefaultControlHandler.ControlActionType.OK) {
-//                                goToPanel.acceptInput();
-//                                codeArea.setCaretPosition(goToPanel.getGoToPosition());
-//                            }
-//
-//                            WindowUtils.closeWindow(dialog);
-//                        }
-//                    });
-//                    WindowUtils.assignGlobalKeyListener(dialog, goToControlPanel.createOkCancelListener());
-//                    dialog.setVisible(true);
+                    final DialogWrapper dialog = DialogUtils.createDialog(dialogPanel, "Go To Position");
+                    goToControlPanel.setHandler(new DefaultControlHandler() {
+                        @Override
+                        public void controlActionPerformed(DefaultControlHandler.ControlActionType actionType) {
+                            if (actionType == DefaultControlHandler.ControlActionType.OK) {
+                                goToPanel.acceptInput();
+                                codeArea.setCaretPosition(goToPanel.getGoToPosition());
+                            }
+
+                            dialog.close(0);
+                        }
+                    });
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            goToPanel.initFocus();
+                        }
+                    });
+                    dialog.showAndGet();
                 }
             };
         }

@@ -16,6 +16,7 @@
 package org.exbin.deltahex.intellij;
 
 import com.intellij.openapi.ui.DialogWrapper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -45,8 +46,20 @@ public class DialogUtils {
 
         @Nullable
         @Override
+        public JComponent getPreferredFocusedComponent() {
+            return dialogPanel;
+        }
+
+        @Nullable
+        @Override
         protected JComponent createCenterPanel() {
             return dialogPanel;
+        }
+
+        @NotNull
+        @Override
+        protected Action[] createActions() {
+            return new Action[0];
         }
     }
 }
