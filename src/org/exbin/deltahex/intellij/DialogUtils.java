@@ -25,7 +25,7 @@ import javax.swing.*;
  * Dialog utilities.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.1 2017/01/09
+ * @version 0.1.1 2017/01/11
  */
 public class DialogUtils {
 
@@ -33,13 +33,23 @@ public class DialogUtils {
         return new DeltaHexDialogWrapper(dialogPanel, dialogTitle);
     }
 
+    public static DialogWrapper createDialog(JComponent dialogPanel, String dialogTitle, JComponent focusedComponent) {
+        return new DeltaHexDialogWrapper(dialogPanel, dialogTitle, focusedComponent);
+    }
+
     public static class DeltaHexDialogWrapper extends DialogWrapper {
 
         private final JComponent dialogPanel;
+        private final JComponent focusedComponent;
 
         public DeltaHexDialogWrapper(JComponent dialogPanel, String dialogTitle) {
+            this(dialogPanel, dialogTitle, dialogPanel);
+        }
+
+        public DeltaHexDialogWrapper(JComponent dialogPanel, String dialogTitle, JComponent focusedComponent) {
             super(true);
             this.dialogPanel = dialogPanel;
+            this.focusedComponent = focusedComponent;
             setTitle(dialogTitle);
             init();
         }
@@ -47,7 +57,7 @@ public class DialogUtils {
         @Nullable
         @Override
         public JComponent getPreferredFocusedComponent() {
-            return dialogPanel;
+            return focusedComponent;
         }
 
         @Nullable

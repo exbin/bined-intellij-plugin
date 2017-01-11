@@ -16,6 +16,7 @@
 package org.exbin.deltahex.intellij;
 
 import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.impl.UndoManagerImpl;
 import com.intellij.openapi.command.undo.DocumentReference;
 import com.intellij.openapi.command.undo.DocumentReferenceManager;
 import com.intellij.openapi.command.undo.UndoManager;
@@ -37,7 +38,7 @@ import java.util.List;
  * Undo handler for hexadecimal editor using IntelliJ Idea's undo.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.1 2016/12/20
+ * @version 0.1.1 2017/01/11
  */
 public class HexUndoIntelliJHandler implements BinaryDataUndoHandler {
 
@@ -114,10 +115,6 @@ public class HexUndoIntelliJHandler implements BinaryDataUndoHandler {
             @Nullable
             @Override
             public DocumentReference[] getAffectedDocuments() {
-                if (documentReference == null) {
-                    documentReference = DocumentReferenceManager.getInstance().create(fileEditor.getVirtualFile());
-                }
-
                 return new DocumentReference[]{documentReference};
             }
 
@@ -199,6 +196,8 @@ public class HexUndoIntelliJHandler implements BinaryDataUndoHandler {
 
     @Override
     public void clear() {
+        documentReference = DocumentReferenceManager.getInstance().create(fileEditor.getVirtualFile());
+        ((UndoManagerImpl) undoManager).invalidateActionsFor(documentReference);
         init();
     }
 

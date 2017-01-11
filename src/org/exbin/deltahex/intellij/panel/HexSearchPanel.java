@@ -42,7 +42,7 @@ import java.util.List;
 /**
  * Hexadecimal editor search panel.
  *
- * @version 0.1.1 2017/01/10
+ * @version 0.1.1 2017/01/11
  * @author ExBin Project (http://exbin.org)
  */
 public class HexSearchPanel extends javax.swing.JPanel {
@@ -102,10 +102,15 @@ public class HexSearchPanel extends javax.swing.JPanel {
 
         findComboBoxEditorComponent = new HexSearchComboBoxPanel();
         findComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
+            private JPanel panel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
 
             @Override
             public Component getListCellRendererComponent(JList<? extends SearchCondition> list, SearchCondition value, int index, boolean isSelected, boolean cellHasFocus) {
+                if (value == null) {
+                    return panel;
+                }
+
                 if (value.getSearchMode() == SearchCondition.SearchMode.TEXT) {
                     return listCellRenderer.getListCellRendererComponent(list, value.getSearchText(), index, isSelected, cellHasFocus);
                 } else {
@@ -182,10 +187,15 @@ public class HexSearchPanel extends javax.swing.JPanel {
 
         replaceComboBoxEditorComponent = new HexSearchComboBoxPanel();
         replaceComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
+            private JPanel panel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
 
             @Override
             public Component getListCellRendererComponent(JList<? extends SearchCondition> list, SearchCondition value, int index, boolean isSelected, boolean cellHasFocus) {
+                if (value == null) {
+                    return panel;
+                }
+
                 if (value.getSearchMode() == SearchCondition.SearchMode.TEXT) {
                     return listCellRenderer.getListCellRendererComponent(list, value.getSearchText(), index, isSelected, cellHasFocus);
                 } else {
@@ -909,10 +919,10 @@ public class HexSearchPanel extends javax.swing.JPanel {
         prevButton.setEnabled(matchesCount > 1 && matchPosition > 0);
         nextButton.setEnabled(matchPosition < matchesCount - 1);
         replaceButton.setEnabled(matchesCount > 0);
-        replaceAllButton.setEnabled(matchesCount > 0);
+        // replaceAllButton.setEnabled(matchesCount > 0);
     }
 
-    // TODO implement optimalized method
+    // TODO implement optimized method
     private boolean dataEquals(EditableBinaryData binaryData, BinaryData comparedData) {
         if (binaryData == null || comparedData == null || binaryData.getDataSize() != comparedData.getDataSize()) {
             return false;

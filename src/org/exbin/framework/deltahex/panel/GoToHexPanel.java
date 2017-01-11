@@ -16,16 +16,15 @@
  */
 package org.exbin.framework.deltahex.panel;
 
+import org.exbin.framework.gui.utils.LanguageUtils;
+import org.exbin.framework.gui.utils.WindowUtils;
+
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.text.ParseException;
 import java.util.ResourceBundle;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
-import javax.swing.text.JTextComponent;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
 
 /**
  * Go-to position panel for hexadecimal editor.
@@ -216,6 +215,10 @@ public class GoToHexPanel extends javax.swing.JPanel {
 
     public void initFocus() {
         ((JSpinner.DefaultEditor) positionSpinner.getEditor()).getTextField().requestFocusInWindow();
+    }
+
+    public JComponent getInitFocusComponent() {
+        return ((JSpinner.DefaultEditor) positionSpinner.getEditor()).getTextField();
     }
 
     public long getGoToPosition() {

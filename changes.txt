@@ -1,4 +1,4 @@
-0.1.1
+0.1.1 (2017-01-11)
 - Fixed issue on Android Studio
 - Added status panel
 - Added go-to position dialog

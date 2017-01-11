@@ -33,8 +33,9 @@ import org.exbin.deltahex.highlight.swing.HighlightCodeAreaPainter;
 import org.exbin.deltahex.intellij.panel.HexSearchPanel;
 import org.exbin.deltahex.intellij.panel.HexSearchPanelApi;
 import org.exbin.deltahex.operation.BinaryDataCommand;
+import org.exbin.deltahex.operation.BinaryDataOperationException;
 import org.exbin.deltahex.operation.swing.CodeAreaOperationCommandHandler;
-import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
+import org.exbin.deltahex.operation.swing.CodeAreaUndoHandler;
 import org.exbin.deltahex.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.framework.deltahex.CodeAreaPopupMenuHandler;
@@ -65,7 +66,7 @@ import java.util.List;
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.1 2017/01/10
+ * @version 0.1.1 2017/01/11
  */
 public class DeltaHexFileEditor implements FileEditor {
 
@@ -82,7 +83,7 @@ public class DeltaHexFileEditor implements FileEditor {
     private JPanel headerPanel;
     private static SegmentsRepository segmentsRepository = null;
     private final CodeArea codeArea;
-    private final BinaryDataUndoHandler undoHandler;
+    private final CodeAreaUndoHandler undoHandler;
     private final int metaMask;
     private final PropertyChangeSupport propertyChangeSupport;
 
@@ -110,6 +111,7 @@ public class DeltaHexFileEditor implements FileEditor {
         preferences = PropertiesComponent.getInstance();
 
         codeArea = new CodeArea();
+        codeArea.setPainter(new HighlightCodeAreaPainter(codeArea));
         codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
         statusPanel = new HexStatusPanel();
@@ -131,7 +133,8 @@ public class DeltaHexFileEditor implements FileEditor {
 
         propertyChangeSupport = new PropertyChangeSupport(this);
         // CodeAreaUndoHandler(codeArea);
-        undoHandler = new HexUndoIntelliJHandler(codeArea, project, this);
+        // undoHandler = new HexUndoIntelliJHandler(codeArea, project, this);
+        undoHandler = new CodeAreaUndoHandler(codeArea);
 
         undoHandler.addUndoUpdateListener(new BinaryDataUndoUpdateListener() {
             @Override
@@ -210,7 +213,8 @@ public class DeltaHexFileEditor implements FileEditor {
         codeArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
-                if (keyEvent.getModifiers() == metaMask) {
+                int modifiers = keyEvent.getModifiers();
+                if (modifiers == metaMask) {
                     int keyCode = keyEvent.getKeyCode();
                     switch (keyCode) {
                         case KeyEvent.VK_F: {
@@ -221,6 +225,24 @@ public class DeltaHexFileEditor implements FileEditor {
                             goToHandler.getGoToLineAction().actionPerformed(null);
                             break;
                         }
+                    }
+                }
+
+                if (modifiers == InputEvent.CTRL_MASK && keyEvent.getKeyCode() == KeyEvent.VK_Z) {
+                    try {
+                        if (undoHandler.canUndo()) {
+                            undoHandler.performUndo();
+                        }
+                    } catch (BinaryDataOperationException e) {
+                        e.printStackTrace();
+                    }
+                } else if (modifiers == (InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK) && keyEvent.getKeyCode() == KeyEvent.VK_Z) {
+                    try {
+                        if (undoHandler.canRedo()) {
+                            undoHandler.performRedo();
+                        }
+                    } catch (BinaryDataOperationException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -688,6 +710,7 @@ public class DeltaHexFileEditor implements FileEditor {
             documentOriginalSize = codeArea.getDataSize();
             updateCurrentDocumentSize();
             updateCurrentMemoryMode();
+            undoHandler.clear();
         }
     }
 
