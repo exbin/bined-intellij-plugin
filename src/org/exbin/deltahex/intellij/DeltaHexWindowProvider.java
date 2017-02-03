@@ -19,15 +19,17 @@ import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
 import com.intellij.openapi.fileEditor.FileEditorProvider;
+import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Window provider for hexadecimal editor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.0 2016/12/08
+ * @version 0.1.2 2017/02/04
  */
 public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationComponent {
 
@@ -38,6 +40,11 @@ public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationCo
 
     @Override
     public void disposeComponent() {
+
+    }
+
+    @Override
+    public void disposeEditor(@NotNull FileEditor editor) {
 
     }
 
@@ -71,5 +78,16 @@ public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationCo
     @Override
     public FileEditorPolicy getPolicy() {
         return FileEditorPolicy.HIDE_DEFAULT_EDITOR;
+    }
+
+    @NotNull
+    @Override
+    public FileEditorState readState(@NotNull Element sourceElement, @NotNull Project project, @NotNull VirtualFile file) {
+        return FileEditorState.INSTANCE;
+    }
+
+    @Override
+    public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) {
+
     }
 }

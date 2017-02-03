@@ -22,6 +22,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
+import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.Key;
@@ -30,6 +31,7 @@ import org.exbin.deltahex.delta.DeltaDocument;
 import org.exbin.deltahex.delta.FileDataSource;
 import org.exbin.deltahex.delta.SegmentsRepository;
 import org.exbin.deltahex.highlight.swing.HighlightCodeAreaPainter;
+import org.exbin.deltahex.highlight.swing.HighlightNonAsciiCodeAreaPainter;
 import org.exbin.deltahex.intellij.panel.HexSearchPanel;
 import org.exbin.deltahex.intellij.panel.HexSearchPanelApi;
 import org.exbin.deltahex.operation.BinaryDataCommand;
@@ -66,7 +68,7 @@ import java.util.List;
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.1 2017/01/11
+ * @version 0.1.2 2017/02/04
  */
 public class DeltaHexFileEditor implements FileEditor {
 
@@ -111,7 +113,7 @@ public class DeltaHexFileEditor implements FileEditor {
         preferences = PropertiesComponent.getInstance();
 
         codeArea = new CodeArea();
-        codeArea.setPainter(new HighlightCodeAreaPainter(codeArea));
+        codeArea.setPainter(new HighlightNonAsciiCodeAreaPainter(codeArea));
         codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
         statusPanel = new HexStatusPanel();
@@ -223,6 +225,10 @@ public class DeltaHexFileEditor implements FileEditor {
                         }
                         case KeyEvent.VK_G: {
                             goToHandler.getGoToLineAction().actionPerformed(null);
+                            break;
+                        }
+                        case KeyEvent.VK_S: {
+                            saveFileButtonActionPerformed(null);
                             break;
                         }
                     }
@@ -373,6 +379,12 @@ public class DeltaHexFileEditor implements FileEditor {
     @Override
     public String getName() {
         return displayName;
+    }
+
+    @NotNull
+    @Override
+    public FileEditorState getState(@NotNull FileEditorStateLevel level) {
+        return FileEditorState.INSTANCE;
     }
 
     @Override
@@ -608,13 +620,22 @@ public class DeltaHexFileEditor implements FileEditor {
         application.runWriteAction(new Runnable() {
             @Override
             public void run() {
-                try (OutputStream stream = virtualFile.getOutputStream(this)) {
-                    codeArea.getData().saveToStream(stream);
-                    undoHandler.setSyncPoint();
-                    updateUndoState();
-                    saveFileButton.setEnabled(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                BinaryData data = codeArea.getData();
+                if (data instanceof DeltaDocument) {
+                    try {
+                        segmentsRepository.saveDocument((DeltaDocument) data);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                    try (OutputStream stream = virtualFile.getOutputStream(this)) {
+                        codeArea.getData().saveToStream(stream);
+                        undoHandler.setSyncPoint();
+                        updateUndoState();
+                        saveFileButton.setEnabled(false);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
