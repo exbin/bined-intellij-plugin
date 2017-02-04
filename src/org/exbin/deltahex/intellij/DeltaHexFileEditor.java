@@ -31,7 +31,6 @@ import org.exbin.deltahex.delta.DeltaDocument;
 import org.exbin.deltahex.delta.FileDataSource;
 import org.exbin.deltahex.delta.SegmentsRepository;
 import org.exbin.deltahex.highlight.swing.HighlightCodeAreaPainter;
-import org.exbin.deltahex.highlight.swing.HighlightNonAsciiCodeAreaPainter;
 import org.exbin.deltahex.intellij.panel.HexSearchPanel;
 import org.exbin.deltahex.intellij.panel.HexSearchPanelApi;
 import org.exbin.deltahex.operation.BinaryDataCommand;
@@ -113,7 +112,7 @@ public class DeltaHexFileEditor implements FileEditor {
         preferences = PropertiesComponent.getInstance();
 
         codeArea = new CodeArea();
-        codeArea.setPainter(new HighlightNonAsciiCodeAreaPainter(codeArea));
+        codeArea.setPainter(new HighlightCodeAreaPainter(codeArea));
         codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
         statusPanel = new HexStatusPanel();
@@ -630,13 +629,14 @@ public class DeltaHexFileEditor implements FileEditor {
                 } else {
                     try (OutputStream stream = virtualFile.getOutputStream(this)) {
                         codeArea.getData().saveToStream(stream);
-                        undoHandler.setSyncPoint();
-                        updateUndoState();
-                        saveFileButton.setEnabled(false);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
+
+                undoHandler.setSyncPoint();
+                updateUndoState();
+                saveFileButton.setEnabled(false);
             }
         });
     }

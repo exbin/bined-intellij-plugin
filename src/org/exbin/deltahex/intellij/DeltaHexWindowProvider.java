@@ -45,7 +45,9 @@ public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationCo
 
     @Override
     public void disposeEditor(@NotNull FileEditor editor) {
-
+        if (editor instanceof DeltaHexFileEditor) {
+            editor.dispose();
+        }
     }
 
     @NotNull

@@ -1,3 +1,7 @@
+0.1.2 (2017-02-04)
+- Fixed issue in Android Studio 2.2.3 (issue #1)
+- Fixed issue with saving in delta mode
+
 0.1.1 (2017-01-11)
 - Fixed issue on Android Studio
 - Added status panel
