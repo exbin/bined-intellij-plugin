@@ -56,13 +56,17 @@
     </extensions>
 
     <actions>
-        <action class="org.exbin.deltahex.intellij.OpenAsHexAction" id="DeltaHexEditor.OpenAsHexAction"
+        <action id="DeltaHexEditor.OpenAsHexAction" class="org.exbin.deltahex.intellij.OpenAsHexAction"
                 text="Open As Hex" description="Opens file in hexadecimal viewer/editor" icon="/images/icon.png"/>
-
         <group>
             <reference id="DeltaHexEditor.OpenAsHexAction"/>
             <add-to-group group-id="ProjectViewPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
         </group>
+
+        <action id="DeltaHexEditor.FileOpenAsHex" class="org.exbin.deltahex.intellij.FileOpenAsHexAction"
+                text="Open as Hex..." description="Opens file in hexadecimal viewer/editor" icon="/images/icon.png">
+            <add-to-group group-id="FileOpenGroup" relative-to-action="OpenFile" anchor="after"/>
+        </action>
 
         <!-- <group>
             <reference id="DeltaHexEditor.OpenAsHexAction"/>

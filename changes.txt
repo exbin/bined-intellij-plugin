@@ -1,3 +1,7 @@
+0.1.3
+- Color by byte values
+- Added File/Open File as Hex action
+
 0.1.2 (2017-02-04)
 - Fixed issue in Android Studio 2.2.3 (issue #1)
 - Fixed issue with saving in delta mode
@@ -11,6 +15,5 @@
 - Enabled delta mode, switchable to memory mode
 - Most settings are now persistent
 
-0.1.0
+0.1.0 (2016-12-13)
 - Released
-
