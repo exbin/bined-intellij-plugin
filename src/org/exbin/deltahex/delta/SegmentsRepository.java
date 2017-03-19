@@ -32,7 +32,7 @@ import org.exbin.utils.binary_data.BinaryData;
 /**
  * Repository of delta segments.
  *
- * @version 0.1.2 2017/01/07
+ * @version 0.1.2 2017/01/18
  * @author ExBin Project (http://exbin.org)
  */
 public class SegmentsRepository {
@@ -936,7 +936,7 @@ public class SegmentsRepository {
         }
 
         /**
-         * Aligns focus segment on last segment at given start position and
+         * Aligns focus pointer on last segment at given start position and
          * length or last segment before given position or null if there is no
          * such segment.
          *
@@ -952,15 +952,15 @@ public class SegmentsRepository {
                 return;
             }
 
-            if (startPosition > pointerRecord.getStartPosition()
-                    || (pointerRecord.getStartPosition() == startPosition && length >= pointerRecord.getLength())) {
+            if (pointerRecord.getStartPosition() < startPosition
+                    || (pointerRecord.getStartPosition() == startPosition && pointerRecord.getLength() <= length)) {
                 // Forward direction traversal
                 SegmentRecord record;
                 do {
                     record = records.nextTo(pointerRecord);
                     if (record != null) {
-                        if (startPosition > record.getStartPosition()
-                                || (record.getStartPosition() == startPosition && length >= record.getLength())) {
+                        if (record.getStartPosition() < startPosition
+                                || (record.getStartPosition() == startPosition && record.getLength() <= length)) {
                             pointerRecord = record;
                         } else {
                             break;
@@ -969,8 +969,8 @@ public class SegmentsRepository {
                 } while (record != null);
             } else {
                 // Backward direction traversal
-                while (startPosition < pointerRecord.getStartPosition()
-                        || (pointerRecord.getStartPosition() == startPosition && length < pointerRecord.getLength())) {
+                while (pointerRecord.getStartPosition() > startPosition
+                        || (pointerRecord.getStartPosition() == startPosition && pointerRecord.getLength() > length)) {
                     pointerRecord = records.prevTo(pointerRecord);
                     if (pointerRecord == null) {
                         break;

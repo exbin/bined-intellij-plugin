@@ -27,7 +27,7 @@ import org.exbin.deltahex.swing.CodeArea;
 /**
  * Hexadecimal component painter supporting search matches highlighting.
  *
- * @version 0.1.0 2016/06/26
+ * @version 0.1.3 2017/03/16
  * @author ExBin Project (http://exbin.org)
  */
 public class HighlightCodeAreaPainter extends DefaultCodeAreaPainter {
@@ -46,9 +46,9 @@ public class HighlightCodeAreaPainter extends DefaultCodeAreaPainter {
     public HighlightCodeAreaPainter(CodeArea codeArea) {
         super(codeArea);
 
-        foundMatchesColors = codeArea.getMainColors();
+        foundMatchesColors = new ColorsGroup(codeArea.getMainColors());
         foundMatchesColors.setBackgroundColor(new Color(180, 255, 180));
-        currentMatchColors = codeArea.getMainColors();
+        currentMatchColors = new ColorsGroup(codeArea.getMainColors());
         currentMatchColors.setBackgroundColor(new Color(255, 210, 180));
     }
 

@@ -23,7 +23,7 @@ import org.exbin.utils.binary_data.EditableBinaryData;
 /**
  * Operation for editing data using overwrite mode.
  *
- * @version 0.1.2 2017/01/07
+ * @version 0.1.3 2017/03/18
  * @author ExBin Project (http://exbin.org)
  */
 public class OverwriteCodeEditDataOperation extends CodeEditDataOperation {
@@ -179,7 +179,7 @@ public class OverwriteCodeEditDataOperation extends CodeEditDataOperation {
     public CodeAreaOperation[] generateUndo() {
         ModifyDataOperation modifyOperation = null;
         if (undoData != null && !undoData.isEmpty()) {
-            modifyOperation = new ModifyDataOperation(codeArea, startPosition, undoData);
+            modifyOperation = new ModifyDataOperation(codeArea, startPosition, undoData.copy());
         }
         long undoDataSize = undoData == null ? 0 : undoData.getDataSize();
         long removeLength = length - undoDataSize;

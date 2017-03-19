@@ -23,7 +23,7 @@ import org.exbin.deltahex.swing.ColorsGroup;
 /**
  * Experimental support for highlighting of non-ascii characters.
  *
- * @version 0.1.2 2017/01/16
+ * @version 0.1.3 2017/03/06
  * @author ExBin Project (http://exbin.org)
  */
 public class HighlightNonAsciiCodeAreaPainter extends HighlightCodeAreaPainter {
@@ -89,7 +89,7 @@ public class HighlightNonAsciiCodeAreaPainter extends HighlightCodeAreaPainter {
     @Override
     public Color getPositionColor(int byteOnLine, int charOnLine, Section section, ColorsGroup.ColorType colorType, PaintData paintData) {
         Color color = super.getPositionColor(byteOnLine, charOnLine, section, colorType, paintData);
-        if (section == Section.CODE_MATRIX && colorType == ColorsGroup.ColorType.TEXT) {
+        if (nonAsciiHighlightingEnabled && section == Section.CODE_MATRIX && colorType == ColorsGroup.ColorType.TEXT) {
             if (color.equals(paintData.getMainColors().getTextColor())) {
                 long dataPosition = paintData.getLineDataPosition() + byteOnLine;
                 if (dataPosition < codeArea.getDataSize()) {

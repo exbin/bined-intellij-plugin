@@ -23,7 +23,7 @@ import org.exbin.utils.binary_data.EditableBinaryData;
 /**
  * Operation for editing data unsing insert mode.
  *
- * @version 0.1.2 2016/12/20
+ * @version 0.1.3 2017/03/19
  * @author ExBin Project (http://exbin.org)
  */
 public class InsertCodeEditDataOperation extends CodeEditDataOperation {
@@ -194,7 +194,7 @@ public class InsertCodeEditDataOperation extends CodeEditDataOperation {
     @Override
     public CodeAreaOperation[] generateUndo() {
         if (trailing) {
-            ModifyDataOperation modifyDataOperation = new ModifyDataOperation(codeArea, startPosition, trailingValue);
+            ModifyDataOperation modifyDataOperation = new ModifyDataOperation(codeArea, startPosition, trailingValue.copy());
             return new CodeAreaOperation[]{modifyDataOperation, new RemoveDataOperation(codeArea, startPosition, startCodeOffset, length)};
         }
 

@@ -39,7 +39,7 @@ import org.exbin.deltahex.ViewMode;
 /**
  * Code area component default painter.
  *
- * @version 0.1.0 2016/09/02
+ * @version 0.1.3 2017/03/07
  * @author ExBin Project (http://exbin.org)
  */
 public class DefaultCodeAreaPainter implements CodeAreaPainter {
@@ -110,8 +110,8 @@ public class DefaultCodeAreaPainter implements CodeAreaPainter {
             if (visibleCharEnd > charsPerLine) {
                 visibleCharEnd = charsPerLine;
             }
-            int visibleStart = codeArea.computeByteOffsetPerCodeCharOffset(visibleCharStart, false);
-            int visibleEnd = codeArea.computeByteOffsetPerCodeCharOffset(visibleCharEnd - 1, false) + 1;
+            int visibleStart = codeArea.computeByteOffsetPerCodeCharOffset(visibleCharStart);
+            int visibleEnd = codeArea.computeByteOffsetPerCodeCharOffset(visibleCharEnd - 1) + 1;
 
             if (codeArea.getBackgroundMode() == CodeArea.BackgroundMode.GRIDDED) {
                 ColorsGroup stripColors = codeArea.getAlternateColors();
@@ -146,7 +146,7 @@ public class DefaultCodeAreaPainter implements CodeAreaPainter {
             Color renderColor = null;
             for (int charOnLine = visibleCharStart; charOnLine < visibleCharEnd; charOnLine++) {
                 int byteOnLine;
-                byteOnLine = codeArea.computeByteOffsetPerCodeCharOffset(charOnLine, false);
+                byteOnLine = codeArea.computeByteOffsetPerCodeCharOffset(charOnLine);
                 boolean sequenceBreak = false;
                 boolean nativeWidth = true;
 
@@ -460,7 +460,7 @@ public class DefaultCodeAreaPainter implements CodeAreaPainter {
                 byteOnLine = charOnLine - paintData.previewCharPos;
                 section = Section.TEXT_PREVIEW;
             } else {
-                byteOnLine = codeArea.computeByteOffsetPerCodeCharOffset(charOnLine, false);
+                byteOnLine = codeArea.computeByteOffsetPerCodeCharOffset(charOnLine);
                 section = Section.CODE_MATRIX;
             }
             boolean sequenceBreak = false;
@@ -525,7 +525,7 @@ public class DefaultCodeAreaPainter implements CodeAreaPainter {
                 byteOnLine = charOnLine - paintData.previewCharPos;
                 section = Section.TEXT_PREVIEW;
             } else {
-                byteOnLine = codeArea.computeByteOffsetPerCodeCharOffset(charOnLine, false);
+                byteOnLine = codeArea.computeByteOffsetPerCodeCharOffset(charOnLine);
                 section = Section.CODE_MATRIX;
             }
             boolean sequenceBreak = false;
@@ -896,7 +896,7 @@ public class DefaultCodeAreaPainter implements CodeAreaPainter {
                     }
                 } else {
                     int charPos = (scrolledX - codeRect.x) / charWidth;
-                    int byteOffset = codeArea.computeByteOffsetPerCodeCharOffset(charPos, false);
+                    int byteOffset = codeArea.computeByteOffsetPerCodeCharOffset(charPos);
                     int codeCharPos = codeArea.computeByteCharPos(byteOffset);
                     char[] lineChars = new char[codeArea.getCodeType().getMaxDigits()];
                     long dataSize = codeArea.getDataSize();
@@ -1048,8 +1048,8 @@ public class DefaultCodeAreaPainter implements CodeAreaPainter {
                 if (visibleCharEnd > charsPerCodeArea) {
                     visibleCharEnd = charsPerCodeArea;
                 }
-                visibleCodeStart = codeArea.computeByteOffsetPerCodeCharOffset(visibleCharStart, false);
-                visibleCodeEnd = codeArea.computeByteOffsetPerCodeCharOffset(visibleCharEnd - 1, false) + 1;
+                visibleCodeStart = codeArea.computeByteOffsetPerCodeCharOffset(visibleCharStart);
+                visibleCodeEnd = codeArea.computeByteOffsetPerCodeCharOffset(visibleCharEnd - 1) + 1;
             } else {
                 visibleCharStart = 0;
                 visibleCharEnd = -1;

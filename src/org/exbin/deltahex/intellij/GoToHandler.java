@@ -58,10 +58,8 @@ public class GoToHandler {
                     DefaultControlPanel goToControlPanel = new DefaultControlPanel(goToPanel.getResourceBundle());
                     goToPanel.setCursorPosition(codeArea.getCaretPosition().getDataPosition());
                     goToPanel.setMaxPosition(codeArea.getDataSize());
-                    goToPanel.setVisible(true);
                     JPanel dialogPanel = WindowUtils.createDialogPanel(goToPanel, goToControlPanel);
                     WindowUtils.assignGlobalKeyListener(dialogPanel, goToControlPanel.createOkCancelListener());
-                    dialogPanel.setVisible(true);
                     final DialogWrapper dialog = DialogUtils.createDialog(dialogPanel, "Go To Position", goToPanel.getInitFocusComponent());
                     goToControlPanel.setHandler(new DefaultControlHandler() {
                         @Override

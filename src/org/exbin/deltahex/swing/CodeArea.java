@@ -71,7 +71,7 @@ import org.exbin.utils.binary_data.BinaryData;
  *
  * Also supports binary, octal and decimal codes.
  *
- * @version 0.1.1 2016/10/10
+ * @version 0.1.3 2017/03/16
  * @author ExBin Project (http://exbin.org)
  */
 public class CodeArea extends JComponent {
@@ -352,7 +352,7 @@ public class CodeArea extends JComponent {
         int byteOnLine;
         if ((viewMode == ViewMode.DUAL && cursorCharX < paintDataCache.previewStartChar) || viewMode == ViewMode.CODE_MATRIX) {
             caret.setSection(Section.CODE_MATRIX);
-            byteOnLine = computeByteOffsetPerCodeCharOffset(cursorCharX, false);
+            byteOnLine = computeByteOffsetPerCodeCharOffset(cursorCharX);
             if (byteOnLine >= bytesPerLine) {
                 codeOffset = 0;
             } else {
@@ -1123,13 +1123,53 @@ public class CodeArea extends JComponent {
         return width / paintDataCache.charWidth;
     }
 
+    /**
+     * Computes how many bytes would fit into given number of characters.
+     *
+     * @param charsPerRect available characters space
+     * @return maximum byte offset index
+     */
     public int computeFittingBytes(int charsPerRect) {
         if (viewMode == ViewMode.TEXT_PREVIEW) {
             return charsPerRect;
         }
 
-        int fittingBytes = computeByteOffsetPerCodeCharOffset(charsPerRect, viewMode == ViewMode.DUAL);
-        if (byteGroupSize != 0 || spaceGroupSize != 0) {
+        int fittingBytes;
+        if (byteGroupSize == 0) {
+            if (spaceGroupSize == 0) {
+                fittingBytes = (charsPerRect - 1)
+                        / (codeType.getMaxDigits() + 1);
+            } else {
+                fittingBytes = spaceGroupSize
+                        * (int) ((charsPerRect - 1) / (long) ((codeType.getMaxDigits() + 1) * spaceGroupSize + 2));
+                int remains = (int) ((charsPerRect - 1) % (long) ((codeType.getMaxDigits() + 1) * spaceGroupSize + 2)) / (codeType.getMaxDigits() + 1);
+                fittingBytes += remains;
+            }
+        } else if (spaceGroupSize == 0) {
+            fittingBytes = byteGroupSize
+                    * (int) ((charsPerRect - 1) / (long) ((codeType.getMaxDigits() + 1) * byteGroupSize + 1));
+            int remains = (int) ((charsPerRect - 1) % (long) ((codeType.getMaxDigits() + 1) * byteGroupSize + 1)) / (codeType.getMaxDigits() + 1);
+            fittingBytes += remains;
+        } else {
+            fittingBytes = 0;
+            int charsPerLine = 1;
+            while (charsPerLine < charsPerRect) {
+                charsPerLine += codeType.getMaxDigits() + 1;
+                fittingBytes++;
+                if ((fittingBytes % byteGroupSize) == 0) {
+                    if ((fittingBytes % spaceGroupSize) == 0) {
+                        charsPerLine += 2;
+                    } else {
+                        charsPerLine++;
+                    }
+                } else if ((fittingBytes % spaceGroupSize) == 0) {
+                    charsPerLine += 2;
+                }
+                if (charsPerLine > charsPerRect) {
+                    return fittingBytes - 1;
+                }
+            }
+
             if (computeCharsPerLine(fittingBytes + 1) <= charsPerRect) {
                 fittingBytes++;
             }
@@ -1142,27 +1182,35 @@ public class CodeArea extends JComponent {
      * Computes byte offset index for given code line offset.
      *
      * @param charOffset char offset position
-     * @param includePreview flag if preview should be included
      * @return byte offset index
      */
-    public int computeByteOffsetPerCodeCharOffset(int charOffset, boolean includePreview) {
+    public int computeByteOffsetPerCodeCharOffset(int charOffset) {
         int byteOffset;
         if (byteGroupSize == 0) {
             if (spaceGroupSize == 0) {
-                byteOffset = (charOffset - (includePreview ? 1 : 0))
-                        / (codeType.getMaxDigits() + (includePreview ? 1 : 0));
+                byteOffset = charOffset / codeType.getMaxDigits();
             } else {
-                byteOffset = (int) (((long) (charOffset - (includePreview ? 1 : 0)) * spaceGroupSize)
-                        / ((long) (codeType.getMaxDigits() + (includePreview ? 1 : 0)) * spaceGroupSize + 2));
+                byteOffset = spaceGroupSize
+                        * (int) (charOffset / (long) (codeType.getMaxDigits() * spaceGroupSize + 2));
+                int remains = (int) (charOffset % (long) (codeType.getMaxDigits() * spaceGroupSize + 2)) / codeType.getMaxDigits();
+                if (remains >= spaceGroupSize) {
+                    remains = spaceGroupSize - 1;
+                }
+                byteOffset += remains;
             }
         } else if (spaceGroupSize == 0) {
-            byteOffset = (int) (((long) (charOffset - (includePreview ? 1 : 0)) * byteGroupSize)
-                    / ((long) (codeType.getMaxDigits() + (includePreview ? 1 : 0)) * byteGroupSize + 1));
+            byteOffset = byteGroupSize
+                    * (int) (charOffset / (long) (codeType.getMaxDigits() * byteGroupSize + 1));
+            int remains = (int) (charOffset % (long) (codeType.getMaxDigits() * byteGroupSize + 1)) / codeType.getMaxDigits();
+            if (remains >= byteGroupSize) {
+                remains = byteGroupSize - 1;
+            }
+            byteOffset += remains;
         } else {
             byteOffset = 0;
-            int charsPerLine = includePreview ? 1 : 0;
+            int charsPerLine = 0;
             while (charsPerLine < charOffset) {
-                charsPerLine += codeType.getMaxDigits() + (includePreview ? 1 : 0);
+                charsPerLine += codeType.getMaxDigits();
                 byteOffset++;
                 if ((byteOffset % byteGroupSize) == 0) {
                     if ((byteOffset % spaceGroupSize) == 0) {
@@ -1203,7 +1251,7 @@ public class CodeArea extends JComponent {
     }
 
     /**
-     * Computes character position for byte code of given offset position
+     * Computes character position for byte code of given offset position.
      *
      * @param byteOffset byte start offset
      * @return characters position
@@ -1241,19 +1289,19 @@ public class CodeArea extends JComponent {
     }
 
     public ColorsGroup getMainColors() {
-        return new ColorsGroup(mainColors);
+        return mainColors;
     }
 
     public ColorsGroup getAlternateColors() {
-        return new ColorsGroup(alternateColors);
+        return alternateColors;
     }
 
     public ColorsGroup getSelectionColors() {
-        return new ColorsGroup(selectionColors);
+        return selectionColors;
     }
 
     public ColorsGroup getMirrorSelectionColors() {
-        return new ColorsGroup(mirrorSelectionColors);
+        return mirrorSelectionColors;
     }
 
     public void setMainColors(ColorsGroup colorsGroup) {

@@ -22,7 +22,7 @@ import org.exbin.utils.binary_data.OutOfBoundsException;
 /**
  * Access window for delta document.
  *
- * @version 0.1.2 2017/01/07
+ * @version 0.1.3 2017/03/17
  * @author ExBin Project (http://exbin.org)
  */
 public class DeltaDocumentWindow {
@@ -113,6 +113,21 @@ public class DeltaDocumentWindow {
         long targetLength = document.getDataSize() + length;
         if (pointer.segment instanceof MemorySegment) {
             repository.insertUninitializedMemoryData((MemorySegment) pointer.segment, startFrom - pointer.position, length);
+            document.setDataLength(targetLength);
+        } else if (pointer.segment != null && pointer.position == startFrom && pointer.segment.getPrev() instanceof MemorySegment
+                && pointer.segment.getPrev().getStartPosition() + pointer.segment.getPrev().getLength() == ((MemorySegment) pointer.segment.getPrev()).getSource().getDataSize()) {
+            MemorySegment prevSegment = (MemorySegment) pointer.segment.getPrev();
+            prevSegment.getSource().insertUninitialized(prevSegment.getSource().getDataSize(), 1);
+            repository.updateSegmentLength(prevSegment, prevSegment.getLength() + 1);
+            pointer.position++;
+            document.setDataLength(targetLength);
+        } else if (pointer.segment == null && segments.last() instanceof MemorySegment
+                && segments.last().getStartPosition() + segments.last().getLength() == ((MemorySegment) segments.last()).getSource().getDataSize()) {
+            MemorySegment prevSegment = (MemorySegment) segments.last();
+            prevSegment.getSource().insertUninitialized(prevSegment.getSource().getDataSize(), 1);
+            repository.updateSegmentLength(prevSegment, prevSegment.getLength() + 1);
+            pointer.position++;
+            document.setDataLength(targetLength);
         } else {
             if (startFrom > pointer.position) {
                 splitSegment(startFrom);
@@ -126,8 +141,9 @@ public class DeltaDocumentWindow {
                 segments.addBefore(pointer.segment, insertedSegment);
             }
             pointer.segment = insertedSegment;
+            document.setDataLength(targetLength);
+            tryMergeArea(startFrom, length);
         }
-        document.setDataLength(targetLength);
         document.notifyChangeListeners(this);
     }
 
@@ -142,6 +158,21 @@ public class DeltaDocumentWindow {
         long targetLength = document.getDataSize() + length;
         if (pointer.segment instanceof MemorySegment) {
             repository.insertMemoryData((MemorySegment) pointer.segment, startFrom - pointer.position, length);
+            document.setDataLength(targetLength);
+        } else if (pointer.segment != null && pointer.position == startFrom && pointer.segment.getPrev() instanceof MemorySegment
+                && pointer.segment.getPrev().getStartPosition() + pointer.segment.getPrev().getLength() == ((MemorySegment) pointer.segment.getPrev()).getSource().getDataSize()) {
+            MemorySegment prevSegment = (MemorySegment) pointer.segment.getPrev();
+            prevSegment.getSource().insert(prevSegment.getSource().getDataSize(), 1);
+            repository.updateSegmentLength(prevSegment, prevSegment.getLength() + 1);
+            pointer.position++;
+            document.setDataLength(targetLength);
+        } else if (pointer.segment == null && segments.last() instanceof MemorySegment
+                && segments.last().getStartPosition() + segments.last().getLength() == ((MemorySegment) segments.last()).getSource().getDataSize()) {
+            MemorySegment prevSegment = (MemorySegment) segments.last();
+            prevSegment.getSource().insert(prevSegment.getSource().getDataSize(), 1);
+            repository.updateSegmentLength(prevSegment, prevSegment.getLength() + 1);
+            pointer.position++;
+            document.setDataLength(targetLength);
         } else {
             if (startFrom > pointer.position) {
                 splitSegment(startFrom);
@@ -155,8 +186,9 @@ public class DeltaDocumentWindow {
                 segments.addBefore(pointer.segment, insertedSegment);
             }
             pointer.segment = insertedSegment;
+            document.setDataLength(targetLength);
+            tryMergeArea(startFrom, length);
         }
-        document.setDataLength(targetLength);
         document.notifyChangeListeners(this);
     }
 
@@ -171,6 +203,7 @@ public class DeltaDocumentWindow {
         long targetLength = document.getDataSize() + insertedData.length;
         if (pointer.segment instanceof MemorySegment) {
             repository.insertMemoryData((MemorySegment) pointer.segment, startFrom - pointer.position, insertedData);
+            document.setDataLength(targetLength);
         } else {
             if (startFrom > pointer.position) {
                 splitSegment(startFrom);
@@ -184,8 +217,9 @@ public class DeltaDocumentWindow {
                 segments.addBefore(pointer.segment, insertedSegment);
             }
             pointer.segment = insertedSegment;
+            document.setDataLength(targetLength);
+            tryMergeArea(startFrom, insertedData.length);
         }
-        document.setDataLength(targetLength);
         document.notifyChangeListeners(this);
     }
 
@@ -197,6 +231,7 @@ public class DeltaDocumentWindow {
         long targetLength = document.getDataSize() + insertedDataLength;
         if (pointer.segment instanceof MemorySegment) {
             repository.insertMemoryData((MemorySegment) pointer.segment, startFrom - pointer.position, insertedData);
+            document.setDataLength(targetLength);
         } else {
             if (startFrom > pointer.position) {
                 splitSegment(startFrom);
@@ -210,8 +245,9 @@ public class DeltaDocumentWindow {
                 segments.addBefore(pointer.segment, insertedSegment);
             }
             pointer.segment = insertedSegment;
+            document.setDataLength(targetLength);
+            tryMergeArea(startFrom, insertedData.length);
         }
-        document.setDataLength(targetLength);
         document.notifyChangeListeners(this);
     }
 
@@ -249,9 +285,11 @@ public class DeltaDocumentWindow {
                 next = next.getNext();
             }
             pointer.segment = first;
+            document.setDataLength(targetLength);
             tryMergeArea(startFrom, insertedData.getDataSize());
         } else if (pointer.segment instanceof MemorySegment) {
             repository.insertMemoryData((MemorySegment) pointer.segment, startFrom - pointer.position, insertedData);
+            document.setDataLength(targetLength);
         } else {
             if (pointer.position < startFrom) {
                 splitSegment(startFrom);
@@ -265,8 +303,9 @@ public class DeltaDocumentWindow {
                 segments.addBefore(pointer.segment, insertedSegment);
             }
             pointer.segment = insertedSegment;
+            document.setDataLength(targetLength);
+            tryMergeArea(startFrom, insertedData.getDataSize());
         }
-        document.setDataLength(targetLength);
         document.notifyChangeListeners(this);
     }
 
@@ -309,9 +348,11 @@ public class DeltaDocumentWindow {
                 next = next.getNext();
             }
             pointer.segment = first;
+            document.setDataLength(targetLength);
             tryMergeArea(startFrom, insertedData.getDataSize());
         } else if (pointer.segment instanceof MemorySegment) {
             repository.insertMemoryData((MemorySegment) pointer.segment, startFrom - pointer.position, insertedData, insertedDataOffset, insertedDataLength);
+            document.setDataLength(targetLength);
         } else {
             if (pointer.position < startFrom) {
                 splitSegment(startFrom);
@@ -325,8 +366,9 @@ public class DeltaDocumentWindow {
                 segments.addBefore(pointer.segment, insertedSegment);
             }
             pointer.segment = insertedSegment;
+            document.setDataLength(targetLength);
+            tryMergeArea(startFrom, insertedData.getDataSize());
         }
-        document.setDataLength(targetLength);
         document.notifyChangeListeners(this);
     }
 
@@ -385,8 +427,8 @@ public class DeltaDocumentWindow {
             // Set pointer position
             pointer.segment = prevSegment;
             pointer.position = prevPointerPosition;
-            tryMergeSegments(startFrom);
             document.setDataLength(targetLength);
+            tryMergeSegments(startFrom);
         }
         document.notifyChangeListeners(this);
     }
