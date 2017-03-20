@@ -30,7 +30,7 @@ import java.util.List;
  * Open file in hexadecimal editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.0 2016/12/17
+ * @version 0.1.3 2017/03/20
  */
 public class OpenAsHexAction extends AnAction {
 
@@ -59,9 +59,14 @@ public class OpenAsHexAction extends AnAction {
         if (virtualFile != null && virtualFile.isValid() && !virtualFile.isDirectory()) {
             DeltaHexVirtualFile deltaHexVirtualFile = new DeltaHexVirtualFile(virtualFile);
             OpenFileDescriptor descriptor = new OpenFileDescriptor(project, deltaHexVirtualFile, 0);
-            List<FileEditor> editors = FileEditorManager.getInstance(project).openEditor(descriptor, true);
-            DeltaHexFileEditor fileEditor = ((DeltaHexFileEditor) editors.get(0));
-            fileEditor.openFile(deltaHexVirtualFile);
+            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+            List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
+            fileEditorManager.setSelectedEditor(virtualFile, DeltaHexWindowProvider.DELTAHEX_EDITOR_TYPE_ID);
+            for (FileEditor fileEditor : editors) {
+                if (fileEditor instanceof DeltaHexFileEditor) {
+                    ((DeltaHexFileEditor) fileEditor).openFile(deltaHexVirtualFile);
+                }
+            }
         }
     }
 }

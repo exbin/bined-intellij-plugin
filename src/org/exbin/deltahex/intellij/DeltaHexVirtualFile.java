@@ -28,13 +28,12 @@ import java.io.OutputStream;
  * Virtual file for hexadecimal editor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.0 2016/12/13
+ * @version 0.1.3 2017/03/20
  */
 public class DeltaHexVirtualFile extends VirtualFile {
 
     private final VirtualFile parentFile;
     private String displayName;
-    private boolean modified = false;
 
     public DeltaHexVirtualFile(VirtualFile parentFile) {
         this.parentFile = parentFile;

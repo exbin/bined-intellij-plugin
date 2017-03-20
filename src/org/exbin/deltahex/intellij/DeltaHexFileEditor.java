@@ -79,7 +79,7 @@ import java.util.Map;
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.3 2017/03/19
+ * @version 0.1.3 2017/03/20
  */
 public class DeltaHexFileEditor implements FileEditor {
 
@@ -139,6 +139,7 @@ public class DeltaHexFileEditor implements FileEditor {
     private String displayName;
     private long documentOriginalSize;
     private DeltaHexVirtualFile virtualFile;
+    private DeltaHexFileEditorState fileEditorState = new DeltaHexFileEditorState();
 
     public DeltaHexFileEditor(Project project) {
         this.project = project;
@@ -309,7 +310,6 @@ public class DeltaHexFileEditor implements FileEditor {
     private javax.swing.JToggleButton showUnprintablesToggleButton;
 
     private void initComponents() {
-
         infoToolbar = new javax.swing.JPanel();
         controlToolBar = new javax.swing.JToolBar();
         saveFileButton = new javax.swing.JButton();
@@ -425,12 +425,11 @@ public class DeltaHexFileEditor implements FileEditor {
     @NotNull
     @Override
     public FileEditorState getState(@NotNull FileEditorStateLevel level) {
-        return FileEditorState.INSTANCE;
+        return fileEditorState;
     }
 
     @Override
     public void setState(@NotNull FileEditorState state) {
-
     }
 
     @Override
@@ -1463,6 +1462,10 @@ public class DeltaHexFileEditor implements FileEditor {
         if (showValuesPanel) {
             showValuesPanel();
         }
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     public static interface CharsetChangeListener {

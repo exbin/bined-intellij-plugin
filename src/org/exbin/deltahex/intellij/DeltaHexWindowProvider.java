@@ -33,6 +33,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationComponent {
 
+    public static final String DELTAHEX_EDITOR_TYPE_ID = "org.exbin.deltahex";
+
     @Override
     public void initComponent() {
 
@@ -73,7 +75,7 @@ public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationCo
     @NotNull
     @Override
     public String getEditorTypeId() {
-        return "deltaHex";
+        return DELTAHEX_EDITOR_TYPE_ID;
     }
 
     @NotNull

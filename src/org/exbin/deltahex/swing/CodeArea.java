@@ -40,6 +40,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -71,7 +73,7 @@ import org.exbin.utils.binary_data.BinaryData;
  *
  * Also supports binary, octal and decimal codes.
  *
- * @version 0.1.3 2017/03/16
+ * @version 0.1.3 2017/03/20
  * @author ExBin Project (http://exbin.org)
  */
 public class CodeArea extends JComponent {
@@ -161,6 +163,48 @@ public class CodeArea extends JComponent {
     }
 
     private void init() {
+        buildColors();
+
+        verticalScrollBar = new JScrollBar(Scrollbar.VERTICAL);
+        verticalScrollBar.setVisible(false);
+        verticalScrollBar.setIgnoreRepaint(true);
+        verticalScrollBar.addAdjustmentListener(new VerticalAdjustmentListener());
+        add(verticalScrollBar);
+        horizontalScrollBar = new JScrollBar(Scrollbar.HORIZONTAL);
+        horizontalScrollBar.setIgnoreRepaint(true);
+        horizontalScrollBar.setVisible(false);
+        horizontalScrollBar.addAdjustmentListener(new HorizontalAdjustmentListener());
+        add(horizontalScrollBar);
+
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
+        addComponentListener(new CodeAreaComponentListener());
+
+        CodeAreaMouseListener codeAreaMouseListener = new CodeAreaMouseListener();
+        addMouseListener(codeAreaMouseListener);
+        addMouseMotionListener(codeAreaMouseListener);
+        addMouseWheelListener(codeAreaMouseListener);
+        addKeyListener(new CodeAreaKeyListener());
+        addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                repaint();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                repaint();
+            }
+        });
+        UIManager.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                buildColors();
+            }
+        });
+    }
+
+    private void buildColors() {
         Color textColor = UIManager.getColor("TextArea.foreground");
         if (textColor == null) {
             textColor = Color.BLACK;
@@ -200,38 +244,6 @@ public class CodeArea extends JComponent {
         }
         negativeCursorColor = createNegativeColor(cursorColor);
         decorationLineColor = Color.GRAY;
-
-        verticalScrollBar = new JScrollBar(Scrollbar.VERTICAL);
-        verticalScrollBar.setVisible(false);
-        verticalScrollBar.setIgnoreRepaint(true);
-        verticalScrollBar.addAdjustmentListener(new VerticalAdjustmentListener());
-        add(verticalScrollBar);
-        horizontalScrollBar = new JScrollBar(Scrollbar.HORIZONTAL);
-        horizontalScrollBar.setIgnoreRepaint(true);
-        horizontalScrollBar.setVisible(false);
-        horizontalScrollBar.addAdjustmentListener(new HorizontalAdjustmentListener());
-        add(horizontalScrollBar);
-
-        setFocusable(true);
-        setFocusTraversalKeysEnabled(false);
-        addComponentListener(new CodeAreaComponentListener());
-
-        CodeAreaMouseListener codeAreaMouseListener = new CodeAreaMouseListener();
-        addMouseListener(codeAreaMouseListener);
-        addMouseMotionListener(codeAreaMouseListener);
-        addMouseWheelListener(codeAreaMouseListener);
-        addKeyListener(new CodeAreaKeyListener());
-        addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                repaint();
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                repaint();
-            }
-        });
     }
 
     @Override
