@@ -39,12 +39,12 @@ import org.exbin.deltahex.ViewMode;
 /**
  * Code area component default painter.
  *
- * @version 0.1.3 2017/03/07
+ * @version 0.1.3 2017/03/21
  * @author ExBin Project (http://exbin.org)
  */
 public class DefaultCodeAreaPainter implements CodeAreaPainter {
 
-    public static final int MIN_MONOSPACE_CODE_POINT = 0x19;
+    public static final int MIN_MONOSPACE_CODE_POINT = 0x1F;
     public static final int MAX_MONOSPACE_CODE_POINT = 0x1C3;
     public static final int INV_SPACE_CODE_POINT = 0x7f;
     public static final int EXCEPTION1_CODE_POINT = 0x8e;
