@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.exbin.deltahex.intellij</id>
     <name>DeltaHex Editor</name>
-    <version>0.1.3-SNAPSHOT</version>
+    <version>0.1.3</version>
     <vendor email="hajdam@users.sf.net" url="http://deltahex.exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
@@ -24,13 +24,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Fixed issue on Android Studio</li>
-<li>Added status panel</li>
-<li>Added go-to position dialog</li>
-<li>Added crude search panel</li>
-<li>Adding charset now support basic filtering</li>
-<li>Enabled delta mode, switchable to memory mode</li>
-<li>Most settings are now persistent</li></ul>
+<ul><li>Added options dialog</li>
+<li>Added values side panel</li>
+<li>Added "File/Open File as Hex" action</li>
+<li>Code colorization by byte value</li>
+<li>Some minor fixes</li></ul>
     ]]>
     </change-notes>
 
