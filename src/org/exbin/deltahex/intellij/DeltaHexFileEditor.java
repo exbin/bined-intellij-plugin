@@ -378,7 +378,7 @@ public class DeltaHexFileEditor implements FileEditor {
         controlToolBar.add(jSeparator3);
 
         codeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BIN", "OCT", "DEC", "HEX"}));
-        codeTypeComboBox.setMaximumSize(new java.awt.Dimension(58, 25));
+        codeTypeComboBox.setMaximumSize(new java.awt.Dimension(64, 25));
         codeTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 codeTypeComboBoxActionPerformed(evt);
