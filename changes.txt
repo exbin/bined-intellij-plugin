@@ -1,3 +1,7 @@
+0.1.4
+- Fixed behavior for high precision wheel scrolling
+- Fixed loading after custom font saved
+
 0.1.3 (2017-03-22)
 - Added options dialog
 - Added values side panel

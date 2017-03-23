@@ -73,7 +73,7 @@ import org.exbin.utils.binary_data.BinaryData;
  *
  * Also supports binary, octal and decimal codes.
  *
- * @version 0.1.3 2017/03/20
+ * @version 0.1.3 2017/03/23
  * @author ExBin Project (http://exbin.org)
  */
 public class CodeArea extends JComponent {
@@ -2062,20 +2062,18 @@ public class CodeArea extends JComponent {
 
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
-            if (!isEnabled()) {
+            if (!isEnabled() || e.getWheelRotation() == 0) {
                 return;
             }
 
             if (e.isShiftDown() && horizontalScrollBar.isVisible()) {
                 if (e.getWheelRotation() > 0) {
-                    // TODO
-                    int visibleChars = paintDataCache.codeSectionRectangle.width / paintDataCache.charWidth;
-                    int bytes = paintDataCache.bytesPerLine - visibleChars;
-                    if (scrollPosition.scrollCharPosition < bytes) {
-                        if (scrollPosition.scrollCharPosition < bytes - MOUSE_SCROLL_LINES) {
+                    if (paintDataCache.bytesPerRect < paintDataCache.charsPerLine) {
+                        int maxScroll = paintDataCache.charsPerLine - paintDataCache.bytesPerRect;
+                        if (scrollPosition.scrollCharPosition < maxScroll - MOUSE_SCROLL_LINES) {
                             scrollPosition.scrollCharPosition += MOUSE_SCROLL_LINES;
                         } else {
-                            scrollPosition.scrollCharPosition = bytes;
+                            scrollPosition.scrollCharPosition = maxScroll;
                         }
                         updateScrollBars();
                         notifyScrolled();
