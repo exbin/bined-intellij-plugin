@@ -558,6 +558,7 @@ public class DeltaHexOptionsPanel extends javax.swing.JPanel {
                 if (actionType == DefaultControlHandler.ControlActionType.OK) {
                     deltaHexFont = textFontPanel.getStoredFont();
                     updateFontTextField();
+                    useDefaultFontCheckBox.setSelected(false);
                 }
 
                 dialog.close(0);
