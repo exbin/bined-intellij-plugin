@@ -27,6 +27,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import org.exbin.deltahex.*;
 import org.exbin.deltahex.delta.DeltaDocument;
 import org.exbin.deltahex.delta.FileDataSource;
@@ -79,7 +80,7 @@ import java.util.Map;
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.3 2017/03/20
+ * @version 0.1.4 2017/03/26
  */
 public class DeltaHexFileEditor implements FileEditor {
 
@@ -377,14 +378,16 @@ public class DeltaHexFileEditor implements FileEditor {
         controlToolBar.add(showUnprintablesToggleButton);
         controlToolBar.add(jSeparator3);
 
+        JPanel spacePanel = new JPanel();
+        spacePanel.setLayout(new BorderLayout());
         codeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BIN", "OCT", "DEC", "HEX"}));
-        codeTypeComboBox.setMaximumSize(new java.awt.Dimension(64, 25));
         codeTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 codeTypeComboBoxActionPerformed(evt);
             }
         });
-        controlToolBar.add(codeTypeComboBox);
+        spacePanel.add(codeTypeComboBox, BorderLayout.WEST);
+        controlToolBar.add(spacePanel);
 
         javax.swing.GroupLayout infoToolbarLayout = new javax.swing.GroupLayout(infoToolbar);
         infoToolbar.setLayout(infoToolbarLayout);
@@ -627,7 +630,8 @@ public class DeltaHexFileEditor implements FileEditor {
         boolean modified = undoHandler.getCommandPosition() != undoHandler.getSyncPoint();
         if (modified != this.modified) {
             this.modified = modified;
-            propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
+            VirtualFileManager.getInstance().notifyPropertyChanged(virtualFile, FileEditor.PROP_MODIFIED, !modified, modified);
+            // propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
         }
         saveFileButton.setEnabled(modified);
     }
@@ -1158,6 +1162,7 @@ public class DeltaHexFileEditor implements FileEditor {
             editorPanel.revalidate();
         }
     }
+
     private JPopupMenu createCodeAreaPopupMenu(final CodeArea codeArea, String menuPostfix) {
         JPopupMenu popupMenu = new JPopupMenu();
 
