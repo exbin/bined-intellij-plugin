@@ -19,15 +19,15 @@ import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorLocation;
-import com.intellij.openapi.fileEditor.FileEditorState;
-import com.intellij.openapi.fileEditor.FileEditorStateLevel;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.ex.DocumentEx;
+import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.util.LocalTimeCounter;
 import org.exbin.deltahex.*;
 import org.exbin.deltahex.delta.DeltaDocument;
 import org.exbin.deltahex.delta.FileDataSource;
@@ -80,7 +80,7 @@ import java.util.Map;
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.4 2017/03/26
+ * @version 0.1.4 2017/03/29
  */
 public class DeltaHexFileEditor implements FileEditor {
 
@@ -630,8 +630,13 @@ public class DeltaHexFileEditor implements FileEditor {
         boolean modified = undoHandler.getCommandPosition() != undoHandler.getSyncPoint();
         if (modified != this.modified) {
             this.modified = modified;
+            // TODO: Trying to force "modified behavior"
+            Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+            if (document instanceof DocumentEx) {
+                ((DocumentEx) document).setModificationStamp(LocalTimeCounter.currentTime());
+            }
+            propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
             VirtualFileManager.getInstance().notifyPropertyChanged(virtualFile, FileEditor.PROP_MODIFIED, !modified, modified);
-            // propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
         }
         saveFileButton.setEnabled(modified);
     }
