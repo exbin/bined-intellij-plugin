@@ -5,6 +5,8 @@ Hexadecimal viewer/editor plugin module for IntelliJ IDEA platform.
 
 Homepage: http://deltahex.exbin.org  
 
+Published as: https://plugins.jetbrains.com/plugin/9339-deltahex-editor  
+
 Screenshot
 ----------
 
