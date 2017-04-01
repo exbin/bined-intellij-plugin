@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.exbin.deltahex.intellij</id>
     <name>DeltaHex Editor</name>
-    <version>0.1.4-SNAPSHOT</version>
+    <version>0.1.4</version>
     <vendor email="hajdam@users.sf.net" url="http://deltahex.exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
@@ -24,11 +24,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Added options dialog</li>
-<li>Added values side panel</li>
-<li>Added "File/Open File as Hex" action</li>
-<li>Code colorization by byte value</li>
-<li>Some minor fixes</li></ul>
+<ul><li>Fixed behavior for high precision wheel scrolling</li>
+<li>Fixed loading after custom font saved</li>
+<li>Fixed opening of read-only files</li></ul>
     ]]>
     </change-notes>
 

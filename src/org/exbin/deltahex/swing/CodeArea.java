@@ -73,7 +73,7 @@ import org.exbin.utils.binary_data.BinaryData;
  *
  * Also supports binary, octal and decimal codes.
  *
- * @version 0.1.3 2017/03/23
+ * @version 0.1.3 2017/04/01
  * @author ExBin Project (http://exbin.org)
  */
 public class CodeArea extends JComponent {
@@ -1449,16 +1449,15 @@ public class CodeArea extends JComponent {
         this.editationAllowed = editationAllowed;
         switch (editationAllowed) {
             case READ_ONLY: {
-                editationMode = EditationMode.INSERT;
+                setEditationMode(EditationMode.INSERT);
                 break;
             }
             case OVERWRITE_ONLY: {
-                editationMode = EditationMode.OVERWRITE;
+                setEditationMode(EditationMode.OVERWRITE);
                 break;
             }
             default: // ignore
         }
-        repaint();
     }
 
     public EditationMode getEditationMode() {
@@ -1513,7 +1512,7 @@ public class CodeArea extends JComponent {
     }
 
     public void setEditable(boolean editable) {
-        setEditationAllowed(EditationAllowed.ALLOWED);
+        setEditationAllowed(editable ? EditationAllowed.ALLOWED : EditationAllowed.READ_ONLY);
     }
 
     public boolean isWrapMode() {

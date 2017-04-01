@@ -16,10 +16,7 @@
  */
 package org.exbin.deltahex.intellij.panel;
 
-import org.exbin.deltahex.CaretMovedListener;
-import org.exbin.deltahex.CaretPosition;
-import org.exbin.deltahex.DataChangedListener;
-import org.exbin.deltahex.Section;
+import org.exbin.deltahex.*;
 import org.exbin.deltahex.operation.BinaryDataCommand;
 import org.exbin.deltahex.operation.BinaryDataOperationException;
 import org.exbin.deltahex.operation.swing.CodeAreaUndoHandler;
@@ -36,7 +33,7 @@ import java.util.Arrays;
 /**
  * Values side panel.
  *
- * @version 0.1.3 2017/03/19
+ * @version 0.1.4 2017/04/01
  * @author ExBin Project (http://exbin.org)
  */
 public class ValuesPanel extends javax.swing.JPanel {
@@ -442,6 +439,7 @@ public class ValuesPanel extends javax.swing.JPanel {
         dataChangedListener = new DataChangedListener() {
             @Override
             public void dataChanged() {
+                updateEditationMode();
                 updateValues();
             }
         };
@@ -491,6 +489,18 @@ public class ValuesPanel extends javax.swing.JPanel {
             clearValues();
         }
         updateInProgress = false;
+    }
+
+    public void updateEditationMode() {
+        boolean editable = codeArea.getEditationAllowed() == EditationAllowed.ALLOWED;
+        binaryCheckBox0.setEnabled(editable);
+        binaryCheckBox1.setEnabled(editable);
+        binaryCheckBox2.setEnabled(editable);
+        binaryCheckBox3.setEnabled(editable);
+        binaryCheckBox4.setEnabled(editable);
+        binaryCheckBox5.setEnabled(editable);
+        binaryCheckBox6.setEnabled(editable);
+        binaryCheckBox7.setEnabled(editable);
     }
 
     private void modifyValues(int bytesCount) {

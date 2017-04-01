@@ -1,5 +1,5 @@
 .gradle
-.idea
+.idea/workspace.xml
 out/
 *~
 deltahex-intellij-plugin.jar

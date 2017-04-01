@@ -32,7 +32,7 @@ import org.exbin.utils.binary_data.BinaryData;
 /**
  * Repository of delta segments.
  *
- * @version 0.1.2 2017/01/18
+ * @version 0.1.3 2017/04/01
  * @author ExBin Project (http://exbin.org)
  */
 public class SegmentsRepository {
@@ -51,6 +51,12 @@ public class SegmentsRepository {
 
     public FileDataSource openFileSource(File sourceFile) throws IOException {
         FileDataSource fileSource = new FileDataSource(sourceFile);
+        fileSources.put(fileSource, new DataSegmentsMap());
+        return fileSource;
+    }
+
+    public FileDataSource openFileSource(File sourceFile, FileDataSource.EditationMode editationMode) throws IOException {
+        FileDataSource fileSource = new FileDataSource(sourceFile, editationMode);
         fileSources.put(fileSource, new DataSegmentsMap());
         return fileSource;
     }
