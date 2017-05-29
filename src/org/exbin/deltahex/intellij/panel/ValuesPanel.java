@@ -29,16 +29,15 @@ import org.exbin.utils.binary_data.ByteArrayEditableData;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Values side panel.
  *
- * @version 0.1.4 2017/04/01
+ * @version 0.1.5 2017/05/29
  * @author ExBin Project (http://exbin.org)
  */
 public class ValuesPanel extends javax.swing.JPanel {
-
-    private final byte[] valuesCache = new byte[8];
 
     private CodeArea codeArea;
     private CodeAreaUndoHandler undoHandler;
@@ -47,6 +46,12 @@ public class ValuesPanel extends javax.swing.JPanel {
     private DataChangedListener dataChangedListener;
     private CaretMovedListener caretMovedListener;
     private BinaryDataUndoUpdateListener undoUpdateListener;
+
+    private Thread updateThread = null;
+    private final Object monitor = new Object();
+    private boolean clearValues = true;
+    private final byte[] valuesCache = new byte[8];
+    private final AtomicBoolean valuesUpdateNeeded = new AtomicBoolean(false);
 
     public ValuesPanel() {
         initComponents();
@@ -483,11 +488,23 @@ public class ValuesPanel extends javax.swing.JPanel {
             if (availableData < 8) {
                 Arrays.fill(valuesCache, availableData, 8, (byte) 0);
             }
-            // TODO: perform in separated thread to not hinder performance
-            populateValues(null);
+            clearValues = false;
         } else {
-            clearValues();
+            clearValues = true;
         }
+
+        if (updateThread == null) {
+            updateThread = new Thread(new UpdateThread());
+            updateThread.start();
+        }
+
+        boolean wasNeeded = valuesUpdateNeeded.getAndSet(true);
+        if (!wasNeeded) {
+            synchronized (monitor) {
+                monitor.notify();
+            }
+        }
+
         updateInProgress = false;
     }
 
@@ -527,61 +544,61 @@ public class ValuesPanel extends javax.swing.JPanel {
         codeArea.repaint();
     }
 
-    private void populateValues(ValueType skipType) {
+    private void populateValues(ValueType skipType, byte[] values) {
         boolean signed = signedRadioButton.isSelected();
         boolean littleEndian = littleEndianRadioButton.isSelected();
 
         if (skipType != ValueType.BINARY) {
-            binaryCheckBox0.setSelected((valuesCache[0] & 0x80) > 0);
-            binaryCheckBox1.setSelected((valuesCache[0] & 0x40) > 0);
-            binaryCheckBox2.setSelected((valuesCache[0] & 0x20) > 0);
-            binaryCheckBox3.setSelected((valuesCache[0] & 0x10) > 0);
-            binaryCheckBox4.setSelected((valuesCache[0] & 0x8) > 0);
-            binaryCheckBox5.setSelected((valuesCache[0] & 0x4) > 0);
-            binaryCheckBox6.setSelected((valuesCache[0] & 0x2) > 0);
-            binaryCheckBox7.setSelected((valuesCache[0] & 0x1) > 0);
+            binaryCheckBox0.setSelected((values[0] & 0x80) > 0);
+            binaryCheckBox1.setSelected((values[0] & 0x40) > 0);
+            binaryCheckBox2.setSelected((values[0] & 0x20) > 0);
+            binaryCheckBox3.setSelected((values[0] & 0x10) > 0);
+            binaryCheckBox4.setSelected((values[0] & 0x8) > 0);
+            binaryCheckBox5.setSelected((values[0] & 0x4) > 0);
+            binaryCheckBox6.setSelected((values[0] & 0x2) > 0);
+            binaryCheckBox7.setSelected((values[0] & 0x1) > 0);
         }
 
         if (skipType != ValueType.BYTE) {
-            byteTextField.setText(String.valueOf(signed ? valuesCache[0] : valuesCache[0] & 0xff));
+            byteTextField.setText(String.valueOf(signed ? values[0] : values[0] & 0xff));
         }
 
         if (skipType != ValueType.WORD) {
             int wordValue = signed
                     ? (littleEndian
-                            ? (valuesCache[0] & 0xff) | (valuesCache[1] << 8)
-                            : (valuesCache[1] & 0xff) | (valuesCache[0] << 8))
+                            ? (values[0] & 0xff) | (values[1] << 8)
+                            : (values[1] & 0xff) | (values[0] << 8))
                     : (littleEndian
-                            ? (valuesCache[0] & 0xff) | ((valuesCache[1] & 0xff) << 8)
-                            : (valuesCache[1] & 0xff) | ((valuesCache[0] & 0xff) << 8));
+                            ? (values[0] & 0xff) | ((values[1] & 0xff) << 8)
+                            : (values[1] & 0xff) | ((values[0] & 0xff) << 8));
             wordTextField.setText(String.valueOf(wordValue));
         }
 
         if (skipType != ValueType.INTEGER) {
             long intValue = signed
                     ? (littleEndian
-                            ? (valuesCache[0] & 0xffl) | ((valuesCache[1] & 0xffl) << 8) | ((valuesCache[2] & 0xffl) << 16) | (valuesCache[3] << 24)
-                            : (valuesCache[3] & 0xffl) | ((valuesCache[2] & 0xffl) << 8) | ((valuesCache[1] & 0xffl) << 16) | (valuesCache[0] << 24))
+                            ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | (values[3] << 24)
+                            : (values[3] & 0xffl) | ((values[2] & 0xffl) << 8) | ((values[1] & 0xffl) << 16) | (values[0] << 24))
                     : (littleEndian
-                            ? (valuesCache[0] & 0xffl) | ((valuesCache[1] & 0xffl) << 8) | ((valuesCache[2] & 0xffl) << 16) | ((valuesCache[3] & 0xffl) << 24)
-                            : (valuesCache[3] & 0xffl) | ((valuesCache[2] & 0xffl) << 8) | ((valuesCache[1] & 0xffl) << 16) | ((valuesCache[0] & 0xffl) << 24));
+                            ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | ((values[3] & 0xffl) << 24)
+                            : (values[3] & 0xffl) | ((values[2] & 0xffl) << 8) | ((values[1] & 0xffl) << 16) | ((values[0] & 0xffl) << 24));
             intTextField.setText(String.valueOf(intValue));
         }
 
         if (skipType != ValueType.LONG) {
             long longValue = signed
                     ? (littleEndian
-                            ? (valuesCache[0] & 0xffl) | ((valuesCache[1] & 0xffl) << 8) | ((valuesCache[2] & 0xffl) << 16) | ((valuesCache[3] & 0xffl) << 24)
-                            | ((valuesCache[4] & 0xffl) << 32) | ((valuesCache[5] & 0xffl) << 40) | ((valuesCache[6] & 0xffl) << 48) | (valuesCache[7] << 56)
-                            : (valuesCache[7] & 0xffl) | ((valuesCache[6] & 0xffl) << 8) | ((valuesCache[5] & 0xffl) << 16) | ((valuesCache[4] & 0xffl) << 24)
-                            | ((valuesCache[3] & 0xffl) << 32) | ((valuesCache[2] & 0xffl) << 40) | ((valuesCache[1] & 0xffl) << 48) | (valuesCache[0] << 56))
+                            ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | ((values[3] & 0xffl) << 24)
+                            | ((values[4] & 0xffl) << 32) | ((values[5] & 0xffl) << 40) | ((values[6] & 0xffl) << 48) | (values[7] << 56)
+                            : (values[7] & 0xffl) | ((values[6] & 0xffl) << 8) | ((values[5] & 0xffl) << 16) | ((values[4] & 0xffl) << 24)
+                            | ((values[3] & 0xffl) << 32) | ((values[2] & 0xffl) << 40) | ((values[1] & 0xffl) << 48) | (values[0] << 56))
                     : (littleEndian
-                            ? (valuesCache[0] & 0xffl) | ((valuesCache[1] & 0xffl) << 8) | ((valuesCache[2] & 0xffl) << 16) | ((valuesCache[3] & 0xffl) << 24)
-                            | ((valuesCache[4] & 0xffl) << 32) | ((valuesCache[5] & 0xffl) << 40) | ((valuesCache[6] & 0xffl) << 48)
-                            : (valuesCache[7] & 0xffl) | ((valuesCache[6] & 0xffl) << 8) | ((valuesCache[5] & 0xffl) << 16) | ((valuesCache[4] & 0xffl) << 24)
-                            | ((valuesCache[3] & 0xffl) << 32) | ((valuesCache[2] & 0xffl) << 40) | ((valuesCache[1] & 0xffl) << 48));
+                            ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | ((values[3] & 0xffl) << 24)
+                            | ((values[4] & 0xffl) << 32) | ((values[5] & 0xffl) << 40) | ((values[6] & 0xffl) << 48)
+                            : (values[7] & 0xffl) | ((values[6] & 0xffl) << 8) | ((values[5] & 0xffl) << 16) | ((values[4] & 0xffl) << 24)
+                            | ((values[3] & 0xffl) << 32) | ((values[2] & 0xffl) << 40) | ((values[1] & 0xffl) << 48));
             if (!signed) {
-                BigInteger bigInt1 = BigInteger.valueOf(valuesCache[littleEndian ? 7 : 0] & 0xffl);
+                BigInteger bigInt1 = BigInteger.valueOf(values[littleEndian ? 7 : 0] & 0xffl);
                 BigInteger bigInt2 = bigInt1.shiftLeft(56);
                 BigInteger bigInt3 = bigInt2.add(BigInteger.valueOf(longValue));
                 longTextField.setText(bigInt3.toString());
@@ -590,7 +607,7 @@ public class ValuesPanel extends javax.swing.JPanel {
             }
         }
 
-        ByteBuffer buffer = ByteBuffer.wrap(valuesCache);
+        ByteBuffer buffer = ByteBuffer.wrap(values);
         if (skipType != ValueType.FLOAT) {
             floatTextField.setText(String.valueOf(buffer.getFloat()));
         }
@@ -601,7 +618,7 @@ public class ValuesPanel extends javax.swing.JPanel {
         }
 
         if (skipType != ValueType.CHARACTER) {
-            String strValue = new String(valuesCache, codeArea.getCharset());
+            String strValue = new String(values, codeArea.getCharset());
             if (strValue.length() > 0) {
                 characterTextField.setText(strValue.substring(0, 1));
             } else {
@@ -628,7 +645,7 @@ public class ValuesPanel extends javax.swing.JPanel {
         characterTextField.setText("");
     }
 
-    public static enum ValueType {
+    public enum ValueType {
         BINARY,
         BYTE,
         WORD,
@@ -637,5 +654,32 @@ public class ValuesPanel extends javax.swing.JPanel {
         FLOAT,
         DOUBLE,
         CHARACTER
+    }
+
+
+    private class UpdateThread implements Runnable {
+
+        @Override
+        public void run() {
+            do {
+                boolean updateNeeded = valuesUpdateNeeded.getAndSet(false);
+                if (updateNeeded) {
+                    byte[] values = valuesCache;
+                    if (clearValues) {
+                        clearValues();
+                    } else {
+                        populateValues(null, values);
+                    }
+                } else {
+                    synchronized (monitor) {
+                        try {
+                            monitor.wait();
+                        } catch (InterruptedException e) {
+                            // Ignore, will be checked below
+                        }
+                    }
+                }
+            } while (!Thread.interrupted());
+        }
     }
 }

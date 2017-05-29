@@ -1,11 +1,11 @@
 <idea-plugin version="2">
     <id>org.exbin.deltahex.intellij</id>
     <name>DeltaHex Editor</name>
-    <version>0.1.4</version>
+    <version>0.1.5-SNAPSHOT</version>
     <vendor email="hajdam@users.sf.net" url="http://deltahex.exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
-<p>Hexadecimal editor based on deltahex library. Use "Open as Hex" action in context popup menu to edit files in projects.</p>
+<p>Hexadecimal editor based on deltahex library. Use "Open as Hex" action in main "File" menu or in project files context menu.</p>
 
 <h1>Preview</h1>
 <p><img src="http://deltahex.exbin.org/images/deltahex-intellij-plugin-preview-0.1.1.png" alt="deltahex-intellij-plugin-preview"/></p>
