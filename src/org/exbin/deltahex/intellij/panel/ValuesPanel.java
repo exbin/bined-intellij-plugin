@@ -524,8 +524,15 @@ public class ValuesPanel extends javax.swing.JPanel {
         codeArea.repaint();
     }
 
-    public enum ValueType {
-        BINARY,
+    public enum ValuesPanelField {
+        BINARY0,
+        BINARY1,
+        BINARY2,
+        BINARY3,
+        BINARY4,
+        BINARY5,
+        BINARY6,
+        BINARY7,
         BYTE,
         WORD,
         INTEGER,
@@ -553,15 +560,15 @@ public class ValuesPanel extends javax.swing.JPanel {
             }
             if (!scheduleUpdate) {
                 scheduleUpdate = true;
-                scheduleNextStep(ValueType.values()[0]);
+                scheduleNextStep(ValuesPanelField.values()[0]);
             }
         }
 
-        private void scheduleNextStep(ValueType valueType) {
+        private void scheduleNextStep(ValuesPanelField valuesPanelField) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    updateValue(valueType);
+                    updateValue(valuesPanelField);
                 }
             });
         }
@@ -570,8 +577,8 @@ public class ValuesPanel extends javax.swing.JPanel {
             return updateInProgress;
         }
 
-        private void updateValue(ValueType valueType) {
-            if (valueType.ordinal() == 0) {
+        private void updateValue(ValuesPanelField valuesPanelField) {
+            if (valuesPanelField.ordinal() == 0) {
                 long dataSize = codeArea.getDataSize();
                 clearFields = dataPosition >= dataSize;
                 littleEndian = littleEndianRadioButton.isSelected();
@@ -586,36 +593,57 @@ public class ValuesPanel extends javax.swing.JPanel {
             }
 
             if (clearFields) {
-                clearField(valueType);
+                clearField(valuesPanelField);
             } else {
-                updateField(valueType);
+                updateField(valuesPanelField);
             }
 
-            ValueType[] values = ValueType.values();
-            ValueType lastValue = values[values.length - 1];
-            if (valueType == lastValue) {
+            ValuesPanelField[] values = ValuesPanelField.values();
+            ValuesPanelField lastValue = values[values.length - 1];
+            if (valuesPanelField == lastValue) {
                 stopUpdate();
             } else {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        ValueType nextValue = values[valueType.ordinal() + 1];
+                        ValuesPanelField nextValue = values[valuesPanelField.ordinal() + 1];
                         updateValue(nextValue);
                     }
                 });
             }
         }
 
-        private void updateField(ValueType valueType) {
-            switch (valueType) {
-                case BINARY: {
+        private void updateField(ValuesPanelField valuesPanelField) {
+            switch (valuesPanelField) {
+                case BINARY0: {
                     binaryCheckBox0.setSelected((values[0] & 0x80) > 0);
+                    break;
+                }
+                case BINARY1: {
                     binaryCheckBox1.setSelected((values[0] & 0x40) > 0);
+                    break;
+                }
+                case BINARY2: {
                     binaryCheckBox2.setSelected((values[0] & 0x20) > 0);
+                    break;
+                }
+                case BINARY3: {
                     binaryCheckBox3.setSelected((values[0] & 0x10) > 0);
+                    break;
+                }
+                case BINARY4: {
                     binaryCheckBox4.setSelected((values[0] & 0x8) > 0);
+                    break;
+                }
+                case BINARY5: {
                     binaryCheckBox5.setSelected((values[0] & 0x4) > 0);
+                    break;
+                }
+                case BINARY6: {
                     binaryCheckBox6.setSelected((values[0] & 0x2) > 0);
+                    break;
+                }
+                case BINARY7: {
                     binaryCheckBox7.setSelected((values[0] & 0x1) > 0);
                     break;
                 }
@@ -689,16 +717,37 @@ public class ValuesPanel extends javax.swing.JPanel {
             }
         }
 
-        private void clearField(ValueType valueType) {
-            switch (valueType) {
-                case BINARY: {
+        private void clearField(ValuesPanelField valuesPanelField) {
+            switch (valuesPanelField) {
+                case BINARY0: {
                     binaryCheckBox0.setSelected(false);
+                    break;
+                }
+                case BINARY1: {
                     binaryCheckBox1.setSelected(false);
+                    break;
+                }
+                case BINARY2: {
                     binaryCheckBox2.setSelected(false);
+                    break;
+                }
+                case BINARY3: {
                     binaryCheckBox3.setSelected(false);
+                    break;
+                }
+                case BINARY4: {
                     binaryCheckBox4.setSelected(false);
+                    break;
+                }
+                case BINARY5: {
                     binaryCheckBox5.setSelected(false);
+                    break;
+                }
+                case BINARY6: {
                     binaryCheckBox6.setSelected(false);
+                    break;
+                }
+                case BINARY7: {
                     binaryCheckBox7.setSelected(false);
                     break;
                 }
