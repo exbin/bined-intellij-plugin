@@ -564,7 +564,7 @@ public class ValuesPanel extends javax.swing.JPanel {
             }
         }
 
-        private void scheduleNextStep(ValuesPanelField valuesPanelField) {
+        private void scheduleNextStep(final ValuesPanelField valuesPanelField) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -577,7 +577,7 @@ public class ValuesPanel extends javax.swing.JPanel {
             return updateInProgress;
         }
 
-        private void updateValue(ValuesPanelField valuesPanelField) {
+        private void updateValue(final ValuesPanelField valuesPanelField) {
             if (valuesPanelField.ordinal() == 0) {
                 long dataSize = codeArea.getDataSize();
                 clearFields = dataPosition >= dataSize;
@@ -598,7 +598,7 @@ public class ValuesPanel extends javax.swing.JPanel {
                 updateField(valuesPanelField);
             }
 
-            ValuesPanelField[] values = ValuesPanelField.values();
+            final ValuesPanelField[] values = ValuesPanelField.values();
             ValuesPanelField lastValue = values[values.length - 1];
             if (valuesPanelField == lastValue) {
                 stopUpdate();
