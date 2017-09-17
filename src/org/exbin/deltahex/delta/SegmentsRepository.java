@@ -791,6 +791,26 @@ public class SegmentsRepository {
     }
 
     /**
+     * Loads all segments from given source file to memory.
+     *
+     * @param fileSource file source
+     */
+    public void detachFileSource(FileDataSource fileSource) {
+        for (DeltaDocument document : documents) {
+            long documentPosition = 0;
+            while (documentPosition < document.getDataSize()) {
+                DataSegment segment = document.getSegment(documentPosition);
+                long segmentLength = segment.getLength();
+                if (segment instanceof FileSegment && ((FileSegment) segment).getSource() == fileSource) {
+                    preloadDocumentSection(document, documentPosition, segmentLength);
+                }
+
+                documentPosition += segmentLength;
+            }
+        }
+    }
+
+    /**
      * Mapping of segments to data source.
      *
      * Segments are suppose to be kept ordered by start position and length with
