@@ -29,6 +29,7 @@ import org.exbin.utils.binary_data.ByteArrayEditableData;
 import javax.swing.*;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
@@ -551,7 +552,7 @@ public class ValuesPanel extends javax.swing.JPanel {
         private boolean clearFields = true;
 
         private boolean signed;
-        private boolean littleEndian;
+        private ByteOrder byteOrder;
         private byte[] values;
 
         private synchronized void schedule() {
@@ -581,7 +582,7 @@ public class ValuesPanel extends javax.swing.JPanel {
             if (valuesPanelField.ordinal() == 0) {
                 long dataSize = codeArea.getDataSize();
                 clearFields = dataPosition >= dataSize;
-                littleEndian = littleEndianRadioButton.isSelected();
+                byteOrder = littleEndianRadioButton.isSelected() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
                 signed = signedRadioButton.isSelected();
                 values = valuesCache;
                 updateStarted();
@@ -598,15 +599,15 @@ public class ValuesPanel extends javax.swing.JPanel {
                 updateField(valuesPanelField);
             }
 
-            final ValuesPanelField[] values = ValuesPanelField.values();
-            ValuesPanelField lastValue = values[values.length - 1];
+            final ValuesPanelField[] panelFields = ValuesPanelField.values();
+            ValuesPanelField lastValue = panelFields[panelFields.length - 1];
             if (valuesPanelField == lastValue) {
                 stopUpdate();
             } else {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        ValuesPanelField nextValue = values[valuesPanelField.ordinal() + 1];
+                        ValuesPanelField nextValue = panelFields[valuesPanelField.ordinal() + 1];
                         updateValue(nextValue);
                     }
                 });
@@ -653,10 +654,10 @@ public class ValuesPanel extends javax.swing.JPanel {
                 }
                 case WORD: {
                     int wordValue = signed
-                            ? (littleEndian
+                            ? (byteOrder == ByteOrder.LITTLE_ENDIAN
                             ? (values[0] & 0xff) | (values[1] << 8)
                             : (values[1] & 0xff) | (values[0] << 8))
-                            : (littleEndian
+                            : (byteOrder == ByteOrder.LITTLE_ENDIAN
                             ? (values[0] & 0xff) | ((values[1] & 0xff) << 8)
                             : (values[1] & 0xff) | ((values[0] & 0xff) << 8));
                     wordTextField.setText(String.valueOf(wordValue));
@@ -664,10 +665,10 @@ public class ValuesPanel extends javax.swing.JPanel {
                 }
                 case INTEGER: {
                     long intValue = signed
-                            ? (littleEndian
+                            ? (byteOrder == ByteOrder.LITTLE_ENDIAN
                             ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | (values[3] << 24)
                             : (values[3] & 0xffl) | ((values[2] & 0xffl) << 8) | ((values[1] & 0xffl) << 16) | (values[0] << 24))
-                            : (littleEndian
+                            : (byteOrder == ByteOrder.LITTLE_ENDIAN
                             ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | ((values[3] & 0xffl) << 24)
                             : (values[3] & 0xffl) | ((values[2] & 0xffl) << 8) | ((values[1] & 0xffl) << 16) | ((values[0] & 0xffl) << 24));
                     intTextField.setText(String.valueOf(intValue));
@@ -675,18 +676,18 @@ public class ValuesPanel extends javax.swing.JPanel {
                 }
                 case LONG: {
                     long longValue = signed
-                            ? (littleEndian
+                            ? (byteOrder == ByteOrder.LITTLE_ENDIAN
                             ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | ((values[3] & 0xffl) << 24)
                             | ((values[4] & 0xffl) << 32) | ((values[5] & 0xffl) << 40) | ((values[6] & 0xffl) << 48) | (values[7] << 56)
                             : (values[7] & 0xffl) | ((values[6] & 0xffl) << 8) | ((values[5] & 0xffl) << 16) | ((values[4] & 0xffl) << 24)
                             | ((values[3] & 0xffl) << 32) | ((values[2] & 0xffl) << 40) | ((values[1] & 0xffl) << 48) | (values[0] << 56))
-                            : (littleEndian
+                            : (byteOrder == ByteOrder.LITTLE_ENDIAN
                             ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | ((values[3] & 0xffl) << 24)
                             | ((values[4] & 0xffl) << 32) | ((values[5] & 0xffl) << 40) | ((values[6] & 0xffl) << 48)
                             : (values[7] & 0xffl) | ((values[6] & 0xffl) << 8) | ((values[5] & 0xffl) << 16) | ((values[4] & 0xffl) << 24)
                             | ((values[3] & 0xffl) << 32) | ((values[2] & 0xffl) << 40) | ((values[1] & 0xffl) << 48));
                     if (!signed) {
-                        BigInteger bigInt1 = BigInteger.valueOf(values[littleEndian ? 7 : 0] & 0xffl);
+                        BigInteger bigInt1 = BigInteger.valueOf(values[byteOrder == ByteOrder.LITTLE_ENDIAN ? 7 : 0] & 0xffl);
                         BigInteger bigInt2 = bigInt1.shiftLeft(56);
                         BigInteger bigInt3 = bigInt2.add(BigInteger.valueOf(longValue));
                         longTextField.setText(bigInt3.toString());
@@ -697,11 +698,19 @@ public class ValuesPanel extends javax.swing.JPanel {
                 }
                 case FLOAT: {
                     ByteBuffer buffer = ByteBuffer.wrap(values);
+                    if (buffer.order() != byteOrder) {
+                        buffer = buffer.order(byteOrder);
+                    }
+
                     floatTextField.setText(String.valueOf(buffer.getFloat()));
                     break;
                 }
                 case DOUBLE: {
                     ByteBuffer buffer = ByteBuffer.wrap(values);
+                    if (buffer.order() != byteOrder) {
+                        buffer = buffer.order(byteOrder);
+                    }
+
                     doubleTextField.setText(String.valueOf(buffer.getDouble()));
                     break;
                 }

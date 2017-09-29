@@ -57,6 +57,7 @@ import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.handler.OptionsControlHandler;
 import org.exbin.framework.gui.utils.panel.OptionsControlPanel;
 import org.exbin.utils.binary_data.BinaryData;
+import org.exbin.utils.binary_data.ByteArrayData;
 import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
 import org.jetbrains.annotations.NotNull;
@@ -601,6 +602,19 @@ public class DeltaHexFileEditor implements FileEditor {
         }
     }
 
+    private void closeData() {
+        BinaryData data = codeArea.getData();
+        codeArea.setData(new ByteArrayData());
+        if (data instanceof DeltaDocument) {
+            FileDataSource fileSource = ((DeltaDocument) data).getFileSource();
+            data.dispose();
+            segmentsRepository.detachFileSource(fileSource);
+            segmentsRepository.closeFileSource(fileSource);
+        } else {
+            data.dispose();
+        }
+    }
+
     public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi) {
         this.encodingStatus = encodingStatusApi;
         setCharsetChangeListener(new CharsetChangeListener() {
@@ -661,7 +675,7 @@ public class DeltaHexFileEditor implements FileEditor {
 
     @Override
     public void dispose() {
-
+        closeData();
     }
 
     @Nullable
