@@ -999,6 +999,7 @@ public class DeltaHexFileEditor implements FileEditor {
                 final DeltaHexOptionsPanelBorder optionsPanel = new DeltaHexOptionsPanelBorder();
                 optionsPanel.setFromCodeArea(codeArea);
                 optionsPanel.setShowValuesPanel(valuesPanelVisible);
+                optionsPanel.setPreferredSize(new Dimension(640, 480));
                 OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
                 JPanel dialogPanel = WindowUtils.createDialogPanel(optionsPanel, optionsControlPanel);
                 final DialogWrapper dialog = DialogUtils.createDialog(dialogPanel, "Options");

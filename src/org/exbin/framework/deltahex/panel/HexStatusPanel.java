@@ -16,14 +16,15 @@
  */
 package org.exbin.framework.deltahex.panel;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.MouseEvent;
 import org.exbin.deltahex.EditationMode;
 import org.exbin.framework.deltahex.HexStatusApi;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.gui.utils.LanguageUtils;
+
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.MouseEvent;
 
 /**
  * Hexadecimal editor status panel.
@@ -32,6 +33,9 @@ import org.exbin.framework.gui.utils.LanguageUtils;
  * @author ExBin Project (http://exbin.org)
  */
 public class HexStatusPanel extends javax.swing.JPanel implements HexStatusApi, TextEncodingStatusApi {
+
+    public static final String INSERT_EDITATION_MODE_LABEL = "INS";
+    public static final String OVERWRITE_EDITATION_MODE_LABEL = "OVR";
 
     private EditationMode editationMode;
     private StatusControlHandler statusControlHandle;
@@ -312,7 +316,7 @@ public class HexStatusPanel extends javax.swing.JPanel implements HexStatusApi, 
 
     @Override
     public void setEncoding(String encodingName) {
-        encodingLabel.setText(encodingName);
+        encodingLabel.setText(encodingName + " \u25BE");
     }
 
     @Override
@@ -320,11 +324,11 @@ public class HexStatusPanel extends javax.swing.JPanel implements HexStatusApi, 
         this.editationMode = editationMode;
         switch (editationMode) {
             case INSERT: {
-                editationModeLabel.setText("INS");
+                editationModeLabel.setText(INSERT_EDITATION_MODE_LABEL);
                 break;
             }
             case OVERWRITE: {
-                editationModeLabel.setText("OVR");
+                editationModeLabel.setText(OVERWRITE_EDITATION_MODE_LABEL);
                 break;
             }
             default:

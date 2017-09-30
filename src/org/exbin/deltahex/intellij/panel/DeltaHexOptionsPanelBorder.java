@@ -21,7 +21,7 @@ import org.exbin.deltahex.swing.CodeArea;
 /**
  * Hexadecimal editor options panel with border.
  *
- * @version 0.1.3 2017/03/19
+ * @version 0.1.5 2017/09/30
  * @author ExBin Project (http://exbin.org)
  */
 public class DeltaHexOptionsPanelBorder extends javax.swing.JPanel {
@@ -39,23 +39,16 @@ public class DeltaHexOptionsPanelBorder extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        scrollPane = new javax.swing.JScrollPane();
         optionsPanel = new org.exbin.deltahex.intellij.panel.DeltaHexOptionsPanel();
 
         setLayout(new java.awt.BorderLayout());
 
-        scrollPane.setAutoscrolls(true);
-
         optionsPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        scrollPane.setViewportView(optionsPanel);
-
-        add(scrollPane, java.awt.BorderLayout.CENTER);
+        add(optionsPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.exbin.deltahex.intellij.panel.DeltaHexOptionsPanel optionsPanel;
-    private javax.swing.JScrollPane scrollPane;
     // End of variables declaration//GEN-END:variables
 
     public void setFromCodeArea(CodeArea codeArea) {
