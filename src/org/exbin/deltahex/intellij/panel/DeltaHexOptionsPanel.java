@@ -71,12 +71,14 @@ public class DeltaHexOptionsPanel extends javax.swing.JPanel {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 int selectedIndex = categoriesList.getSelectedIndex();
-                CategoryItem categoryItem = categoryModel.get(selectedIndex);
-                currentCategoryPanel = categoryItem.getCategoryPanel();
-                mainPane.setViewportView(currentCategoryPanel);
-                mainPane.invalidate();
-                revalidate();
-                mainPane.repaint();
+                if (selectedIndex >= 0) {
+                    CategoryItem categoryItem = categoryModel.get(selectedIndex);
+                    currentCategoryPanel = categoryItem.getCategoryPanel();
+                    mainPane.setViewportView(currentCategoryPanel);
+                    mainPane.invalidate();
+                    revalidate();
+                    mainPane.repaint();
+                }
             }
         });
         categoriesList.setCellRenderer(new DefaultListCellRenderer() {
