@@ -27,6 +27,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.LocalTimeCounter;
 import org.exbin.deltahex.*;
 import org.exbin.deltahex.delta.DeltaDocument;
@@ -132,6 +133,7 @@ public class DeltaHexFileEditor implements FileEditor {
     private EncodingsHandler encodingsHandler;
     private boolean findTextPanelVisible = false;
     private HexSearchPanel hexSearchPanel = null;
+    private JScrollPane valuesPanelScrollPane = null;
     private ValuesPanel valuesPanel = null;
     private boolean valuesPanelVisible = false;
 
@@ -1166,11 +1168,13 @@ public class DeltaHexFileEditor implements FileEditor {
             if (valuesPanel == null) {
                 valuesPanel = new ValuesPanel();
                 valuesPanel.setCodeArea(codeArea, undoHandler);
+                valuesPanelScrollPane = new JBScrollPane(valuesPanel);
             }
-            editorPanel.add(valuesPanel, BorderLayout.EAST);
+            editorPanel.add(valuesPanelScrollPane, BorderLayout.EAST);
             valuesPanel.enableUpdate();
             valuesPanel.updateValues();
-            editorPanel.revalidate();
+            valuesPanelScrollPane.revalidate();
+            valuesPanel.revalidate();
             editorPanel.revalidate();
         }
     }
@@ -1179,8 +1183,7 @@ public class DeltaHexFileEditor implements FileEditor {
         if (valuesPanelVisible) {
             valuesPanelVisible = false;
             valuesPanel.disableUpdate();
-            editorPanel.remove(valuesPanel);
-            editorPanel.revalidate();
+            editorPanel.remove(valuesPanelScrollPane);
             editorPanel.revalidate();
         }
     }

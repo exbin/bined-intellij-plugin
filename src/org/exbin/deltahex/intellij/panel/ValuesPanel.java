@@ -40,7 +40,7 @@ import java.util.InputMismatchException;
  * Values side panel.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.5 2017/10/02
+ * @version 0.1.5 2017/10/03
  */
 public class ValuesPanel extends javax.swing.JPanel {
 
@@ -449,7 +449,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_binaryCheckBox7ActionPerformed
 
     private void byteTextFieldKeyReleased(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 Integer intValue = Integer.valueOf(byteTextField.getText());
                 if (isSigned()) {
@@ -472,7 +472,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     private void wordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 Integer intValue = Integer.valueOf(wordTextField.getText());
                 if (isSigned()) {
@@ -501,7 +501,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     private void intTextFieldKeyPressed(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 Long longValue = Long.valueOf(intTextField.getText());
                 if (isSigned()) {
@@ -534,7 +534,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     private void longTextFieldKeyReleased(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 ByteOrder byteOrder = getByteOrder();
                 if (isSigned()) {
@@ -577,7 +577,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     private void floatTextFieldKeyReleased(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 ByteOrder byteOrder = getByteOrder();
                 Float floatValue = Float.valueOf(floatTextField.getText());
@@ -598,7 +598,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     private void doubleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 ByteOrder byteOrder = getByteOrder();
                 Double doubleValue = Double.valueOf(doubleTextField.getText());
@@ -619,7 +619,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     private void characterTextFieldKeyReleased(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 String characterText = characterTextField.getText();
                 if (characterText.length() == 0) {
@@ -716,7 +716,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     public void updateEditationMode() {
-        boolean editable = codeArea.getEditationAllowed() == EditationAllowed.ALLOWED;
+        boolean editable = isEditable();
         binaryCheckBox0.setEnabled(editable);
         binaryCheckBox1.setEnabled(editable);
         binaryCheckBox2.setEnabled(editable);
@@ -787,6 +787,10 @@ public class ValuesPanel extends javax.swing.JPanel {
 
     private boolean isSigned() {
         return signedRadioButton.isSelected();
+    }
+
+    private boolean isEditable() {
+        return codeArea.getEditationAllowed() == EditationAllowed.ALLOWED;
     }
 
     private ByteOrder getByteOrder() {
