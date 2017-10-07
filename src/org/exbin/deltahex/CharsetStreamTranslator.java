@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.CodingErrorAction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,12 +31,12 @@ import java.util.logging.Logger;
  * Input stream translation class which converts from input charset to target
  * charset.
  *
- * @version 0.1.1 2016/11/02
+ * @version 0.1.5 2017/10/07
  * @author ExBin Project (http://exbin.org)
  */
 public class CharsetStreamTranslator extends InputStream {
 
-    public static final int BYTE_BUFFER_SIZE = 1024;
+    public static final int BYTE_BUFFER_SIZE = 16;
 
     private final CharsetEncoder encoder;
     private final CharsetDecoder decoder;
@@ -52,7 +53,9 @@ public class CharsetStreamTranslator extends InputStream {
     public CharsetStreamTranslator(Charset inputCharset, Charset outputCharset, InputStream source, int bufferSize) {
         this.source = source;
         decoder = inputCharset.newDecoder();
+        decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
         encoder = outputCharset.newEncoder();
+        encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
         maxInputCharSize = (int) decoder.maxCharsPerByte();
         if (maxInputCharSize < 0) {
             maxInputCharSize = 1;
@@ -61,11 +64,13 @@ public class CharsetStreamTranslator extends InputStream {
         if (maxOutputCharSize < 0) {
             maxOutputCharSize = 1;
         }
+
+        charBuffer = CharBuffer.allocate(bufferSize * 8);
+
         inputBuffer = ByteBuffer.allocate(bufferSize);
-        // Use limit as mark of used bytes
         inputBuffer.limit(0);
-        charBuffer = CharBuffer.allocate(bufferSize);
-        outputBuffer = ByteBuffer.allocate(bufferSize * maxOutputCharSize);
+
+        outputBuffer = ByteBuffer.allocate(bufferSize * maxOutputCharSize * 8);
         outputBuffer.limit(0);
     }
 
@@ -91,16 +96,106 @@ public class CharsetStreamTranslator extends InputStream {
         return byteData;
     }
 
+    @Override
+    public int read(byte[] buffer, int offset, int length) throws IOException {
+        int processed = 0;
+
+        while (processed < length) {
+            int remaining = outputBuffer.remaining();
+            if (remaining == 0) {
+                if (endOfInput) {
+                    return processed > 0 ? processed : -1;
+                } else {
+                    processNext();
+                    remaining = outputBuffer.remaining();
+                    if (remaining == 0) {
+                        return processed > 0 ? processed : -1;
+                    }
+                }
+            }
+
+            int toProcess = length > remaining ? remaining : length;
+            outputBuffer.get(buffer, offset, toProcess);
+            offset += toProcess;
+            length -= toProcess;
+            processed += toProcess;
+        }
+
+        return processed;
+    }
+
     public void processNext() {
+        charBuffer.rewind();
+        charBuffer.limit(charBuffer.capacity());
+
+        do {
+            loadFromInput();
+            if (inputBuffer.remaining() == 0) {
+                return;
+            }
+
+            decoder.reset();
+            CoderResult decodeResult = decoder.decode(inputBuffer, charBuffer, endOfInput);
+            // TODO process errors?
+            if (decodeResult.isOverflow()) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            } else if (decodeResult.isError()) {
+                // Skip byte
+                if (charBuffer.position() == 0 && inputBuffer.remaining() > 0) {
+                    inputBuffer.position(inputBuffer.position() + 1);
+                }
+            } else if (decodeResult.isUnmappable()) {
+                throw new IllegalStateException("Unmappable character should be handled automatically");
+            } else if (decodeResult.isMalformed()) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        } while (charBuffer.position() == 0);
+
+        int chars = charBuffer.position();
+        charBuffer.rewind();
+        charBuffer.limit(chars);
+
+        outputBuffer.limit(outputBuffer.capacity());
+        outputBuffer.clear();
+        while (charBuffer.remaining() > 0) {
+            encoder.reset();
+            CoderResult encodeResult = encoder.encode(charBuffer, outputBuffer, endOfInput);
+            if (encodeResult.isOverflow()) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            } else if (encodeResult.isUnmappable()) {
+                throw new IllegalStateException("Unmappable character should be handled automatically");
+            } else if (encodeResult.isError()) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            } else if (encodeResult.isMalformed()) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        }
+
+        int length = outputBuffer.position();
+        outputBuffer.rewind();
+        outputBuffer.limit(length);
+    }
+
+    @Override
+
+    public int available() throws IOException {
+        int remaining = outputBuffer.remaining();
+        if (remaining > 0) {
+            return remaining;
+        }
+
+        return endOfInput ? 1 : 0;
+    }
+
+    private void loadFromInput() {
         byte[] buffer = inputBuffer.array();
-        if (inputBuffer.remaining() > 0) {
+        int remainingLength = inputBuffer.remaining();
+        if (remainingLength > 0) {
             // Copy remaining data from previous processing
-            int bufferOffset = inputBuffer.position();
-            int length = inputBuffer.remaining();
-            System.arraycopy(buffer, bufferOffset, buffer, 0, length);
+            System.arraycopy(buffer, inputBuffer.position(), buffer, 0, remainingLength);
             inputBuffer.rewind();
-            inputBuffer.limit(length);
-            inputBuffer.position(length);
+            inputBuffer.limit(remainingLength);
+            inputBuffer.position(remainingLength);
         } else {
             inputBuffer.rewind();
             inputBuffer.limit(0);
@@ -114,7 +209,7 @@ public class CharsetStreamTranslator extends InputStream {
             try {
                 int red = source.read(buffer, offset, toRead);
                 if (red < 0) {
-                    inputBuffer.limit(position + offset);
+                    inputBuffer.limit(offset);
                     endOfInput = true;
                     break;
                 }
@@ -127,23 +222,5 @@ public class CharsetStreamTranslator extends InputStream {
         }
 
         inputBuffer.rewind();
-
-        decoder.reset();
-        charBuffer.limit(charBuffer.capacity());
-        CoderResult decodeResult = decoder.decode(inputBuffer, charBuffer, endOfInput);
-        // TODO process errors?
-
-        encoder.reset();
-        outputBuffer.limit(outputBuffer.capacity());
-        outputBuffer.clear();
-        int chars = charBuffer.position();
-        charBuffer.rewind();
-        charBuffer.limit(chars);
-        CoderResult encodeResult = encoder.encode(charBuffer, outputBuffer, endOfInput);
-        // TODO process errors?
-
-        int length = outputBuffer.position();
-        outputBuffer.rewind();
-        outputBuffer.limit(length);
     }
 }

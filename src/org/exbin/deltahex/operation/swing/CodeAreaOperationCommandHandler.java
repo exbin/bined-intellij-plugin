@@ -15,14 +15,17 @@
  */
 package org.exbin.deltahex.operation.swing;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.FlavorEvent;
-import java.awt.datatransfer.FlavorListener;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
+import org.exbin.deltahex.*;
+import org.exbin.deltahex.operation.BinaryDataOperationException;
+import org.exbin.deltahex.operation.swing.command.*;
+import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
+import org.exbin.deltahex.swing.CodeArea;
+import org.exbin.deltahex.swing.CodeAreaCaret;
+import org.exbin.deltahex.swing.CodeAreaCommandHandler;
+import org.exbin.utils.binary_data.*;
+
+import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,40 +35,12 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.exbin.deltahex.CaretPosition;
-import org.exbin.deltahex.CharsetStreamTranslator;
-import org.exbin.deltahex.CodeAreaUtils;
-import org.exbin.deltahex.CodeType;
-import org.exbin.deltahex.EditationAllowed;
-import org.exbin.deltahex.EditationMode;
-import org.exbin.deltahex.Section;
-import org.exbin.deltahex.SelectionRange;
-import org.exbin.deltahex.ViewMode;
-import org.exbin.deltahex.operation.BinaryDataOperationException;
-import org.exbin.deltahex.operation.swing.command.CodeAreaCommand;
-import org.exbin.deltahex.operation.swing.command.CodeAreaCommandType;
-import org.exbin.deltahex.operation.swing.command.EditCharDataCommand;
-import org.exbin.deltahex.operation.swing.command.EditCodeDataCommand;
-import org.exbin.deltahex.operation.swing.command.EditDataCommand;
-import org.exbin.deltahex.operation.swing.command.HexCompoundCommand;
-import org.exbin.deltahex.operation.swing.command.InsertDataCommand;
-import org.exbin.deltahex.operation.swing.command.ModifyDataCommand;
-import org.exbin.deltahex.operation.swing.command.RemoveDataCommand;
-import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
-import org.exbin.deltahex.swing.CodeArea;
-import org.exbin.deltahex.swing.CodeAreaCaret;
-import org.exbin.deltahex.swing.CodeAreaCommandHandler;
-import org.exbin.utils.binary_data.BinaryData;
-import org.exbin.utils.binary_data.ByteArrayData;
-import org.exbin.utils.binary_data.ByteArrayEditableData;
-import org.exbin.utils.binary_data.EditableBinaryData;
-import org.exbin.utils.binary_data.PagedData;
 
 /**
  * Command handler for undo/redo aware hexadecimal editor editing.
  *
- * @version 0.1.2 2017/01/07
  * @author ExBin Project (http://exbin.org)
+ * @version 0.1.2 2017/01/07
  */
 public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
 
@@ -1015,13 +990,9 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
             if (flavor.equals(deltahexDataFlavor)) {
                 return data;
             } else {
-                DataFlavor textPlainUnicodeFlavor = DataFlavor.getTextPlainUnicodeFlavor();
-                if (flavor.equals(textPlainUnicodeFlavor)) {
-                    String charsetName = textPlainUnicodeFlavor.getParameter(MIME_CHARSET);
-                    return new CharsetStreamTranslator(codeArea.getCharset(), Charset.forName(charsetName), data.getDataInputStream());
-                } else {
-                    throw new IllegalStateException("Unexpected clipboard flavor");
-                }
+                String clipboardCharsetName = DataFlavor.getTextPlainUnicodeFlavor().getParameter(MIME_CHARSET);
+                Charset clipboardCharset = Charset.forName(clipboardCharsetName);
+                return new CharsetStreamTranslator(codeArea.getCharset(), clipboardCharset, data.getDataInputStream());
             }
         }
 
@@ -1070,8 +1041,9 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
                 for (int i = 0; i < data.getDataSize(); i++) {
                     CodeAreaUtils.byteToCharsCode(data.getByte(i), codeArea.getCodeType(), dataTarget, i * charsPerByte, codeArea.getHexCharactersCase());
                 }
-                DataFlavor textPlainUnicodeFlavor = DataFlavor.getTextPlainUnicodeFlavor();
-                return new ByteArrayInputStream(new String(dataTarget).getBytes(textPlainUnicodeFlavor.getParameter(MIME_CHARSET)));
+                String clipboardCharsetName = DataFlavor.getTextPlainUnicodeFlavor().getParameter(MIME_CHARSET);
+                Charset clipboardCharset = Charset.forName(clipboardCharsetName);
+                return new ByteArrayInputStream(new String(dataTarget).getBytes(clipboardCharset));
             }
         }
 

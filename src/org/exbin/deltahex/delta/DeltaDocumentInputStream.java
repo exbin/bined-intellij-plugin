@@ -15,10 +15,11 @@
  */
 package org.exbin.deltahex.delta;
 
-import java.io.IOException;
-import java.io.InputStream;
 import org.exbin.utils.binary_data.FinishableStream;
 import org.exbin.utils.binary_data.SeekableStream;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Delta document input stream.
@@ -42,7 +43,9 @@ public class DeltaDocumentInputStream extends InputStream implements SeekableStr
         }
 
         try {
-            return data.getByte(position++);
+            int value = data.getByte(position) & 0xFF;
+            position++;
+            return value;
         } catch (ArrayIndexOutOfBoundsException ex) {
             return -1;
         }
