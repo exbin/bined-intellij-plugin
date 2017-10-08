@@ -765,11 +765,13 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
                     long clipDataSize = insertedData.getDataSize();
                     long insertionPosition = dataPosition;
                     if (codeArea.getEditationMode() == EditationMode.OVERWRITE) {
-                        BinaryData modifiedData = insertedData;
+                        BinaryData modifiedData;
                         long replacedPartSize = clipDataSize;
                         if (insertionPosition + replacedPartSize > dataSize) {
                             replacedPartSize = dataSize - insertionPosition;
                             modifiedData = insertedData.copy(0, replacedPartSize);
+                        } else {
+                            modifiedData = insertedData.copy();
                         }
                         if (replacedPartSize > 0) {
                             modifyCommand = new ModifyDataCommand(codeArea, dataPosition, modifiedData);
@@ -783,7 +785,7 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
                     }
 
                     CodeAreaCommand insertCommand = null;
-                    if (clipDataSize > 0) {
+                    if (!insertedData.isEmpty()) {
                         insertCommand = new InsertDataCommand(codeArea, insertionPosition, insertedData);
                     }
 
