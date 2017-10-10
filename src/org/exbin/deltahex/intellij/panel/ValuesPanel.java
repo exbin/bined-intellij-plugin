@@ -706,6 +706,8 @@ public class ValuesPanel extends javax.swing.JPanel {
             }
         };
         undoHandler.addUndoUpdateListener(undoUpdateListener);
+        updateEditationMode();
+        updateValues();
     }
 
     public void disableUpdate() {

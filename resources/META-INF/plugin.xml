@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.exbin.deltahex.intellij</id>
     <name>DeltaHex Editor</name>
-    <version>0.1.5-SNAPSHOT</version>
+    <version>0.1.5</version>
     <vendor email="hajdam@users.sf.net" url="http://deltahex.exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
@@ -24,9 +24,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Fixed behavior for high precision wheel scrolling</li>
-<li>Fixed loading after custom font saved</li>
-<li>Fixed opening of read-only files</li></ul>
+<ul><li>Values panel made editable</li>
+<li>Byte order support for floating point numbers in values panel</li>
+<li>Added thread for values panel updating</li>
+<li>Fixed files closing on window closing</li>
+<li>Fixed clipboard charset translation</li></ul>
     ]]>
     </change-notes>
 

@@ -1,4 +1,4 @@
-0.1.5
+0.1.5 (2017-10-10)
 - Values panel made editable
 - Byte order support for floating point numbers in values panel
 - Added thread for values panel updating
