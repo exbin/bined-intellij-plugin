@@ -1289,8 +1289,8 @@ public class DeltaHexFileEditor implements FileEditor {
             while (matchCharLength < findText.length()) {
                 long searchPosition = position + matchLength;
                 int bytesToUse = maxBytesPerChar;
-                if (position + bytesToUse > dataSize) {
-                    bytesToUse = (int) (dataSize - position);
+                if (searchPosition + bytesToUse > dataSize) {
+                    bytesToUse = (int) (dataSize - searchPosition);
                 }
                 data.copyToArray(searchPosition, charData, 0, bytesToUse);
                 char singleChar = new String(charData, charset).charAt(0);

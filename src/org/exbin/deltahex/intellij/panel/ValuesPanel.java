@@ -752,7 +752,6 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     private void modifyValues(int bytesCount) {
-        // ((EditableBinaryData) codeArea.getData()).replace(dataPosition, valuesCache, 0, bytesCount);
         ByteArrayEditableData byteArrayData = new ByteArrayEditableData();
         byteArrayData.insert(0, valuesCache, 0, bytesCount);
         long oldDataPosition = dataPosition;
@@ -770,8 +769,8 @@ public class ValuesPanel extends javax.swing.JPanel {
                 EditableBinaryData modifiedData = (EditableBinaryData) byteArrayData.copy(0, modifiedDataSize);
                 EditableBinaryData insertedData = (EditableBinaryData) byteArrayData.copy(modifiedDataSize, byteArrayData.getDataSize() - modifiedDataSize);
                 command = new HexCompoundCommand(codeArea);
-                ((HexCompoundCommand) command).appendCommand(new InsertDataCommand(codeArea, dataPosition + modifiedDataSize, insertedData));
                 ((HexCompoundCommand) command).appendCommand(new ModifyDataCommand(codeArea, dataPosition, modifiedData));
+                ((HexCompoundCommand) command).appendCommand(new InsertDataCommand(codeArea, dataPosition + modifiedDataSize, insertedData));
             } else {
                 command = new ModifyDataCommand(codeArea, dataPosition, byteArrayData);
             }
