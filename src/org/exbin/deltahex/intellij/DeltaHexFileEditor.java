@@ -19,16 +19,15 @@ import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.LocalTimeCounter;
+import com.intellij.util.messages.MessageBus;
+import com.intellij.util.messages.MessageBusConnection;
 import org.exbin.deltahex.*;
 import org.exbin.deltahex.delta.DeltaDocument;
 import org.exbin.deltahex.delta.FileDataSource;
@@ -43,6 +42,7 @@ import org.exbin.deltahex.operation.BinaryDataCommand;
 import org.exbin.deltahex.operation.BinaryDataOperationException;
 import org.exbin.deltahex.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.deltahex.operation.swing.CodeAreaUndoHandler;
+import org.exbin.deltahex.operation.swing.command.InsertDataCommand;
 import org.exbin.deltahex.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.deltahex.swing.CodeAreaSpace;
@@ -138,7 +138,6 @@ public class DeltaHexFileEditor implements FileEditor {
     private boolean valuesPanelVisible = false;
 
     private boolean opened = false;
-    private boolean modified = false;
     private boolean deltaMemoryMode = true;
     private String displayName;
     private long documentOriginalSize;
@@ -295,6 +294,41 @@ public class DeltaHexFileEditor implements FileEditor {
                 }
             }
         });
+
+        MessageBus messageBus = project.getMessageBus();
+        MessageBusConnection connect = messageBus.connect();
+        connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+            @Override
+            public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+            }
+
+            @Override
+            public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+                if (virtualFile != null) {
+                    if (!releaseFile()) {
+                        // TODO Intercept close event instead of editor recreation
+                        OpenFileDescriptor descriptor = new OpenFileDescriptor(project, virtualFile, 0);
+                        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+                        List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
+                        fileEditorManager.setSelectedEditor(virtualFile, DeltaHexWindowProvider.DELTAHEX_EDITOR_TYPE_ID);
+                        for (FileEditor fileEditor : editors) {
+                            if (fileEditor instanceof DeltaHexFileEditor) {
+                                ((DeltaHexFileEditor) fileEditor).reopenFile(virtualFile, codeArea.getData(), undoHandler);
+                            }
+                        }
+                        closeData(false);
+                    } else {
+                        closeData(true);
+                    }
+                }
+
+                virtualFile = null;
+            }
+
+            @Override
+            public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+            }
+        });
     }
 
     public static PropertiesComponent getPreferences() {
@@ -440,7 +474,7 @@ public class DeltaHexFileEditor implements FileEditor {
 
     @Override
     public boolean isModified() {
-        return modified;
+        return undoHandler.getCommandPosition() != undoHandler.getSyncPoint();
     }
 
     private void setNewData() {
@@ -456,7 +490,7 @@ public class DeltaHexFileEditor implements FileEditor {
      *
      * @return true if successful
      */
-    private boolean releaseFile() {
+    public boolean releaseFile() {
 
         if (virtualFile == null) {
             return true;
@@ -604,17 +638,21 @@ public class DeltaHexFileEditor implements FileEditor {
         }
     }
 
-    private void closeData() {
+    private void closeData(boolean closeFileSource) {
         BinaryData data = codeArea.getData();
         codeArea.setData(new ByteArrayData());
         if (data instanceof DeltaDocument) {
             FileDataSource fileSource = ((DeltaDocument) data).getFileSource();
             data.dispose();
-            segmentsRepository.detachFileSource(fileSource);
-            segmentsRepository.closeFileSource(fileSource);
+            if (closeFileSource) {
+                segmentsRepository.detachFileSource(fileSource);
+                segmentsRepository.closeFileSource(fileSource);
+            }
         } else {
             data.dispose();
         }
+
+        virtualFile = null;
     }
 
     public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi) {
@@ -644,16 +682,13 @@ public class DeltaHexFileEditor implements FileEditor {
 
     private void notifyModified() {
         boolean modified = undoHandler.getCommandPosition() != undoHandler.getSyncPoint();
-        if (modified != this.modified) {
-            this.modified = modified;
-            // TODO: Trying to force "modified behavior"
-            Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
-            if (document instanceof DocumentEx) {
-                ((DocumentEx) document).setModificationStamp(LocalTimeCounter.currentTime());
-            }
-            propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
-            VirtualFileManager.getInstance().notifyPropertyChanged(virtualFile, FileEditor.PROP_MODIFIED, !modified, modified);
-        }
+        // TODO: Trying to force "modified behavior"
+//        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+//        if (document instanceof DocumentEx) {
+//            ((DocumentEx) document).setModificationStamp(LocalTimeCounter.currentTime());
+//        }
+//        propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
+
         saveFileButton.setEnabled(modified);
     }
 
@@ -677,7 +712,6 @@ public class DeltaHexFileEditor implements FileEditor {
 
     @Override
     public void dispose() {
-        closeData();
     }
 
     @Nullable
@@ -794,10 +828,6 @@ public class DeltaHexFileEditor implements FileEditor {
                             codeArea.setData(new PagedData());
                         }
                         ((EditableBinaryData) codeArea.getData()).loadFromStream(stream);
-                        opened = true;
-                        documentOriginalSize = codeArea.getDataSize();
-                        updateCurrentDocumentSize();
-                        updateCurrentMemoryMode();
                     }
                 } catch (IOException ex) {
                     // Exceptions.printStackTrace(ex);
@@ -832,6 +862,31 @@ public class DeltaHexFileEditor implements FileEditor {
         documentOriginalSize = codeArea.getDataSize();
         updateCurrentDocumentSize();
         updateCurrentMemoryMode();
+    }
+
+    private void reopenFile(@NotNull DeltaHexVirtualFile virtualFile, @NotNull BinaryData data, @NotNull CodeAreaUndoHandler undoHandler) {
+        this.virtualFile = virtualFile;
+        boolean editable = virtualFile.isWritable();
+        codeArea.setEditable(editable);
+
+        switchDeltaMemoryMode(data instanceof DeltaDocument);
+        if (data instanceof DeltaDocument) {
+            DeltaDocument document = (DeltaDocument) codeArea.getData();
+            document.setFileSource(((DeltaDocument) data).getFileSource());
+        }
+
+        opened = true;
+        documentOriginalSize = codeArea.getDataSize();
+        updateCurrentDocumentSize();
+        updateCurrentMemoryMode();
+
+        this.undoHandler.clear();
+        // TODO migrate undo
+        try {
+            this.undoHandler.execute(new InsertDataCommand(codeArea, 0, (EditableBinaryData) data));
+        } catch (BinaryDataOperationException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateCurrentDocumentSize() {

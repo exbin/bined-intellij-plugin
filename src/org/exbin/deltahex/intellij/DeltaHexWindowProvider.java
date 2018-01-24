@@ -37,12 +37,10 @@ public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationCo
 
     @Override
     public void initComponent() {
-
     }
 
     @Override
     public void disposeComponent() {
-
     }
 
     @Override
@@ -92,6 +90,5 @@ public class DeltaHexWindowProvider implements FileEditorProvider, ApplicationCo
 
     @Override
     public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) {
-
     }
 }

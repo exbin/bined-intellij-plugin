@@ -671,6 +671,25 @@ public class DeltaDocumentWindow {
         return false;
     }
 
+    public void validatePointerPosition() {
+        if (pointer.segment == null) {
+            if (pointer.position > 0 && pointer.position < getDataSize()) {
+                throw new IllegalStateException("Illegal pointer position " + pointer.position + " for null segment");
+            }
+        } else {
+            long segmentsLengthSum = 0;
+            DataSegment segment = pointer.segment.getPrev();
+            while (segment != null) {
+                segmentsLengthSum += segment.getLength();
+                segment = segment.getPrev();
+            }
+
+            if (segmentsLengthSum != pointer.position) {
+                throw new IllegalStateException("Illegal pointer position " + pointer.position);
+            }
+        }
+    }
+
     /**
      * POJO structure for sliding data pointer.
      */

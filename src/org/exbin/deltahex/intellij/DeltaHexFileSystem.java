@@ -112,12 +112,10 @@ public class DeltaHexFileSystem extends VirtualFileSystem implements Application
 
     @Override
     public void initComponent() {
-
     }
 
     @Override
     public void disposeComponent() {
-
     }
 
     @NotNull

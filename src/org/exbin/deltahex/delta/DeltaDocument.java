@@ -15,19 +15,20 @@
  */
 package org.exbin.deltahex.delta;
 
+import org.exbin.deltahex.delta.list.DefaultDoublyLinkedList;
+import org.exbin.utils.binary_data.BinaryData;
+import org.exbin.utils.binary_data.EditableBinaryData;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import org.exbin.deltahex.delta.list.DefaultDoublyLinkedList;
-import org.exbin.utils.binary_data.BinaryData;
-import org.exbin.utils.binary_data.EditableBinaryData;
 
 /**
  * Delta document defined as a sequence of segments.
  *
- * @version 0.1.2 2017/01/02
+ * @version 0.2.0 2017/10/04
  * @author ExBin Project (http://exbin.org)
  */
 public class DeltaDocument implements EditableBinaryData {
@@ -37,7 +38,7 @@ public class DeltaDocument implements EditableBinaryData {
     private final DefaultDoublyLinkedList<DataSegment> segments = new DefaultDoublyLinkedList<>();
 
     private long dataLength = 0;
-    private final DeltaDocumentWindow window;
+    private final DeltaDocumentWindow pointerWindow;
     private final List<DeltaDocumentChangedListener> changeListeners = new ArrayList<>();
 
     public DeltaDocument(SegmentsRepository repository, FileDataSource fileSource) throws IOException {
@@ -48,15 +49,15 @@ public class DeltaDocument implements EditableBinaryData {
             DataSegment fullFileSegment = repository.createFileSegment(fileSource, 0, dataLength);
             segments.add(fullFileSegment);
         }
-        window = new DeltaDocumentWindow(this);
-        window.reset();
+        pointerWindow = new DeltaDocumentWindow(this);
+        pointerWindow.reset();
     }
 
     public DeltaDocument(SegmentsRepository repository) {
         this.repository = repository;
         dataLength = 0;
-        window = new DeltaDocumentWindow(this);
-        window.reset();
+        pointerWindow = new DeltaDocumentWindow(this);
+        pointerWindow.reset();
     }
 
     // Temporary method for accessing data pages
@@ -73,7 +74,7 @@ public class DeltaDocument implements EditableBinaryData {
      * @return data segment or null
      */
     public DataSegment getSegment(long position) {
-        return window.getSegment(position);
+        return pointerWindow.getSegment(position);
     }
 
     @Override
@@ -88,42 +89,42 @@ public class DeltaDocument implements EditableBinaryData {
 
     @Override
     public byte getByte(long position) {
-        return window.getByte(position);
+        return pointerWindow.getByte(position);
     }
 
     @Override
     public void setByte(long position, byte value) {
-        window.setByte(position, value);
+        pointerWindow.setByte(position, value);
     }
 
     @Override
     public void insertUninitialized(long startFrom, long length) {
-        window.insertUninitialized(startFrom, length);
+        pointerWindow.insertUninitialized(startFrom, length);
     }
 
     @Override
     public void insert(long startFrom, long length) {
-        window.insert(startFrom, length);
+        pointerWindow.insert(startFrom, length);
     }
 
     @Override
     public void insert(long startFrom, byte[] insertedData) {
-        window.insert(startFrom, insertedData);
+        pointerWindow.insert(startFrom, insertedData);
     }
 
     @Override
     public void insert(long startFrom, byte[] insertedData, int insertedDataOffset, int insertedDataLength) {
-        window.insert(startFrom, insertedData, insertedDataOffset, insertedDataLength);
+        pointerWindow.insert(startFrom, insertedData, insertedDataOffset, insertedDataLength);
     }
 
     @Override
     public void insert(long startFrom, BinaryData insertedData) {
-        window.insert(startFrom, insertedData);
+        pointerWindow.insert(startFrom, insertedData);
     }
 
     @Override
     public void insert(long startFrom, BinaryData insertedData, long insertedDataOffset, long insertedDataLength) {
-        window.insert(startFrom, insertedData, insertedDataOffset, insertedDataLength);
+        pointerWindow.insert(startFrom, insertedData, insertedDataOffset, insertedDataLength);
     }
 
     /**
@@ -133,7 +134,7 @@ public class DeltaDocument implements EditableBinaryData {
      * @param segment inserted segment
      */
     public void insertSegment(long startFrom, DataSegment segment) {
-        window.insertSegment(startFrom, segment);
+        pointerWindow.insertSegment(startFrom, segment);
     }
 
     @Override
@@ -188,14 +189,14 @@ public class DeltaDocument implements EditableBinaryData {
 
     @Override
     public void remove(long startFrom, long length) {
-        window.remove(startFrom, length);
+        pointerWindow.remove(startFrom, length);
     }
 
     @Override
     public void clear() {
         dataLength = 0;
         segments.clear();
-        window.reset();
+        pointerWindow.reset();
     }
 
     @Override
@@ -215,12 +216,12 @@ public class DeltaDocument implements EditableBinaryData {
 
     @Override
     public BinaryData copy() {
-        return window.copy();
+        return pointerWindow.copy();
     }
 
     @Override
     public BinaryData copy(long startFrom, long length) {
-        return window.copy(startFrom, length);
+        return pointerWindow.copy(startFrom, length);
     }
 
     @Override
@@ -263,7 +264,7 @@ public class DeltaDocument implements EditableBinaryData {
      * Resets cached state - needed after change.
      */
     public void clearCache() {
-        window.reset();
+        pointerWindow.reset();
     }
 
     /* package */ void setDataLength(long dataSize) {
@@ -279,7 +280,7 @@ public class DeltaDocument implements EditableBinaryData {
      * @return data segment
      */
     public DataSegment getPartCopy(long position, long length) {
-        return window.getPartCopy(position, length);
+        return pointerWindow.getPartCopy(position, length);
     }
 
     public FileDataSource getFileSource() {
@@ -306,5 +307,27 @@ public class DeltaDocument implements EditableBinaryData {
         for (DeltaDocumentChangedListener listener : changeListeners) {
             listener.dataChanged(window);
         }
+    }
+    
+    public void validatePointerPosition() {
+        pointerWindow.validatePointerPosition();
+    }
+
+    public void validateDocumentSize() {
+        long segmentsSizeSum = 0;
+        DataSegment segment = segments.first();
+        while (segment != null) {
+            segmentsSizeSum += segment.getLength();
+            segment = segment.getNext();
+        }
+        
+        if (segmentsSizeSum != getDataSize()) {
+            throw new IllegalStateException("Invalid size " + getDataSize() + " (expected " + segmentsSizeSum + ")");
+        }
+    }
+    
+    public void validate() {
+        validatePointerPosition();
+        validateDocumentSize();
     }
 }

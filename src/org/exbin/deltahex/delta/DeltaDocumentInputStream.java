@@ -15,11 +15,10 @@
  */
 package org.exbin.deltahex.delta;
 
-import org.exbin.utils.binary_data.FinishableStream;
-import org.exbin.utils.binary_data.SeekableStream;
-
 import java.io.IOException;
 import java.io.InputStream;
+import org.exbin.utils.binary_data.FinishableStream;
+import org.exbin.utils.binary_data.SeekableStream;
 
 /**
  * Delta document input stream.
@@ -58,7 +57,8 @@ public class DeltaDocumentInputStream extends InputStream implements SeekableStr
 
     @Override
     public int available() throws IOException {
-        return (int) (data.getDataSize() - position);
+        long available = data.getDataSize()  - position;
+        return (available > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) available;
     }
 
     @Override

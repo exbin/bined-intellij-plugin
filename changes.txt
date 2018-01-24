@@ -1,4 +1,6 @@
 0.1.6
+- Document changed dialog on window close
+- Fixed Unknown property name: 'modified' (issue #3)
 
 0.1.5 (2017-10-10)
 - Values panel made editable
