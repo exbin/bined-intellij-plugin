@@ -51,6 +51,7 @@
     </application-components>
 
     <extensions defaultExtensionNs="com.intellij">
+        <debugger.nodeRenderer implementation="org.exbin.deltahex.intellij.DeltaHexTypeRenderer" id="DeltaHex."/>
     </extensions>
 
     <actions>
@@ -65,6 +66,21 @@
                 text="Open as Hex..." description="Opens file in hexadecimal viewer/editor" icon="/images/icon.png">
             <add-to-group group-id="FileOpenGroup" relative-to-action="OpenFile" anchor="after"/>
         </action>
+
+        <group>
+            <reference id="DeltaHexEditor.OpenAsHexAction"/>
+            <add-to-group group-id="EditorPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
+        </group>
+
+        <group>
+            <action id="Debugger.DeltaHexShowAsHex" class="org.exbin.deltahex.intellij.DebugViewHexAction" text="Show As Hex" icon="/images/icon.png"/>
+
+            <add-to-group group-id="XDebugger.Watches.Tree.Popup" anchor="last"/>
+            <add-to-group group-id="XDebugger.Variables.Tree.Toolbar" anchor="last"/>
+            <add-to-group group-id="XDebugger.Variables.Tree.Popup" anchor="last"/>
+            <add-to-group group-id="XDebugger.Evaluation.Dialog.Tree.Popup" anchor="last"/>
+            <add-to-group group-id="XDebugger.Inspect.Tree.Popup" anchor="last"/>
+        </group>
 
         <!-- <group>
             <reference id="DeltaHexEditor.OpenAsHexAction"/>

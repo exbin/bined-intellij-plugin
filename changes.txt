@@ -1,10 +1,11 @@
 0.1.6
-- Document changed dialog on window close
+- Added "Show as hex" action for debugger data
+- Show "Document changed" dialog on window close
 - Fixed Unknown property name: 'modified' (issue #3)
 
 0.1.5 (2017-10-10)
 - Values panel made editable
-- Byte order support for floating point numbers in values panel
+- Byte order support for floating point numbers in values panel (issue #2)
 - Added thread for values panel updating
 - Fixed files closing on window closing
 - Fixed clipboard charset translation
