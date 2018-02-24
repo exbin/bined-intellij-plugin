@@ -21,14 +21,15 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.CommonClassNames;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
-import com.intellij.xdebugger.evaluation.XInstanceEvaluator;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
+import com.sun.jdi.*;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.ByteArrayData;
 import org.jetbrains.annotations.NotNull;
@@ -112,13 +113,45 @@ public class DebugViewHexAction extends XFetchValueActionBase {
             if (myDataNode != null) {
                 XValue container = myDataNode.getValueContainer();
                 ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
-                ByteArrayData data;
+                ByteArrayData data = null;
                 if (descriptor.isArray()) {
-                    XValue valueContainer = myDataNode.getValueContainer();
-                    XInstanceEvaluator instanceEvaluator = valueContainer.getInstanceEvaluator();
-                    data = new ByteArrayData("TODO".getBytes(Charset.defaultCharset()));
+                    final ArrayReference arrayRef = (ArrayReference) descriptor.getValue();
+                    final ArrayType type = (ArrayType) descriptor.getType();
+                    if (type != null) {
+                        final String componentType = type.componentTypeName();
+                        switch (componentType) {
+                            case CommonClassNames.JAVA_LANG_BYTE:
+                            case "byte": {
+                                int size = arrayRef.length();
+                                final List<Value> values = arrayRef.getValues(0, size);
+                                byte[] result = new byte[size];
+                                for (int i = 0; i < values.size(); i++) {
+                                    result[i] = ((ByteValue) values.get(i)).value();
+                                }
+                                data = new ByteArrayData(result);
+                                break;
+                            }
+                            case CommonClassNames.JAVA_LANG_SHORT:
+                            case "short": {
+                                int size = arrayRef.length();
+                                final List<Value> values = arrayRef.getValues(0, size);
+                                byte[] result = new byte[size * 2];
+                                for (int i = 0; i < values.size(); i++) {
+                                    result[i * 2] = (byte) (((ShortValue) values.get(i)).value() >> 8);
+                                    result[i * 2 + 1] = (byte) (((ShortValue) values.get(i)).value() & 0xff);
+                                }
+                                data = new ByteArrayData(result);
+                                break;
+                            }
+                            // TODO
+                        }
+                    }
                 } else {
                     data = new ByteArrayData(myDataNode.getRawValue().getBytes(Charset.defaultCharset()));
+                }
+
+                if (data == null) {
+                    data = new ByteArrayData(new byte[0]);
                 }
 
                 codeArea.setData(data);
