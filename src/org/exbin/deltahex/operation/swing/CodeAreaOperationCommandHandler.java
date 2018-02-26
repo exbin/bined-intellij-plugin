@@ -15,17 +15,14 @@
  */
 package org.exbin.deltahex.operation.swing;
 
-import org.exbin.deltahex.*;
-import org.exbin.deltahex.operation.BinaryDataOperationException;
-import org.exbin.deltahex.operation.swing.command.*;
-import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
-import org.exbin.deltahex.swing.CodeArea;
-import org.exbin.deltahex.swing.CodeAreaCaret;
-import org.exbin.deltahex.swing.CodeAreaCommandHandler;
-import org.exbin.utils.binary_data.*;
-
-import java.awt.*;
-import java.awt.datatransfer.*;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.FlavorEvent;
+import java.awt.datatransfer.FlavorListener;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,12 +32,40 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.exbin.deltahex.CaretPosition;
+import org.exbin.deltahex.CharsetStreamTranslator;
+import org.exbin.deltahex.CodeAreaUtils;
+import org.exbin.deltahex.CodeType;
+import org.exbin.deltahex.EditationAllowed;
+import org.exbin.deltahex.EditationMode;
+import org.exbin.deltahex.Section;
+import org.exbin.deltahex.SelectionRange;
+import org.exbin.deltahex.ViewMode;
+import org.exbin.deltahex.operation.BinaryDataOperationException;
+import org.exbin.deltahex.operation.swing.command.CodeAreaCommand;
+import org.exbin.deltahex.operation.swing.command.CodeAreaCommandType;
+import org.exbin.deltahex.operation.swing.command.EditCharDataCommand;
+import org.exbin.deltahex.operation.swing.command.EditCodeDataCommand;
+import org.exbin.deltahex.operation.swing.command.EditDataCommand;
+import org.exbin.deltahex.operation.swing.command.HexCompoundCommand;
+import org.exbin.deltahex.operation.swing.command.InsertDataCommand;
+import org.exbin.deltahex.operation.swing.command.ModifyDataCommand;
+import org.exbin.deltahex.operation.swing.command.RemoveDataCommand;
+import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
+import org.exbin.deltahex.swing.CodeArea;
+import org.exbin.deltahex.swing.CodeAreaCaret;
+import org.exbin.deltahex.swing.CodeAreaCommandHandler;
+import org.exbin.utils.binary_data.BinaryData;
+import org.exbin.utils.binary_data.ByteArrayData;
+import org.exbin.utils.binary_data.ByteArrayEditableData;
+import org.exbin.utils.binary_data.EditableBinaryData;
+import org.exbin.utils.binary_data.PagedData;
 
 /**
  * Command handler for undo/redo aware hexadecimal editor editing.
  *
+ * @version 0.1.2 2017/10/19
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.2 2017/01/07
  */
 public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
 
@@ -472,7 +497,8 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
             }
         } else {
             char keyChar = keyValue;
-            if (keyChar > 31 && codeArea.isValidChar(keyValue)) {
+            boolean validKey = keyChar > 31 && keyChar != DELETE_CHAR && codeArea.isValidChar(keyValue);
+            if (validKey) {
                 CaretPosition caretPosition = codeArea.getCaretPosition();
 
                 if (editCommand != null && editCommand.wasReverted()) {
@@ -521,10 +547,11 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
 
                     ((EditCharDataCommand) editCommand).appendEdit(keyChar);
                 }
+
+                codeArea.notifyDataChanged();
+                codeArea.revealCursor();
+                codeArea.repaint();
             }
-            codeArea.notifyDataChanged();
-            codeArea.revealCursor();
-            codeArea.repaint();
         }
     }
 
@@ -551,6 +578,7 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
             DeleteSelectionCommand deleteSelectionCommand = new DeleteSelectionCommand(codeArea);
             try {
                 undoHandler.execute(deleteSelectionCommand);
+                sequenceBreak();
                 codeArea.notifyDataChanged();
             } catch (BinaryDataOperationException ex) {
                 Logger.getLogger(CodeAreaOperationCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -588,6 +616,7 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
 
         try {
             undoHandler.execute(new DeleteSelectionCommand(codeArea));
+            sequenceBreak();
             codeArea.notifyDataChanged();
         } catch (BinaryDataOperationException ex) {
             Logger.getLogger(CodeAreaOperationCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -651,6 +680,7 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
             copy();
             try {
                 undoHandler.execute(new DeleteSelectionCommand(codeArea));
+                sequenceBreak();
                 codeArea.notifyDataChanged();
             } catch (BinaryDataOperationException ex) {
                 Logger.getLogger(CodeAreaOperationCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -677,6 +707,7 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
             try {
                 deleteSelectionCommand = new DeleteSelectionCommand(codeArea);
                 deleteSelectionCommand.execute();
+                sequenceBreak();
             } catch (BinaryDataOperationException ex) {
                 Logger.getLogger(CodeAreaOperationCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -738,6 +769,7 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
                                 Logger.getLogger(CodeAreaOperationCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
                             }
 
+                            sequenceBreak();
                             codeArea.notifyDataChanged();
                             codeArea.updateScrollBars();
                             codeArea.revealCursor();
@@ -802,6 +834,7 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
                         Logger.getLogger(CodeAreaOperationCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
+                    sequenceBreak();
                     codeArea.notifyDataChanged();
                     codeArea.updateScrollBars();
                     codeArea.revealCursor();
@@ -951,6 +984,7 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
                         Logger.getLogger(CodeAreaOperationCommandHandler.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
+                    sequenceBreak();
                     codeArea.notifyDataChanged();
                     codeArea.updateScrollBars();
                     codeArea.revealCursor();
@@ -1043,9 +1077,8 @@ public class CodeAreaOperationCommandHandler implements CodeAreaCommandHandler {
                 for (int i = 0; i < data.getDataSize(); i++) {
                     CodeAreaUtils.byteToCharsCode(data.getByte(i), codeArea.getCodeType(), dataTarget, i * charsPerByte, codeArea.getHexCharactersCase());
                 }
-                String clipboardCharsetName = DataFlavor.getTextPlainUnicodeFlavor().getParameter(MIME_CHARSET);
-                Charset clipboardCharset = Charset.forName(clipboardCharsetName);
-                return new ByteArrayInputStream(new String(dataTarget).getBytes(clipboardCharset));
+                DataFlavor textPlainUnicodeFlavor = DataFlavor.getTextPlainUnicodeFlavor();
+                return new ByteArrayInputStream(new String(dataTarget).getBytes(textPlainUnicodeFlavor.getParameter(MIME_CHARSET)));
             }
         }
 

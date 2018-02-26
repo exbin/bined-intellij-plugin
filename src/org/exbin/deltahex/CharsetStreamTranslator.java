@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * Input stream translation class which converts from input charset to target
  * charset.
  *
- * @version 0.1.5 2017/10/07
+ * @version 0.2.0 2017/10/07
  * @author ExBin Project (http://exbin.org)
  */
 public class CharsetStreamTranslator extends InputStream {
@@ -127,7 +127,7 @@ public class CharsetStreamTranslator extends InputStream {
     public void processNext() {
         charBuffer.rewind();
         charBuffer.limit(charBuffer.capacity());
-
+        
         do {
             loadFromInput();
             if (inputBuffer.remaining() == 0) {

@@ -31,6 +31,7 @@ import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.sun.jdi.*;
 import org.exbin.deltahex.swing.CodeArea;
+import org.exbin.utils.binary_data.BinaryData;
 import org.exbin.utils.binary_data.ByteArrayData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -113,7 +114,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
             if (myDataNode != null) {
                 XValue container = myDataNode.getValueContainer();
                 ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
-                ByteArrayData data = null;
+                BinaryData data = null;
                 if (descriptor.isArray()) {
                     final ArrayReference arrayRef = (ArrayReference) descriptor.getValue();
                     final ArrayType type = (ArrayType) descriptor.getType();
@@ -122,13 +123,28 @@ public class DebugViewHexAction extends XFetchValueActionBase {
                         switch (componentType) {
                             case CommonClassNames.JAVA_LANG_BYTE:
                             case "byte": {
-                                int size = arrayRef.length();
-                                final List<Value> values = arrayRef.getValues(0, size);
-                                byte[] result = new byte[size];
-                                for (int i = 0; i < values.size(); i++) {
-                                    result[i] = ((ByteValue) values.get(i)).value();
-                                }
-                                data = new ByteArrayData(result);
+                                data = new DebugViewDataSource(new DebugViewDataSource.PageProvider() {
+                                    @Override
+                                    public byte[] getPage(long pageIndex) {
+                                        int startPos = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE);
+                                        int length = DebugViewDataSource.PAGE_SIZE;
+                                        if (arrayRef.length() - startPos < DebugViewDataSource.PAGE_SIZE) {
+                                            length = arrayRef.length() - startPos;
+                                        }
+                                        final List<Value> values = arrayRef.getValues(startPos, length);
+                                        byte[] result = new byte[length];
+                                        for (int i = 0; i < values.size(); i++) {
+                                            result[i] = ((ByteValue) values.get(i)).value();
+                                        }
+
+                                        return result;
+                                    }
+
+                                    @Override
+                                    public long getDocumentSize() {
+                                        return arrayRef.length();
+                                    }
+                                });
                                 break;
                             }
                             case CommonClassNames.JAVA_LANG_SHORT:

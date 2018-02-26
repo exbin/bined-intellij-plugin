@@ -15,16 +15,15 @@
  */
 package org.exbin.deltahex.operation.swing;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.exbin.deltahex.operation.BinaryDataCommand;
 import org.exbin.deltahex.operation.BinaryDataOperationException;
 import org.exbin.deltahex.operation.undo.BinaryDataUndoHandler;
 import org.exbin.deltahex.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.deltahex.swing.CodeArea;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Undo handler for hexadecimal editor.

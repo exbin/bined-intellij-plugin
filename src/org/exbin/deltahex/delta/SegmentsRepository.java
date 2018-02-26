@@ -15,16 +15,19 @@
  */
 package org.exbin.deltahex.delta;
 
-import org.exbin.deltahex.delta.list.DefaultDoublyLinkedList;
-import org.exbin.deltahex.delta.list.DoublyLinkedItem;
-import org.exbin.utils.binary_data.BinaryData;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.exbin.deltahex.delta.list.DefaultDoublyLinkedList;
+import org.exbin.deltahex.delta.list.DoublyLinkedItem;
+import org.exbin.utils.binary_data.BinaryData;
 
 /**
  * Repository of delta segments.

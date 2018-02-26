@@ -50,20 +50,16 @@
         </component> -->
     </application-components>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <debugger.nodeRenderer implementation="org.exbin.deltahex.intellij.DeltaHexTypeRenderer" id="DeltaHex."/>
-    </extensions>
-
     <actions>
         <action id="DeltaHexEditor.OpenAsHexAction" class="org.exbin.deltahex.intellij.OpenAsHexAction"
-                text="Open As Hex" description="Opens file in hexadecimal viewer/editor" icon="/images/icon.png"/>
+                text="Open As Hex" description="Opens file in hexadecimal viewer/editor" icon="/images/icon-idea.png"/>
         <group>
             <reference id="DeltaHexEditor.OpenAsHexAction"/>
             <add-to-group group-id="ProjectViewPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
         </group>
 
         <action id="DeltaHexEditor.FileOpenAsHex" class="org.exbin.deltahex.intellij.FileOpenAsHexAction"
-                text="Open as Hex..." description="Opens file in hexadecimal viewer/editor" icon="/images/icon.png">
+                text="Open as Hex..." description="Opens file in hexadecimal viewer/editor" icon="/images/icon-idea.png">
             <add-to-group group-id="FileOpenGroup" relative-to-action="OpenFile" anchor="after"/>
         </action>
 
@@ -73,7 +69,7 @@
         </group>
 
         <group>
-            <action id="Debugger.DeltaHexShowAsHex" class="org.exbin.deltahex.intellij.DebugViewHexAction" text="Show As Hex" icon="/images/icon.png"/>
+            <action id="Debugger.DeltaHexShowAsHex" class="org.exbin.deltahex.intellij.DebugViewHexAction" text="Show As Hex" icon="/images/icon-idea.png"/>
 
             <add-to-group group-id="XDebugger.Watches.Tree.Popup" anchor="last"/>
             <add-to-group group-id="XDebugger.Variables.Tree.Toolbar" anchor="last"/>
