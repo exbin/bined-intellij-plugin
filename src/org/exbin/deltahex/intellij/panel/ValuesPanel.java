@@ -705,7 +705,9 @@ public class ValuesPanel extends javax.swing.JPanel {
                 updateValues();
             }
         };
-        undoHandler.addUndoUpdateListener(undoUpdateListener);
+        if (undoHandler != null) {
+            undoHandler.addUndoUpdateListener(undoUpdateListener);
+        }
         updateEditationMode();
         updateValues();
     }
@@ -713,7 +715,9 @@ public class ValuesPanel extends javax.swing.JPanel {
     public void disableUpdate() {
         codeArea.removeDataChangedListener(dataChangedListener);
         codeArea.removeCaretMovedListener(caretMovedListener);
-        undoHandler.addUndoUpdateListener(undoUpdateListener);
+        if (undoHandler != null) {
+            undoHandler.addUndoUpdateListener(undoUpdateListener);
+        }
     }
 
     public void updateEditationMode() {
@@ -757,10 +761,12 @@ public class ValuesPanel extends javax.swing.JPanel {
         long oldDataPosition = dataPosition;
         if (dataPosition == codeArea.getDataSize()) {
             InsertDataCommand insertCommand = new InsertDataCommand(codeArea, dataPosition, byteArrayData);
-            try {
-                undoHandler.execute(insertCommand);
-            } catch (BinaryDataOperationException ex) {
-                ex.printStackTrace();
+            if (undoHandler != null) {
+                try {
+                    undoHandler.execute(insertCommand);
+                } catch (BinaryDataOperationException ex) {
+                    ex.printStackTrace();
+                }
             }
         } else {
             BinaryDataCommand command;
@@ -775,10 +781,12 @@ public class ValuesPanel extends javax.swing.JPanel {
                 command = new ModifyDataCommand(codeArea, dataPosition, byteArrayData);
             }
 
-            try {
-                undoHandler.execute(command);
-            } catch (BinaryDataOperationException ex) {
-                ex.printStackTrace();
+            if (undoHandler != null) {
+                try {
+                    undoHandler.execute(command);
+                } catch (BinaryDataOperationException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
         codeArea.setCaretPosition(oldDataPosition);

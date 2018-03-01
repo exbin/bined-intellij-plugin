@@ -29,8 +29,11 @@ import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
-import com.sun.jdi.*;
-import org.exbin.deltahex.swing.CodeArea;
+import com.sun.jdi.ArrayReference;
+import com.sun.jdi.ArrayType;
+import org.exbin.deltahex.intellij.debug.ByteArrayPageProvider;
+import org.exbin.deltahex.intellij.debug.ShortArrayPageProvider;
+import org.exbin.deltahex.intellij.panel.DebugViewPanel;
 import org.exbin.utils.binary_data.BinaryData;
 import org.exbin.utils.binary_data.ByteArrayData;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +50,7 @@ import java.util.List;
  * @version 0.1.3 2017/03/20
  */
 public class DebugViewHexAction extends XFetchValueActionBase {
+
     @Override
     protected void handle(Project project, String value, XDebuggerTree tree) {
     }
@@ -96,7 +100,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
     }
 
     private static class DataDialog extends DialogWrapper {
-        private final CodeArea codeArea;
+        private final DebugViewPanel viewPanel;
         private final XValueNodeImpl myDataNode;
 
         private DataDialog(Project project, @Nullable String initialValue, @Nullable XValueNodeImpl dataNode) {
@@ -108,8 +112,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
             getOKAction().setEnabled(false);
             setCrossClosesWindow(true);
 
-            codeArea = new CodeArea();
-            codeArea.setEditable(false);
+            viewPanel = new DebugViewPanel();
 
             if (myDataNode != null) {
                 XValue container = myDataNode.getValueContainer();
@@ -123,40 +126,12 @@ public class DebugViewHexAction extends XFetchValueActionBase {
                         switch (componentType) {
                             case CommonClassNames.JAVA_LANG_BYTE:
                             case "byte": {
-                                data = new DebugViewDataSource(new DebugViewDataSource.PageProvider() {
-                                    @Override
-                                    public byte[] getPage(long pageIndex) {
-                                        int startPos = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE);
-                                        int length = DebugViewDataSource.PAGE_SIZE;
-                                        if (arrayRef.length() - startPos < DebugViewDataSource.PAGE_SIZE) {
-                                            length = arrayRef.length() - startPos;
-                                        }
-                                        final List<Value> values = arrayRef.getValues(startPos, length);
-                                        byte[] result = new byte[length];
-                                        for (int i = 0; i < values.size(); i++) {
-                                            result[i] = ((ByteValue) values.get(i)).value();
-                                        }
-
-                                        return result;
-                                    }
-
-                                    @Override
-                                    public long getDocumentSize() {
-                                        return arrayRef.length();
-                                    }
-                                });
+                                data = new DebugViewDataSource(new ByteArrayPageProvider(arrayRef));
                                 break;
                             }
                             case CommonClassNames.JAVA_LANG_SHORT:
                             case "short": {
-                                int size = arrayRef.length();
-                                final List<Value> values = arrayRef.getValues(0, size);
-                                byte[] result = new byte[size * 2];
-                                for (int i = 0; i < values.size(); i++) {
-                                    result[i * 2] = (byte) (((ShortValue) values.get(i)).value() >> 8);
-                                    result[i * 2 + 1] = (byte) (((ShortValue) values.get(i)).value() & 0xff);
-                                }
-                                data = new ByteArrayData(result);
+                                data = new DebugViewDataSource(new ShortArrayPageProvider(arrayRef));
                                 break;
                             }
                             // TODO
@@ -170,7 +145,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
                     data = new ByteArrayData(new byte[0]);
                 }
 
-                codeArea.setData(data);
+                viewPanel.setData(data);
             }
 
             init();
@@ -199,8 +174,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
         @Nullable
         @Override
         public JComponent getPreferredFocusedComponent() {
-            return codeArea;
-//            return myTextViewer;
+            return viewPanel;
         }
 
         @Override
@@ -210,7 +184,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
 
         @Override
         protected JComponent createCenterPanel() {
-            BorderLayoutPanel panel = JBUI.Panels.simplePanel(codeArea);
+            BorderLayoutPanel panel = JBUI.Panels.simplePanel(viewPanel);
             panel.setPreferredSize(JBUI.size(600, 400));
             return panel;
         }

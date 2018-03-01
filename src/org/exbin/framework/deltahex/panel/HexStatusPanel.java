@@ -29,19 +29,25 @@ import java.awt.event.MouseEvent;
 /**
  * Hexadecimal editor status panel.
  *
- * @version 0.2.0 2017/01/05
+ * @version 0.2.0 2017/03/01
  * @author ExBin Project (http://exbin.org)
  */
 public class HexStatusPanel extends javax.swing.JPanel implements HexStatusApi, TextEncodingStatusApi {
 
     public static final String INSERT_EDITATION_MODE_LABEL = "INS";
     public static final String OVERWRITE_EDITATION_MODE_LABEL = "OVR";
+    private final boolean extendedMode;
 
     private EditationMode editationMode;
     private StatusControlHandler statusControlHandle;
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(HexStatusPanel.class);
 
     public HexStatusPanel() {
+        this(true);
+    }
+
+    public HexStatusPanel(boolean extendedMode) {
+        this.extendedMode = extendedMode;
         initComponents();
     }
 
@@ -60,13 +66,17 @@ public class HexStatusPanel extends javax.swing.JPanel implements HexStatusApi, 
         documentSizePopupMenu = new javax.swing.JPopupMenu();
         documentSizeCopyMenuItem = new javax.swing.JMenuItem();
         memoryModePopupMenu = new javax.swing.JPopupMenu();
-        deltaMemoryModeRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
-        ramMemoryModeRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
-        memoryModeButtonGroup = new javax.swing.ButtonGroup();
-        memoryModeLabel = new javax.swing.JLabel();
+        if (extendedMode) {
+            deltaMemoryModeRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
+            ramMemoryModeRadioButtonMenuItem = new javax.swing.JRadioButtonMenuItem();
+            memoryModeButtonGroup = new javax.swing.ButtonGroup();
+            memoryModeLabel = new javax.swing.JLabel();
+        }
         documentSizeLabel = new javax.swing.JLabel();
         positionLabel = new javax.swing.JLabel();
-        editationModeLabel = new javax.swing.JLabel();
+        if (extendedMode) {
+            editationModeLabel = new javax.swing.JLabel();
+        }
         encodingLabel = new javax.swing.JLabel();
 
         positionPopupMenu.setName("positionPopupMenu"); // NOI18N
@@ -100,37 +110,41 @@ public class HexStatusPanel extends javax.swing.JPanel implements HexStatusApi, 
         });
         documentSizePopupMenu.add(documentSizeCopyMenuItem);
 
-        memoryModePopupMenu.setName("memoryModePopupMenu"); // NOI18N
+        if (extendedMode) {
+            memoryModePopupMenu.setName("memoryModePopupMenu"); // NOI18N
 
-        memoryModeButtonGroup.add(deltaMemoryModeRadioButtonMenuItem);
-        deltaMemoryModeRadioButtonMenuItem.setSelected(true);
-        deltaMemoryModeRadioButtonMenuItem.setText(resourceBundle.getString("HexStatusPanel.deltaMemoryModeRadioButtonMenuItem.text")); // NOI18N
-        deltaMemoryModeRadioButtonMenuItem.setName("deltaMemoryModeRadioButtonMenuItem"); // NOI18N
-        deltaMemoryModeRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deltaMemoryModeRadioButtonMenuItemActionPerformed(evt);
-            }
-        });
-        memoryModePopupMenu.add(deltaMemoryModeRadioButtonMenuItem);
+            memoryModeButtonGroup.add(deltaMemoryModeRadioButtonMenuItem);
+            deltaMemoryModeRadioButtonMenuItem.setSelected(true);
+            deltaMemoryModeRadioButtonMenuItem.setText(resourceBundle.getString("HexStatusPanel.deltaMemoryModeRadioButtonMenuItem.text")); // NOI18N
+            deltaMemoryModeRadioButtonMenuItem.setName("deltaMemoryModeRadioButtonMenuItem"); // NOI18N
+            deltaMemoryModeRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    deltaMemoryModeRadioButtonMenuItemActionPerformed(evt);
+                }
+            });
+            memoryModePopupMenu.add(deltaMemoryModeRadioButtonMenuItem);
 
-        memoryModeButtonGroup.add(ramMemoryModeRadioButtonMenuItem);
-        ramMemoryModeRadioButtonMenuItem.setText(resourceBundle.getString("HexStatusPanel.ramMemoryModeRadioButtonMenuItem.text")); // NOI18N
-        ramMemoryModeRadioButtonMenuItem.setName("ramMemoryModeRadioButtonMenuItem"); // NOI18N
-        ramMemoryModeRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ramMemoryModeRadioButtonMenuItemActionPerformed(evt);
-            }
-        });
-        memoryModePopupMenu.add(ramMemoryModeRadioButtonMenuItem);
+            memoryModeButtonGroup.add(ramMemoryModeRadioButtonMenuItem);
+            ramMemoryModeRadioButtonMenuItem.setText(resourceBundle.getString("HexStatusPanel.ramMemoryModeRadioButtonMenuItem.text")); // NOI18N
+            ramMemoryModeRadioButtonMenuItem.setName("ramMemoryModeRadioButtonMenuItem"); // NOI18N
+            ramMemoryModeRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    ramMemoryModeRadioButtonMenuItemActionPerformed(evt);
+                }
+            });
+            memoryModePopupMenu.add(ramMemoryModeRadioButtonMenuItem);
+        }
 
         setName("Form"); // NOI18N
 
-        memoryModeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        memoryModeLabel.setText(resourceBundle.getString("memoryModeLabel.text")); // NOI18N
-        memoryModeLabel.setToolTipText(resourceBundle.getString("memoryModeLabel.toolTipText")); // NOI18N
-        memoryModeLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        memoryModeLabel.setComponentPopupMenu(memoryModePopupMenu);
-        memoryModeLabel.setName("memoryModeLabel"); // NOI18N
+        if (extendedMode) {
+            memoryModeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            memoryModeLabel.setText(resourceBundle.getString("memoryModeLabel.text")); // NOI18N
+            memoryModeLabel.setToolTipText(resourceBundle.getString("memoryModeLabel.toolTipText")); // NOI18N
+            memoryModeLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+            memoryModeLabel.setComponentPopupMenu(memoryModePopupMenu);
+            memoryModeLabel.setName("memoryModeLabel"); // NOI18N
+        }
 
         documentSizeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         documentSizeLabel.setText("0 (0)");
@@ -151,16 +165,18 @@ public class HexStatusPanel extends javax.swing.JPanel implements HexStatusApi, 
             }
         });
 
-        editationModeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        editationModeLabel.setText("OVR");
-        editationModeLabel.setToolTipText(resourceBundle.getString("editationModeLabel.toolTipText")); // NOI18N
-        editationModeLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        editationModeLabel.setName("editationModeLabel"); // NOI18N
-        editationModeLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                editationModeLabelMouseClicked(evt);
-            }
-        });
+        if (extendedMode) {
+            editationModeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            editationModeLabel.setText("OVR");
+            editationModeLabel.setToolTipText(resourceBundle.getString("editationModeLabel.toolTipText")); // NOI18N
+            editationModeLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+            editationModeLabel.setName("editationModeLabel"); // NOI18N
+            editationModeLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    editationModeLabelMouseClicked(evt);
+                }
+            });
+        }
 
         encodingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         encodingLabel.setText(resourceBundle.getString("encodingLabel.text")); // NOI18N
@@ -181,28 +197,48 @@ public class HexStatusPanel extends javax.swing.JPanel implements HexStatusApi, 
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(195, Short.MAX_VALUE)
-                .addComponent(encodingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(documentSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(positionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(memoryModeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(editationModeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(editationModeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(documentSizeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(memoryModeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(positionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(encodingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+
+        if (extendedMode) {
+            layout.setHorizontalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addContainerGap(195, Short.MAX_VALUE)
+                                    .addComponent(encodingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(0, 0, 0)
+                                    .addComponent(documentSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(0, 0, 0)
+                                    .addComponent(positionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(0, 0, 0)
+                                    .addComponent(memoryModeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(0, 0, 0)
+                                    .addComponent(editationModeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+            );
+            layout.setVerticalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(editationModeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(documentSizeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(memoryModeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(positionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(encodingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            );
+        } else {
+            layout.setHorizontalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addContainerGap(195, Short.MAX_VALUE)
+                                    .addComponent(encodingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(0, 0, 0)
+                                    .addComponent(documentSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(0, 0, 0)
+                                    .addComponent(positionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
+            );
+            layout.setVerticalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(documentSizeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(positionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(encodingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            );
+        }
     }// </editor-fold>//GEN-END:initComponents
 
     private void editationModeLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_editationModeLabelMouseClicked

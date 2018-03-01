@@ -1553,8 +1553,8 @@ public class DeltaHexFileEditor implements FileEditor {
         return project;
     }
 
-    public static interface CharsetChangeListener {
+    public interface CharsetChangeListener {
 
-        public void charsetChanged();
+        void charsetChanged();
     }
 }
