@@ -16,40 +16,45 @@
 package org.exbin.deltahex.intellij.debug;
 
 import com.sun.jdi.ArrayReference;
-import com.sun.jdi.ShortValue;
+import com.sun.jdi.LongValue;
 import com.sun.jdi.Value;
 import org.exbin.deltahex.intellij.DebugViewDataSource;
+import org.exbin.deltahex.intellij.panel.ValuesPanel;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Short array data source for debugger view.
+ * Integer array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
  */
-public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider {
+public class LongArrayPageProvider implements DebugViewDataSource.PageProvider {
 
     private final ArrayReference arrayRef;
 
-    public ShortArrayPageProvider(ArrayReference arrayRef) {
+    public LongArrayPageProvider(ArrayReference arrayRef) {
         this.arrayRef = arrayRef;
     }
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int pageSize = DebugViewDataSource.PAGE_SIZE / 2;
-        int startPos = (int) (pageIndex * pageSize);
-        int length = pageSize;
-        if (arrayRef.length() - startPos < pageSize) {
+        int startPos = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE / 8);
+        int length = DebugViewDataSource.PAGE_SIZE / 8;
+        if (arrayRef.length() - startPos < DebugViewDataSource.PAGE_SIZE / 8) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length * 2];
-        for (int i = 0; i < length; i++) {
-            short value = ((ShortValue) values.get(i)).value();
-            result[i * 2] = (byte) (value >> 8);
-            result[i * 2 + 1] = (byte) (value & 0xff);
+        byte[] result = new byte[length];
+        for (int i = 0; i < values.size(); i++) {
+            long value = ((LongValue) values.get(i)).value();
+            BigInteger bigInteger = BigInteger.valueOf(value);
+            for (int bit = 0; bit < 7; bit++) {
+                BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
+                result[i * 8 + bit] = nextByte.byteValue();
+                bigInteger = bigInteger.shiftRight(8);
+            }
         }
 
         return result;
@@ -57,6 +62,6 @@ public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider 
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length() * 2;
+        return arrayRef.length() * 8;
     }
 }

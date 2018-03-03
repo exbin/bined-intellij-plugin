@@ -16,10 +16,11 @@
 package org.exbin.deltahex.intellij.debug;
 
 import com.sun.jdi.ArrayReference;
-import com.sun.jdi.ShortValue;
+import com.sun.jdi.FloatValue;
 import com.sun.jdi.Value;
 import org.exbin.deltahex.intellij.DebugViewDataSource;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
@@ -28,28 +29,32 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
  */
-public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider {
+public class FloatArrayPageProvider implements DebugViewDataSource.PageProvider {
+
+    private final byte[] valuesCache = new byte[4];
+    private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
 
     private final ArrayReference arrayRef;
 
-    public ShortArrayPageProvider(ArrayReference arrayRef) {
+    public FloatArrayPageProvider(ArrayReference arrayRef) {
         this.arrayRef = arrayRef;
     }
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int pageSize = DebugViewDataSource.PAGE_SIZE / 2;
-        int startPos = (int) (pageIndex * pageSize);
-        int length = pageSize;
-        if (arrayRef.length() - startPos < pageSize) {
+        int startPos = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE / 4);
+        int length = DebugViewDataSource.PAGE_SIZE / 4;
+        if (arrayRef.length() - startPos < DebugViewDataSource.PAGE_SIZE / 4) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length * 2];
-        for (int i = 0; i < length; i++) {
-            short value = ((ShortValue) values.get(i)).value();
-            result[i * 2] = (byte) (value >> 8);
-            result[i * 2 + 1] = (byte) (value & 0xff);
+        byte[] result = new byte[length];
+        for (int i = 0; i < values.size(); i++) {
+            float value = ((FloatValue) values.get(i)).value();
+
+            byteBuffer.rewind();
+            byteBuffer.putFloat(value);
+            System.arraycopy(valuesCache, 0, result, i * 4, 4);
         }
 
         return result;
@@ -57,6 +62,6 @@ public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider 
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length() * 2;
+        return arrayRef.length() * 4;
     }
 }

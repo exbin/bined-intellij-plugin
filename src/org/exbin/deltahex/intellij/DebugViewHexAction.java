@@ -31,8 +31,7 @@ import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.ArrayType;
-import org.exbin.deltahex.intellij.debug.ByteArrayPageProvider;
-import org.exbin.deltahex.intellij.debug.ShortArrayPageProvider;
+import org.exbin.deltahex.intellij.debug.*;
 import org.exbin.deltahex.intellij.panel.DebugViewPanel;
 import org.exbin.utils.binary_data.BinaryData;
 import org.exbin.utils.binary_data.ByteArrayData;
@@ -132,6 +131,26 @@ public class DebugViewHexAction extends XFetchValueActionBase {
                             case CommonClassNames.JAVA_LANG_SHORT:
                             case "short": {
                                 data = new DebugViewDataSource(new ShortArrayPageProvider(arrayRef));
+                                break;
+                            }
+                            case CommonClassNames.JAVA_LANG_INTEGER:
+                            case "int": {
+                                data = new DebugViewDataSource(new IntegerArrayPageProvider(arrayRef));
+                                break;
+                            }
+                            case CommonClassNames.JAVA_LANG_LONG:
+                            case "long": {
+                                data = new DebugViewDataSource(new LongArrayPageProvider(arrayRef));
+                                break;
+                            }
+                            case CommonClassNames.JAVA_LANG_FLOAT:
+                            case "float": {
+                                data = new DebugViewDataSource(new FloatArrayPageProvider(arrayRef));
+                                break;
+                            }
+                            case CommonClassNames.JAVA_LANG_DOUBLE:
+                            case "double": {
+                                data = new DebugViewDataSource(new DoubleArrayPageProvider(arrayRef));
                                 break;
                             }
                             // TODO
