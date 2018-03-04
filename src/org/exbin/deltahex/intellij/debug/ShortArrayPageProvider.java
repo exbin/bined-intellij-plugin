@@ -46,8 +46,9 @@ public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider 
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
         byte[] result = new byte[length * 2];
-        for (int i = 0; i < length; i++) {
-            short value = ((ShortValue) values.get(i)).value();
+        for (int i = 0; i < values.size(); i++) {
+            Value rawValue = values.get(i);
+            short value = rawValue instanceof ShortValue ? ((ShortValue) rawValue).value() : 0;
             result[i * 2] = (byte) (value >> 8);
             result[i * 2 + 1] = (byte) (value & 0xff);
         }

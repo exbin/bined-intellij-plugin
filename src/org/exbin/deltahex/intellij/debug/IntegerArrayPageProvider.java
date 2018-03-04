@@ -38,15 +38,18 @@ public class IntegerArrayPageProvider implements DebugViewDataSource.PageProvide
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int startPos = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE / 4);
-        int length = DebugViewDataSource.PAGE_SIZE / 4;
-        if (arrayRef.length() - startPos < DebugViewDataSource.PAGE_SIZE / 4) {
+        int pageSize = DebugViewDataSource.PAGE_SIZE / 4;
+        int startPos = (int) (pageIndex * pageSize);
+        int length = pageSize;
+        if (arrayRef.length() - startPos < pageSize) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length];
+        byte[] result = new byte[length * 4];
         for (int i = 0; i < values.size(); i++) {
-            int value = ((IntegerValue) values.get(i)).value();
+            Value rawValue = values.get(i);
+            int value = rawValue instanceof IntegerValue ? ((IntegerValue) rawValue).value() : 0;
+
             result[i * 4] = (byte) (value >> 24);
             result[i * 4 + 1] = (byte) ((value >> 16) & 0xff);
             result[i * 4 + 2] = (byte) ((value >> 8) & 0xff);

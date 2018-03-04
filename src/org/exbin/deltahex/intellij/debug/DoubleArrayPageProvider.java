@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
- * Short array data source for debugger view.
+ * Double array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
@@ -42,15 +42,17 @@ public class DoubleArrayPageProvider implements DebugViewDataSource.PageProvider
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int startPos = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE / 8);
-        int length = DebugViewDataSource.PAGE_SIZE / 4;
-        if (arrayRef.length() - startPos < DebugViewDataSource.PAGE_SIZE / 8) {
+        int pageSize = DebugViewDataSource.PAGE_SIZE / 8;
+        int startPos = (int) (pageIndex * pageSize);
+        int length = pageSize;
+        if (arrayRef.length() - startPos < pageSize) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length];
+        byte[] result = new byte[length * 8];
         for (int i = 0; i < values.size(); i++) {
-            double value = ((DoubleValue) values.get(i)).value();
+            Value rawValue = values.get(i);
+            double value = rawValue instanceof DoubleValue ? ((DoubleValue) rawValue).value() : 0;
 
             byteBuffer.rewind();
             byteBuffer.putDouble(value);

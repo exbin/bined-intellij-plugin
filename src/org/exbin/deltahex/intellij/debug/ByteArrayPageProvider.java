@@ -15,9 +15,7 @@
  */
 package org.exbin.deltahex.intellij.debug;
 
-import com.sun.jdi.ArrayReference;
-import com.sun.jdi.ByteValue;
-import com.sun.jdi.Value;
+import com.sun.jdi.*;
 import org.exbin.deltahex.intellij.DebugViewDataSource;
 
 import java.util.List;
@@ -26,7 +24,7 @@ import java.util.List;
  * Byte array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.6 2018/03/01
+ * @version 0.1.6 2018/03/04
  */
 public class ByteArrayPageProvider implements DebugViewDataSource.PageProvider {
 
@@ -46,7 +44,18 @@ public class ByteArrayPageProvider implements DebugViewDataSource.PageProvider {
         final List<Value> values = arrayRef.getValues(startPos, length);
         byte[] result = new byte[length];
         for (int i = 0; i < values.size(); i++) {
-            result[i] = ((ByteValue) values.get(i)).value();
+            Value rawValue = values.get(i);
+            byte value = 0;
+            if (rawValue instanceof ByteValue) {
+                value = ((ByteValue) rawValue).value();
+            } else {
+                if (rawValue instanceof ObjectReference) {
+                    ReferenceType referenceType = ((ObjectReference) rawValue).referenceType();
+//                    Value refValue = referenceType.getValue(referenceType.visibleFields().get(3));
+                }
+            }
+
+            result[i] = value;
         }
 
         return result;

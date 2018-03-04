@@ -25,7 +25,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Integer array data source for debugger view.
+ * Long array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
@@ -40,19 +40,22 @@ public class LongArrayPageProvider implements DebugViewDataSource.PageProvider {
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int startPos = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE / 8);
-        int length = DebugViewDataSource.PAGE_SIZE / 8;
-        if (arrayRef.length() - startPos < DebugViewDataSource.PAGE_SIZE / 8) {
+        int pageSize = DebugViewDataSource.PAGE_SIZE / 8;
+        int startPos = (int) (pageIndex * pageSize);
+        int length = pageSize;
+        if (arrayRef.length() - startPos < pageSize) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length];
+        byte[] result = new byte[length * 8];
         for (int i = 0; i < values.size(); i++) {
-            long value = ((LongValue) values.get(i)).value();
+            Value rawValue = values.get(i);
+            long value = rawValue instanceof LongValue ? ((LongValue) rawValue).value() : 0;
+
             BigInteger bigInteger = BigInteger.valueOf(value);
             for (int bit = 0; bit < 7; bit++) {
                 BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
-                result[i * 8 + bit] = nextByte.byteValue();
+                result[i * 8 + 7 - bit] = nextByte.byteValue();
                 bigInteger = bigInteger.shiftRight(8);
             }
         }
