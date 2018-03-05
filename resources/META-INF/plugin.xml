@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.exbin.deltahex.intellij</id>
     <name>DeltaHex Editor</name>
-    <version>0.1.6-SNAPSHOT</version>
+    <version>0.1.6</version>
     <vendor email="hajdam@users.sf.net" url="http://deltahex.exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
@@ -24,11 +24,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Values panel made editable</li>
-<li>Byte order support for floating point numbers in values panel</li>
-<li>Added thread for values panel updating</li>
-<li>Fixed files closing on window closing</li>
-<li>Fixed clipboard charset translation</li></ul>
+<ul><li>Added "Show as hex" action for debugger (native types and native arrays only)</li>
+<li>Show "Document changed" dialog on window close</li>
+<li>Fixed Unknown property name: 'modified' (issue #3)</li></ul>
     ]]>
     </change-notes>
 
@@ -77,11 +75,6 @@
             <add-to-group group-id="XDebugger.Evaluation.Dialog.Tree.Popup" anchor="last"/>
             <add-to-group group-id="XDebugger.Inspect.Tree.Popup" anchor="last"/>
         </group>
-
-        <!-- <group>
-            <reference id="DeltaHexEditor.OpenAsHexAction"/>
-            <add-to-group group-id="EditorPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
-        </group> -->
     </actions>
 
 </idea-plugin>

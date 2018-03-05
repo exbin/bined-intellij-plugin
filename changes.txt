@@ -1,5 +1,5 @@
-0.1.6
-- Added "Show as hex" action for debugger data
+0.1.6 (2018-03-05)
+- Added "Show as hex" action for debugger (native types and native arrays only)
 - Show "Document changed" dialog on window close
 - Fixed Unknown property name: 'modified' (issue #3)
 
