@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.exbin.deltahex.intellij</id>
     <name>DeltaHex Editor</name>
-    <version>0.1.6</version>
+    <version>0.1.6.1</version>
     <vendor email="hajdam@users.sf.net" url="http://deltahex.exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
@@ -24,7 +24,8 @@
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Added "Show as hex" action for debugger (native types and native arrays only)</li>
+<ul><li>Fixed issue with byte array / NPE</li>
+<li>Added "Show as hex" action for debugger (native types and native arrays only)</li>
 <li>Show "Document changed" dialog on window close</li>
 <li>Fixed Unknown property name: 'modified' (issue #3)</li></ul>
     ]]>
@@ -70,7 +71,7 @@
             <action id="Debugger.DeltaHexShowAsHex" class="org.exbin.deltahex.intellij.DebugViewHexAction" text="Show As Hex" icon="/images/icon-idea.png"/>
 
             <add-to-group group-id="XDebugger.Watches.Tree.Popup" anchor="last"/>
-            <add-to-group group-id="XDebugger.Variables.Tree.Toolbar" anchor="last"/>
+            <add-to-group group-id="XDebugger.Watches.Tree.Toolbar" anchor="after" relative-to-action="XDebugger.Actions"/>
             <add-to-group group-id="XDebugger.Variables.Tree.Popup" anchor="last"/>
             <add-to-group group-id="XDebugger.Evaluation.Dialog.Tree.Popup" anchor="last"/>
             <add-to-group group-id="XDebugger.Inspect.Tree.Popup" anchor="last"/>

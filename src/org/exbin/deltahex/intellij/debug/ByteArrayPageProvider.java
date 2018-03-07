@@ -46,13 +46,13 @@ public class ByteArrayPageProvider implements DebugViewDataSource.PageProvider {
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
             byte value = 0;
+            if (rawValue instanceof ObjectReference) {
+                Field field = ((ObjectReference) rawValue).referenceType().fieldByName("value");
+                rawValue = ((ObjectReference) rawValue).getValue(field);
+            }
+
             if (rawValue instanceof ByteValue) {
                 value = ((ByteValue) rawValue).value();
-            } else {
-                if (rawValue instanceof ObjectReference) {
-                    ReferenceType referenceType = ((ObjectReference) rawValue).referenceType();
-//                    Value refValue = referenceType.getValue(referenceType.visibleFields().get(3));
-                }
             }
 
             result[i] = value;

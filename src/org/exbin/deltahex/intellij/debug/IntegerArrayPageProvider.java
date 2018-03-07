@@ -15,9 +15,7 @@
  */
 package org.exbin.deltahex.intellij.debug;
 
-import com.sun.jdi.ArrayReference;
-import com.sun.jdi.IntegerValue;
-import com.sun.jdi.Value;
+import com.sun.jdi.*;
 import org.exbin.deltahex.intellij.DebugViewDataSource;
 
 import java.util.List;
@@ -48,6 +46,11 @@ public class IntegerArrayPageProvider implements DebugViewDataSource.PageProvide
         byte[] result = new byte[length * 4];
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
+            if (rawValue instanceof ObjectReference) {
+                Field field = ((ObjectReference) rawValue).referenceType().fieldByName("value");
+                rawValue = ((ObjectReference) rawValue).getValue(field);
+            }
+
             int value = rawValue instanceof IntegerValue ? ((IntegerValue) rawValue).value() : 0;
 
             result[i * 4] = (byte) (value >> 24);

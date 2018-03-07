@@ -15,9 +15,7 @@
  */
 package org.exbin.deltahex.intellij.debug;
 
-import com.sun.jdi.ArrayReference;
-import com.sun.jdi.DoubleValue;
-import com.sun.jdi.Value;
+import com.sun.jdi.*;
 import org.exbin.deltahex.intellij.DebugViewDataSource;
 
 import java.nio.ByteBuffer;
@@ -52,6 +50,11 @@ public class DoubleArrayPageProvider implements DebugViewDataSource.PageProvider
         byte[] result = new byte[length * 8];
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
+            if (rawValue instanceof ObjectReference) {
+                Field field = ((ObjectReference) rawValue).referenceType().fieldByName("value");
+                rawValue = ((ObjectReference) rawValue).getValue(field);
+            }
+
             double value = rawValue instanceof DoubleValue ? ((DoubleValue) rawValue).value() : 0;
 
             byteBuffer.rewind();

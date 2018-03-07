@@ -48,7 +48,7 @@ import java.util.List;
  * Show debugger value in hexadecimal editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.6 2018/03/05
+ * @version 0.1.6 2018/03/07
  */
 public class DebugViewHexAction extends XFetchValueActionBase {
 
@@ -116,7 +116,6 @@ public class DebugViewHexAction extends XFetchValueActionBase {
         private final byte[] valuesCache = new byte[8];
         private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
 
-
         private final DebugViewPanel viewPanel;
         private final XValueNodeImpl myDataNode;
 
@@ -137,128 +136,10 @@ public class DebugViewHexAction extends XFetchValueActionBase {
                 XValue container = myDataNode.getValueContainer();
                 ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
                 if (descriptor.isPrimitive() || isBasicType(descriptor) || !descriptor.isNull()) {
-                    final String type = descriptor.getDeclaredType();
-                    switch (type) {
-                        case CommonClassNames.JAVA_LANG_BYTE:
-                        case "byte": {
-                            ByteValue value = (ByteValue) getPrimitiveValue(descriptor);
-                            byte[] byteArray = new byte[1];
-                            byteArray[0] = value.value();
-                            data = new ByteArrayData(byteArray);
-                            break;
-                        }
-                        case CommonClassNames.JAVA_LANG_SHORT:
-                        case "short": {
-                            ShortValue valueRecord = (ShortValue) getPrimitiveValue(descriptor);
-                            byte[] byteArray = new byte[2];
-                            short value = valueRecord.value();
-                            byteArray[0] = (byte) (value >> 8);
-                            byteArray[1] = (byte) (value & 0xff);
-                            data = new ByteArrayData(byteArray);
-                            break;
-                        }
-                        case CommonClassNames.JAVA_LANG_INTEGER:
-                        case "int": {
-                            IntegerValue valueRecord = (IntegerValue) getPrimitiveValue(descriptor);
-                            byte[] byteArray = new byte[4];
-                            int value = valueRecord.value();
-                            byteArray[0] = (byte) (value >> 24);
-                            byteArray[1] = (byte) ((value >> 16) & 0xff);
-                            byteArray[2] = (byte) ((value >> 8) & 0xff);
-                            byteArray[3] = (byte) (value & 0xff);
-                            data = new ByteArrayData(byteArray);
-                            break;
-                        }
-                        case CommonClassNames.JAVA_LANG_LONG:
-                        case "long": {
-                            LongValue valueRecord = (LongValue) getPrimitiveValue(descriptor);
-                            byte[] byteArray = new byte[8];
-                            long value = valueRecord.value();
-                            BigInteger bigInteger = BigInteger.valueOf(value);
-                            for (int bit = 0; bit < 7; bit++) {
-                                BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
-                                byteArray[7 - bit] = nextByte.byteValue();
-                                bigInteger = bigInteger.shiftRight(8);
-                            }
-                            data = new ByteArrayData(byteArray);
-                            break;
-                        }
-                        case CommonClassNames.JAVA_LANG_FLOAT:
-                        case "float": {
-                            FloatValue valueRecord = (FloatValue) getPrimitiveValue(descriptor);
-                            byte[] byteArray = new byte[4];
-                            float value = valueRecord.value();
-                            byteBuffer.rewind();
-                            byteBuffer.putFloat(value);
-                            System.arraycopy(valuesCache, 0, byteArray, 0, 4);
-                            data = new ByteArrayData(byteArray);
-                            break;
-                        }
-                        case CommonClassNames.JAVA_LANG_DOUBLE:
-                        case "double": {
-                            DoubleValue valueRecord = (DoubleValue) getPrimitiveValue(descriptor);
-                            byte[] byteArray = new byte[8];
-                            double value = valueRecord.value();
-                            byteBuffer.rewind();
-                            byteBuffer.putDouble(value);
-                            System.arraycopy(valuesCache, 0, byteArray, 0, 8);
-                            data = new ByteArrayData(byteArray);
-                            break;
-                        }
-                        case CommonClassNames.JAVA_LANG_CHARACTER:
-                        case "char": {
-                            CharValue valueRecord = (CharValue) getPrimitiveValue(descriptor);
-                            byte[] byteArray = new byte[2];
-                            char value = valueRecord.value();
-                            byteBuffer.rewind();
-                            byteBuffer.putChar(value);
-                            System.arraycopy(valuesCache, 0, byteArray, 0, 2);
-                            data = new ByteArrayData(byteArray);
-                            break;
-                        }
-                    }
-                } else if (descriptor.isArray()) {
-                    final ArrayReference arrayRef = (ArrayReference) descriptor.getValue();
-                    final ArrayType type = (ArrayType) descriptor.getType();
-                    if (type != null) {
-                        final String componentType = type.componentTypeName();
-                        switch (componentType) {
-                            case CommonClassNames.JAVA_LANG_BYTE:
-                            case "byte": {
-                                data = new DebugViewDataSource(new ByteArrayPageProvider(arrayRef));
-                                break;
-                            }
-                            case CommonClassNames.JAVA_LANG_SHORT:
-                            case "short": {
-                                data = new DebugViewDataSource(new ShortArrayPageProvider(arrayRef));
-                                break;
-                            }
-                            case CommonClassNames.JAVA_LANG_INTEGER:
-                            case "int": {
-                                data = new DebugViewDataSource(new IntegerArrayPageProvider(arrayRef));
-                                break;
-                            }
-                            case CommonClassNames.JAVA_LANG_LONG:
-                            case "long": {
-                                data = new DebugViewDataSource(new LongArrayPageProvider(arrayRef));
-                                break;
-                            }
-                            case CommonClassNames.JAVA_LANG_FLOAT:
-                            case "float": {
-                                data = new DebugViewDataSource(new FloatArrayPageProvider(arrayRef));
-                                break;
-                            }
-                            case CommonClassNames.JAVA_LANG_DOUBLE:
-                            case "double": {
-                                data = new DebugViewDataSource(new DoubleArrayPageProvider(arrayRef));
-                                break;
-                            }
-                            case CommonClassNames.JAVA_LANG_CHARACTER:
-                            case "char": {
-                                data = new DebugViewDataSource(new CharArrayPageProvider(arrayRef));
-                                break;
-                            }
-                        }
+                    if (descriptor.isArray()) {
+                        data = processArrayData(descriptor);
+                    } else {
+                        data = processSimpleValue(descriptor);
                     }
                 } else {
                     String rawValue = myDataNode.getRawValue();
@@ -279,6 +160,127 @@ public class DebugViewHexAction extends XFetchValueActionBase {
             viewPanel.setData(data);
 
             init();
+        }
+
+        private BinaryData processArrayData(ValueDescriptorImpl descriptor) {
+            final ArrayReference arrayRef = (ArrayReference) descriptor.getValue();
+            final ArrayType arrayType = (ArrayType) descriptor.getType();
+            if (arrayType != null) {
+                final String componentType = arrayType.componentTypeName();
+                switch (componentType) {
+                    case CommonClassNames.JAVA_LANG_BYTE:
+                    case "byte": {
+                        return new DebugViewDataSource(new ByteArrayPageProvider(arrayRef));
+                    }
+                    case CommonClassNames.JAVA_LANG_SHORT:
+                    case "short": {
+                        return new DebugViewDataSource(new ShortArrayPageProvider(arrayRef));
+                    }
+                    case CommonClassNames.JAVA_LANG_INTEGER:
+                    case "int": {
+                        return new DebugViewDataSource(new IntegerArrayPageProvider(arrayRef));
+                    }
+                    case CommonClassNames.JAVA_LANG_LONG:
+                    case "long": {
+                        return new DebugViewDataSource(new LongArrayPageProvider(arrayRef));
+                    }
+                    case CommonClassNames.JAVA_LANG_FLOAT:
+                    case "float": {
+                        return new DebugViewDataSource(new FloatArrayPageProvider(arrayRef));
+                    }
+                    case CommonClassNames.JAVA_LANG_DOUBLE:
+                    case "double": {
+                        return new DebugViewDataSource(new DoubleArrayPageProvider(arrayRef));
+                    }
+                    case CommonClassNames.JAVA_LANG_CHARACTER:
+                    case "char": {
+                        return new DebugViewDataSource(new CharArrayPageProvider(arrayRef));
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private BinaryData processSimpleValue(ValueDescriptorImpl descriptor) {
+            final String type = descriptor.getDeclaredType();
+            if (type == null)
+                return null;
+
+            switch (type) {
+                case CommonClassNames.JAVA_LANG_BYTE:
+                case "byte": {
+                    ByteValue value = (ByteValue) getPrimitiveValue(descriptor);
+                    byte[] byteArray = new byte[1];
+                    byteArray[0] = value.value();
+                    return new ByteArrayData(byteArray);
+                }
+                case CommonClassNames.JAVA_LANG_SHORT:
+                case "short": {
+                    ShortValue valueRecord = (ShortValue) getPrimitiveValue(descriptor);
+                    byte[] byteArray = new byte[2];
+                    short value = valueRecord.value();
+                    byteArray[0] = (byte) (value >> 8);
+                    byteArray[1] = (byte) (value & 0xff);
+                    return new ByteArrayData(byteArray);
+                }
+                case CommonClassNames.JAVA_LANG_INTEGER:
+                case "int": {
+                    IntegerValue valueRecord = (IntegerValue) getPrimitiveValue(descriptor);
+                    byte[] byteArray = new byte[4];
+                    int value = valueRecord.value();
+                    byteArray[0] = (byte) (value >> 24);
+                    byteArray[1] = (byte) ((value >> 16) & 0xff);
+                    byteArray[2] = (byte) ((value >> 8) & 0xff);
+                    byteArray[3] = (byte) (value & 0xff);
+                    return new ByteArrayData(byteArray);
+                }
+                case CommonClassNames.JAVA_LANG_LONG:
+                case "long": {
+                    LongValue valueRecord = (LongValue) getPrimitiveValue(descriptor);
+                    byte[] byteArray = new byte[8];
+                    long value = valueRecord.value();
+                    BigInteger bigInteger = BigInteger.valueOf(value);
+                    for (int bit = 0; bit < 7; bit++) {
+                        BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
+                        byteArray[7 - bit] = nextByte.byteValue();
+                        bigInteger = bigInteger.shiftRight(8);
+                    }
+                    return new ByteArrayData(byteArray);
+                }
+                case CommonClassNames.JAVA_LANG_FLOAT:
+                case "float": {
+                    FloatValue valueRecord = (FloatValue) getPrimitiveValue(descriptor);
+                    byte[] byteArray = new byte[4];
+                    float value = valueRecord.value();
+                    byteBuffer.rewind();
+                    byteBuffer.putFloat(value);
+                    System.arraycopy(valuesCache, 0, byteArray, 0, 4);
+                    return new ByteArrayData(byteArray);
+                }
+                case CommonClassNames.JAVA_LANG_DOUBLE:
+                case "double": {
+                    DoubleValue valueRecord = (DoubleValue) getPrimitiveValue(descriptor);
+                    byte[] byteArray = new byte[8];
+                    double value = valueRecord.value();
+                    byteBuffer.rewind();
+                    byteBuffer.putDouble(value);
+                    System.arraycopy(valuesCache, 0, byteArray, 0, 8);
+                    return new ByteArrayData(byteArray);
+                }
+                case CommonClassNames.JAVA_LANG_CHARACTER:
+                case "char": {
+                    CharValue valueRecord = (CharValue) getPrimitiveValue(descriptor);
+                    byte[] byteArray = new byte[2];
+                    char value = valueRecord.value();
+                    byteBuffer.rewind();
+                    byteBuffer.putChar(value);
+                    System.arraycopy(valuesCache, 0, byteArray, 0, 2);
+                    return new ByteArrayData(byteArray);
+                }
+            }
+
+            return null;
         }
 
         private Value getPrimitiveValue(ValueDescriptorImpl descriptor) {

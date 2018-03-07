@@ -15,9 +15,7 @@
  */
 package org.exbin.deltahex.intellij.debug;
 
-import com.sun.jdi.ArrayReference;
-import com.sun.jdi.LongValue;
-import com.sun.jdi.Value;
+import com.sun.jdi.*;
 import org.exbin.deltahex.intellij.DebugViewDataSource;
 import org.exbin.deltahex.intellij.panel.ValuesPanel;
 
@@ -50,6 +48,11 @@ public class LongArrayPageProvider implements DebugViewDataSource.PageProvider {
         byte[] result = new byte[length * 8];
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
+            if (rawValue instanceof ObjectReference) {
+                Field field = ((ObjectReference) rawValue).referenceType().fieldByName("value");
+                rawValue = ((ObjectReference) rawValue).getValue(field);
+            }
+
             long value = rawValue instanceof LongValue ? ((LongValue) rawValue).value() : 0;
 
             BigInteger bigInteger = BigInteger.valueOf(value);

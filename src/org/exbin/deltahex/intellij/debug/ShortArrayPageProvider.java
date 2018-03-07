@@ -15,9 +15,7 @@
  */
 package org.exbin.deltahex.intellij.debug;
 
-import com.sun.jdi.ArrayReference;
-import com.sun.jdi.ShortValue;
-import com.sun.jdi.Value;
+import com.sun.jdi.*;
 import org.exbin.deltahex.intellij.DebugViewDataSource;
 
 import java.util.List;
@@ -48,6 +46,11 @@ public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider 
         byte[] result = new byte[length * 2];
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
+            if (rawValue instanceof ObjectReference) {
+                Field field = ((ObjectReference) rawValue).referenceType().fieldByName("value");
+                rawValue = ((ObjectReference) rawValue).getValue(field);
+            }
+
             short value = rawValue instanceof ShortValue ? ((ShortValue) rawValue).value() : 0;
             result[i * 2] = (byte) (value >> 8);
             result[i * 2 + 1] = (byte) (value & 0xff);
