@@ -52,6 +52,19 @@ import java.util.List;
  */
 public class DebugViewHexAction extends XFetchValueActionBase {
 
+    private static final boolean javaValueClassAvailable;
+
+    static {
+        boolean available = false;
+        try  {
+            Class.forName("com.intellij.debugger.engine.JavaValue");
+            available = true;
+        }  catch (ClassNotFoundException e) {
+        }
+
+        javaValueClassAvailable = available;
+    }
+
     @Override
     protected void handle(Project project, String value, XDebuggerTree tree) {
     }
@@ -89,7 +102,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
         if (selectedNodes.size() == 1) {
             XValueNodeImpl node = selectedNodes.get(0);
             XValue container = node.getValueContainer();
-            if (container instanceof JavaValue && container.getModifier() != null) {
+            if (javaValueClassAvailable && container instanceof JavaValue && container.getModifier() != null) {
                 ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
                 if (descriptor.isString() || descriptor.isArray() || descriptor.isPrimitive() || isBasicType(descriptor)) {
                     return node;
