@@ -3,14 +3,14 @@ BinEd - Binary Data Editor Plugin for IntelliJ
 
 Hexadecimal viewer/editor plugin module for IntelliJ IDEA platform.
 
-Homepage: http://bined.exbin.org  
+Homepage: https://bined.exbin.org/intellij-plugin/  
 
 Published as: https://plugins.jetbrains.com/plugin/9339-deltahex-editor  
 
 Screenshot
 ----------
 
-![DeltaHex-Editor Screenshot](images/intellij-screenshot.png?raw=true)
+![BinEd-Editor Screenshot](images/intellij-screenshot.png?raw=true)
 
 Features
 --------
