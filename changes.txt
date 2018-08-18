@@ -1,3 +1,7 @@
+0.1.7
+- Fixed issue with debugging in CLion (issue #4)
+- Fixed issue with goto does not scrolling window (issue #5)
+
 0.1.6.1 (2018-03-07)
 - Fixed issue with byte array / NPE
 

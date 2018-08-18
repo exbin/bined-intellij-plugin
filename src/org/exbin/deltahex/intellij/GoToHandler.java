@@ -67,6 +67,7 @@ public class GoToHandler {
                             if (actionType == DefaultControlHandler.ControlActionType.OK) {
                                 goToPanel.acceptInput();
                                 codeArea.setCaretPosition(goToPanel.getGoToPosition());
+                                codeArea.revealCursor();
                             }
 
                             dialog.close(0);
