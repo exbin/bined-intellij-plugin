@@ -24,10 +24,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Fixed issue with byte array / NPE</li>
-<li>Added "Show as hex" action for debugger (native types and native arrays only)</li>
-<li>Show "Document changed" dialog on window close</li>
-<li>Fixed Unknown property name: 'modified' (issue #3)</li></ul>
+<ul><li>Fixed issue with debugging in CLion (issue #4)</li>
+<li>Fixed issue with goto does not scrolling window (issue #5)</li>
+<li>Added basic support for debug view of bytearray and bytes for Python</li>
+</ul>
     ]]>
     </change-notes>
 
@@ -37,6 +37,7 @@
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
+    <depends optional="true">com.intellij.modules.python</depends>
 
     <project-components>
     </project-components>
