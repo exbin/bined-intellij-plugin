@@ -15,6 +15,7 @@
  */
 package org.exbin.deltahex.intellij;
 
+import com.google.common.util.concurrent.AbstractFuture;
 import com.intellij.debugger.engine.JavaValue;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -24,13 +25,16 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import com.intellij.xdebugger.frame.XFullValueEvaluator;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
+import com.jetbrains.python.debugger.PyDebugValue;
 import com.sun.jdi.*;
 import org.exbin.deltahex.intellij.debug.*;
+import org.exbin.deltahex.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.deltahex.intellij.panel.DebugViewPanel;
 import org.exbin.deltahex.intellij.panel.ValuesPanel;
 import org.exbin.utils.binary_data.BinaryData;
@@ -39,21 +43,22 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Show debugger value in hexadecimal editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.6 2018/03/07
+ * @version 0.1.7 2018/08/22
  */
 public class DebugViewHexAction extends XFetchValueActionBase {
 
     private static final boolean javaValueClassAvailable;
-
     static {
         boolean available = false;
         try  {
@@ -61,8 +66,18 @@ public class DebugViewHexAction extends XFetchValueActionBase {
             available = true;
         }  catch (ClassNotFoundException e) {
         }
-
         javaValueClassAvailable = available;
+    }
+
+    private static final boolean pythonValueClassAvailable;
+    static {
+        boolean available = false;
+        try  {
+            Class.forName("com.jetbrains.python.debugger.PyDebugValue");
+            available = true;
+        }  catch (ClassNotFoundException e) {
+        }
+        pythonValueClassAvailable = available;
     }
 
     @Override
@@ -108,6 +123,10 @@ public class DebugViewHexAction extends XFetchValueActionBase {
                     return node;
                 }
             }
+
+            if (pythonValueClassAvailable && container instanceof PyDebugValue) {
+                return node;
+            }
         }
         return null;
     }
@@ -126,6 +145,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
 
     private static class DataDialog extends DialogWrapper {
 
+        private final Project project;
         private final byte[] valuesCache = new byte[8];
         private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
 
@@ -134,6 +154,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
 
         private DataDialog(Project project, @Nullable String initialValue, @Nullable XValueNodeImpl dataNode) {
             super(project, false);
+            this.project = project;
             myDataNode = dataNode;
             setModal(false);
             setCancelButtonText("Close");
@@ -143,18 +164,54 @@ public class DebugViewHexAction extends XFetchValueActionBase {
 
             viewPanel = new DebugViewPanel();
 
-            BinaryData data = null;
+            BinaryData data = identifyData(initialValue);
 
+            viewPanel.setData(data);
+
+            init();
+        }
+
+        @NotNull
+        private BinaryData identifyData(@Nullable String initialValue) {
+            BinaryData data = null;
             if (myDataNode != null) {
                 XValue container = myDataNode.getValueContainer();
-                ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
-                if (descriptor.isPrimitive() || isBasicType(descriptor) || !descriptor.isNull()) {
-                    if (descriptor.isArray()) {
-                        data = processArrayData(descriptor);
-                    } else {
-                        data = processSimpleValue(descriptor);
+                if (javaValueClassAvailable && container instanceof JavaValue) {
+                    ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
+                    if (descriptor.isPrimitive() || isBasicType(descriptor) || !descriptor.isNull()) {
+                        if (descriptor.isArray()) {
+                            data = processArrayData(descriptor);
+                        } else {
+                            data = processSimpleValue(descriptor);
+                        }
                     }
-                } else {
+                }
+
+                if (pythonValueClassAvailable && container instanceof PyDebugValue) {
+                    String dataType = ((PyDebugValue) container).getType();
+                    switch (dataType) {
+                        case "bytearray":
+                        case "bytes": {
+                            // Very primitive and inefficient data reading using existing readers via string
+                            PyValueFuture value = new PyValueFuture(myDataNode);
+//                            PyDebugValue debugValue = (PyDebugValue) container;
+//                            XDebuggerTree parentTree = myDataNode.getTree();
+//                            XSourcePosition sourcePosition = debugValue.getFrameAccessor().getSourcePositionForType(debugValue.getType());
+//                            XDebuggerTree tree = new XDebuggerTree(project, parentTree.getEditorsProvider(), sourcePosition, "XDebugger.Inspect.Tree.Popup", parentTree.getValueMarkers());
+//                            XValueNodeImpl fullValueNode = new XValueNodeImpl(parentTree, (XDebuggerTreeNode)null, debugValue.getName(), debugValue);
+//                            debugValue.computePresentation(fullValueNode, XValuePlace.TREE);
+//                            PyFullValueEvaluator fullValueEvaluator = new PyFullValueEvaluator(debugValue.getFrameAccessor(), debugValue.getEvaluationExpression());
+//                            fullValueNode.getRawValue()
+                            try {
+                                data = new DebugViewDataSource(new PythonByteArrayPageProvider(value.get(), dataType));
+                            } catch (ExecutionException | InterruptedException e) {
+                                data = null;
+                            }
+                        }
+                    }
+                }
+
+                if (data == null) {
                     String rawValue = myDataNode.getRawValue();
                     if (rawValue != null) {
                         data = new ByteArrayData(rawValue.getBytes(Charset.defaultCharset()));
@@ -170,9 +227,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
                 }
             }
 
-            viewPanel.setData(data);
-
-            init();
+            return data;
         }
 
         private BinaryData processArrayData(ValueDescriptorImpl descriptor) {
@@ -341,6 +396,34 @@ public class DebugViewHexAction extends XFetchValueActionBase {
             BorderLayoutPanel panel = JBUI.Panels.simplePanel(viewPanel);
             panel.setPreferredSize(JBUI.size(600, 400));
             return panel;
+        }
+    }
+
+    private static class PyValueFuture extends AbstractFuture<String> {
+        public PyValueFuture(@NotNull XValueNodeImpl dataNode) {
+            super();
+
+            XFullValueEvaluator fullValueEvaluator = dataNode.getFullValueEvaluator();
+            fullValueEvaluator.startEvaluation(new XFullValueEvaluator.XFullValueEvaluationCallback() {
+                public boolean isObsolete() {
+                    return false;
+                }
+
+                @Override
+                public void evaluated(@NotNull String s) {
+                    set(s);
+                }
+
+                @Override
+                public void evaluated(@NotNull String s, @Nullable Font font) {
+                    set(s);
+                }
+
+                @Override
+                public void errorOccurred(@NotNull String s) {
+                    set(null);
+                }
+            });
         }
     }
 }

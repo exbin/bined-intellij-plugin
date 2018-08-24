@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 /**
  * Encodings handler.
  *
- * @version 0.1.7 2018/08/18
+ * @version 0.1.4 2016/12/23
  * @author ExBin Project (http://exbin.org)
  */
 public class GoToHandler {
