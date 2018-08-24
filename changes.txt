@@ -1,4 +1,4 @@
-0.1.7
+0.1.7 (2018-08-24)
 - Fixed issue with debugging in CLion (issue #4)
 - Fixed issue with goto does not scrolling window (issue #5)
 - Added basic support for debug view of bytearray and bytes for Python
