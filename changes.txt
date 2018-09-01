@@ -1,4 +1,5 @@
 0.2.0
+- Updated to newer version of library
 
 0.1.7 (2018-08-24)
 - Fixed issue with debugging in CLion (issue #4)

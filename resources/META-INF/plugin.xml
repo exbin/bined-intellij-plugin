@@ -1,6 +1,6 @@
 <idea-plugin version="2" url="https://github.com/exbin/bined-intellij-plugin">
-    <id>org.exbin.deltahex.intellij</id>
-    <name>BinEd Hexadecimal Editor</name>
+    <id>org.exbin.bined.intellij</id>
+    <name>BinEd Binary Editor</name>
     <version>0.2.0-SNAPSHOT</version>
     <vendor email="hajdam@users.sf.net" url="https://exbin.org">ExBin Project</vendor>
 
@@ -8,26 +8,21 @@
 <p>Hexadecimal editor plugin based on BinEd binary editor. Use "Open as Hex" action in main "File" menu or in project files context menu.</p>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/deltahex-intellij-plugin-preview-0.1.1.png" alt="deltahex-intellij-plugin-preview"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.0.png" alt="bined-intellij-plugin-preview"/></p>
 
 <h1>Features</h1>
-<ul><li>Show data as hexadecimal codes and text preview</li>
-<li>Insert and overwrite edit modes</li>
-<li>Support for selection and clipboard actions</li>
-<li>Support for undo/redo</li>
-<li>Support for encoding selection</li>
-<li>Support for showing unprintable/whitespace characters</li>
+<ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
 <li>Codes can be also binary, octal or decimal</li>
+<li>Support for Unicode, UTF-8 and other charsetsv
+<li>Insert and overwrite edit modes</li>
 <li>Searching for text / hexadecimal code with matching highlighting</li>
-<li>Delta mode - Changes are stored only in memory till save</li>
-<li>Support for huge files</li></ul>
+<li>Support for undo/redo</li>
+<li>Support for files with size up to exabytes</li></ul>
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Fixed issue with byte array / NPE</li>
-<li>Added "Show as hex" action for debugger (native types and native arrays only)</li>
-<li>Show "Document changed" dialog on window close</li>
-<li>Fixed Unknown property name: 'modified' (issue #3)</li></ul>
+<ul><li>Updated to newer version of library</li>
+</ul>
     ]]>
     </change-notes>
 
@@ -43,33 +38,33 @@
     </project-components>
 
     <application-components>
-        <component><implementation-class>org.exbin.deltahex.intellij.DeltaHexFileSystem</implementation-class></component>
-        <component><implementation-class>org.exbin.deltahex.intellij.DeltaHexWindowProvider</implementation-class></component>
+        <component><implementation-class>org.exbin.bined.intellij.BinEdFileSystem</implementation-class></component>
+        <component><implementation-class>org.exbin.bined.intellij.BinEdWindowProvider</implementation-class></component>
         <!--        <component>
-            <implementation-class>org.exbin.deltahex.intellij.Configuration</implementation-class>
+            <implementation-class>org.exbin.bined.intellij.Configuration</implementation-class>
         </component> -->
     </application-components>
 
     <actions>
-        <action id="DeltaHexEditor.OpenAsHexAction" class="org.exbin.deltahex.intellij.OpenAsHexAction"
+        <action id="BinEdEditor.OpenAsHexAction" class="org.exbin.bined.intellij.OpenAsHexAction"
                 text="Open As Hex" description="Opens file in hexadecimal viewer/editor" icon="/images/icon-idea.png"/>
         <group>
-            <reference id="DeltaHexEditor.OpenAsHexAction"/>
+            <reference id="BinEdEditor.OpenAsHexAction"/>
             <add-to-group group-id="ProjectViewPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
         </group>
 
-        <action id="DeltaHexEditor.FileOpenAsHex" class="org.exbin.deltahex.intellij.FileOpenAsHexAction"
+        <action id="BinEdEditor.FileOpenAsHex" class="org.exbin.bined.intellij.FileOpenAsHexAction"
                 text="Open as Hex..." description="Opens file in hexadecimal viewer/editor" icon="/images/icon-idea.png">
             <add-to-group group-id="FileOpenGroup" relative-to-action="OpenFile" anchor="after"/>
         </action>
 
         <group>
-            <reference id="DeltaHexEditor.OpenAsHexAction"/>
+            <reference id="BinEdEditor.OpenAsHexAction"/>
             <add-to-group group-id="EditorPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
         </group>
 
         <group>
-            <action id="Debugger.DeltaHexShowAsHex" class="org.exbin.deltahex.intellij.DebugViewHexAction" text="Show As Hex" icon="/images/icon-idea.png"/>
+            <action id="Debugger.BinEdShowAsHex" class="org.exbin.bined.intellij.DebugViewHexAction" text="Show As Hex" icon="/images/icon-idea.png"/>
 
             <add-to-group group-id="XDebugger.Watches.Tree.Popup" anchor="last"/>
             <add-to-group group-id="XDebugger.Watches.Tree.Toolbar" anchor="after" relative-to-action="XDebugger.Actions"/>

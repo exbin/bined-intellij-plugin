@@ -1,11 +1,11 @@
-BinEd - Binary Data Editor Plugin for IntelliJ
-==============================================
+BinEd - Binary Editor Plugin for IntelliJ
+=========================================
 
 Hexadecimal viewer/editor plugin module for IntelliJ IDEA platform.
 
 Homepage: https://bined.exbin.org/intellij-plugin/  
 
-Published as: https://plugins.jetbrains.com/plugin/9339-deltahex-editor  
+Published as: https://plugins.jetbrains.com/plugin/9339-bined  
 
 Screenshot
 ----------
@@ -15,21 +15,18 @@ Screenshot
 Features
 --------
 
-- Data as hexadecimal codes and text preview
-- Insert and overwrite edit modes
-- Support for selection and clipboard
-- Support for undo/redo
-- Support for encoding selection
-- Support for showing unprintable/whitespace characters
-- Codes can be also binary, octal or decimal
-- Searching for text / hexadecimal code with matching highlighting
-- Delta mode - Changes are stored only in memory till save
-- Support for huge files
+ - Visualize data as numerical (hexadecimal) codes and text representation
+ - Codes can be also binary, octal or decimal
+ - Support for Unicode, UTF-8 and other charsets
+ - Insert and overwrite edit modes
+ - Searching for text / hexadecimal code with matching highlighting
+ - Support for undo/redo
+ - Support for files with size up to exabytes
 
 Compiling
 ---------
 
-Java Development Kit (JDK) version 7 or later is required to build this project.
+Java Development Kit (JDK) version 8 or later is required to build this project.
 
 IntelliJ Idea platform is necessary for build of this plugin. See. http://jetbrains.org  
 
