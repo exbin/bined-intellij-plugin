@@ -21,7 +21,7 @@ import org.exbin.bined.ScrollBarVisibility;
 import org.exbin.bined.basic.BasicBackgroundPaintMode;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.intellij.DialogUtils;
-import org.exbin.bined.swing.basic.CodeArea;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.panel.*;
 import org.exbin.framework.gui.utils.LanguageUtils;
@@ -57,7 +57,7 @@ public class HexSearchPanel extends javax.swing.JPanel {
     private final HexSearchPanelApi hexSearchPanelApi;
     private int matchesCount;
     private int matchPosition;
-    private final CodeArea hexadecimalRenderer = new CodeArea();
+    private final ExtCodeArea hexadecimalRenderer = new ExtCodeArea();
 
     private boolean replaceMode = true;
     private ComboBoxEditor findComboBoxEditor;

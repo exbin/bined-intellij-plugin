@@ -20,8 +20,8 @@ import org.exbin.bined.DataChangedListener;
 import org.exbin.bined.ScrollBarVisibility;
 import org.exbin.bined.basic.BasicBackgroundPaintMode;
 import org.exbin.bined.capability.RowWrappingCapable;
-import org.exbin.bined.swing.basic.CodeArea;
 import org.exbin.bined.swing.capability.BackgroundPaintCapable;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
 import org.exbin.utils.binary_data.EditableBinaryData;
@@ -45,7 +45,7 @@ public class HexSearchComboBoxPanel extends JPanel {
     public static final String BINARY_MODE = "binary";
 
     private final JTextField textField;
-    private final CodeArea hexadecimalEditor = new CodeArea();
+    private final ExtCodeArea hexadecimalEditor = new ExtCodeArea();
 
     private final SearchCondition item = new SearchCondition();
 

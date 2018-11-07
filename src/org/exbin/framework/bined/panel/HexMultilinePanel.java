@@ -16,7 +16,7 @@
  */
 package org.exbin.framework.bined.panel;
 
-import org.exbin.bined.swing.basic.CodeArea;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.utils.binary_data.EditableBinaryData;
@@ -40,7 +40,7 @@ public class HexMultilinePanel extends javax.swing.JPanel {
 
     private JTextArea textArea;
     private JScrollPane scrollPane;
-    private CodeArea codeArea;
+    private ExtCodeArea codeArea;
     private CodeAreaPopupMenuHandler hexCodePopupMenuHandler;
 
     public HexMultilinePanel() {
@@ -90,7 +90,7 @@ public class HexMultilinePanel extends javax.swing.JPanel {
             textArea.setText(condition.getSearchText());
             add(scrollPane, BorderLayout.CENTER);
         } else {
-            codeArea = new CodeArea();
+            codeArea = new ExtCodeArea();
             codeArea.setContentData(condition.getBinaryData());
             add(codeArea, BorderLayout.CENTER);
             if (hexCodePopupMenuHandler != null) {

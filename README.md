@@ -1,7 +1,7 @@
-BinEd - Binary Editor Plugin for IntelliJ
-=========================================
+BinEd - Binary/Hexadecimal Editor - Plugin for IntelliJ Platform
+================================================================
 
-Hexadecimal viewer/editor plugin module for IntelliJ IDEA platform.
+Hexadecimal viewer/editor plugin module for IntelliJ platform.
 
 Homepage: https://bined.exbin.org/intellij-plugin/  
 

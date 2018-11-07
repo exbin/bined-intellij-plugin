@@ -48,7 +48,7 @@ import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.operation.swing.command.InsertDataCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoUpdateListener;
-import org.exbin.bined.swing.basic.CodeArea;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.HexStatusApi;
 import org.exbin.framework.bined.panel.HexStatusPanel;
@@ -85,7 +85,7 @@ import java.util.Map;
  * File editor using DeltaHex editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.4 2017/04/01
+ * @version 0.2.0 2018/11/07
  */
 public class BinEdFileEditor implements FileEditor {
 
@@ -123,7 +123,7 @@ public class BinEdFileEditor implements FileEditor {
     private JPanel editorPanel;
     private JPanel headerPanel;
     private static SegmentsRepository segmentsRepository = null;
-    private final CodeArea codeArea;
+    private final ExtCodeArea codeArea;
     private final CodeAreaUndoHandler undoHandler;
     private final int metaMask;
     private final PropertyChangeSupport propertyChangeSupport;
@@ -154,7 +154,7 @@ public class BinEdFileEditor implements FileEditor {
 
         preferences = getPreferences();
 
-        codeArea = new CodeArea();
+        codeArea = new ExtCodeArea();
         codeArea.setPainter(new HighlightNonAsciiCodeAreaPainter(codeArea));
         codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
@@ -1182,7 +1182,7 @@ public class BinEdFileEditor implements FileEditor {
             });
             hexSearchPanel.setHexCodePopupMenuHandler(new CodeAreaPopupMenuHandler() {
                 @Override
-                public JPopupMenu createPopupMenu(CodeArea codeArea, String menuPostfix) {
+                public JPopupMenu createPopupMenu(ExtCodeArea codeArea, String menuPostfix) {
                     return createCodeAreaPopupMenu(codeArea, menuPostfix);
                 }
 
@@ -1246,7 +1246,7 @@ public class BinEdFileEditor implements FileEditor {
         }
     }
 
-    private JPopupMenu createCodeAreaPopupMenu(final CodeArea codeArea, String menuPostfix) {
+    private JPopupMenu createCodeAreaPopupMenu(final ExtCodeArea codeArea, String menuPostfix) {
         JPopupMenu popupMenu = new JPopupMenu();
 
         JMenuItem cutMenuItem = new JMenuItem(new AbstractAction() {
@@ -1502,7 +1502,7 @@ public class BinEdFileEditor implements FileEditor {
         // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
 
         // Decoration
-        codeArea.setBackgroundPaintMode(BasicBackgroundPaintMode.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, BasicBackgroundPaintMode.STRIPED.name())));
+        codeArea.setBackgroundPaintMode(convertBackgroundPaintMode(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, BasicBackgroundPaintMode.STRIPED.name())));
         /* TODO codeArea.setLineNumberBackground(preferences.getBoolean(BinEdFileEditor.PREFERENCES_PAINT_LINE_NUMBERS_BACKGROUND, true));
         int decorationMode = (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_HEADER_LINE, true) ? CodeArea.DECORATION_HEADER_LINE : 0)
                 + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_PREVIEW_LINE, true) ? CodeArea.DECORATION_PREVIEW_LINE : 0)
@@ -1555,6 +1555,12 @@ public class BinEdFileEditor implements FileEditor {
 
     public Project getProject() {
         return project;
+    }
+
+    private static BasicBackgroundPaintMode convertBackgroundPaintMode(String value) {
+        if ("STRIPPED".equals(value))
+            return BasicBackgroundPaintMode.STRIPED;
+        return BasicBackgroundPaintMode.valueOf(value);
     }
 
     public interface CharsetChangeListener {

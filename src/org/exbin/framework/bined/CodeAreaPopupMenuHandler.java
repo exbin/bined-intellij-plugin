@@ -16,7 +16,7 @@
  */
 package org.exbin.framework.bined;
 
-import org.exbin.bined.swing.basic.CodeArea;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 
 import javax.swing.*;
 
@@ -28,7 +28,7 @@ import javax.swing.*;
  */
 public interface CodeAreaPopupMenuHandler {
 
-    JPopupMenu createPopupMenu(CodeArea codeArea, String menuPostfix);
+    JPopupMenu createPopupMenu(ExtCodeArea codeArea, String menuPostfix);
 
     void dropPopupMenu(String menuPostfix);
 }

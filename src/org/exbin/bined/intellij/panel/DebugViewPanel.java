@@ -26,7 +26,7 @@ import org.exbin.bined.highlight.swing.HighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdFileEditor;
 import org.exbin.bined.intellij.EncodingsHandler;
 import org.exbin.bined.intellij.GoToHandler;
-import org.exbin.bined.swing.basic.CodeArea;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.HexStatusApi;
 import org.exbin.framework.bined.panel.HexStatusPanel;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
@@ -51,7 +51,7 @@ public class DebugViewPanel extends JPanel {
 
     private PropertiesComponent preferences;
     private JPanel headerPanel;
-    private CodeArea codeArea;
+    private ExtCodeArea codeArea;
     private ValuesPanel valuesPanel = null;
     private boolean valuesPanelVisible = false;
 
@@ -71,7 +71,7 @@ public class DebugViewPanel extends JPanel {
         preferences = BinEdFileEditor.getPreferences();
 
         initComponents();
-        codeArea = new CodeArea();
+        codeArea = new ExtCodeArea();
         codeArea.setEditationMode(EditationMode.READ_ONLY);
 
         codeArea.setPainter(new HighlightNonAsciiCodeAreaPainter(codeArea));
@@ -397,7 +397,7 @@ public class DebugViewPanel extends JPanel {
         // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
 
         // Decoration
-        codeArea.setBackgroundPaintMode(BasicBackgroundPaintMode.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, BasicBackgroundPaintMode.STRIPED.name())));
+        codeArea.setBackgroundPaintMode(convertBackgroundPaintMode(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, BasicBackgroundPaintMode.STRIPED.name())));
         /* TODO codeArea.setLineNumberBackground(preferences.getBoolean(BinEdFileEditor.PREFERENCES_PAINT_LINE_NUMBERS_BACKGROUND, true));
         int decorationMode = (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_HEADER_LINE, true) ? CodeArea.DECORATION_HEADER_LINE : 0)
                 + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_PREVIEW_LINE, true) ? CodeArea.DECORATION_PREVIEW_LINE : 0)
@@ -472,6 +472,12 @@ public class DebugViewPanel extends JPanel {
             remove(valuesPanelScrollPane);
             revalidate();
         }
+    }
+
+    private static BasicBackgroundPaintMode convertBackgroundPaintMode(String value) {
+        if ("STRIPPED".equals(value))
+            return BasicBackgroundPaintMode.STRIPED;
+        return BasicBackgroundPaintMode.valueOf(value);
     }
 
     public interface CharsetChangeListener {

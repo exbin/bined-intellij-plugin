@@ -16,7 +16,9 @@
  */
 package org.exbin.bined.intellij.panel;
 
-import org.exbin.bined.*;
+import org.exbin.bined.CaretMovedListener;
+import org.exbin.bined.CaretPosition;
+import org.exbin.bined.DataChangedListener;
 import org.exbin.bined.capability.EditationModeCapable;
 import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.BinaryDataOperationException;
@@ -25,7 +27,7 @@ import org.exbin.bined.operation.swing.command.HexCompoundCommand;
 import org.exbin.bined.operation.swing.command.InsertDataCommand;
 import org.exbin.bined.operation.swing.command.ModifyDataCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoUpdateListener;
-import org.exbin.bined.swing.basic.CodeArea;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
 import org.exbin.utils.binary_data.EditableBinaryData;
 
@@ -41,7 +43,7 @@ import java.util.InputMismatchException;
  * Values side panel.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.5 2017/10/09
+ * @version 0.2.0 2018/11/07
  */
 public class ValuesPanel extends javax.swing.JPanel {
 
@@ -54,7 +56,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     public static final BigInteger BIG_INTEGER_BYTE_MASK = BigInteger.valueOf(255);
     public static final String VALUE_OUT_OF_RANGE = "Value is out of range";
 
-    private CodeArea codeArea;
+    private ExtCodeArea codeArea;
     private CodeAreaUndoHandler undoHandler;
     private long dataPosition;
     private DataChangedListener dataChangedListener;
@@ -674,7 +676,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     private javax.swing.JTextField wordTextField;
     // End of variables declaration//GEN-END:variables
 
-    public void setCodeArea(CodeArea codeArea, CodeAreaUndoHandler undoHandler) {
+    public void setCodeArea(ExtCodeArea codeArea, CodeAreaUndoHandler undoHandler) {
         this.codeArea = codeArea;
         this.undoHandler = undoHandler;
     }

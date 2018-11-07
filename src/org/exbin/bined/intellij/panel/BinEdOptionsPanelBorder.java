@@ -16,7 +16,7 @@
  */
 package org.exbin.bined.intellij.panel;
 
-import org.exbin.bined.swing.basic.CodeArea;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 
 /**
  * Hexadecimal editor options panel with border.
@@ -51,11 +51,11 @@ public class BinEdOptionsPanelBorder extends javax.swing.JPanel {
     private BinEdOptionsPanel optionsPanel;
     // End of variables declaration//GEN-END:variables
 
-    public void setFromCodeArea(CodeArea codeArea) {
+    public void setFromCodeArea(ExtCodeArea codeArea) {
         optionsPanel.setFromCodeArea(codeArea);
     }
 
-    public void applyToCodeArea(CodeArea codeArea) {
+    public void applyToCodeArea(ExtCodeArea codeArea) {
         optionsPanel.applyToCodeArea(codeArea);
         codeArea.repaint();
     }

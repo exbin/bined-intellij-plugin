@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.openapi.ui.DialogWrapper;
-import org.exbin.bined.swing.basic.CodeArea;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.panel.GoToHexPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
@@ -37,10 +37,10 @@ public class GoToHandler {
 
     private final ResourceBundle resourceBundle;
 
-    private CodeArea codeArea;
+    private ExtCodeArea codeArea;
     private Action goToLineAction;
 
-    public GoToHandler(CodeArea codeArea) {
+    public GoToHandler(ExtCodeArea codeArea) {
         this.codeArea = codeArea;
         resourceBundle = LanguageUtils.getResourceBundleByClass(GoToHandler.class);
         init();

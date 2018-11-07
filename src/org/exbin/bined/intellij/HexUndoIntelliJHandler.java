@@ -26,7 +26,7 @@ import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.BinaryDataOperationException;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.operation.undo.BinaryDataUndoUpdateListener;
-import org.exbin.bined.swing.basic.CodeArea;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.undo.CannotRedoException;
@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class HexUndoIntelliJHandler implements BinaryDataUndoHandler {
 
-    private final CodeArea codeArea;
+    private final ExtCodeArea codeArea;
     private final List<BinaryDataUndoUpdateListener> listeners = new ArrayList<>();
     private final UndoManager undoManager;
     private final BinEdFileEditor fileEditor;
@@ -56,7 +56,7 @@ public class HexUndoIntelliJHandler implements BinaryDataUndoHandler {
      *
      * @param codeArea hexadecimal component
      */
-    public HexUndoIntelliJHandler(CodeArea codeArea, Project project, BinEdFileEditor fileEditor) {
+    public HexUndoIntelliJHandler(ExtCodeArea codeArea, Project project, BinEdFileEditor fileEditor) {
         this.codeArea = codeArea;
         this.fileEditor = fileEditor;
         this.project = project;
