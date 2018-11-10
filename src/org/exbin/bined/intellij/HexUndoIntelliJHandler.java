@@ -124,12 +124,7 @@ public class HexUndoIntelliJHandler implements BinaryDataUndoHandler {
             }
         };
         CommandProcessor commandProcessor = CommandProcessor.getInstance();
-        commandProcessor.executeCommand(project, new Runnable() {
-            @Override
-            public void run() {
-                undoManager.undoableActionPerformed(action);
-            }
-        }, command.getCaption(), "DeltaHex");
+        commandProcessor.executeCommand(project, () -> undoManager.undoableActionPerformed(action), command.getCaption(), "BinEd");
 
         commandPosition++;
         undoUpdated();
@@ -141,7 +136,7 @@ public class HexUndoIntelliJHandler implements BinaryDataUndoHandler {
     /**
      * Performs single undo step.
      *
-     * @throws java.lang.Exception if commands throws it
+     * @throws BinaryDataOperationException if commands throws it
      */
     @Override
     public void performUndo() throws BinaryDataOperationException {

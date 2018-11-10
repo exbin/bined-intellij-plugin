@@ -36,7 +36,7 @@ import java.util.List;
 public class FileOpenAsHexAction extends AnAction {
 
     public FileOpenAsHexAction() {
-        super("Open As Hex...");
+        super("Open As Hex" + DialogUtils.DIALOG_MENUITEM_EXT);
     }
 
     @Override

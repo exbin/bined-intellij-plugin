@@ -1,4 +1,4 @@
-<idea-plugin version="2" url="https://github.com/exbin/bined-intellij-plugin">
+<idea-plugin version="2" url="https://bined.exbin.org/intellij-plugin">
     <id>org.exbin.bined.intellij</id>
     <name>BinEd - Binary/Hexadecimal Editor</name>
     <version>0.2.0-SNAPSHOT</version>

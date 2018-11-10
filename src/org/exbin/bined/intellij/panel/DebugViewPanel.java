@@ -24,6 +24,7 @@ import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.capability.RowWrappingCapable.RowWrappingMode;
 import org.exbin.bined.highlight.swing.HighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdFileEditor;
+import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.EncodingsHandler;
 import org.exbin.bined.intellij.GoToHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
@@ -45,7 +46,7 @@ import java.util.Map;
  * Debugger value hexadecimal editor panel.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.6 2018/03/01
+ * @version 0.2.0 2018/11/10
  */
 public class DebugViewPanel extends JPanel {
 
@@ -181,31 +182,19 @@ public class DebugViewPanel extends JPanel {
 
         lineWrappingToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/bined-linewrap.png")));
         lineWrappingToggleButton.setToolTipText("Wrap line to window size");
-        lineWrappingToggleButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                lineWrappingToggleButtonActionPerformed(evt);
-            }
-        });
+        lineWrappingToggleButton.addActionListener(this::lineWrappingToggleButtonActionPerformed);
         controlToolBar.add(lineWrappingToggleButton);
 
         showUnprintablesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png")));
         showUnprintablesToggleButton.setToolTipText("Show symbols for unprintable/whitespace characters");
-        showUnprintablesToggleButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showUnprintablesToggleButtonActionPerformed(evt);
-            }
-        });
+        showUnprintablesToggleButton.addActionListener(this::showUnprintablesToggleButtonActionPerformed);
         controlToolBar.add(showUnprintablesToggleButton);
         controlToolBar.add(jSeparator3);
 
         JPanel spacePanel = new JPanel();
         spacePanel.setLayout(new BorderLayout());
         codeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BIN", "OCT", "DEC", "HEX"}));
-        codeTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                codeTypeComboBoxActionPerformed(evt);
-            }
-        });
+        codeTypeComboBox.addActionListener(this::codeTypeComboBoxActionPerformed);
         spacePanel.add(codeTypeComboBox, BorderLayout.WEST);
         controlToolBar.add(spacePanel);
 
@@ -232,23 +221,17 @@ public class DebugViewPanel extends JPanel {
         final JMenuItem copyMenuItem = new JMenuItem("Copy");
         copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, metaMask));
         copyMenuItem.setEnabled(codeArea.hasSelection());
-        copyMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.copy();
-                result.setVisible(false);
-            }
+        copyMenuItem.addActionListener(e -> {
+            codeArea.copy();
+            result.setVisible(false);
         });
         result.add(copyMenuItem);
 
         final JMenuItem copyAsCodeMenuItem = new JMenuItem("Copy as Code");
         copyAsCodeMenuItem.setEnabled(codeArea.hasSelection());
-        copyAsCodeMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.copyAsCode();
-                result.setVisible(false);
-            }
+        copyAsCodeMenuItem.addActionListener(e -> {
+            codeArea.copyAsCode();
+            result.setVisible(false);
         });
         result.add(copyAsCodeMenuItem);
 
@@ -256,35 +239,27 @@ public class DebugViewPanel extends JPanel {
 
         final JMenuItem selectAllMenuItem = new JMenuItem("Select All");
         selectAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, metaMask));
-        selectAllMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.selectAll();
-                result.setVisible(false);
-            }
+        selectAllMenuItem.addActionListener(e -> {
+            codeArea.selectAll();
+            result.setVisible(false);
         });
         result.add(selectAllMenuItem);
         result.addSeparator();
 
-        final JMenuItem goToMenuItem = new JMenuItem("Go To...");
+        final JMenuItem goToMenuItem = new JMenuItem("Go To" + DialogUtils.DIALOG_MENUITEM_EXT);
         goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, metaMask));
-        goToMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                goToHandler.getGoToLineAction().actionPerformed(null);
-            }
-        });
+        goToMenuItem.addActionListener(e -> goToHandler.getGoToLineAction().actionPerformed(null));
         result.add(goToMenuItem);
 
         return result;
     }
 
     private void lineWrappingToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        ((RowWrappingCapable) codeArea).setRowWrapping(lineWrappingToggleButton.isSelected() ? RowWrappingCapable.RowWrappingMode.WRAPPING : RowWrappingCapable.RowWrappingMode.NO_WRAPPING);
+        codeArea.setRowWrapping(lineWrappingToggleButton.isSelected() ? RowWrappingCapable.RowWrappingMode.WRAPPING : RowWrappingCapable.RowWrappingMode.NO_WRAPPING);
     }
 
     private void showUnprintablesToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO codeArea.setShowUnprintableCharacters(showUnprintablesToggleButton.isSelected());
+        codeArea.setShowUnprintables(showUnprintablesToggleButton.isSelected());
     }
 
     private void codeTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {
@@ -294,12 +269,9 @@ public class DebugViewPanel extends JPanel {
 
     public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi) {
         this.encodingStatus = encodingStatusApi;
-        setCharsetChangeListener(new CharsetChangeListener() {
-            @Override
-            public void charsetChanged() {
-                String selectedEncoding = codeArea.getCharset().name();
-                encodingStatus.setEncoding(selectedEncoding);
-            }
+        setCharsetChangeListener(() -> {
+            String selectedEncoding = codeArea.getCharset().name();
+            encodingStatus.setEncoding(selectedEncoding);
         });
     }
 
@@ -309,19 +281,16 @@ public class DebugViewPanel extends JPanel {
 
     private void applyFromCodeArea() {
         codeTypeComboBox.setSelectedIndex(codeArea.getCodeType().ordinal());
-        // TODO showUnprintablesToggleButton.setSelected(codeArea.isShowUnprintableCharacters());
-        lineWrappingToggleButton.setSelected(((RowWrappingCapable) codeArea).getRowWrapping() == RowWrappingCapable.RowWrappingMode.WRAPPING);
+        showUnprintablesToggleButton.setSelected(codeArea.isShowUnprintables());
+        lineWrappingToggleButton.setSelected(codeArea.getRowWrapping() == RowWrappingCapable.RowWrappingMode.WRAPPING);
     }
 
     public void registerHexStatus(HexStatusApi hexStatusApi) {
         this.hexStatus = hexStatusApi;
-        codeArea.addCaretMovedListener(new CaretMovedListener() {
-            @Override
-            public void caretMoved(CaretPosition caretPosition) {
-                String position = String.valueOf(caretPosition.getDataPosition());
-                position += ":" + caretPosition.getCodeOffset();
-                hexStatus.setCursorPosition(position);
-            }
+        codeArea.addCaretMovedListener(caretPosition -> {
+            String position = String.valueOf(caretPosition.getDataPosition());
+            position += ":" + caretPosition.getCodeOffset();
+            hexStatus.setCursorPosition(position);
         });
 
         hexStatus.setControlHandler(new HexStatusApi.StatusControlHandler() {
@@ -367,10 +336,10 @@ public class DebugViewPanel extends JPanel {
 
         boolean showNonprintables = preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_UNPRINTABLES, false);
         showUnprintablesToggleButton.setSelected(showNonprintables);
-        // TODO codeArea.setShowUnprintableCharacters(showNonprintables);
+        codeArea.setShowUnprintables(showNonprintables);
 
         boolean lineWrapping = preferences.getBoolean(BinEdFileEditor.PREFERENCES_LINE_WRAPPING, false);
-        ((RowWrappingCapable) codeArea).setRowWrapping(lineWrapping ? RowWrappingMode.WRAPPING : RowWrappingMode.NO_WRAPPING);
+        codeArea.setRowWrapping(lineWrapping ? RowWrappingMode.WRAPPING : RowWrappingMode.NO_WRAPPING);
         lineWrappingToggleButton.setSelected(lineWrapping);
 
         encodingsHandler.loadFromPreferences(preferences);
@@ -414,13 +383,9 @@ public class DebugViewPanel extends JPanel {
             String value;
             Map<TextAttribute, Object> attribs = new HashMap<>();
             value = preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_FAMILY, "MONOSPACED");
-            if (value != null) {
-                attribs.put(TextAttribute.FAMILY, value);
-            }
+            attribs.put(TextAttribute.FAMILY, value);
             value = preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SIZE, "12");
-            if (value != null) {
-                attribs.put(TextAttribute.SIZE, new Integer(value).floatValue());
-            }
+            attribs.put(TextAttribute.SIZE, new Integer(value).floatValue());
             if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_UNDERLINE, "FALSE"))) {
                 attribs.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
             }

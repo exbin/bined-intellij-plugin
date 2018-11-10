@@ -58,8 +58,8 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
     private DefaultListModel<CategoryItem> categoryModel = new DefaultListModel<>();
     private JPanel currentCategoryPanel = null;
 
-    private Font deltaHexDefaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
-    private Font deltaHexFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+    private Font binEdDefaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+    private Font binEdFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
 
     public BinEdOptionsPanel() {
         initComponents();
@@ -570,7 +570,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         final TextFontPanel textFontPanel = new TextFontPanel();
 
         DefaultControlPanel textFontControlPanel = new DefaultControlPanel();
-        textFontPanel.setStoredFont(deltaHexFont);
+        textFontPanel.setStoredFont(binEdFont);
         textFontPanel.setVisible(true);
         JPanel dialogPanel = WindowUtils.createDialogPanel(textFontPanel, textFontControlPanel);
         WindowUtils.assignGlobalKeyListener(dialogPanel, textFontControlPanel.createOkCancelListener());
@@ -580,7 +580,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
             @Override
             public void controlActionPerformed(DefaultControlHandler.ControlActionType actionType) {
                 if (actionType == DefaultControlHandler.ControlActionType.OK) {
-                    deltaHexFont = textFontPanel.getStoredFont();
+                    binEdFont = textFontPanel.getStoredFont();
                     updateFontTextField();
                     useDefaultFontCheckBox.setSelected(false);
                 }
@@ -667,9 +667,9 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUPERSCRIPT, null))) {
             attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
         }
-        Font derivedFont = deltaHexFont.deriveFont(attribs);
+        Font derivedFont = binEdFont.deriveFont(attribs);
         if (derivedFont != null) {
-            deltaHexFont = derivedFont;
+            binEdFont = derivedFont;
         }
         updateFontTextField();
     }
@@ -710,7 +710,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         // Font
         preferences.setValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(useDefaultFontCheckBox.isSelected()));
 
-        Map<TextAttribute, ?> attribs = deltaHexFont.getAttributes();
+        Map<TextAttribute, ?> attribs = binEdFont.getAttributes();
         String value = (String) attribs.get(TextAttribute.FAMILY);
         if (value != null) {
             preferences.setValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_FAMILY, value);
@@ -749,7 +749,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         // Mode
         viewModeComboBox.setSelectedIndex(codeArea.getViewMode().ordinal());
         codeTypeComboBox.setSelectedIndex(codeArea.getCodeType().ordinal());
-        // TODO showNonprintableCharactersCheckBox.setSelected(codeArea.isShowUnprintableCharacters());
+        showNonprintableCharactersCheckBox.setSelected(codeArea.isShowUnprintables());
         codeColorizationCheckBox.setSelected(((HighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).isNonAsciiHighlightingEnabled());
         memoryModeComboBox.setSelectedIndex(codeArea.getContentData() instanceof DeltaDocument ? 0 : 1);
 
@@ -761,9 +761,9 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         // TODO positionCodeTypeComboBox.setSelectedIndex(codeArea.getPositionCodeType().ordinal());
 
         // Font
-        deltaHexFont = codeArea.getFont();
+        binEdFont = codeArea.getFont();
         updateFontTextField();
-        useDefaultFontCheckBox.setSelected(deltaHexFont.equals(deltaHexDefaultFont));
+        useDefaultFontCheckBox.setSelected(binEdFont.equals(binEdDefaultFont));
     }
 
     public void applyToCodeArea(ExtCodeArea codeArea) {
@@ -797,9 +797,9 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
 
         // Font
         if (useDefaultFontCheckBox.isSelected()) {
-            codeArea.setFont(deltaHexDefaultFont);
+            codeArea.setFont(binEdDefaultFont);
         } else {
-            codeArea.setFont(deltaHexFont);
+            codeArea.setFont(binEdFont);
         }
     }
 
@@ -835,7 +835,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
     }
 
     private void updateFontTextField() {
-        int fontStyle = deltaHexFont.getStyle();
+        int fontStyle = binEdFont.getStyle();
         String fontStyleName;
         if ((fontStyle & (Font.BOLD + Font.ITALIC)) == Font.BOLD + Font.ITALIC) {
             fontStyleName = "Bold Italic";
@@ -846,7 +846,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         } else {
             fontStyleName = "Plain";
         }
-        fontTextField.setText(deltaHexFont.getFamily() + " " + String.valueOf(deltaHexFont.getSize()) + " " + fontStyleName);
+        fontTextField.setText(binEdFont.getFamily() + " " + String.valueOf(binEdFont.getSize()) + " " + fontStyleName);
     }
 
     private static BasicBackgroundPaintMode convertBackgroundPaintMode(String value) {

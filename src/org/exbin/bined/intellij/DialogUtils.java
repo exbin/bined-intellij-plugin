@@ -25,28 +25,30 @@ import javax.swing.*;
  * Dialog utilities.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.1 2017/01/11
+ * @version 0.2.0 2018/11/10
  */
 public class DialogUtils {
 
+    public static final String DIALOG_MENUITEM_EXT = "...";
+
     public static DialogWrapper createDialog(JComponent dialogPanel, String dialogTitle) {
-        return new DeltaHexDialogWrapper(dialogPanel, dialogTitle);
+        return new BinEdDialogWrapper(dialogPanel, dialogTitle);
     }
 
     public static DialogWrapper createDialog(JComponent dialogPanel, String dialogTitle, JComponent focusedComponent) {
-        return new DeltaHexDialogWrapper(dialogPanel, dialogTitle, focusedComponent);
+        return new BinEdDialogWrapper(dialogPanel, dialogTitle, focusedComponent);
     }
 
-    public static class DeltaHexDialogWrapper extends DialogWrapper {
+    public static class BinEdDialogWrapper extends DialogWrapper {
 
         private final JComponent dialogPanel;
         private final JComponent focusedComponent;
 
-        public DeltaHexDialogWrapper(JComponent dialogPanel, String dialogTitle) {
+        public BinEdDialogWrapper(JComponent dialogPanel, String dialogTitle) {
             this(dialogPanel, dialogTitle, dialogPanel);
         }
 
-        public DeltaHexDialogWrapper(JComponent dialogPanel, String dialogTitle, JComponent focusedComponent) {
+        public BinEdDialogWrapper(JComponent dialogPanel, String dialogTitle, JComponent focusedComponent) {
             super(true);
             this.dialogPanel = dialogPanel;
             this.focusedComponent = focusedComponent;

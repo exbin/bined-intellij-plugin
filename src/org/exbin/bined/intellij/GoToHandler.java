@@ -61,17 +61,14 @@ public class GoToHandler {
                     JPanel dialogPanel = WindowUtils.createDialogPanel(goToPanel, goToControlPanel);
                     WindowUtils.assignGlobalKeyListener(dialogPanel, goToControlPanel.createOkCancelListener());
                     final DialogWrapper dialog = DialogUtils.createDialog(dialogPanel, "Go To Position", goToPanel.getInitFocusComponent());
-                    goToControlPanel.setHandler(new DefaultControlHandler() {
-                        @Override
-                        public void controlActionPerformed(DefaultControlHandler.ControlActionType actionType) {
-                            if (actionType == DefaultControlHandler.ControlActionType.OK) {
-                                goToPanel.acceptInput();
-                                codeArea.setCaretPosition(goToPanel.getGoToPosition());
-                                codeArea.revealCursor();
-                            }
-
-                            dialog.close(0);
+                    goToControlPanel.setHandler(actionType -> {
+                        if (actionType == DefaultControlHandler.ControlActionType.OK) {
+                            goToPanel.acceptInput();
+                            codeArea.setCaretPosition(goToPanel.getGoToPosition());
+                            codeArea.revealCursor();
                         }
+
+                        dialog.close(0);
                     });
                     dialog.showAndGet();
                 }

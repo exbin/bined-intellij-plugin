@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
  * Window provider for hexadecimal editor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.2 2017/02/04
+ * @version 0.2.0 2018/11/10
  */
 public class BinEdWindowProvider implements FileEditorProvider, ApplicationComponent {
 
@@ -53,7 +53,7 @@ public class BinEdWindowProvider implements FileEditorProvider, ApplicationCompo
     @NotNull
     @Override
     public String getComponentName() {
-        return "DeltaHex.BinEdWindowProvider";
+        return "BinEd.BinEdWindowProvider";
     }
 
     @Override
