@@ -35,8 +35,8 @@ import org.exbin.bined.capability.RowWrappingCapable.RowWrappingMode;
 import org.exbin.bined.delta.DeltaDocument;
 import org.exbin.bined.delta.FileDataSource;
 import org.exbin.bined.delta.SegmentsRepository;
-import org.exbin.bined.highlight.swing.HighlightCodeAreaPainter;
-import org.exbin.bined.highlight.swing.HighlightNonAsciiCodeAreaPainter;
+import org.exbin.bined.highlight.swing.extended.ExtendedHighlightCodeAreaPainter;
+import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.panel.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.panel.HexSearchPanel;
 import org.exbin.bined.intellij.panel.HexSearchPanelApi;
@@ -84,7 +84,7 @@ import java.util.Map;
  * File editor using BinEd editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.0 2018/11/10
+ * @version 0.2.0 2018/11/26
  */
 public class BinEdFileEditor implements FileEditor {
 
@@ -154,8 +154,8 @@ public class BinEdFileEditor implements FileEditor {
         preferences = getPreferences();
 
         codeArea = new ExtCodeArea();
-        codeArea.setPainter(new HighlightNonAsciiCodeAreaPainter(codeArea));
-        codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        codeArea.setPainter(new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea));
+        codeArea.setCodeFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
         statusPanel = new HexStatusPanel();
         registerEncodingStatus(statusPanel);
@@ -204,22 +204,11 @@ public class BinEdFileEditor implements FileEditor {
         registerHexStatus(statusPanel);
         goToHandler = new GoToHandler(codeArea);
 
-        codeArea.addMouseListener(new MouseAdapter() {
+        codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                maybeShowPopup(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                maybeShowPopup(e);
-            }
-
-            private void maybeShowPopup(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    JPopupMenu popupMenu = createContextMenu();
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
+            public void show(Component invoker, int x, int y) {
+                JPopupMenu popupMenu = createContextMenu();
+                popupMenu.show(invoker, x, y);
             }
         });
 
@@ -1022,7 +1011,7 @@ public class BinEdFileEditor implements FileEditor {
             hexSearchPanel = new HexSearchPanel(new HexSearchPanelApi() {
                 @Override
                 public void performFind(SearchParameters searchParameters) {
-                    HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
+                    ExtendedHighlightCodeAreaPainter painter = (ExtendedHighlightCodeAreaPainter) codeArea.getPainter();
                     SearchCondition condition = searchParameters.getCondition();
                     hexSearchPanel.clearStatus();
                     if (condition.isEmpty()) {
@@ -1066,9 +1055,9 @@ public class BinEdFileEditor implements FileEditor {
 
                 @Override
                 public void setMatchPosition(int matchPosition) {
-                    HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
+                    ExtendedHighlightCodeAreaPainter painter = (ExtendedHighlightCodeAreaPainter) codeArea.getPainter();
                     painter.setCurrentMatchIndex(matchPosition);
-                    HighlightCodeAreaPainter.SearchMatch currentMatch = painter.getCurrentMatch();
+                    ExtendedHighlightCodeAreaPainter.SearchMatch currentMatch = painter.getCurrentMatch();
                     codeArea.revealPosition(new CodeAreaCaretPosition(currentMatch.getPosition(), 0, codeArea.getActiveSection()));
                     codeArea.repaint();
                 }
@@ -1081,8 +1070,8 @@ public class BinEdFileEditor implements FileEditor {
                 @Override
                 public void performReplace(SearchParameters searchParameters, ReplaceParameters replaceParameters) {
                     SearchCondition replaceCondition = replaceParameters.getCondition();
-                    HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
-                    HighlightCodeAreaPainter.SearchMatch currentMatch = painter.getCurrentMatch();
+                    ExtendedHighlightCodeAreaPainter painter = (ExtendedHighlightCodeAreaPainter) codeArea.getPainter();
+                    ExtendedHighlightCodeAreaPainter.SearchMatch currentMatch = painter.getCurrentMatch();
                     if (currentMatch != null) {
                         EditableBinaryData editableData = ((EditableBinaryData) codeArea.getContentData());
                         editableData.remove(currentMatch.getPosition(), currentMatch.getLength());
@@ -1098,7 +1087,7 @@ public class BinEdFileEditor implements FileEditor {
 
                 @Override
                 public void clearMatches() {
-                    HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
+                    ExtendedHighlightCodeAreaPainter painter = (ExtendedHighlightCodeAreaPainter) codeArea.getPainter();
                     painter.clearMatches();
                 }
             });
@@ -1239,7 +1228,7 @@ public class BinEdFileEditor implements FileEditor {
      * Performs search by text/characters.
      */
     private void searchForText(SearchParameters searchParameters) {
-        HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
+        ExtendedHighlightCodeAreaPainter painter = (ExtendedHighlightCodeAreaPainter) codeArea.getPainter();
         SearchCondition condition = searchParameters.getCondition();
 
         long position = searchParameters.getStartPosition();
@@ -1251,7 +1240,7 @@ public class BinEdFileEditor implements FileEditor {
         }
         BinaryData data = codeArea.getContentData();
 
-        List<HighlightCodeAreaPainter.SearchMatch> foundMatches = new ArrayList<>();
+        List<ExtendedHighlightCodeAreaPainter.SearchMatch> foundMatches = new ArrayList<>();
 
         Charset charset = codeArea.getCharset();
         CharsetEncoder encoder = charset.newEncoder();
@@ -1284,7 +1273,7 @@ public class BinEdFileEditor implements FileEditor {
             }
 
             if (matchCharLength == findText.length()) {
-                HighlightCodeAreaPainter.SearchMatch match = new HighlightCodeAreaPainter.SearchMatch();
+                ExtendedHighlightCodeAreaPainter.SearchMatch match = new ExtendedHighlightCodeAreaPainter.SearchMatch();
                 match.setPosition(position);
                 match.setLength(matchLength);
                 foundMatches.add(match);
@@ -1311,7 +1300,7 @@ public class BinEdFileEditor implements FileEditor {
         painter.setMatches(foundMatches);
         if (foundMatches.size() > 0) {
             painter.setCurrentMatchIndex(0);
-            HighlightCodeAreaPainter.SearchMatch firstMatch = painter.getCurrentMatch();
+            ExtendedHighlightCodeAreaPainter.SearchMatch firstMatch = painter.getCurrentMatch();
             codeArea.revealPosition(new CodeAreaCaretPosition(firstMatch.getPosition(), 0, codeArea.getActiveSection()));
         }
         hexSearchPanel.setStatus(foundMatches.size(), 0);
@@ -1322,10 +1311,10 @@ public class BinEdFileEditor implements FileEditor {
      * Performs search by binary data.
      */
     private void searchForBinaryData(SearchParameters searchParameters) {
-        HighlightCodeAreaPainter painter = (HighlightCodeAreaPainter) codeArea.getPainter();
+        ExtendedHighlightCodeAreaPainter painter = (ExtendedHighlightCodeAreaPainter) codeArea.getPainter();
         SearchCondition condition = searchParameters.getCondition();
         long position = codeArea.getCaretPosition().getDataPosition();
-        HighlightCodeAreaPainter.SearchMatch currentMatch = painter.getCurrentMatch();
+        ExtendedHighlightCodeAreaPainter.SearchMatch currentMatch = painter.getCurrentMatch();
 
         if (currentMatch != null) {
             if (currentMatch.getPosition() == position) {
@@ -1339,7 +1328,7 @@ public class BinEdFileEditor implements FileEditor {
         BinaryData searchData = condition.getBinaryData();
         BinaryData data = codeArea.getContentData();
 
-        List<HighlightCodeAreaPainter.SearchMatch> foundMatches = new ArrayList<>();
+        List<ExtendedHighlightCodeAreaPainter.SearchMatch> foundMatches = new ArrayList<>();
 
         long dataSize = data.getDataSize();
         while (position < dataSize - searchData.getDataSize()) {
@@ -1352,7 +1341,7 @@ public class BinEdFileEditor implements FileEditor {
             }
 
             if (matchLength == searchData.getDataSize()) {
-                HighlightCodeAreaPainter.SearchMatch match = new HighlightCodeAreaPainter.SearchMatch();
+                ExtendedHighlightCodeAreaPainter.SearchMatch match = new ExtendedHighlightCodeAreaPainter.SearchMatch();
                 match.setPosition(position);
                 match.setLength(searchData.getDataSize());
                 foundMatches.add(match);
@@ -1368,7 +1357,7 @@ public class BinEdFileEditor implements FileEditor {
         painter.setMatches(foundMatches);
         if (foundMatches.size() > 0) {
             painter.setCurrentMatchIndex(0);
-            HighlightCodeAreaPainter.SearchMatch firstMatch = painter.getCurrentMatch();
+            ExtendedHighlightCodeAreaPainter.SearchMatch firstMatch = painter.getCurrentMatch();
             codeArea.revealPosition(new CodeAreaCaretPosition(firstMatch.getPosition(), 0, codeArea.getActiveSection()));
         }
         hexSearchPanel.setStatus(foundMatches.size(), 0);
@@ -1415,7 +1404,7 @@ public class BinEdFileEditor implements FileEditor {
         // Mode
         codeArea.setViewMode(CodeAreaViewMode.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_VIEW_MODE, CodeAreaViewMode.DUAL.name())));
         codeArea.setCodeType(CodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_CODE_TYPE, CodeType.HEXADECIMAL.name())));
-        ((HighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).setNonAsciiHighlightingEnabled(preferences.getBoolean(BinEdFileEditor.PREFERENCES_CODE_COLORIZATION, true));
+        ((ExtendedHighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).setNonAsciiHighlightingEnabled(preferences.getBoolean(BinEdFileEditor.PREFERENCES_CODE_COLORIZATION, true));
         // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
 
         // Decoration
@@ -1457,8 +1446,8 @@ public class BinEdFileEditor implements FileEditor {
             if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUPERSCRIPT, "FALSE"))) {
                 attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
             }
-            Font derivedFont = codeArea.getFont().deriveFont(attribs);
-            codeArea.setFont(derivedFont);
+            Font derivedFont = codeArea.getCodeFont().deriveFont(attribs);
+            codeArea.setCodeFont(derivedFont);
         }
         boolean showValuesPanel = preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_VALUES_PANEL, true);
         if (showValuesPanel) {

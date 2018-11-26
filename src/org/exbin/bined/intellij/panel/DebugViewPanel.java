@@ -18,11 +18,14 @@ package org.exbin.bined.intellij.panel;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBScrollPane;
-import org.exbin.bined.*;
+import org.exbin.bined.CodeAreaViewMode;
+import org.exbin.bined.CodeCharactersCase;
+import org.exbin.bined.CodeType;
+import org.exbin.bined.EditationMode;
 import org.exbin.bined.basic.BasicBackgroundPaintMode;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.capability.RowWrappingCapable.RowWrappingMode;
-import org.exbin.bined.highlight.swing.HighlightNonAsciiCodeAreaPainter;
+import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdFileEditor;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.EncodingsHandler;
@@ -36,7 +39,10 @@ import org.exbin.utils.binary_data.BinaryData;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -75,8 +81,8 @@ public class DebugViewPanel extends JPanel {
         codeArea = new ExtCodeArea();
         codeArea.setEditationMode(EditationMode.READ_ONLY);
 
-        codeArea.setPainter(new HighlightNonAsciiCodeAreaPainter(codeArea));
-        codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        codeArea.setPainter(new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea));
+        codeArea.setCodeFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
 
         statusPanel = new HexStatusPanel(false);
@@ -362,7 +368,7 @@ public class DebugViewPanel extends JPanel {
         // Mode
         codeArea.setViewMode(CodeAreaViewMode.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_VIEW_MODE, CodeAreaViewMode.DUAL.name())));
         codeArea.setCodeType(CodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_CODE_TYPE, CodeType.HEXADECIMAL.name())));
-        ((HighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).setNonAsciiHighlightingEnabled(preferences.getBoolean(BinEdFileEditor.PREFERENCES_CODE_COLORIZATION, true));
+        ((ExtendedHighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).setNonAsciiHighlightingEnabled(preferences.getBoolean(BinEdFileEditor.PREFERENCES_CODE_COLORIZATION, true));
         // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
 
         // Decoration
@@ -404,8 +410,8 @@ public class DebugViewPanel extends JPanel {
             if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUPERSCRIPT, "FALSE"))) {
                 attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
             }
-            Font derivedFont = codeArea.getFont().deriveFont(attribs);
-            codeArea.setFont(derivedFont);
+            Font derivedFont = codeArea.getCodeFont().deriveFont(attribs);
+            codeArea.setCodeFont(derivedFont);
         }
         boolean showValuesPanel = preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_VALUES_PANEL, true);
         if (showValuesPanel) {
