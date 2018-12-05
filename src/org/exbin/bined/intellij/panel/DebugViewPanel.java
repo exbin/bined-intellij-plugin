@@ -18,11 +18,7 @@ package org.exbin.bined.intellij.panel;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBScrollPane;
-import org.exbin.bined.CodeAreaViewMode;
-import org.exbin.bined.CodeCharactersCase;
-import org.exbin.bined.CodeType;
-import org.exbin.bined.EditationMode;
-import org.exbin.bined.basic.BasicBackgroundPaintMode;
+import org.exbin.bined.*;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.capability.RowWrappingCapable.RowWrappingMode;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
@@ -31,6 +27,7 @@ import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.EncodingsHandler;
 import org.exbin.bined.intellij.GoToHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.extended.ExtendedBackgroundPaintMode;
 import org.exbin.framework.bined.HexStatusApi;
 import org.exbin.framework.bined.panel.HexStatusPanel;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
@@ -351,12 +348,12 @@ public class DebugViewPanel extends JPanel {
         encodingsHandler.loadFromPreferences(preferences);
 
         // Layout
-        /* TODO codeArea.setShowHeader(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_HEADER, true));
-        String headerSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_HEADER_SPACE_TYPE, CodeAreaSpace.SpaceType.HALF_UNIT.name());
+        codeArea.setShowHeader(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_HEADER, true));
+        /* TODO String headerSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_HEADER_SPACE_TYPE, CodeAreaSpace.SpaceType.HALF_UNIT.name());
         codeArea.setHeaderSpaceType(CodeAreaSpace.SpaceType.valueOf(headerSpaceTypeName));
-        codeArea.setHeaderSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_HEADER_SPACE, 0));
-        codeArea.setShowLineNumbers(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, true));
-        String lineNumbersSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE_TYPE, CodeAreaSpace.SpaceType.ONE_UNIT.name());
+        codeArea.setHeaderSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_HEADER_SPACE, 0)); */
+        codeArea.setShowRowPosition(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, true));
+        /* TODO String lineNumbersSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE_TYPE, CodeAreaSpace.SpaceType.ONE_UNIT.name());
         codeArea.setLineNumberSpaceType(CodeAreaSpace.SpaceType.valueOf(lineNumbersSpaceTypeName));
         codeArea.setLineNumberSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE, 8));
         String lineNumbersLengthTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_LENGTH_TYPE, CodeAreaLineNumberLength.LineNumberType.SPECIFIED.name());
@@ -372,7 +369,7 @@ public class DebugViewPanel extends JPanel {
         // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
 
         // Decoration
-        codeArea.setBackgroundPaintMode(convertBackgroundPaintMode(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, BasicBackgroundPaintMode.STRIPED.name())));
+        codeArea.setBackgroundPaintMode(convertBackgroundPaintMode(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, ExtendedBackgroundPaintMode.STRIPED.name())));
         /* TODO codeArea.setLineNumberBackground(preferences.getBoolean(BinEdFileEditor.PREFERENCES_PAINT_LINE_NUMBERS_BACKGROUND, true));
         int decorationMode = (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_HEADER_LINE, true) ? CodeArea.DECORATION_HEADER_LINE : 0)
                 + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_PREVIEW_LINE, true) ? CodeArea.DECORATION_PREVIEW_LINE : 0)
@@ -380,7 +377,7 @@ public class DebugViewPanel extends JPanel {
                 + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_LINENUM_LINE, true) ? CodeArea.DECORATION_LINENUM_LINE : 0);
         codeArea.setDecorationMode(decorationMode); */
         codeArea.setCodeCharactersCase(CodeCharactersCase.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_HEX_CHARACTERS_CASE, CodeCharactersCase.UPPER.name())));
-        // TODO codeArea.setPositionCodeType(PositionCodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_POSITION_CODE_TYPE, PositionCodeType.HEXADECIMAL.name())));
+        codeArea.setPositionCodeType(PositionCodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_POSITION_CODE_TYPE, PositionCodeType.HEXADECIMAL.name())));
 
         // Font
         Boolean useDefaultColor = Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(true)));
@@ -445,10 +442,10 @@ public class DebugViewPanel extends JPanel {
         }
     }
 
-    private static BasicBackgroundPaintMode convertBackgroundPaintMode(String value) {
+    private static ExtendedBackgroundPaintMode convertBackgroundPaintMode(String value) {
         if ("STRIPPED".equals(value))
-            return BasicBackgroundPaintMode.STRIPED;
-        return BasicBackgroundPaintMode.valueOf(value);
+            return ExtendedBackgroundPaintMode.STRIPED;
+        return ExtendedBackgroundPaintMode.valueOf(value);
     }
 
     public interface CharsetChangeListener {

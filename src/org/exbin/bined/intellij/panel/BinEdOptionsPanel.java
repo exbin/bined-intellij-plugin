@@ -29,6 +29,7 @@ import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAre
 import org.exbin.bined.intellij.BinEdFileEditor;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.extended.ExtendedBackgroundPaintMode;
 import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
 import org.exbin.framework.editor.text.panel.TextFontPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
@@ -114,7 +115,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         headerSpaceComboBox = new javax.swing.JComboBox<>();
         headerSpaceSpinner = new javax.swing.JSpinner();
         lineNumbersPanel = new javax.swing.JPanel();
-        showLineNumbersCheckBox = new javax.swing.JCheckBox();
+        showRowPositionCheckBox = new javax.swing.JCheckBox();
         lineNumberLengthLabel = new javax.swing.JLabel();
         lineNumbersLengthComboBox = new javax.swing.JComboBox<>();
         lineNumbersLengthSpinner = new javax.swing.JSpinner();
@@ -209,7 +210,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
 
         lineNumbersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceBundle.getString("lineNumbersPanel.border.title"))); // NOI18N
 
-        showLineNumbersCheckBox.setText(resourceBundle.getString("showLineNumbersCheckBox.text")); // NOI18N
+        showRowPositionCheckBox.setText(resourceBundle.getString("showLineNumbersCheckBox.text")); // NOI18N
 
         lineNumberLengthLabel.setText(resourceBundle.getString("lineNumberLengthLabel.text")); // NOI18N
 
@@ -231,7 +232,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         lineNumbersPanelLayout.setHorizontalGroup(
                 lineNumbersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(lineNumbersPanelLayout.createSequentialGroup()
-                                .addComponent(showLineNumbersCheckBox)
+                                .addComponent(showRowPositionCheckBox)
                                 .addGap(0, 0, Short.MAX_VALUE))
                         .addGroup(lineNumbersPanelLayout.createSequentialGroup()
                                 .addContainerGap()
@@ -254,7 +255,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         lineNumbersPanelLayout.setVerticalGroup(
                 lineNumbersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(lineNumbersPanelLayout.createSequentialGroup()
-                                .addComponent(showLineNumbersCheckBox)
+                                .addComponent(showRowPositionCheckBox)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lineNumberLengthLabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -396,7 +397,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
 
         codeCharactersModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"LOWER", "UPPER"}));
 
-        backgroundModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"NONE", "PLAIN", "STRIPPED", "GRIDDED"}));
+        backgroundModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"NONE", "PLAIN", "STRIPED", "GRIDDED"}));
         backgroundModeComboBox.setSelectedIndex(2);
 
         positionCodeTypeLabel.setText(resourceBundle.getString("positionCodeTypeLabel.text")); // NOI18N
@@ -600,7 +601,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
 // TODO        CodeAreaSpace.SpaceType headerSpaceType = CodeAreaSpace.SpaceType.valueOf(headerSpaceTypeName);
 // TODO       headerSpaceComboBox.setSelectedIndex(headerSpaceType.ordinal());
         headerSpaceSpinner.setValue(preferences.getInt(BinEdFileEditor.PREFERENCES_HEADER_SPACE, 0));
-        showLineNumbersCheckBox.setSelected(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, true));
+        showRowPositionCheckBox.setSelected(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, true));
 // TODO        String lineNumbersSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE_TYPE, CodeAreaSpace.SpaceType.ONE_UNIT.name());
 // TODO        CodeAreaSpace.SpaceType lineNumbersSpaceType = CodeAreaSpace.SpaceType.valueOf(lineNumbersSpaceTypeName);
 // TODO        lineNumbersSpaceComboBox.setSelectedIndex(lineNumbersSpaceType.ordinal());
@@ -681,7 +682,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         preferences.setValue(BinEdFileEditor.PREFERENCES_SHOW_HEADER, showHeaderCheckBox.isSelected());
 // TODO        preferences.setValue(BinEdFileEditor.PREFERENCES_HEADER_SPACE_TYPE, CodeAreaSpace.SpaceType.values()[headerSpaceComboBox.getSelectedIndex()].name());
         preferences.setValue(BinEdFileEditor.PREFERENCES_HEADER_SPACE, (int) ((Integer) headerSpaceSpinner.getValue()), 0);
-        preferences.setValue(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, showLineNumbersCheckBox.isSelected());
+        preferences.setValue(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, showRowPositionCheckBox.isSelected());
 // TODO        preferences.setValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE_TYPE, CodeAreaSpace.SpaceType.values()[lineNumbersSpaceComboBox.getSelectedIndex()].name());
         preferences.setValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE, (Integer) lineNumbersSpaceSpinner.getValue(), 0);
 // TODO        preferences.setValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_LENGTH_TYPE, CodeAreaLineNumberLength.LineNumberType.values()[lineNumbersLengthComboBox.getSelectedIndex()].name());
@@ -734,12 +735,12 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
     public void setFromCodeArea(ExtCodeArea codeArea) {
         // Layout
         wrapLineModeCheckBox.setSelected(codeArea.getRowWrapping() == RowWrappingMode.WRAPPING);
-        /* TODO lineLengthSpinner.setValue(codeArea.getLineLength());
+        /* TODO lineLengthSpinner.setValue(codeArea.getLineLength()); */
         showHeaderCheckBox.setSelected(codeArea.isShowHeader());
-        headerSpaceComboBox.setSelectedIndex(codeArea.getHeaderSpaceType().ordinal());
-        headerSpaceSpinner.setValue(codeArea.getHeaderSpaceSize());
-        showLineNumbersCheckBox.setSelected(codeArea.isShowLineNumbers());
-        lineNumbersSpaceComboBox.setSelectedIndex(codeArea.getLineNumberSpaceType().ordinal());
+        /* TODO headerSpaceComboBox.setSelectedIndex(codeArea.getHeaderSpaceType().ordinal());
+        headerSpaceSpinner.setValue(codeArea.getHeaderSpaceSize()); */
+        showRowPositionCheckBox.setSelected(codeArea.isShowRowPosition());
+        /* TODO lineNumbersSpaceComboBox.setSelectedIndex(codeArea.getLineNumberSpaceType().ordinal());
         lineNumbersSpaceSpinner.setValue(codeArea.getLineNumberSpaceSize());
         lineNumbersLengthComboBox.setSelectedIndex(codeArea.getLineNumberType().ordinal());
         lineNumbersLengthSpinner.setValue(codeArea.getLineNumberSpecifiedLength());
@@ -758,7 +759,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         // TODO lineNumbersBackgroundCheckBox.setSelected(codeArea.isLineNumberBackground());
         // TODO setDecorationMode(codeArea.getDecorationMode());
         codeCharactersModeComboBox.setSelectedIndex(codeArea.getCodeCharactersCase().ordinal());
-        // TODO positionCodeTypeComboBox.setSelectedIndex(codeArea.getPositionCodeType().ordinal());
+        positionCodeTypeComboBox.setSelectedIndex(codeArea.getPositionCodeType().ordinal());
 
         // Font
         binEdFont = codeArea.getCodeFont();
@@ -769,12 +770,12 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
     public void applyToCodeArea(ExtCodeArea codeArea) {
         // Layout
         codeArea.setRowWrapping(wrapLineModeCheckBox.isSelected() ? RowWrappingMode.WRAPPING : RowWrappingMode.NO_WRAPPING);
-        /* TODO codeArea.setLineLength((Integer) lineLengthSpinner.getValue());
+        /* TODO codeArea.setLineLength((Integer) lineLengthSpinner.getValue()); */
         codeArea.setShowHeader(showHeaderCheckBox.isSelected());
-        codeArea.setHeaderSpaceType(CodeAreaSpace.SpaceType.values()[headerSpaceComboBox.getSelectedIndex()]);
-        codeArea.setHeaderSpaceSize((Integer) headerSpaceSpinner.getValue());
-        codeArea.setShowLineNumbers(showLineNumbersCheckBox.isSelected());
-        codeArea.setLineNumberSpaceType(CodeAreaSpace.SpaceType.values()[lineNumbersSpaceComboBox.getSelectedIndex()]);
+        /* TODO codeArea.setHeaderSpaceType(CodeAreaSpace.SpaceType.values()[headerSpaceComboBox.getSelectedIndex()]);
+        codeArea.setHeaderSpaceSize((Integer) headerSpaceSpinner.getValue()); */
+        codeArea.setShowRowPosition(showRowPositionCheckBox.isSelected());
+        /* TODO codeArea.setLineNumberSpaceType(CodeAreaSpace.SpaceType.values()[lineNumbersSpaceComboBox.getSelectedIndex()]);
         codeArea.setLineNumberSpaceSize((Integer) lineNumbersSpaceSpinner.getValue());
         codeArea.setLineNumberType(CodeAreaLineNumberLength.LineNumberType.values()[lineNumbersLengthComboBox.getSelectedIndex()]);
         codeArea.setLineNumberSpecifiedLength((Integer) lineNumbersLengthSpinner.getValue());
@@ -789,11 +790,11 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
 
         // Decoration
-        codeArea.setBackgroundPaintMode(BasicBackgroundPaintMode.values()[backgroundModeComboBox.getSelectedIndex()]);
+        codeArea.setBackgroundPaintMode(ExtendedBackgroundPaintMode.values()[backgroundModeComboBox.getSelectedIndex()]);
         // TODO codeArea.setLineNumberBackground(lineNumbersBackgroundCheckBox.isSelected());
         // TODO codeArea.setDecorationMode(getDecorationMode());
         codeArea.setCodeCharactersCase(CodeCharactersCase.values()[codeCharactersModeComboBox.getSelectedIndex()]);
-        // TODO codeArea.setPositionCodeType(PositionCodeType.values()[positionCodeTypeComboBox.getSelectedIndex()]);
+        codeArea.setPositionCodeType(PositionCodeType.values()[positionCodeTypeComboBox.getSelectedIndex()]);
 
         // Font
         if (useDefaultFontCheckBox.isSelected()) {
@@ -901,7 +902,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel positionCodeTypeLabel;
     private javax.swing.JButton selectFontButton;
     private javax.swing.JCheckBox showHeaderCheckBox;
-    private javax.swing.JCheckBox showLineNumbersCheckBox;
+    private javax.swing.JCheckBox showRowPositionCheckBox;
     private javax.swing.JCheckBox showNonprintableCharactersCheckBox;
     private javax.swing.JCheckBox showValuesPanelCheckBox;
     private javax.swing.JLabel spaceGroupSizeLabel;

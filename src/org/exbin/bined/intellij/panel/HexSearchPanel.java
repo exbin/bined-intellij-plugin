@@ -18,10 +18,10 @@ package org.exbin.bined.intellij.panel;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.exbin.bined.ScrollBarVisibility;
-import org.exbin.bined.basic.BasicBackgroundPaintMode;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.extended.ExtendedBackgroundPaintMode;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.panel.*;
 import org.exbin.framework.gui.utils.LanguageUtils;
@@ -78,10 +78,11 @@ public class HexSearchPanel extends javax.swing.JPanel {
     }
 
     private void init() {
-// TODO        hexadecimalRenderer.setShowHeader(false);
-// TODO       hexadecimalRenderer.setShowLineNumbers(false);
+        hexadecimalRenderer.setShowHeader(false);
+        hexadecimalRenderer.setShowRowPosition(false);
         hexadecimalRenderer.setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
-        hexadecimalRenderer.setBackgroundPaintMode(BasicBackgroundPaintMode.PLAIN);
+        hexadecimalRenderer.setWrappingBytesGroupSize(0);
+        hexadecimalRenderer.setBackgroundPaintMode(ExtendedBackgroundPaintMode.PLAIN);
         hexadecimalRenderer.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
         hexadecimalRenderer.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
         hexadecimalRenderer.setContentData(new ByteArrayEditableData(new byte[]{1, 2, 3}));

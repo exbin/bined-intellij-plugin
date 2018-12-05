@@ -17,10 +17,9 @@
 package org.exbin.framework.bined.panel;
 
 import org.exbin.bined.ScrollBarVisibility;
-import org.exbin.bined.basic.BasicBackgroundPaintMode;
 import org.exbin.bined.capability.RowWrappingCapable;
-import org.exbin.bined.swing.capability.BackgroundPaintCapable;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.extended.ExtendedBackgroundPaintMode;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
@@ -63,10 +62,11 @@ public class FindHexPanel extends javax.swing.JPanel {
     }
 
     private void init() {
-        // TODO findHexadecimalRenderer.setShowHeader(false);
-        // TODO findHexadecimalRenderer.setShowLineNumbers(false);
-        ((RowWrappingCapable) findHexadecimalRenderer).setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
-        ((BackgroundPaintCapable) findHexadecimalRenderer).setBackgroundPaintMode(BasicBackgroundPaintMode.PLAIN);
+        findHexadecimalRenderer.setShowHeader(false);
+        findHexadecimalRenderer.setShowRowPosition(false);
+        findHexadecimalRenderer.setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
+        findHexadecimalRenderer.setWrappingBytesGroupSize(0);
+        findHexadecimalRenderer.setBackgroundPaintMode(ExtendedBackgroundPaintMode.PLAIN);
         findHexadecimalRenderer.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
         findHexadecimalRenderer.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
         findHexadecimalRenderer.setContentData(new ByteArrayEditableData());
@@ -134,10 +134,11 @@ public class FindHexPanel extends javax.swing.JPanel {
         findComboBox.setEditor(findComboBoxEditor);
         findComboBox.setModel(new SearchHistoryModel(searchHistory));
 
-// TODO        replaceHexadecimalRenderer.setShowHeader(false);
-// TODO        replaceHexadecimalRenderer.setShowLineNumbers(false);
-        ((RowWrappingCapable) replaceHexadecimalRenderer).setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
-        ((BackgroundPaintCapable) replaceHexadecimalRenderer).setBackgroundPaintMode(BasicBackgroundPaintMode.PLAIN);
+        replaceHexadecimalRenderer.setShowHeader(false);
+        replaceHexadecimalRenderer.setShowRowPosition(false);
+        replaceHexadecimalRenderer.setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
+        replaceHexadecimalRenderer.setWrappingBytesGroupSize(0);
+        replaceHexadecimalRenderer.setBackgroundPaintMode(ExtendedBackgroundPaintMode.PLAIN);
         replaceHexadecimalRenderer.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
         replaceHexadecimalRenderer.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
         replaceHexadecimalRenderer.setContentData(new ByteArrayEditableData());
