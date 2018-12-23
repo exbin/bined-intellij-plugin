@@ -17,7 +17,7 @@ package org.exbin.bined.intellij;
 
 import com.intellij.openapi.ui.DialogWrapper;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.panel.GoToHexPanel;
+import org.exbin.framework.bined.panel.GoToBinaryPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
@@ -54,7 +54,7 @@ public class GoToHandler {
             goToLineAction = new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    final GoToHexPanel goToPanel = new GoToHexPanel();
+                    final GoToBinaryPanel goToPanel = new GoToBinaryPanel();
                     DefaultControlPanel goToControlPanel = new DefaultControlPanel(goToPanel.getResourceBundle());
                     goToPanel.setCursorPosition(codeArea.getCaretPosition().getDataPosition());
                     goToPanel.setMaxPosition(codeArea.getDataSize());

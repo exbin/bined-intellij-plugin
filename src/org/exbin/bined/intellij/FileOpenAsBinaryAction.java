@@ -31,12 +31,12 @@ import java.util.List;
  * Open file in hexadecimal editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.3 2017/03/20
+ * @version 0.2.0 2018/12/23
  */
-public class FileOpenAsHexAction extends AnAction {
+public class FileOpenAsBinaryAction extends AnAction {
 
-    public FileOpenAsHexAction() {
-        super("Open As Hex" + DialogUtils.DIALOG_MENUITEM_EXT);
+    public FileOpenAsBinaryAction() {
+        super("Open As Binary" + DialogUtils.DIALOG_MENUITEM_EXT);
     }
 
     @Override

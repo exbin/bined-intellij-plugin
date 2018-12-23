@@ -19,8 +19,10 @@ package org.exbin.framework.bined.panel;
 import org.exbin.bined.DataChangedListener;
 import org.exbin.bined.ScrollBarVisibility;
 import org.exbin.bined.capability.RowWrappingCapable;
+import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.bined.swing.extended.ExtendedBackgroundPaintMode;
+import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaLayoutProfile;
+import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
 import org.exbin.utils.binary_data.EditableBinaryData;
@@ -38,7 +40,7 @@ import java.awt.event.KeyListener;
  * @version 0.1.0 2016/07/21
  * @author ExBin Project (http://exbin.org)
  */
-public class HexSearchComboBoxPanel extends JPanel {
+public class BinarySearchComboBoxPanel extends JPanel {
 
     public static final String TEXT_MODE = "text";
     public static final String BINARY_MODE = "binary";
@@ -51,7 +53,7 @@ public class HexSearchComboBoxPanel extends JPanel {
     private boolean runningUpdate = false;
     private ValueChangedListener valueChangedListener = null;
 
-    public HexSearchComboBoxPanel() {
+    public BinarySearchComboBoxPanel() {
         super.setLayout(new CardLayout());
         Border comboBoxBorder = ((JComponent) (new JComboBox<>().getEditor().getEditorComponent())).getBorder();
         textField = new JTextField();
@@ -75,11 +77,19 @@ public class HexSearchComboBoxPanel extends JPanel {
 
         super.add(textField, TEXT_MODE);
 
-        hexadecimalEditor.setShowHeader(false);
-        hexadecimalEditor.setShowRowPosition(false);
+        {
+            ExtendedCodeAreaLayoutProfile layoutProfile = hexadecimalEditor.getLayoutProfile();
+            layoutProfile.setShowHeader(false);
+            layoutProfile.setShowRowPosition(false);
+            hexadecimalEditor.setLayoutProfile(layoutProfile);
+        }
         hexadecimalEditor.setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
         hexadecimalEditor.setWrappingBytesGroupSize(0);
-        hexadecimalEditor.setBackgroundPaintMode(ExtendedBackgroundPaintMode.PLAIN);
+        {
+            ExtendedCodeAreaThemeProfile themeProfile = hexadecimalEditor.getThemeProfile();
+            themeProfile.setBackgroundPaintMode(ExtendedBackgroundPaintMode.PLAIN);
+            hexadecimalEditor.setThemeProfile(themeProfile);
+        }
         hexadecimalEditor.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
         hexadecimalEditor.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
         hexadecimalEditor.setContentData(new ByteArrayEditableData());

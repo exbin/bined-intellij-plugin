@@ -56,7 +56,7 @@ import java.util.concurrent.ExecutionException;
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.7 2018/08/22
  */
-public class DebugViewHexAction extends XFetchValueActionBase {
+public class DebugViewBinaryAction extends XFetchValueActionBase {
 
     private static final boolean javaValueClassAvailable;
     static {
@@ -96,7 +96,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
                 String text = StringUtil.unquoteString(value);
                 if (dialog == null) {
                     dialog = new DataDialog(project, text, node);
-                    dialog.setTitle("View as Hexadecimal Data");
+                    dialog.setTitle("View as Binary Data");
                     dialog.show();
                 }
                 dialog.setText(text);
@@ -108,7 +108,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
     public void update(@NotNull AnActionEvent event) {
         super.update(event);
         if (getDataNode(event) != null) {
-            event.getPresentation().setText("View Hex");
+            event.getPresentation().setText("View Binary");
         }
     }
 
@@ -388,7 +388,7 @@ public class DebugViewHexAction extends XFetchValueActionBase {
 
         @Override
         protected String getDimensionServiceKey() {
-            return "#org.exbin.bined.intellij.DebugViewHexAction";
+            return "#org.exbin.bined.intellij.DebugViewBinaryAction";
         }
 
         @Override

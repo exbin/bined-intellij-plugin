@@ -32,15 +32,15 @@ import java.util.ResourceBundle;
  * @version 0.2.0 2016/12/30
  * @author ExBin Project (http://exbin.org)
  */
-public class GoToHexPanel extends javax.swing.JPanel {
+public class GoToBinaryPanel extends javax.swing.JPanel {
 
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(GoToHexPanel.class);
+    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(GoToBinaryPanel.class);
 
     private long cursorPosition;
     private long maxPosition;
     private GoToMode goToMode = GoToMode.ABSOLUTE;
 
-    public GoToHexPanel() {
+    public GoToBinaryPanel() {
         initComponents();
 
         // Spinner selection workaround from http://forums.sun.com/thread.jspa?threadID=409748&forumID=57
@@ -261,7 +261,7 @@ public class GoToHexPanel extends javax.swing.JPanel {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        WindowUtils.invokeDialog(new GoToHexPanel());
+        WindowUtils.invokeDialog(new GoToBinaryPanel());
     }
 
     public void acceptInput() {

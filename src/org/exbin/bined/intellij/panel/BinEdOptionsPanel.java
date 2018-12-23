@@ -29,7 +29,9 @@ import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAre
 import org.exbin.bined.intellij.BinEdFileEditor;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.bined.swing.extended.ExtendedBackgroundPaintMode;
+import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
+import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaLayoutProfile;
+import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
 import org.exbin.framework.editor.text.panel.TextFontPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
@@ -734,12 +736,13 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
 
     public void setFromCodeArea(ExtCodeArea codeArea) {
         // Layout
+        ExtendedCodeAreaLayoutProfile layoutProfile = codeArea.getLayoutProfile();
         wrapLineModeCheckBox.setSelected(codeArea.getRowWrapping() == RowWrappingMode.WRAPPING);
         /* TODO lineLengthSpinner.setValue(codeArea.getLineLength()); */
-        showHeaderCheckBox.setSelected(codeArea.isShowHeader());
+        showHeaderCheckBox.setSelected(layoutProfile.isShowHeader());
         /* TODO headerSpaceComboBox.setSelectedIndex(codeArea.getHeaderSpaceType().ordinal());
         headerSpaceSpinner.setValue(codeArea.getHeaderSpaceSize()); */
-        showRowPositionCheckBox.setSelected(codeArea.isShowRowPosition());
+        showRowPositionCheckBox.setSelected(layoutProfile.isShowRowPosition());
         /* TODO lineNumbersSpaceComboBox.setSelectedIndex(codeArea.getLineNumberSpaceType().ordinal());
         lineNumbersSpaceSpinner.setValue(codeArea.getLineNumberSpaceSize());
         lineNumbersLengthComboBox.setSelectedIndex(codeArea.getLineNumberType().ordinal());
@@ -755,7 +758,8 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         memoryModeComboBox.setSelectedIndex(codeArea.getContentData() instanceof DeltaDocument ? 0 : 1);
 
         // Decoration
-        backgroundModeComboBox.setSelectedIndex(codeArea.getBackgroundPaintMode().ordinal());
+        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        backgroundModeComboBox.setSelectedIndex(themeProfile.getBackgroundPaintMode().ordinal());
         // TODO lineNumbersBackgroundCheckBox.setSelected(codeArea.isLineNumberBackground());
         // TODO setDecorationMode(codeArea.getDecorationMode());
         codeCharactersModeComboBox.setSelectedIndex(codeArea.getCodeCharactersCase().ordinal());
@@ -771,10 +775,12 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         // Layout
         codeArea.setRowWrapping(wrapLineModeCheckBox.isSelected() ? RowWrappingMode.WRAPPING : RowWrappingMode.NO_WRAPPING);
         /* TODO codeArea.setLineLength((Integer) lineLengthSpinner.getValue()); */
-        codeArea.setShowHeader(showHeaderCheckBox.isSelected());
+        ExtendedCodeAreaLayoutProfile layoutProfile = codeArea.getLayoutProfile();
+        layoutProfile.setShowHeader(showHeaderCheckBox.isSelected());
         /* TODO codeArea.setHeaderSpaceType(CodeAreaSpace.SpaceType.values()[headerSpaceComboBox.getSelectedIndex()]);
         codeArea.setHeaderSpaceSize((Integer) headerSpaceSpinner.getValue()); */
-        codeArea.setShowRowPosition(showRowPositionCheckBox.isSelected());
+        layoutProfile.setShowRowPosition(showRowPositionCheckBox.isSelected());
+        codeArea.setLayoutProfile(layoutProfile);
         /* TODO codeArea.setLineNumberSpaceType(CodeAreaSpace.SpaceType.values()[lineNumbersSpaceComboBox.getSelectedIndex()]);
         codeArea.setLineNumberSpaceSize((Integer) lineNumbersSpaceSpinner.getValue());
         codeArea.setLineNumberType(CodeAreaLineNumberLength.LineNumberType.values()[lineNumbersLengthComboBox.getSelectedIndex()]);
@@ -790,8 +796,10 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
 
         // Decoration
-        codeArea.setBackgroundPaintMode(ExtendedBackgroundPaintMode.values()[backgroundModeComboBox.getSelectedIndex()]);
-        // TODO codeArea.setLineNumberBackground(lineNumbersBackgroundCheckBox.isSelected());
+        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        themeProfile.setBackgroundPaintMode(ExtendedBackgroundPaintMode.values()[backgroundModeComboBox.getSelectedIndex()]);
+        themeProfile.setPaintRowPosBackground(lineNumbersBackgroundCheckBox.isSelected());
+        codeArea.setThemeProfile(themeProfile);
         // TODO codeArea.setDecorationMode(getDecorationMode());
         codeArea.setCodeCharactersCase(CodeCharactersCase.values()[codeCharactersModeComboBox.getSelectedIndex()]);
         codeArea.setPositionCodeType(PositionCodeType.values()[positionCodeTypeComboBox.getSelectedIndex()]);

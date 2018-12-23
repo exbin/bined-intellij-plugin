@@ -21,15 +21,17 @@ import com.intellij.ui.components.JBScrollPane;
 import org.exbin.bined.*;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.capability.RowWrappingCapable.RowWrappingMode;
+import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdFileEditor;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.EncodingsHandler;
 import org.exbin.bined.intellij.GoToHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.bined.swing.extended.ExtendedBackgroundPaintMode;
-import org.exbin.framework.bined.HexStatusApi;
-import org.exbin.framework.bined.panel.HexStatusPanel;
+import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaLayoutProfile;
+import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
+import org.exbin.framework.bined.BinaryStatusApi;
+import org.exbin.framework.bined.panel.BinaryStatusPanel;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
 import org.exbin.utils.binary_data.BinaryData;
@@ -60,14 +62,14 @@ public class DebugViewPanel extends JPanel {
     private boolean valuesPanelVisible = false;
 
     private final int metaMask;
-    private HexStatusPanel statusPanel;
-    private HexStatusApi hexStatus;
+    private BinaryStatusPanel statusPanel;
+    private BinaryStatusApi hexStatus;
     private TextEncodingStatusApi encodingStatus;
     private CharsetChangeListener charsetChangeListener = null;
     private GoToHandler goToHandler;
     private EncodingsHandler encodingsHandler;
     private boolean findTextPanelVisible = false;
-    private HexSearchPanel hexSearchPanel = null;
+    private BinarySearchPanel binarySearchPanel = null;
     private JScrollPane valuesPanelScrollPane = null;
 
     public DebugViewPanel() {
@@ -82,7 +84,7 @@ public class DebugViewPanel extends JPanel {
         codeArea.setCodeFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
 
-        statusPanel = new HexStatusPanel(false);
+        statusPanel = new BinaryStatusPanel(false);
         registerEncodingStatus(statusPanel);
         encodingsHandler = new EncodingsHandler(new TextEncodingStatusApi() {
             @Override
@@ -288,18 +290,18 @@ public class DebugViewPanel extends JPanel {
         lineWrappingToggleButton.setSelected(codeArea.getRowWrapping() == RowWrappingCapable.RowWrappingMode.WRAPPING);
     }
 
-    public void registerHexStatus(HexStatusApi hexStatusApi) {
-        this.hexStatus = hexStatusApi;
+    public void registerHexStatus(BinaryStatusApi binaryStatusApi) {
+        this.hexStatus = binaryStatusApi;
         codeArea.addCaretMovedListener(caretPosition -> {
             String position = String.valueOf(caretPosition.getDataPosition());
             position += ":" + caretPosition.getCodeOffset();
             hexStatus.setCursorPosition(position);
         });
 
-        hexStatus.setControlHandler(new HexStatusApi.StatusControlHandler() {
+        hexStatus.setControlHandler(new BinaryStatusApi.StatusControlHandler() {
             @Override
-            public void changeEditationMode(EditationMode editationMode) {
-                codeArea.setEditationMode(editationMode);
+            public void changeEditationOperation(EditationOperation editationOperation) {
+                codeArea.setEditationOperation(editationOperation);
             }
 
             @Override
@@ -322,7 +324,7 @@ public class DebugViewPanel extends JPanel {
             }
 
             @Override
-            public void changeMemoryMode(HexStatusApi.MemoryMode memoryMode) {
+            public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
             }
         });
     }
@@ -348,11 +350,13 @@ public class DebugViewPanel extends JPanel {
         encodingsHandler.loadFromPreferences(preferences);
 
         // Layout
-        codeArea.setShowHeader(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_HEADER, true));
+        ExtendedCodeAreaLayoutProfile layoutProfile = codeArea.getLayoutProfile();
+        layoutProfile.setShowHeader(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_HEADER, true));
         /* TODO String headerSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_HEADER_SPACE_TYPE, CodeAreaSpace.SpaceType.HALF_UNIT.name());
         codeArea.setHeaderSpaceType(CodeAreaSpace.SpaceType.valueOf(headerSpaceTypeName));
         codeArea.setHeaderSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_HEADER_SPACE, 0)); */
-        codeArea.setShowRowPosition(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, true));
+        layoutProfile.setShowRowPosition(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, true));
+        codeArea.setLayoutProfile(layoutProfile);
         /* TODO String lineNumbersSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE_TYPE, CodeAreaSpace.SpaceType.ONE_UNIT.name());
         codeArea.setLineNumberSpaceType(CodeAreaSpace.SpaceType.valueOf(lineNumbersSpaceTypeName));
         codeArea.setLineNumberSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE, 8));
@@ -369,9 +373,11 @@ public class DebugViewPanel extends JPanel {
         // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
 
         // Decoration
-        codeArea.setBackgroundPaintMode(convertBackgroundPaintMode(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, ExtendedBackgroundPaintMode.STRIPED.name())));
-        /* TODO codeArea.setLineNumberBackground(preferences.getBoolean(BinEdFileEditor.PREFERENCES_PAINT_LINE_NUMBERS_BACKGROUND, true));
-        int decorationMode = (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_HEADER_LINE, true) ? CodeArea.DECORATION_HEADER_LINE : 0)
+        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        themeProfile.setBackgroundPaintMode(convertBackgroundPaintMode(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, ExtendedBackgroundPaintMode.STRIPED.name())));
+        themeProfile.setPaintRowPosBackground(preferences.getBoolean(BinEdFileEditor.PREFERENCES_PAINT_LINE_NUMBERS_BACKGROUND, true));
+        codeArea.setThemeProfile(themeProfile);
+        /*int decorationMode = (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_HEADER_LINE, true) ? CodeArea.DECORATION_HEADER_LINE : 0)
                 + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_PREVIEW_LINE, true) ? CodeArea.DECORATION_PREVIEW_LINE : 0)
                 + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_BOX, false) ? CodeArea.DECORATION_BOX : 0)
                 + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_LINENUM_LINE, true) ? CodeArea.DECORATION_LINENUM_LINE : 0);

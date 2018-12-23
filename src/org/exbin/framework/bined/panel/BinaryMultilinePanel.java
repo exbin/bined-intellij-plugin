@@ -31,11 +31,11 @@ import java.util.ResourceBundle;
  * @version 0.2.0 2016/12/27
  * @author ExBin Project (http://exbin.org)
  */
-public class HexMultilinePanel extends javax.swing.JPanel {
+public class BinaryMultilinePanel extends javax.swing.JPanel {
 
     private static final String POPUP_MENU_POSTFIX = ".hexMultilineDialog";
 
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(HexMultilinePanel.class);
+    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinaryMultilinePanel.class);
     private SearchCondition condition;
 
     private JTextArea textArea;
@@ -43,7 +43,7 @@ public class HexMultilinePanel extends javax.swing.JPanel {
     private ExtCodeArea codeArea;
     private CodeAreaPopupMenuHandler hexCodePopupMenuHandler;
 
-    public HexMultilinePanel() {
+    public BinaryMultilinePanel() {
         initComponents();
     }
 

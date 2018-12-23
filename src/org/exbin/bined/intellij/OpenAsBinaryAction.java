@@ -30,11 +30,11 @@ import java.util.List;
  * Open file in binary editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.0 2018/08/25
+ * @version 0.2.0 2018/12/23
  */
-public class OpenAsHexAction extends AnAction {
+public class OpenAsBinaryAction extends AnAction {
 
-    public OpenAsHexAction() {
+    public OpenAsBinaryAction() {
         super("Open As Binary");
     }
 

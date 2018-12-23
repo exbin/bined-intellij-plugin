@@ -40,7 +40,7 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.1 2017/01/11
  */
-public class HexUndoIntelliJHandler implements BinaryDataUndoHandler {
+public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
 
     private final ExtCodeArea codeArea;
     private final List<BinaryDataUndoUpdateListener> listeners = new ArrayList<>();
@@ -56,7 +56,7 @@ public class HexUndoIntelliJHandler implements BinaryDataUndoHandler {
      *
      * @param codeArea hexadecimal component
      */
-    public HexUndoIntelliJHandler(ExtCodeArea codeArea, Project project, BinEdFileEditor fileEditor) {
+    public BinaryUndoIntelliJHandler(ExtCodeArea codeArea, Project project, BinEdFileEditor fileEditor) {
         this.codeArea = codeArea;
         this.fileEditor = fileEditor;
         this.project = project;
