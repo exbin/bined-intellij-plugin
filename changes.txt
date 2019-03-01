@@ -1,5 +1,7 @@
 0.2.0
+- Renamed to BinEd
 - Updated to newer version of library
+- Support for half-size space
 
 0.1.7 (2018-08-24)
 - Fixed issue with debugging in CLion (issue #4)

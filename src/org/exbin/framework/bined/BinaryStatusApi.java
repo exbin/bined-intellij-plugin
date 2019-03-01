@@ -16,17 +16,16 @@
  */
 package org.exbin.framework.bined;
 
-import org.exbin.bined.EditationMode;
-import org.exbin.bined.EditationOperation;
-
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
+import org.exbin.bined.EditationMode;
+import org.exbin.bined.EditationOperation;
 
 /**
  * Hexadecimal editor status interface.
  *
- * @version 0.2.0 2018/12/23
+ * @version 0.2.1 2018/12/12
  * @author ExBin Project (http://exbin.org)
  */
 public interface BinaryStatusApi {
@@ -41,10 +40,10 @@ public interface BinaryStatusApi {
     /**
      * Reports currently active editation mode.
      *
-     * @param mode editation mode
-     * @param operation editation operation
+     * @param editationMode editation mode
+     * @param editationOperation editation operation
      */
-    void setEditationMode(EditationMode mode, EditationOperation operation);
+    void setEditationMode(EditationMode editationMode, EditationOperation editationOperation);
 
     /**
      * Sets control handler for status operations.
@@ -72,9 +71,9 @@ public interface BinaryStatusApi {
         /**
          * Requests change of editation mode from given mode.
          *
-         * @param pperation editation pperation
+         * @param editationOperation editation operation
          */
-        void changeEditationOperation(EditationOperation operation);
+        void changeEditationOperation(EditationOperation editationOperation);
 
         /**
          * Requests change of cursor position using go-to dialog.

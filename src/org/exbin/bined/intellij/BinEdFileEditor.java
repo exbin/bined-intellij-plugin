@@ -34,6 +34,8 @@ import org.exbin.bined.capability.RowWrappingCapable.RowWrappingMode;
 import org.exbin.bined.delta.DeltaDocument;
 import org.exbin.bined.delta.FileDataSource;
 import org.exbin.bined.delta.SegmentsRepository;
+import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
+import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightCodeAreaPainter;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.panel.BinEdOptionsPanelBorder;
@@ -47,19 +49,19 @@ import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.operation.swing.command.InsertDataCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
-import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
-import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.BinaryStatusApi;
+import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.panel.BinaryStatusPanel;
 import org.exbin.framework.bined.panel.ReplaceParameters;
 import org.exbin.framework.bined.panel.SearchCondition;
 import org.exbin.framework.bined.panel.SearchParameters;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
+import org.exbin.framework.gui.about.panel.AboutPanel;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.handler.OptionsControlHandler;
+import org.exbin.framework.gui.utils.panel.CloseControlPanel;
 import org.exbin.framework.gui.utils.panel.OptionsControlPanel;
 import org.exbin.utils.binary_data.BinaryData;
 import org.exbin.utils.binary_data.ByteArrayData;
@@ -1004,6 +1006,23 @@ public class BinEdFileEditor implements FileEditor {
             dialog.showAndGet();
         });
         result.add(optionsMenuItem);
+        result.addSeparator();
+
+        final JMenuItem aboutMenuItem = new JMenuItem("About...");
+        aboutMenuItem.addActionListener((ActionEvent e) -> {
+            AboutPanel aboutPanel = new AboutPanel();
+            aboutPanel.setupFields();
+            CloseControlPanel closeControlPanel = new CloseControlPanel();
+            JPanel dialogPanel = WindowUtils.createDialogPanel(aboutPanel, closeControlPanel);
+            final DialogWrapper dialog = DialogUtils.createDialog(dialogPanel, "About Plugin");
+            WindowUtils.assignGlobalKeyListener(dialogPanel, closeControlPanel.createOkCancelListener());
+            closeControlPanel.setHandler(() -> {
+                dialog.close(0);
+            });
+            dialog.setSize(650, 460);
+            dialog.showAndGet();
+        });
+        result.add(aboutMenuItem);
 
         return result;
     }
