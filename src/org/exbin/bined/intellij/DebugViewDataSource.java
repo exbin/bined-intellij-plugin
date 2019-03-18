@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij;
 
 import org.exbin.utils.binary_data.BinaryData;
+import org.exbin.utils.binary_data.ByteArrayEditableData;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.io.OutputStream;
  * Debugger value dual page data source.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.6 2018/02/26
+ * @version 0.2.0 2019/03/15
  */
 public class DebugViewDataSource implements BinaryData {
 
@@ -89,7 +90,50 @@ public class DebugViewDataSource implements BinaryData {
 
     @Override
     public BinaryData copy(long startFrom, long length) {
-        throw new UnsupportedOperationException("Copy is not supported");
+        ByteArrayEditableData result = new ByteArrayEditableData();
+        result.insertUninitialized(0, length);
+        int offset = 0;
+
+        while (length > 0) {
+            long pageIndex = startFrom / PAGE_SIZE;
+            int pageOffset = (int) (startFrom % PAGE_SIZE);
+            CachePage page;
+
+            if (pages[0].index == pageIndex && pages[0].data != null) {
+                page = pages[0];
+            } else if (pages[1].index == pageIndex && pages[1].data != null) {
+                page = pages[1];
+            } else {
+                byte[] data = pageProvider.getPage(pageIndex);
+                if (data == null) {
+                    throw new IndexOutOfBoundsException("Requested data out of bounds");
+                }
+
+                pages[nextPage].data = data;
+                pages[nextPage].index = pageIndex;
+                page = pages[nextPage];
+                nextPage = 1 - nextPage;
+            }
+
+            if (pageOffset >= page.data.length) {
+                throw new IndexOutOfBoundsException("Requested data out of bounds");
+            }
+
+            int copyLength = length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) length;
+            if (pageOffset + copyLength > page.data.length) {
+                copyLength = page.data.length - pageOffset;
+            }
+            if (copyLength == 0) {
+                throw new IndexOutOfBoundsException("Requested data out of bounds");
+            }
+
+            result.replace(offset, page.data, pageOffset, copyLength);
+            startFrom += copyLength;
+            offset += copyLength;
+            length -= copyLength;
+        }
+
+        return result;
     }
 
     @Override
