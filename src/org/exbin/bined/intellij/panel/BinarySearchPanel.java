@@ -45,7 +45,7 @@ import java.util.List;
 /**
  * Hexadecimal editor search panel.
  *
- * @version 0.2.0 2018/11/27
+ * @version 0.2.0 2019/03/20
  * @author ExBin Project (http://exbin.org)
  */
 public class BinarySearchPanel extends javax.swing.JPanel {
@@ -61,7 +61,7 @@ public class BinarySearchPanel extends javax.swing.JPanel {
     private int matchPosition;
     private final ExtCodeArea hexadecimalRenderer = new ExtCodeArea();
 
-    private boolean replaceMode = true;
+    private SearchOperation searchOperation = SearchOperation.REPLACE;
     private ComboBoxEditor findComboBoxEditor;
     private BinarySearchComboBoxPanel findComboBoxEditorComponent;
     private ComboBoxEditor replaceComboBoxEditor;
@@ -277,10 +277,10 @@ public class BinarySearchPanel extends javax.swing.JPanel {
         replaceComboBox.setModel(new SearchHistoryModel(replaceHistory));
     }
 
-    public void switchReplaceMode(boolean replaceMode) {
-        if (this.replaceMode != replaceMode) {
-            this.replaceMode = replaceMode;
-            if (replaceMode) {
+    public void switchReplaceMode(SearchOperation searchOperation) {
+        if (this.searchOperation != searchOperation) {
+            this.searchOperation = searchOperation;
+            if (searchOperation == SearchOperation.REPLACE) {
                 add(replacePanel, BorderLayout.SOUTH);
             } else {
                 remove(replacePanel);
@@ -497,7 +497,7 @@ public class BinarySearchPanel extends javax.swing.JPanel {
         replaceTypeToolBar.setFocusable(false);
         replaceTypeToolBar.setName("replaceTypeToolBar"); // NOI18N
 
-        replaceTypeButton.setText(resourceBundle.getString("HexSearchPanel.replaceTypeButton.text")); // NOI18N
+        replaceTypeButton.setText(resourceBundle.getString("replaceTypeButton.text")); // NOI18N
         replaceTypeButton.setToolTipText(resourceBundle.getString("replaceTypeButton.toolTipText")); // NOI18N
         replaceTypeButton.setDefaultCapable(false);
         replaceTypeButton.setFocusable(false);
@@ -582,7 +582,7 @@ public class BinarySearchPanel extends javax.swing.JPanel {
         findBinaryPanel.setSelected();
         findBinaryPanel.setSearchHistory(searchHistory);
         findBinaryPanel.setSearchParameters(searchParameters);
-        replaceParameters.setPerformReplace(replaceMode);
+        replaceParameters.setPerformReplace(searchOperation == SearchOperation.REPLACE);
         findBinaryPanel.setReplaceParameters(replaceParameters);
         findBinaryPanel.setHexCodePopupMenuHandler(hexCodePopupMenuHandler);
         DefaultControlPanel controlPanel = new DefaultControlPanel(findBinaryPanel.getResourceBundle());
@@ -632,7 +632,7 @@ public class BinarySearchPanel extends javax.swing.JPanel {
                     updateFindStatus();
 
                     ReplaceParameters dialogReplaceParameters = findBinaryPanel.getReplaceParameters();
-                    switchReplaceMode(dialogReplaceParameters.isPerformReplace());
+                    switchReplaceMode(dialogReplaceParameters.isPerformReplace() ? SearchOperation.REPLACE : SearchOperation.FIND);
                     binarySearchPanelApi.performFind(dialogSearchParameters);
                 }
                 findBinaryPanel.detachMenu();
@@ -949,9 +949,9 @@ public class BinarySearchPanel extends javax.swing.JPanel {
         return true;
     }
 
-    public void setHexCodePopupMenuHandler(CodeAreaPopupMenuHandler hexCodePopupMenuHandler) {
-        this.hexCodePopupMenuHandler = hexCodePopupMenuHandler;
-        findComboBoxEditorComponent.setHexCodePopupMenuHandler(hexCodePopupMenuHandler, "");
+    public void setBinaryCodePopupMenuHandler(CodeAreaPopupMenuHandler binaryCodePopupMenuHandler) {
+        this.hexCodePopupMenuHandler = binaryCodePopupMenuHandler;
+        findComboBoxEditorComponent.setHexCodePopupMenuHandler(binaryCodePopupMenuHandler, "");
     }
 
     /**
@@ -960,5 +960,9 @@ public class BinarySearchPanel extends javax.swing.JPanel {
     public static interface ClosePanelListener {
 
         void panelClosed();
+    }
+
+    public enum SearchOperation {
+        FIND, REPLACE
     }
 }

@@ -13,15 +13,28 @@
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
 <li>Codes can be also binary, octal or decimal</li>
-<li>Support for Unicode, UTF-8 and other charsetsv
+<li>Support for Unicode, UTF-8 and other charsets</li>
 <li>Insert and overwrite edit modes</li>
 <li>Searching for text / hexadecimal code with matching highlighting</li>
 <li>Support for undo/redo</li>
 <li>Support for files with size up to exabytes</li></ul>
+
+<h1>License</h1>
+<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>
+
+<h1>Links</h1>
+Homepage: <a href="https://bined.exbin.org/intellij-plugin/">https://bined.exbin.org/intellij-plugin/</a><br/>
+Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github.com/exbin/bined-intellij-plugin</a>
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Updated to newer version of library</li>
+<ul><li>Renamed to BinEd</li>
+<li>Updated to newer version of library</li>
+<li>Support for half-size space</li>
+<li>Support for layout, theme and colors profiles</li>
+<li>Added support for different numerical types in status bar</li>
+<li>Context aware popup menu</li>
+<li>Fixed issue with copy as code for debug view</li>
 </ul>
     ]]>
     </change-notes>

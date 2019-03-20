@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij.panel;
 
 import org.exbin.bined.CaretMovedListener;
-import org.exbin.bined.CaretPosition;
+import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.DataChangedListener;
 import org.exbin.bined.capability.EditationModeCapable;
 import org.exbin.bined.operation.BinaryDataCommand;
@@ -42,7 +42,7 @@ import java.util.InputMismatchException;
  * Values side panel.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.0 2018/11/07
+ * @version 0.2.0 2019/03/20
  */
 public class ValuesPanel extends javax.swing.JPanel {
 
@@ -691,7 +691,7 @@ public class ValuesPanel extends javax.swing.JPanel {
         codeArea.addDataChangedListener(dataChangedListener);
         caretMovedListener = new CaretMovedListener() {
             @Override
-            public void caretMoved(CaretPosition caretPosition) {
+            public void caretMoved(CodeAreaCaretPosition caretPosition) {
                 updateValues();
             }
         };
@@ -742,7 +742,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     public void updateValues() {
-        CaretPosition caretPosition = codeArea.getCaretPosition();
+        CodeAreaCaretPosition caretPosition = codeArea.getCaretPosition();
         dataPosition = caretPosition.getDataPosition();
         long dataSize = codeArea.getDataSize();
 

@@ -2,6 +2,10 @@
 - Renamed to BinEd
 - Updated to newer version of library
 - Support for half-size space
+- Support for layout, theme and colors profiles
+- Added support for different numerical types in status bar (issue #13)
+- Context aware popup menu (issue #12)
+- Fixed issue with copy as code for debug view (issue #10)
 
 0.1.7 (2018-08-24)
 - Fixed issue with debugging in CLion (issue #4)

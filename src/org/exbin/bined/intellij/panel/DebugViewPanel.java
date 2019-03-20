@@ -18,10 +18,10 @@ package org.exbin.bined.intellij.panel;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBScrollPane;
-import org.exbin.bined.*;
+import org.exbin.bined.CodeType;
+import org.exbin.bined.EditationMode;
+import org.exbin.bined.EditationOperation;
 import org.exbin.bined.capability.RowWrappingCapable;
-import org.exbin.bined.capability.RowWrappingCapable.RowWrappingMode;
-import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdFileEditor;
@@ -29,11 +29,9 @@ import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.EncodingsHandler;
 import org.exbin.bined.intellij.GoToHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.panel.BinaryStatusPanel;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
-import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
 import org.exbin.utils.binary_data.BinaryData;
 
 import javax.swing.*;
@@ -42,10 +40,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.font.TextAttribute;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Debugger value hexadecimal editor panel.
@@ -63,7 +58,7 @@ public class DebugViewPanel extends JPanel {
 
     private final int metaMask;
     private BinaryStatusPanel statusPanel;
-    private BinaryStatusApi hexStatus;
+    private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi encodingStatus;
     private CharsetChangeListener charsetChangeListener = null;
     private GoToHandler goToHandler;
@@ -84,7 +79,7 @@ public class DebugViewPanel extends JPanel {
         codeArea.setCodeFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
 
-        statusPanel = new BinaryStatusPanel(false);
+        statusPanel = new BinaryStatusPanel();
         registerEncodingStatus(statusPanel);
         encodingsHandler = new EncodingsHandler(new TextEncodingStatusApi() {
             @Override
@@ -153,7 +148,7 @@ public class DebugViewPanel extends JPanel {
                             break;
                         }
                         case KeyEvent.VK_G: {
-                            goToHandler.getGoToLineAction().actionPerformed(null);
+                            goToHandler.getGoToRowAction().actionPerformed(null);
                             break;
                         }
                     }
@@ -253,7 +248,7 @@ public class DebugViewPanel extends JPanel {
 
         final JMenuItem goToMenuItem = new JMenuItem("Go To" + DialogUtils.DIALOG_MENUITEM_EXT);
         goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, metaMask));
-        goToMenuItem.addActionListener(e -> goToHandler.getGoToLineAction().actionPerformed(null));
+        goToMenuItem.addActionListener(e -> goToHandler.getGoToRowAction().actionPerformed(null));
         result.add(goToMenuItem);
 
         return result;
@@ -291,14 +286,12 @@ public class DebugViewPanel extends JPanel {
     }
 
     public void registerHexStatus(BinaryStatusApi binaryStatusApi) {
-        this.hexStatus = binaryStatusApi;
+        this.binaryStatus = binaryStatusApi;
         codeArea.addCaretMovedListener(caretPosition -> {
-            String position = String.valueOf(caretPosition.getDataPosition());
-            position += ":" + caretPosition.getCodeOffset();
-            hexStatus.setCursorPosition(position);
+            binaryStatus.setCursorPosition(caretPosition);
         });
 
-        hexStatus.setControlHandler(new BinaryStatusApi.StatusControlHandler() {
+        binaryStatus.setControlHandler(new BinaryStatusApi.StatusControlHandler() {
             @Override
             public void changeEditationOperation(EditationOperation editationOperation) {
                 codeArea.setEditationOperation(editationOperation);
@@ -306,7 +299,7 @@ public class DebugViewPanel extends JPanel {
 
             @Override
             public void changeCursorPosition() {
-                goToHandler.getGoToLineAction().actionPerformed(null);
+                goToHandler.getGoToRowAction().actionPerformed(null);
             }
 
             @Override
@@ -317,7 +310,7 @@ public class DebugViewPanel extends JPanel {
             }
 
             @Override
-            public void popupEncodingsMenu(MouseEvent mouseEvent) {
+            public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
                 if (encodingsHandler != null) {
                     encodingsHandler.popupEncodingsMenu(mouseEvent);
                 }
@@ -330,96 +323,96 @@ public class DebugViewPanel extends JPanel {
     }
 
     private void loadFromPreferences() {
-        CodeType codeType = CodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_CODE_TYPE, "HEXADECIMAL"));
-        codeArea.setCodeType(codeType);
-        codeTypeComboBox.setSelectedIndex(codeType.ordinal());
-        String selectedEncoding = preferences.getValue(BinEdFileEditor.PREFERENCES_ENCODING_SELECTED, "UTF-8");
-        statusPanel.setEncoding(selectedEncoding);
-        codeArea.setCharset(Charset.forName(selectedEncoding));
-        int bytesPerLine = preferences.getInt(BinEdFileEditor.PREFERENCES_BYTES_PER_LINE, 16);
-        // TODO codeArea.setLineLength(bytesPerLine);
-
-        boolean showNonprintables = preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_UNPRINTABLES, false);
-        showUnprintablesToggleButton.setSelected(showNonprintables);
-        codeArea.setShowUnprintables(showNonprintables);
-
-        boolean lineWrapping = preferences.getBoolean(BinEdFileEditor.PREFERENCES_LINE_WRAPPING, false);
-        codeArea.setRowWrapping(lineWrapping ? RowWrappingMode.WRAPPING : RowWrappingMode.NO_WRAPPING);
-        lineWrappingToggleButton.setSelected(lineWrapping);
-
-        encodingsHandler.loadFromPreferences(preferences);
-
-        // Layout
-        ExtendedCodeAreaLayoutProfile layoutProfile = codeArea.getLayoutProfile();
-        layoutProfile.setShowHeader(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_HEADER, true));
-        /* TODO String headerSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_HEADER_SPACE_TYPE, CodeAreaSpace.SpaceType.HALF_UNIT.name());
-        codeArea.setHeaderSpaceType(CodeAreaSpace.SpaceType.valueOf(headerSpaceTypeName));
-        codeArea.setHeaderSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_HEADER_SPACE, 0)); */
-        layoutProfile.setShowRowPosition(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, true));
-        codeArea.setLayoutProfile(layoutProfile);
-        /* TODO String lineNumbersSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE_TYPE, CodeAreaSpace.SpaceType.ONE_UNIT.name());
-        codeArea.setLineNumberSpaceType(CodeAreaSpace.SpaceType.valueOf(lineNumbersSpaceTypeName));
-        codeArea.setLineNumberSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE, 8));
-        String lineNumbersLengthTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_LENGTH_TYPE, CodeAreaLineNumberLength.LineNumberType.SPECIFIED.name());
-        codeArea.setLineNumberType(CodeAreaLineNumberLength.LineNumberType.valueOf(lineNumbersLengthTypeName));
-        codeArea.setLineNumberSpecifiedLength(preferences.getInt(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_LENGTH, 8));
-        codeArea.setByteGroupSize(preferences.getInt(BinEdFileEditor.PREFERENCES_BYTE_GROUP_SIZE, 1));
-        codeArea.setSpaceGroupSize(preferences.getInt(BinEdFileEditor.PREFERENCES_SPACE_GROUP_SIZE, 0)); */
-
-        // Mode
-        codeArea.setViewMode(CodeAreaViewMode.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_VIEW_MODE, CodeAreaViewMode.DUAL.name())));
-        codeArea.setCodeType(CodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_CODE_TYPE, CodeType.HEXADECIMAL.name())));
-        ((ExtendedHighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).setNonAsciiHighlightingEnabled(preferences.getBoolean(BinEdFileEditor.PREFERENCES_CODE_COLORIZATION, true));
-        // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
-
-        // Decoration
-        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
-        themeProfile.setBackgroundPaintMode(convertBackgroundPaintMode(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, ExtendedBackgroundPaintMode.STRIPED.name())));
-        themeProfile.setPaintRowPosBackground(preferences.getBoolean(BinEdFileEditor.PREFERENCES_PAINT_LINE_NUMBERS_BACKGROUND, true));
-        codeArea.setThemeProfile(themeProfile);
-        /*int decorationMode = (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_HEADER_LINE, true) ? CodeArea.DECORATION_HEADER_LINE : 0)
-                + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_PREVIEW_LINE, true) ? CodeArea.DECORATION_PREVIEW_LINE : 0)
-                + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_BOX, false) ? CodeArea.DECORATION_BOX : 0)
-                + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_LINENUM_LINE, true) ? CodeArea.DECORATION_LINENUM_LINE : 0);
-        codeArea.setDecorationMode(decorationMode); */
-        codeArea.setCodeCharactersCase(CodeCharactersCase.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_HEX_CHARACTERS_CASE, CodeCharactersCase.UPPER.name())));
-        codeArea.setPositionCodeType(PositionCodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_POSITION_CODE_TYPE, PositionCodeType.HEXADECIMAL.name())));
-
-        // Font
-        Boolean useDefaultColor = Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(true)));
-
-        if (!useDefaultColor) {
-            String value;
-            Map<TextAttribute, Object> attribs = new HashMap<>();
-            value = preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_FAMILY, "MONOSPACED");
-            attribs.put(TextAttribute.FAMILY, value);
-            value = preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SIZE, "12");
-            attribs.put(TextAttribute.SIZE, new Integer(value).floatValue());
-            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_UNDERLINE, "FALSE"))) {
-                attribs.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
-            }
-            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRIKETHROUGH, "FALSE"))) {
-                attribs.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
-            }
-            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRONG, "FALSE"))) {
-                attribs.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
-            }
-            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_ITALIC, "FALSE"))) {
-                attribs.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
-            }
-            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUBSCRIPT, "FALSE"))) {
-                attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUB);
-            }
-            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUPERSCRIPT, "FALSE"))) {
-                attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
-            }
-            Font derivedFont = codeArea.getCodeFont().deriveFont(attribs);
-            codeArea.setCodeFont(derivedFont);
-        }
-        boolean showValuesPanel = preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_VALUES_PANEL, true);
-        if (showValuesPanel) {
-            showValuesPanel();
-        }
+//        CodeType codeType = CodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_CODE_TYPE, "HEXADECIMAL"));
+//        codeArea.setCodeType(codeType);
+//        codeTypeComboBox.setSelectedIndex(codeType.ordinal());
+//        String selectedEncoding = preferences.getValue(BinEdFileEditor.PREFERENCES_ENCODING_SELECTED, "UTF-8");
+//        statusPanel.setEncoding(selectedEncoding);
+//        codeArea.setCharset(Charset.forName(selectedEncoding));
+//        int bytesPerLine = preferences.getInt(BinEdFileEditor.PREFERENCES_BYTES_PER_LINE, 16);
+//        // TODO codeArea.setLineLength(bytesPerLine);
+//
+//        boolean showNonprintables = preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_UNPRINTABLES, false);
+//        showUnprintablesToggleButton.setSelected(showNonprintables);
+//        codeArea.setShowUnprintables(showNonprintables);
+//
+//        boolean lineWrapping = preferences.getBoolean(BinEdFileEditor.PREFERENCES_LINE_WRAPPING, false);
+//        codeArea.setRowWrapping(lineWrapping ? RowWrappingMode.WRAPPING : RowWrappingMode.NO_WRAPPING);
+//        lineWrappingToggleButton.setSelected(lineWrapping);
+//
+//        encodingsHandler.loadFromPreferences(preferences);
+//
+//        // Layout
+//        ExtendedCodeAreaLayoutProfile layoutProfile = codeArea.getLayoutProfile();
+//        layoutProfile.setShowHeader(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_HEADER, true));
+//        /* TODO String headerSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_HEADER_SPACE_TYPE, CodeAreaSpace.SpaceType.HALF_UNIT.name());
+//        codeArea.setHeaderSpaceType(CodeAreaSpace.SpaceType.valueOf(headerSpaceTypeName));
+//        codeArea.setHeaderSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_HEADER_SPACE, 0)); */
+//        layoutProfile.setShowRowPosition(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, true));
+//        codeArea.setLayoutProfile(layoutProfile);
+//        /* TODO String lineNumbersSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE_TYPE, CodeAreaSpace.SpaceType.ONE_UNIT.name());
+//        codeArea.setLineNumberSpaceType(CodeAreaSpace.SpaceType.valueOf(lineNumbersSpaceTypeName));
+//        codeArea.setLineNumberSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE, 8));
+//        String lineNumbersLengthTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_LENGTH_TYPE, CodeAreaLineNumberLength.LineNumberType.SPECIFIED.name());
+//        codeArea.setLineNumberType(CodeAreaLineNumberLength.LineNumberType.valueOf(lineNumbersLengthTypeName));
+//        codeArea.setLineNumberSpecifiedLength(preferences.getInt(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_LENGTH, 8));
+//        codeArea.setByteGroupSize(preferences.getInt(BinEdFileEditor.PREFERENCES_BYTE_GROUP_SIZE, 1));
+//        codeArea.setSpaceGroupSize(preferences.getInt(BinEdFileEditor.PREFERENCES_SPACE_GROUP_SIZE, 0)); */
+//
+//        // Mode
+//        codeArea.setViewMode(CodeAreaViewMode.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_VIEW_MODE, CodeAreaViewMode.DUAL.name())));
+//        codeArea.setCodeType(CodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_CODE_TYPE, CodeType.HEXADECIMAL.name())));
+//        ((ExtendedHighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).setNonAsciiHighlightingEnabled(preferences.getBoolean(BinEdFileEditor.PREFERENCES_CODE_COLORIZATION, true));
+//        // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
+//
+//        // Decoration
+//        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+//        themeProfile.setBackgroundPaintMode(convertBackgroundPaintMode(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, ExtendedBackgroundPaintMode.STRIPED.name())));
+//        themeProfile.setPaintRowPosBackground(preferences.getBoolean(BinEdFileEditor.PREFERENCES_PAINT_LINE_NUMBERS_BACKGROUND, true));
+//        codeArea.setThemeProfile(themeProfile);
+//        /*int decorationMode = (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_HEADER_LINE, true) ? CodeArea.DECORATION_HEADER_LINE : 0)
+//                + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_PREVIEW_LINE, true) ? CodeArea.DECORATION_PREVIEW_LINE : 0)
+//                + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_BOX, false) ? CodeArea.DECORATION_BOX : 0)
+//                + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_LINENUM_LINE, true) ? CodeArea.DECORATION_LINENUM_LINE : 0);
+//        codeArea.setDecorationMode(decorationMode); */
+//        codeArea.setCodeCharactersCase(CodeCharactersCase.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_HEX_CHARACTERS_CASE, CodeCharactersCase.UPPER.name())));
+//        codeArea.setPositionCodeType(PositionCodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_POSITION_CODE_TYPE, PositionCodeType.HEXADECIMAL.name())));
+//
+//        // Font
+//        Boolean useDefaultColor = Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(true)));
+//
+//        if (!useDefaultColor) {
+//            String value;
+//            Map<TextAttribute, Object> attribs = new HashMap<>();
+//            value = preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_FAMILY, "MONOSPACED");
+//            attribs.put(TextAttribute.FAMILY, value);
+//            value = preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SIZE, "12");
+//            attribs.put(TextAttribute.SIZE, new Integer(value).floatValue());
+//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_UNDERLINE, "FALSE"))) {
+//                attribs.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
+//            }
+//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRIKETHROUGH, "FALSE"))) {
+//                attribs.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+//            }
+//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRONG, "FALSE"))) {
+//                attribs.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
+//            }
+//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_ITALIC, "FALSE"))) {
+//                attribs.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
+//            }
+//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUBSCRIPT, "FALSE"))) {
+//                attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUB);
+//            }
+//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUPERSCRIPT, "FALSE"))) {
+//                attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
+//            }
+//            Font derivedFont = codeArea.getCodeFont().deriveFont(attribs);
+//            codeArea.setCodeFont(derivedFont);
+//        }
+//        boolean showValuesPanel = preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_VALUES_PANEL, true);
+//        if (showValuesPanel) {
+//            showValuesPanel();
+//        }
     }
 
     public void showValuesPanel() {

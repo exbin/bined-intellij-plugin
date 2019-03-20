@@ -15,14 +15,18 @@
  */
 package org.exbin.bined.intellij.panel;
 
-import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.intellij.BinEdApplyOptions;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Hexadecimal editor options panel with border.
  *
- * @version 0.1.5 2017/09/30
+ * @version 0.2.0 2019/03/16
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class BinEdOptionsPanelBorder extends javax.swing.JPanel {
 
     public BinEdOptionsPanelBorder() {
@@ -38,7 +42,7 @@ public class BinEdOptionsPanelBorder extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        optionsPanel = new BinEdOptionsPanel();
+        optionsPanel = new org.exbin.bined.intellij.panel.BinEdOptionsPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -46,32 +50,25 @@ public class BinEdOptionsPanelBorder extends javax.swing.JPanel {
         add(optionsPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private BinEdOptionsPanel optionsPanel;
+    private org.exbin.bined.intellij.panel.BinEdOptionsPanel optionsPanel;
     // End of variables declaration//GEN-END:variables
 
-    public void setFromCodeArea(ExtCodeArea codeArea) {
-        optionsPanel.setFromCodeArea(codeArea);
+    @Nonnull
+    public BinEdApplyOptions getApplyOptions() {
+        return optionsPanel.getApplyOptions();
     }
 
-    public void applyToCodeArea(ExtCodeArea codeArea) {
-        optionsPanel.applyToCodeArea(codeArea);
-        codeArea.repaint();
+    public void setApplyOptions(BinEdApplyOptions applyOptions) {
+        optionsPanel.setApplyOptions(applyOptions);;
     }
 
-    public boolean isShowValuesPanel() {
-        return optionsPanel.isShowValuesPanel();
-    }
-
-    public void setShowValuesPanel(boolean flag) {
-        optionsPanel.setShowValuesPanel(flag);
+    public void load() {
+        optionsPanel.load();
     }
 
     public void store() {
         optionsPanel.store();
-    }
-
-    public boolean isDeltaMemoryMode() {
-        return optionsPanel.isDeltaMemoryMode();
     }
 }

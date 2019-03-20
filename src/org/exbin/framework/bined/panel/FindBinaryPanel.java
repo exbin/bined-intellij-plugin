@@ -16,29 +16,33 @@
  */
 package org.exbin.framework.bined.panel;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import javax.swing.ComboBoxEditor;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 import org.exbin.bined.ScrollBarVisibility;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
 /**
  * Find text/hexadecimal data panel.
  *
- * @version 0.2.0 2018/12/23
+ * @version 0.2.1 2018/12/22
  * @author ExBin Project (http://exbin.org)
  */
 public class FindBinaryPanel extends javax.swing.JPanel {
@@ -84,7 +88,7 @@ public class FindBinaryPanel extends javax.swing.JPanel {
 
         findComboBoxEditorComponent = new BinarySearchComboBoxPanel();
         findComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
-            private JPanel emptyPanel = new JPanel();
+            private final JPanel emptyPanel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
 
             @Override
@@ -104,9 +108,9 @@ public class FindBinaryPanel extends javax.swing.JPanel {
                     } else {
                         backgroundColor = list.getBackground();
                     }
-// TODO                    ColorsGroup mainColors = findHexadecimalRenderer.getMainColors();
-// TODO                    mainColors.setBothBackgroundColors(backgroundColor);
-// TODO                    findHexadecimalRenderer.setMainColors(mainColors);
+// TODO                    ColorsGroup mainColors = new ColorsGroup(findHexadecimalRenderer.getMainColors());
+//                    mainColors.setBothBackgroundColors(backgroundColor);
+//                    findHexadecimalRenderer.setMainColors(mainColors);
                     return findHexadecimalRenderer;
                 }
             }
@@ -147,8 +151,8 @@ public class FindBinaryPanel extends javax.swing.JPanel {
 
         {
             ExtendedCodeAreaLayoutProfile layoutProfile = replaceHexadecimalRenderer.getLayoutProfile();
-            ((DefaultExtendedCodeAreaLayoutProfile) layoutProfile).setShowHeader(false);
-            ((DefaultExtendedCodeAreaLayoutProfile) layoutProfile).setShowRowPosition(false);
+            layoutProfile.setShowHeader(false);
+            layoutProfile.setShowRowPosition(false);
             replaceHexadecimalRenderer.setLayoutProfile(layoutProfile);
         }
         replaceHexadecimalRenderer.setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
@@ -164,7 +168,7 @@ public class FindBinaryPanel extends javax.swing.JPanel {
 
         replaceComboBoxEditorComponent = new BinarySearchComboBoxPanel();
         replaceComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
-            private JPanel emptyPanel = new JPanel();
+            private final JPanel emptyPanel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
 
             @Override
@@ -184,9 +188,9 @@ public class FindBinaryPanel extends javax.swing.JPanel {
                     } else {
                         backgroundColor = list.getBackground();
                     }
-// TODO                    ColorsGroup mainColors = replaceHexadecimalRenderer.getMainColors();
-// TODO                    mainColors.setBothBackgroundColors(backgroundColor);
-// TODO                    replaceHexadecimalRenderer.setMainColors(mainColors);
+// TODO                    ColorsGroup mainColors = new ColorsGroup(replaceHexadecimalRenderer.getMainColors());
+//                    mainColors.setBothBackgroundColors(backgroundColor);
+//                    replaceHexadecimalRenderer.setMainColors(mainColors);
                     return replaceHexadecimalRenderer;
                 }
             }
@@ -575,7 +579,7 @@ public class FindBinaryPanel extends javax.swing.JPanel {
 
     public void setHexCodePopupMenuHandler(CodeAreaPopupMenuHandler hexCodePopupMenuHandler) {
         this.hexCodePopupMenuHandler = hexCodePopupMenuHandler;
-        findComboBoxEditorComponent.setHexCodePopupMenuHandler(hexCodePopupMenuHandler, "FindBinaryPanel");
+        findComboBoxEditorComponent.setHexCodePopupMenuHandler(hexCodePopupMenuHandler, "FindHexPanel");
     }
 
     public void detachMenu() {

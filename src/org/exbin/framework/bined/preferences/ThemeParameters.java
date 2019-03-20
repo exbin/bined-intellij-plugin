@@ -15,8 +15,11 @@
  */
 package org.exbin.framework.bined.preferences;
 
+import org.exbin.framework.Preferences;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
@@ -24,13 +27,15 @@ import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 /**
  * Theme parameters.
  *
- * @version 0.2.0 2019/01/01
+ * @version 0.2.0 2019/03/11
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class ThemeParameters {
 
-    public static final String PREFERENCES_THEMES_COUNT = "themesCount";
-    public static final String PREFERENCES_THEME_NAME_PREFIX = "themeName.";
+    public static final String PREFERENCES_THEMES_COUNT = "themeProfilesCount";
+    public static final String PREFERENCES_THEME_PROFILE_SELECTED = "themeProfilesSelected";
+    public static final String PREFERENCES_THEME_NAME_PREFIX = "themeProfileName.";
     public static final String PREFERENCES_THEME_VALUE_PREFIX = "theme.";
 
     public static final String THEME_BACKGROUND_PAINT_MODE = "backgroundPaintMode";
@@ -50,7 +55,8 @@ public class ThemeParameters {
         this.preferences = preferences;
     }
 
-    public List<String> getThemesList() {
+    @Nonnull
+    public List<String> getThemeProfilesList() {
         List<String> themesList = new ArrayList<>();
         int themesCount = preferences.getInt(PREFERENCES_THEMES_COUNT, 0);
 
@@ -62,12 +68,7 @@ public class ThemeParameters {
         return themesList;
     }
 
-    public void setThemesList(List<String> themesNames) {
-        int prevThemesCount = preferences.getInt(PREFERENCES_THEMES_COUNT, 0);
-        for (int i = 0; i < prevThemesCount; i++) {
-            clearTheme(i);
-        }
-
+    public void setThemeProfilesList(List<String> themesNames) {
         int themesCount = themesNames.size();
         preferences.putInt(PREFERENCES_THEMES_COUNT, themesCount);
 
@@ -76,6 +77,15 @@ public class ThemeParameters {
         }
     }
 
+    public int getSelectedProfile() {
+        return preferences.getInt(PREFERENCES_THEME_PROFILE_SELECTED, -1);
+    }
+
+    public void setSelectedProfile(int profileIndex) {
+        preferences.putInt(PREFERENCES_THEME_PROFILE_SELECTED, profileIndex);
+    }
+
+    @Nonnull
     public ExtendedCodeAreaThemeProfile getThemeProfile(int themeIndex) {
         ExtendedCodeAreaThemeProfile themeProfile = new ExtendedCodeAreaThemeProfile();
         String themePrefix = PREFERENCES_THEME_VALUE_PREFIX + String.valueOf(themeIndex) + ".";

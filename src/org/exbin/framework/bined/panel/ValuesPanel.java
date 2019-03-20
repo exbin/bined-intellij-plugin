@@ -16,16 +16,8 @@
  */
 package org.exbin.framework.bined.panel;
 
-import java.awt.event.KeyEvent;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.InputMismatchException;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import org.exbin.bined.CaretMovedListener;
-import org.exbin.bined.CaretPosition;
+import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.DataChangedListener;
 import org.exbin.bined.capability.EditationModeCapable;
 import org.exbin.bined.operation.BinaryDataCommand;
@@ -39,6 +31,14 @@ import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
 import org.exbin.utils.binary_data.EditableBinaryData;
+
+import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
+import java.util.InputMismatchException;
 
 /**
  * Values side panel.
@@ -686,7 +686,7 @@ public class ValuesPanel extends javax.swing.JPanel {
             updateValues();
         };
         codeArea.addDataChangedListener(dataChangedListener);
-        caretMovedListener = (CaretPosition caretPosition) -> {
+        caretMovedListener = (CodeAreaCaretPosition caretPosition) -> {
             updateValues();
         };
         codeArea.addCaretMovedListener(caretMovedListener);
@@ -732,7 +732,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     public void updateValues() {
-        CaretPosition caretPosition = codeArea.getCaretPosition();
+        CodeAreaCaretPosition caretPosition = codeArea.getCaretPosition();
         dataPosition = caretPosition.getDataPosition();
         long dataSize = codeArea.getDataSize();
 

@@ -17,12 +17,12 @@
 package org.exbin.framework.gui.options.api;
 
 import java.util.List;
-import java.util.prefs.Preferences;
+import org.exbin.framework.Preferences;
 
 /**
  * Interface for basic options panels.
  *
- * @version 0.1.22 2013/03/18
+ * @version 0.2.0 2019/03/13
  * @author ExBin Project (http://exbin.org)
  */
 public interface OptionsPanel {

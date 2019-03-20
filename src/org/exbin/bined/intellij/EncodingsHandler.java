@@ -15,8 +15,8 @@
  */
 package org.exbin.bined.intellij;
 
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.DialogWrapper;
+import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.panel.AddEncodingPanel;
 import org.exbin.framework.editor.text.panel.TextEncodingPanel;
@@ -62,7 +62,7 @@ public class EncodingsHandler implements TextEncodingPanelApi {
     public static final String UTF_ENCODING_TOOLTIP = "Set encoding UTF-8";
 
     private Action manageEncodingsAction;
-    private PropertiesComponent preferences;
+    private BinaryEditorPreferences preferences;
 
     public EncodingsHandler(TextEncodingStatusApi textEncodingStatus) {
         resourceBundle = LanguageUtils.getResourceBundleByClass(EncodingsHandler.class);
@@ -111,11 +111,7 @@ public class EncodingsHandler implements TextEncodingPanelApi {
                             encodings = textEncodingPanel.getEncodingList();
                             rebuildEncodings();
                             if (actionType == OptionsControlHandler.ControlActionType.SAVE) {
-                                // Save encodings
-                                for (int i = 0; i < encodings.size(); i++) {
-                                    preferences.setValue(BinEdFileEditor.PREFERENCES_ENCODING_PREFIX + Integer.toString(i), encodings.get(i));
-                                }
-                                preferences.unsetValue(BinEdFileEditor.PREFERENCES_ENCODING_PREFIX + Integer.toString(encodings.size()));
+                                preferences.getCodeAreaParameters().setEncodings(encodings);
                             }
                         }
 
@@ -228,19 +224,11 @@ public class EncodingsHandler implements TextEncodingPanelApi {
         item.setSelected(true);
     }
 
-    public void loadFromPreferences(PropertiesComponent preferences) {
+    public void loadFromPreferences(BinaryEditorPreferences preferences) {
         this.preferences = preferences;
-        setSelectedEncoding(preferences.getValue(BinEdFileEditor.PREFERENCES_ENCODING_SELECTED, ENCODING_UTF8));
+        setSelectedEncoding(preferences.getCodeAreaParameters().getSelectedEncoding());
         encodings.clear();
-        String value;
-        int i = 0;
-        do {
-            value = preferences.getValue(BinEdFileEditor.PREFERENCES_ENCODING_PREFIX + Integer.toString(i), "");
-            if (!value.isEmpty()) {
-                encodings.add(value);
-                i++;
-            }
-        } while (!value.isEmpty());
+        encodings.addAll(preferences.getCodeAreaParameters().getEncodings());
         rebuildEncodings();
     }
 

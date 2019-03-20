@@ -16,19 +16,19 @@
  */
 package org.exbin.framework.bined.panel;
 
+import java.awt.BorderLayout;
+import java.util.ResourceBundle;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.utils.binary_data.EditableBinaryData;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-
 /**
  * Multiline search condition editor panel.
  *
- * @version 0.2.0 2016/12/27
+ * @version 0.2.0 2018/10/27
  * @author ExBin Project (http://exbin.org)
  */
 public class BinaryMultilinePanel extends javax.swing.JPanel {

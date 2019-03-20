@@ -49,7 +49,7 @@ public class LanguageUtils {
      * @param targetClass target class
      * @return name path
      */
-    public static String getClassNamePath(Class targetClass) {
+    public static String getClassNamePath(Class<?> targetClass) {
         return targetClass.getCanonicalName().replace(".", "/");
     }
 
@@ -60,7 +60,7 @@ public class LanguageUtils {
      * @param targetClass target class
      * @return resource bundle
      */
-    public static ResourceBundle getResourceBundleByClass(Class targetClass) {
+    public static ResourceBundle getResourceBundleByClass(Class<?> targetClass) {
         if (languageClassLoader == null) {
             return ResourceBundle.getBundle(getResourceBaseNameBundleByClass(targetClass));
         } else {
@@ -75,7 +75,7 @@ public class LanguageUtils {
      * @param targetClass target class
      * @return base name string
      */
-    public static String getResourceBaseNameBundleByClass(Class targetClass) {
+    public static String getResourceBaseNameBundleByClass(Class<?> targetClass) {
         String classNamePath = getClassNamePath(targetClass);
         int classNamePos = classNamePath.lastIndexOf("/");
         return classNamePath.substring(0, classNamePos + 1) + "resources" + classNamePath.substring(classNamePos);

@@ -49,7 +49,7 @@ public class GoToHandler {
     private void init() {
     }
 
-    public Action getGoToLineAction() {
+    public Action getGoToRowAction() {
         if (goToLineAction == null) {
             goToLineAction = new AbstractAction() {
                 @Override

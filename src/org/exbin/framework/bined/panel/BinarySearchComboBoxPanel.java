@@ -16,7 +16,15 @@
  */
 package org.exbin.framework.bined.panel;
 
-import org.exbin.bined.DataChangedListener;
+import java.awt.CardLayout;
+import java.awt.event.KeyListener;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.exbin.bined.ScrollBarVisibility;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
@@ -27,17 +35,10 @@ import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
 import org.exbin.utils.binary_data.EditableBinaryData;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.KeyListener;
-
 /**
  * Combo box panel supporting both binary and text values.
  *
- * @version 0.1.0 2016/07/21
+ * @version 0.2.1 2018/12/22
  * @author ExBin Project (http://exbin.org)
  */
 public class BinarySearchComboBoxPanel extends JPanel {
@@ -94,12 +95,7 @@ public class BinarySearchComboBoxPanel extends JPanel {
         hexadecimalEditor.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
         hexadecimalEditor.setContentData(new ByteArrayEditableData());
         hexadecimalEditor.setBorder(comboBoxBorder);
-        hexadecimalEditor.addDataChangedListener(new DataChangedListener() {
-            @Override
-            public void dataChanged() {
-                comboBoxValueChanged();
-            }
-        });
+        hexadecimalEditor.addDataChangedListener(this::comboBoxValueChanged);
         super.add(hexadecimalEditor, BINARY_MODE);
     }
 
