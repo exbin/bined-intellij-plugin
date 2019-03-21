@@ -91,7 +91,7 @@ public class BinEdFileEditor implements FileEditor {
     private final BinaryEditorPreferences preferences;
     private final Project project;
     private JPanel editorPanel;
-    private JPanel headerPanel;
+//    private JPanel headerPanel;
     private static SegmentsRepository segmentsRepository = null;
     private final ExtCodeArea codeArea;
     private final CodeAreaUndoHandler undoHandler;
@@ -131,7 +131,7 @@ public class BinEdFileEditor implements FileEditor {
 
         toolbarPanel = new BinEdToolbarPanel(preferences, codeArea);
         statusPanel = new BinaryStatusPanel();
-        codeAreaPanel.add(toolbarPanel, BorderLayout.NORTH);
+        editorPanel.add(toolbarPanel, BorderLayout.NORTH);
         registerEncodingStatus(statusPanel);
         encodingsHandler = new EncodingsHandler(new TextEncodingStatusApi() {
             @Override
@@ -322,12 +322,10 @@ public class BinEdFileEditor implements FileEditor {
 //    private javax.swing.JToggleButton showUnprintablesToggleButton;
 
     private void initComponents() {
-
         codeAreaPanel = new javax.swing.JPanel();
+        codeAreaPanel.setLayout(new java.awt.BorderLayout());
 
         editorPanel.setLayout(new java.awt.BorderLayout());
-
-        codeAreaPanel.setLayout(new java.awt.BorderLayout());
         editorPanel.add(codeAreaPanel, java.awt.BorderLayout.CENTER);
 //        infoToolbar = new javax.swing.JPanel();
 //        controlToolBar = new javax.swing.JToolBar();
