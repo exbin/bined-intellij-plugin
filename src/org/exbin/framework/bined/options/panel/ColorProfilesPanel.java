@@ -16,27 +16,23 @@
  */
 package org.exbin.framework.bined.options.panel;
 
-import java.awt.Component;
-import java.awt.Dialog;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.framework.bined.preferences.ColorParameters;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.*;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manage list of color profiles panel.
@@ -293,8 +289,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final Dialog dialog = WindowUtils.createDialog(dialogPanel, null, Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setTitle("Add Colors Profile");
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Add Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
             if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
                 if (!isValidProfileName(namedProfilePanel.getProfileName())) {
@@ -315,10 +310,10 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
                 wasModified();
             }
 
-            WindowUtils.closeWindow(dialog);
+            dialog.close();
         });
-        dialog.setLocationByPlatform(true);
-        dialog.setVisible(true);
+        dialog.center();
+        dialog.show();
         dialog.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 
@@ -338,8 +333,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final Dialog dialog = WindowUtils.createDialog(dialogPanel, null, Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setTitle("Edit Colors Profile");
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Edit Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
         namedProfilePanel.setProfileName(profileRecord.profileName);
         colorProfilePanel.setColorProfile(profileRecord.colorProfile);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
@@ -356,10 +350,10 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
                 wasModified();
             }
 
-            WindowUtils.closeWindow(dialog);
+            dialog.close();
         });
-        dialog.setLocationByPlatform(true);
-        dialog.setVisible(true);
+        dialog.center();
+        dialog.show();
         dialog.dispose();
     }//GEN-LAST:event_editButtonActionPerformed
 
@@ -385,8 +379,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final Dialog dialog = WindowUtils.createDialog(dialogPanel, null, Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setTitle("Copy Colors Profile");
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Copy Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
         colorProfilePanel.setColorProfile(profileRecord.colorProfile);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
             if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
@@ -409,10 +402,10 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
                 wasModified();
             }
 
-            WindowUtils.closeWindow(dialog);
+            dialog.close();
         });
-        dialog.setLocationByPlatform(true);
-        dialog.setVisible(true);
+        dialog.center();
+        dialog.show();
         dialog.dispose();
     }//GEN-LAST:event_copyButtonActionPerformed
 

@@ -28,11 +28,13 @@ import java.util.ArrayList;
 /**
  * Hexadecimal editor preferences.
  *
- * @version 0.2.0 2019/03/15
+ * @version 0.2.0 2019/03/22
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class BinaryEditorPreferences {
+
+    public static final String PLUGIN_PREFIX = "BinEdPlugin.";
 
     private final static String PREFERENCES_VERSION = "version";
     private final static String PREFERENCES_VERSION_VALUE = "0.2.0";
@@ -109,7 +111,7 @@ public class BinaryEditorPreferences {
     }
 
     private void importLegacyPreferences() {
-        LegacyPreferences legacyPreferences = new LegacyPreferences(new PreferencesWrapper(PropertiesComponent.getInstance()));
+        LegacyPreferences legacyPreferences = new LegacyPreferences(new PreferencesWrapper(PropertiesComponent.getInstance(), ""));
         codeAreaParameters.setSelectedEncoding(legacyPreferences.getSelectedEncoding());
         codeAreaParameters.setEncodings(new ArrayList<>(legacyPreferences.getEncodings()));
         codeAreaParameters.setUseDefaultFont(legacyPreferences.isUseDefaultFont());

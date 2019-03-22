@@ -22,6 +22,7 @@ import org.exbin.framework.editor.text.panel.TextEncodingPanelApi;
 import org.exbin.framework.gui.utils.ActionUtils;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.handler.OptionsControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
@@ -95,8 +96,7 @@ public class EncodingsHandler implements TextEncodingPanelApi {
                 textEncodingPanel.setEncodingList(encodings);
                 final OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
                 JPanel dialogPanel = WindowUtils.createDialogPanel(textEncodingPanel, optionsControlPanel);
-                final Dialog dialog = WindowUtils.createDialog(dialogPanel, null, Dialog.ModalityType.APPLICATION_MODAL);
-                dialog.setTitle("Manage Encodings");
+                final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Manage Encodings", Dialog.ModalityType.APPLICATION_MODAL);
                 optionsControlPanel.setHandler((OptionsControlHandler.ControlActionType actionType) -> {
                     if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
                         encodings = textEncodingPanel.getEncodingList();
@@ -106,7 +106,7 @@ public class EncodingsHandler implements TextEncodingPanelApi {
                         }
                     }
 
-                    WindowUtils.closeWindow(dialog);
+                    dialog.close();
                 });
                 textEncodingPanel.setAddEncodingsOperation((List<String> usedEncodings) -> {
                     final List<String> result = new ArrayList<>();
@@ -114,19 +114,18 @@ public class EncodingsHandler implements TextEncodingPanelApi {
                     addEncodingPanel.setUsedEncodings(usedEncodings);
                     DefaultControlPanel encodingsControlPanel = new DefaultControlPanel(addEncodingPanel.getResourceBundle());
                     JPanel dialogPanel1 = WindowUtils.createDialogPanel(addEncodingPanel, encodingsControlPanel);
-                    final Dialog addEncodingDialog = WindowUtils.createDialog(dialogPanel1, null, Dialog.ModalityType.APPLICATION_MODAL);
-                    dialog.setTitle("Add Encodings");
+                    final DialogWrapper addEncodingDialog = WindowUtils.createDialog(dialogPanel1, null, "Add Encodings", Dialog.ModalityType.APPLICATION_MODAL);
                     encodingsControlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
                         if (actionType == DefaultControlHandler.ControlActionType.OK) {
                             result.addAll(addEncodingPanel.getEncodings());
                         }
 
-                        WindowUtils.closeWindow(addEncodingDialog);
+                        addEncodingDialog.close();
                     });
-                    addEncodingDialog.setVisible(true);
+                    addEncodingDialog.show();
                     return result;
                 });
-                dialog.setVisible(true);
+                dialog.show();
             }
         };
         ActionUtils.setupAction(manageEncodingsAction, resourceBundle, "manageEncodingsAction");

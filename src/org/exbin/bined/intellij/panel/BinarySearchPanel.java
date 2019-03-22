@@ -16,18 +16,17 @@
 package org.exbin.bined.intellij.panel;
 
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.ui.DialogWrapper;
 import org.exbin.bined.ScrollBarVisibility;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
-import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.panel.*;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
 import org.exbin.utils.binary_data.BinaryData;
@@ -587,7 +586,7 @@ public class BinarySearchPanel extends javax.swing.JPanel {
         findBinaryPanel.setHexCodePopupMenuHandler(hexCodePopupMenuHandler);
         DefaultControlPanel controlPanel = new DefaultControlPanel(findBinaryPanel.getResourceBundle());
         JPanel dialogPanel = WindowUtils.createDialogPanel(findBinaryPanel, controlPanel);
-        final DialogWrapper dialog = DialogUtils.createDialog(dialogPanel, "Find Text");
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Find Text", Dialog.ModalityType.APPLICATION_MODAL);
         findBinaryPanel.setMultilineEditorListener(new FindBinaryPanel.MultilineEditorListener() {
             @Override
             public SearchCondition multilineEdit(SearchCondition condition) {
@@ -596,7 +595,7 @@ public class BinarySearchPanel extends javax.swing.JPanel {
                 multilinePanel.setCondition(condition);
                 DefaultControlPanel controlPanel = new DefaultControlPanel();
                 JPanel dialogPanel = WindowUtils.createDialogPanel(multilinePanel, controlPanel);
-                final DialogWrapper multilineDialog = DialogUtils.createDialog(dialogPanel, "Multiline Hex/Text");
+                final DialogWrapper multilineDialog = WindowUtils.createDialog(dialogPanel, null, "Multiline Hex/Text", Dialog.ModalityType.APPLICATION_MODAL);
                 final SearchConditionResult result = new SearchConditionResult();
                 controlPanel.setHandler(new DefaultControlHandler() {
                     @Override
@@ -606,12 +605,12 @@ public class BinarySearchPanel extends javax.swing.JPanel {
                             updateFindStatus();
                         }
 
-                        multilineDialog.close(0);
+                        multilineDialog.close();
                     }
                 });
                 WindowUtils.assignGlobalKeyListener(multilineDialog.getWindow(), controlPanel.createOkCancelListener());
                 // multilineDialog.setLocationRelativeTo(dialog);
-                multilineDialog.showAndGet();
+                multilineDialog.show();
                 multilinePanel.detachMenu();
                 return result.searchCondition;
             }
@@ -636,12 +635,12 @@ public class BinarySearchPanel extends javax.swing.JPanel {
                     binarySearchPanelApi.performFind(dialogSearchParameters);
                 }
                 findBinaryPanel.detachMenu();
-                dialog.close(0);
+                dialog.close();
             }
         });
         WindowUtils.assignGlobalKeyListener(dialog.getWindow(), controlPanel.createOkCancelListener());
 //        dialog.setLocationRelativeTo(frameModule.getFrame());
-        dialog.showAndGet();
+        dialog.show();
     }//GEN-LAST:event_optionsButtonActionPerformed
 
     private void prevButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevButtonActionPerformed

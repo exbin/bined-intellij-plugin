@@ -28,6 +28,7 @@ import org.exbin.framework.editor.text.panel.AddEncodingPanel;
 import org.exbin.framework.editor.text.panel.TextEncodingPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
 
@@ -73,7 +74,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
 
     public BinEdOptionsPanel() {
         initComponents();
-        preferences = new BinaryEditorPreferences(new PreferencesWrapper(PropertiesComponent.getInstance()));
+        preferences = new BinaryEditorPreferences(new PreferencesWrapper(PropertiesComponent.getInstance(), BinaryEditorPreferences.PLUGIN_PREFIX));
 
         categoryModel.addElement(new CategoryItem("Editor", editorParametersPanel));
         categoryModel.addElement(new CategoryItem("Status Panel", statusParametersPanel));
@@ -110,16 +111,15 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
             addEncodingPanel.setUsedEncodings(usedEncodings);
             DefaultControlPanel encodingsControlPanel = new DefaultControlPanel(addEncodingPanel.getResourceBundle());
             JPanel dialogPanel = WindowUtils.createDialogPanel(addEncodingPanel, encodingsControlPanel);
-            final Dialog addEncodingDialog = WindowUtils.createDialog(dialogPanel, null, Dialog.ModalityType.APPLICATION_MODAL);
-            addEncodingDialog.setTitle("Add Encodings");
+            final DialogWrapper addEncodingDialog = WindowUtils.createDialog(dialogPanel, null, "Add Encodings", Dialog.ModalityType.APPLICATION_MODAL);
             encodingsControlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
                 if (actionType == DefaultControlHandler.ControlActionType.OK) {
                     result.addAll(addEncodingPanel.getEncodings());
                 }
 
-                WindowUtils.closeWindow(addEncodingDialog);
+                addEncodingDialog.close();
             });
-            addEncodingDialog.setVisible(true);
+            addEncodingDialog.show();
             return result;
         });
     }

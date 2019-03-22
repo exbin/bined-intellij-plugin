@@ -103,7 +103,7 @@ public class BinEdFileEditor implements FileEditor {
     private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi encodingStatus;
     private CharsetChangeListener charsetChangeListener = null;
-    private GoToHandler goToHandler;
+    private GoToPositionAction goToRowAction;
     private EncodingsHandler encodingsHandler;
     private JScrollPane valuesPanelScrollPane = null;
     private ValuesPanel valuesPanel = null;
@@ -122,7 +122,7 @@ public class BinEdFileEditor implements FileEditor {
         editorPanel = new JPanel();
         initComponents();
 
-        preferences = new BinaryEditorPreferences(new org.exbin.bined.intellij.PreferencesWrapper(getPreferences()));
+        preferences = new BinaryEditorPreferences(new org.exbin.bined.intellij.PreferencesWrapper(getPreferences(), BinaryEditorPreferences.PLUGIN_PREFIX));
 
         codeArea = new ExtCodeArea();
         codeArea.setPainter(new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea));
@@ -176,7 +176,7 @@ public class BinEdFileEditor implements FileEditor {
         editorPanel.add(codeArea, BorderLayout.CENTER);
         editorPanel.add(statusPanel, BorderLayout.SOUTH);
         registerBinaryStatus(statusPanel);
-        goToHandler = new GoToHandler(codeArea);
+        goToRowAction = new GoToPositionAction(codeArea);
 
         int metaMaskValue;
         try {
@@ -236,7 +236,7 @@ public class BinEdFileEditor implements FileEditor {
                             break;
                         }
                         case KeyEvent.VK_G: {
-                            goToHandler.getGoToRowAction().actionPerformed(null);
+                            goToRowAction.actionPerformed(null);
                             break;
                         }
                         case KeyEvent.VK_S: {
@@ -512,7 +512,7 @@ public class BinEdFileEditor implements FileEditor {
 
             @Override
             public void changeCursorPosition() {
-                goToHandler.getGoToRowAction().actionPerformed(null);
+                goToRowAction.actionPerformed(null);
             }
 
             @Override
@@ -945,7 +945,7 @@ public class BinEdFileEditor implements FileEditor {
 
         final JMenuItem goToMenuItem = new JMenuItem("Go To" + DialogUtils.DIALOG_MENUITEM_EXT);
         goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, metaMask));
-        goToMenuItem.addActionListener(e -> goToHandler.getGoToRowAction().actionPerformed(null));
+        goToMenuItem.addActionListener(goToRowAction);
         result.add(goToMenuItem);
 
         final JMenuItem findMenuItem = new JMenuItem("Find" + DialogUtils.DIALOG_MENUITEM_EXT);

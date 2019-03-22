@@ -20,103 +20,106 @@ import org.exbin.framework.Preferences;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 
 /**
  * Wrapper for preferences.
  *
- * @version 0.2.0 2019/03/20
+ * @version 0.2.0 2019/03/22
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class PreferencesWrapper implements Preferences {
 
     private final PropertiesComponent preferences;
-    private static final String PLUGIN_PREFIX = "BinEdPlugin.";
+    private final String prefix;
 
-    public PreferencesWrapper(PropertiesComponent preferences) {
-        this.preferences = preferences;
+    public PreferencesWrapper(PropertiesComponent preferences, String prefix) {
+        this.preferences = Objects.requireNonNull(preferences);
+        this.prefix = Objects.requireNonNull(prefix);
     }
 
     @Override
     public void put(String key, @Nullable String value) {
         if (value == null) {
-            preferences.unsetValue(PLUGIN_PREFIX + key);
+            preferences.unsetValue(prefix + key);
         } else {
-            preferences.setValue(PLUGIN_PREFIX + key, value);
+            preferences.setValue(prefix + key, value);
         }
     }
 
+    @Nullable
     @Override
     public String get(String key, @Nullable String def) {
-        String value = preferences.getValue(PLUGIN_PREFIX + key, def == null ? "" : def);
+        String value = preferences.getValue(prefix + key, def == null ? "" : def);
         return "".equals(value) ? null : value;
     }
 
     @Override
     public void remove(String key) {
-        preferences.unsetValue(PLUGIN_PREFIX + key);
+        preferences.unsetValue(prefix + key);
     }
 
     @Override
     public void putInt(String key, int value) {
-        preferences.setValue(PLUGIN_PREFIX + key, value, -1);
+        preferences.setValue(prefix + key, value, -1);
     }
 
     @Override
     public int getInt(String key, int def) {
-        return preferences.getInt(PLUGIN_PREFIX + key, def);
+        return preferences.getInt(prefix + key, def);
     }
 
     @Override
     public void putLong(String key, long value) {
-        preferences.setValue(PLUGIN_PREFIX + key, (int) value, -1);
+        preferences.setValue(prefix + key, (int) value, -1);
     }
 
     @Override
     public long getLong(String key, long def) {
-        return preferences.getOrInitLong(PLUGIN_PREFIX + key, def);
+        return preferences.getOrInitLong(prefix + key, def);
     }
 
     @Override
     public void putBoolean(String key, boolean value) {
-        preferences.setValue(PLUGIN_PREFIX + key, value);
+        preferences.setValue(prefix + key, value);
     }
 
     @Override
     public boolean getBoolean(String key, boolean def) {
-        return preferences.getBoolean(PLUGIN_PREFIX + key, def);
+        return preferences.getBoolean(prefix + key, def);
     }
 
     @Override
     public void putFloat(String key, float value) {
-        preferences.setValue(PLUGIN_PREFIX + key, value, 0f);
+        preferences.setValue(prefix + key, value, 0f);
     }
 
     @Override
     public float getFloat(String key, float def) {
-        return preferences.getFloat(PLUGIN_PREFIX + key, def);
+        return preferences.getFloat(prefix + key, def);
     }
 
     @Override
     public void putDouble(String key, double value) {
-        preferences.setValue(PLUGIN_PREFIX + key, (float) value, 0f);
+        preferences.setValue(prefix + key, (float) value, 0f);
     }
 
     @Override
     public double getDouble(String key, double def) {
-        return preferences.getFloat(PLUGIN_PREFIX + key, (float) def);
+        return preferences.getFloat(prefix + key, (float) def);
     }
 
     @Override
     public void putByteArray(String key, byte[] value) {
         throw new UnsupportedOperationException("Not supported yet.");
-        //preferences.setValue(PLUGIN_PREFIX + key, value);
+        //preferences.setValue(prefix + key, value);
     }
 
     @Override
     public byte[] getByteArray(String key, byte[] def) {
         throw new UnsupportedOperationException("Not supported yet.");
-        // return preferences.getValue(PLUGIN_PREFIX + key, def);
+        // return preferences.getValue(prefix + key, def);
     }
 
     @Override

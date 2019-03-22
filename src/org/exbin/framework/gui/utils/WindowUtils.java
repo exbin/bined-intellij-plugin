@@ -16,34 +16,18 @@
  */
 package org.exbin.framework.gui.utils;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Window;
+import com.intellij.openapi.Disposable;
+import org.exbin.bined.intellij.DialogUtils;
+import org.exbin.framework.gui.utils.panel.WindowHeaderPanel;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.LookAndFeel;
-import javax.swing.SwingUtilities;
-import javax.swing.UnsupportedLookAndFeelException;
-import org.exbin.framework.gui.utils.panel.WindowHeaderPanel;
 
 /**
  * Utility static methods usable for windows and dialogs.
@@ -110,12 +94,40 @@ public class WindowUtils {
         });
     }
 
-    public static JDialog createDialog(final Component component, Window parent, Dialog.ModalityType modalityType) {
-        JDialog dialog = new JDialog(parent, modalityType);
-        Dimension size = component.getPreferredSize();
-        dialog.add(component);
-        dialog.setSize(size.width + 8, size.height + 24);
-        return dialog;
+    public static DialogWrapper createDialog(final JComponent component, Window parent, String dialogTitle, Dialog.ModalityType modalityType) {
+        final com.intellij.openapi.ui.DialogWrapper dialog = DialogUtils.createDialog(component, dialogTitle);
+//        JDialog dialog = new JDialog(parent, modalityType);
+//        dialog.setTitle(dialogTitle);
+//        Dimension size = component.getPreferredSize();
+//        dialog.add(component);
+//        dialog.setSize(size.width + 8, size.height + 24);
+        return new DialogWrapper() {
+            @Override
+            public void show() {
+                dialog.showAndGet();
+            }
+
+            @Override
+            public void close() {
+                dialog.close(0);
+            }
+
+            @Override
+            public void dispose() {
+                Disposable disposable = dialog.getDisposable();
+                disposable.dispose();
+            }
+
+            @Override
+            public Window getWindow() {
+                return dialog.getWindow();
+            }
+
+            @Override
+            public void center() {
+
+            }
+        };
     }
 
     public static JDialog createDialog(final Component component) {
@@ -173,7 +185,7 @@ public class WindowUtils {
     /**
      * Assign ESCAPE/ENTER key for all focusable components recursively.
      *
-     * @param component target component
+     * @param component   target component
      * @param closeButton button which will be used for closing operation
      */
     public static void assignGlobalKeyListener(Container component, final JButton closeButton) {
@@ -183,8 +195,8 @@ public class WindowUtils {
     /**
      * Assign ESCAPE/ENTER key for all focusable components recursively.
      *
-     * @param component target component
-     * @param okButton button which will be used for default ENTER
+     * @param component    target component
+     * @param okButton     button which will be used for default ENTER
      * @param cancelButton button which will be used for closing operation
      */
     public static void assignGlobalKeyListener(Container component, final JButton okButton, final JButton cancelButton) {
@@ -205,7 +217,7 @@ public class WindowUtils {
      * Assign ESCAPE/ENTER key for all focusable components recursively.
      *
      * @param component target component
-     * @param listener ok and cancel event listener
+     * @param listener  ok and cancel event listener
      */
     public static void assignGlobalKeyListener(Container component, final OkCancelListener listener) {
         KeyListener keyListener = new KeyListener() {
@@ -249,7 +261,7 @@ public class WindowUtils {
     /**
      * Assign key listener for all focusable components recursively.
      *
-     * @param component target component
+     * @param component   target component
      * @param keyListener key lisneter
      */
     public static void assignGlobalKeyListener(Container component, KeyListener keyListener) {
@@ -344,7 +356,7 @@ public class WindowUtils {
     /**
      * Creates panel for given main and control panel.
      *
-     * @param mainPanel main panel
+     * @param mainPanel    main panel
      * @param controlPanel control panel
      * @return panel
      */
@@ -355,10 +367,24 @@ public class WindowUtils {
         return dialogPanel;
     }
 
-    public static interface OkCancelListener {
+    public interface OkCancelListener {
 
         void okEvent();
 
         void cancelEvent();
     }
+
+    public interface DialogWrapper {
+
+        void show();
+
+        void close();
+
+        void dispose();
+
+        Window getWindow();
+
+        void center();
+    }
 }
+

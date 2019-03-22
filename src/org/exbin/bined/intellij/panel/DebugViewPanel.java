@@ -27,7 +27,7 @@ import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAre
 import org.exbin.bined.intellij.BinEdFileEditor;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.EncodingsHandler;
-import org.exbin.bined.intellij.GoToHandler;
+import org.exbin.bined.intellij.GoToPositionAction;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.panel.BinaryStatusPanel;
@@ -61,7 +61,7 @@ public class DebugViewPanel extends JPanel {
     private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi encodingStatus;
     private CharsetChangeListener charsetChangeListener = null;
-    private GoToHandler goToHandler;
+    private GoToPositionAction goToRowAction;
     private EncodingsHandler encodingsHandler;
     private boolean findTextPanelVisible = false;
     private BinarySearchPanel binarySearchPanel = null;
@@ -102,7 +102,7 @@ public class DebugViewPanel extends JPanel {
 
         loadFromPreferences();
 
-        goToHandler = new GoToHandler(codeArea);
+        goToRowAction = new GoToPositionAction(codeArea);
 
         applyFromCodeArea();
 
@@ -148,7 +148,7 @@ public class DebugViewPanel extends JPanel {
                             break;
                         }
                         case KeyEvent.VK_G: {
-                            goToHandler.getGoToRowAction().actionPerformed(null);
+                            goToRowAction.actionPerformed(null);
                             break;
                         }
                     }
@@ -248,7 +248,7 @@ public class DebugViewPanel extends JPanel {
 
         final JMenuItem goToMenuItem = new JMenuItem("Go To" + DialogUtils.DIALOG_MENUITEM_EXT);
         goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, metaMask));
-        goToMenuItem.addActionListener(e -> goToHandler.getGoToRowAction().actionPerformed(null));
+        goToMenuItem.addActionListener(goToRowAction);
         result.add(goToMenuItem);
 
         return result;
@@ -299,7 +299,7 @@ public class DebugViewPanel extends JPanel {
 
             @Override
             public void changeCursorPosition() {
-                goToHandler.getGoToRowAction().actionPerformed(null);
+                goToRowAction.actionPerformed(null);
             }
 
             @Override
