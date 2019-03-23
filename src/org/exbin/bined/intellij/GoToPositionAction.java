@@ -54,7 +54,7 @@ public class GoToPositionAction implements ActionListener {
         goToPanel.setCursorPosition(codeArea.getCaretPosition().getDataPosition());
         goToPanel.setMaxPosition(codeArea.getDataSize());
         JPanel dialogPanel = WindowUtils.createDialogPanel(goToPanel, goToControlPanel);
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, resourceBundle.getString("dialogTitle"), Dialog.ModalityType.APPLICATION_MODAL);
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, resourceBundle.getString("dialog.title"), Dialog.ModalityType.APPLICATION_MODAL);
 
         goToPanel.initFocus();
         goToControlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {

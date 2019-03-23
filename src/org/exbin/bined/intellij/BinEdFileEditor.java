@@ -33,7 +33,6 @@ import org.exbin.bined.EditationOperation;
 import org.exbin.bined.delta.DeltaDocument;
 import org.exbin.bined.delta.FileDataSource;
 import org.exbin.bined.delta.SegmentsRepository;
-import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.panel.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.panel.BinEdToolbarPanel;
@@ -62,10 +61,9 @@ import org.exbin.utils.binary_data.BinaryData;
 import org.exbin.utils.binary_data.ByteArrayData;
 import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -128,8 +126,10 @@ public class BinEdFileEditor implements FileEditor {
         codeArea.setPainter(new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea));
         codeArea.setCodeFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
+        undoHandler = new CodeAreaUndoHandler(codeArea);
 
-        toolbarPanel = new BinEdToolbarPanel(preferences, codeArea);
+        toolbarPanel = new BinEdToolbarPanel(preferences, codeArea, undoHandler);
+        toolbarPanel.setSaveAction(this::saveFileButtonActionPerformed);
         statusPanel = new BinaryStatusPanel();
         editorPanel.add(toolbarPanel, BorderLayout.NORTH);
         registerEncodingStatus(statusPanel);
@@ -150,24 +150,23 @@ public class BinEdFileEditor implements FileEditor {
         propertyChangeSupport = new PropertyChangeSupport(this);
         // CodeAreaUndoHandler(codeArea);
         // undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, this);
-        undoHandler = new CodeAreaUndoHandler(codeArea);
         loadFromPreferences();
 
         undoHandler.addUndoUpdateListener(new BinaryDataUndoUpdateListener() {
             @Override
             public void undoCommandPositionChanged() {
                 codeArea.repaint();
-                updateUndoState();
+                toolbarPanel.updateUndoState();
                 notifyModified();
             }
 
             @Override
             public void undoCommandAdded(final BinaryDataCommand command) {
-                updateUndoState();
+                toolbarPanel.updateUndoState();
                 notifyModified();
             }
         });
-        updateUndoState();
+        toolbarPanel.updateUndoState();
 
         getSegmentsRepository();
         setNewData();
@@ -270,11 +269,11 @@ public class BinEdFileEditor implements FileEditor {
         MessageBusConnection connect = messageBus.connect();
         connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
-            public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+            public void fileOpened(@Nonnull FileEditorManager source, @Nonnull VirtualFile file) {
             }
 
             @Override
-            public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+            public void fileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile file) {
                 if (virtualFile != null) {
                     if (!releaseFile()) {
                         // TODO Intercept close event instead of editor recreation
@@ -297,7 +296,7 @@ public class BinEdFileEditor implements FileEditor {
             }
 
             @Override
-            public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+            public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
             }
         });
         editorPanel.invalidate();
@@ -309,97 +308,15 @@ public class BinEdFileEditor implements FileEditor {
 
     private javax.swing.JPanel codeAreaPanel;
 
-//    private ComboBox<String> codeTypeComboBox;
-//    private javax.swing.JToolBar controlToolBar;
-//    private javax.swing.JPanel infoToolbar;
-//    private javax.swing.JToolBar.Separator separator1;
-//    private javax.swing.JToolBar.Separator separator2;
-//    private javax.swing.JToolBar.Separator separator3;
-    private javax.swing.JButton saveFileButton;
-    private javax.swing.JButton undoEditButton;
-    private javax.swing.JButton redoEditButton;
-//    private javax.swing.JToggleButton lineWrappingToggleButton;
-//    private javax.swing.JToggleButton showUnprintablesToggleButton;
-
     private void initComponents() {
         codeAreaPanel = new javax.swing.JPanel();
         codeAreaPanel.setLayout(new java.awt.BorderLayout());
 
         editorPanel.setLayout(new java.awt.BorderLayout());
         editorPanel.add(codeAreaPanel, java.awt.BorderLayout.CENTER);
-//        infoToolbar = new javax.swing.JPanel();
-//        controlToolBar = new javax.swing.JToolBar();
-        saveFileButton = new javax.swing.JButton();
-        undoEditButton = new javax.swing.JButton();
-        redoEditButton = new javax.swing.JButton();
-//        lineWrappingToggleButton = new javax.swing.JToggleButton();
-//        showUnprintablesToggleButton = new javax.swing.JToggleButton();
-//        separator1 = new javax.swing.JToolBar.Separator();
-//        separator2 = new javax.swing.JToolBar.Separator();
-//        separator3 = new javax.swing.JToolBar.Separator();
-//        codeTypeComboBox = new ComboBox<>();
-//
-//        editorPanel.setLayout(new java.awt.BorderLayout());
-//
-//        controlToolBar.setBorder(null);
-//        controlToolBar.setFloatable(false);
-//        controlToolBar.setRollover(true);
-//
-//        saveFileButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/document-save.png")));
-//        saveFileButton.setToolTipText("Save current file");
-//        saveFileButton.addActionListener(this::saveFileButtonActionPerformed);
-//        saveFileButton.setEnabled(false);
-//        controlToolBar.add(saveFileButton);
-//        controlToolBar.add(separator1);
-//
-//        undoEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-undo.png")));
-//        undoEditButton.setToolTipText("Undo last operation");
-//        undoEditButton.addActionListener(this::undoEditButtonActionPerformed);
-//        controlToolBar.add(undoEditButton);
-//
-//        redoEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-redo.png")));
-//        redoEditButton.setToolTipText("Redo last undid operation");
-//        redoEditButton.addActionListener(this::redoEditButtonActionPerformed);
-//        controlToolBar.add(redoEditButton);
-//        controlToolBar.add(separator2);
-//
-//        lineWrappingToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/bined-linewrap.png")));
-//        lineWrappingToggleButton.setToolTipText("Wrap line to window size");
-//        lineWrappingToggleButton.addActionListener(this::lineWrappingToggleButtonActionPerformed);
-//        controlToolBar.add(lineWrappingToggleButton);
-//
-//        showUnprintablesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png")));
-//        showUnprintablesToggleButton.setToolTipText("Show symbols for unprintable/whitespace characters");
-//        showUnprintablesToggleButton.addActionListener(this::showUnprintablesToggleButtonActionPerformed);
-//        controlToolBar.add(showUnprintablesToggleButton);
-//        controlToolBar.add(separator3);
-//
-//        JPanel spacePanel = new JPanel();
-//        spacePanel.setLayout(new BorderLayout());
-//        codeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BIN", "OCT", "DEC", "HEX"}));
-//        codeTypeComboBox.addActionListener(this::codeTypeComboBoxActionPerformed);
-//        spacePanel.add(codeTypeComboBox, BorderLayout.WEST);
-//        controlToolBar.add(spacePanel);
-//
-//        javax.swing.GroupLayout infoToolbarLayout = new javax.swing.GroupLayout(infoToolbar);
-//        infoToolbar.setLayout(infoToolbarLayout);
-//        infoToolbarLayout.setHorizontalGroup(
-//                infoToolbarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//                        .addGroup(infoToolbarLayout.createSequentialGroup()
-//                                .addComponent(controlToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
-//        );
-//        infoToolbarLayout.setVerticalGroup(
-//                infoToolbarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//                        .addComponent(controlToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 25, Short.MAX_VALUE)
-//        );
-//
-//        headerPanel = new JPanel();
-//        headerPanel.setLayout(new java.awt.BorderLayout());
-//        headerPanel.add(infoToolbar, java.awt.BorderLayout.CENTER);
-//        editorPanel.add(headerPanel, java.awt.BorderLayout.NORTH);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public JComponent getComponent() {
         return editorPanel;
@@ -411,20 +328,20 @@ public class BinEdFileEditor implements FileEditor {
         return editorPanel;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getName() {
         return displayName;
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public FileEditorState getState(@NotNull FileEditorStateLevel level) {
+    public FileEditorState getState(@Nonnull FileEditorStateLevel level) {
         return fileEditorState;
     }
 
     @Override
-    public void setState(@NotNull FileEditorState state) {
+    public void setState(@Nonnull FileEditorState state) {
     }
 
     @Override
@@ -617,12 +534,12 @@ public class BinEdFileEditor implements FileEditor {
     }
 
     @Override
-    public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {
+    public void addPropertyChangeListener(@Nonnull PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     @Override
-    public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {
+    public void removePropertyChangeListener(@Nonnull PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
@@ -635,12 +552,7 @@ public class BinEdFileEditor implements FileEditor {
 //        }
 //        propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
 
-        saveFileButton.setEnabled(modified);
-    }
-
-    private void updateUndoState() {
-        undoEditButton.setEnabled(undoHandler.canUndo());
-        redoEditButton.setEnabled(undoHandler.canRedo());
+        toolbarPanel.updateModified(modified);
     }
 
     @Nullable
@@ -662,12 +574,12 @@ public class BinEdFileEditor implements FileEditor {
 
     @Nullable
     @Override
-    public <T> T getUserData(@NotNull Key<T> key) {
+    public <T> T getUserData(@Nonnull Key<T> key) {
         return null;
     }
 
     @Override
-    public <T> void putUserData(@NotNull Key<T> key, @Nullable T value) {
+    public <T> void putUserData(@Nonnull Key<T> key, @Nullable T value) {
     }
 
     private void saveFileButtonActionPerformed(java.awt.event.ActionEvent evt) {
@@ -691,47 +603,11 @@ public class BinEdFileEditor implements FileEditor {
                 }
 
                 undoHandler.setSyncPoint();
-                updateUndoState();
-                saveFileButton.setEnabled(false);
+                toolbarPanel.updateUndoState();
+                toolbarPanel.updateModified(false);
             }
         });
     }
-
-    private void undoEditButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            undoHandler.performUndo();
-            codeArea.repaint();
-            updateUndoState();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void redoEditButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            undoHandler.performRedo();
-            codeArea.repaint();
-            updateUndoState();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-//    private void lineWrappingToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {
-//        codeArea.setRowWrapping(lineWrappingToggleButton.isSelected() ? RowWrappingCapable.RowWrappingMode.WRAPPING : RowWrappingCapable.RowWrappingMode.NO_WRAPPING);
-//// TODO        preferences.setValue(BinEdFileEditor.PREFERENCES_LINE_WRAPPING, lineWrappingToggleButton.isSelected());
-//    }
-//
-//    private void showUnprintablesToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {
-//        codeArea.setShowUnprintables(showUnprintablesToggleButton.isSelected());
-//// TODO        preferences.setValue(BinEdFileEditor.PREFERENCES_SHOW_UNPRINTABLES, lineWrappingToggleButton.isSelected());
-//    }
-//
-//    private void codeTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {
-//        CodeType codeType = CodeType.values()[codeTypeComboBox.getSelectedIndex()];
-//        codeArea.setCodeType(codeType);
-//// TODO        preferences.setValue(BinEdFileEditor.PREFERENCES_CODE_TYPE, codeType.name());
-//    }
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
@@ -798,8 +674,8 @@ public class BinEdFileEditor implements FileEditor {
                 codeArea.getContentData().saveToStream(stream);
                 stream.flush();
                 undoHandler.setSyncPoint();
-                updateUndoState();
-                saveFileButton.setEnabled(false);
+                toolbarPanel.updateUndoState();
+                toolbarPanel.updateModified(false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -810,7 +686,7 @@ public class BinEdFileEditor implements FileEditor {
         updateCurrentMemoryMode();
     }
 
-    private void reopenFile(@NotNull BinEdVirtualFile virtualFile, @NotNull BinaryData data, @NotNull CodeAreaUndoHandler undoHandler) {
+    private void reopenFile(@Nonnull BinEdVirtualFile virtualFile, @Nonnull BinaryData data, @Nonnull CodeAreaUndoHandler undoHandler) {
         this.virtualFile = virtualFile;
         boolean editable = virtualFile.isWritable();
         codeArea.setEditationMode(editable ? EditationMode.EXPANDING : EditationMode.READ_ONLY);
@@ -1122,12 +998,6 @@ public class BinEdFileEditor implements FileEditor {
 
     public Project getProject() {
         return project;
-    }
-
-    private static ExtendedBackgroundPaintMode convertBackgroundPaintMode(String value) {
-        if ("STRIPPED".equals(value))
-            return ExtendedBackgroundPaintMode.STRIPED;
-        return ExtendedBackgroundPaintMode.valueOf(value);
     }
 
     public interface CharsetChangeListener {
