@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij;
+package org.exbin.framework;
 
 import com.intellij.ide.util.PropertiesComponent;
-import org.exbin.framework.Preferences;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -17,7 +17,7 @@ package org.exbin.framework.bined.preferences;
 
 import com.intellij.ide.util.PropertiesComponent;
 import org.exbin.bined.intellij.FileHandlingMode;
-import org.exbin.bined.intellij.PreferencesWrapper;
+import org.exbin.framework.PreferencesWrapper;
 import org.exbin.framework.Preferences;
 import org.exbin.framework.bined.options.CodeAreaOptions;
 

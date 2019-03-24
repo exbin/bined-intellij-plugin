@@ -17,7 +17,7 @@ package org.exbin.bined.intellij.panel;
 
 import com.intellij.ide.util.PropertiesComponent;
 import org.exbin.bined.intellij.BinEdApplyOptions;
-import org.exbin.bined.intellij.PreferencesWrapper;
+import org.exbin.framework.PreferencesWrapper;
 import org.exbin.framework.bined.options.CharsetOptions;
 import org.exbin.framework.bined.options.CodeAreaOptions;
 import org.exbin.framework.bined.options.EditorOptions;

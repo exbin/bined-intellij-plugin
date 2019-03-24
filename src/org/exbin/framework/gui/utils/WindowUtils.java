@@ -130,7 +130,7 @@ public class WindowUtils {
         };
     }
 
-    public static JDialog createDialog(final Component component) {
+    public static JDialog createDialog(final JComponent component) {
         JDialog dialog = new JDialog();
         Dimension size = component.getPreferredSize();
         dialog.add(component);
@@ -138,7 +138,7 @@ public class WindowUtils {
         return dialog;
     }
 
-    public static void invokeDialog(final Component component) {
+    public static void invokeDialog(final JComponent component) {
         JDialog dialog = createDialog(component);
         invokeWindow(dialog);
     }

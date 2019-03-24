@@ -45,6 +45,7 @@ import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.operation.swing.command.InsertDataCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.PreferencesWrapper;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.options.CodeAreaOptions;
 import org.exbin.framework.bined.options.EditorOptions;
@@ -120,7 +121,7 @@ public class BinEdFileEditor implements FileEditor {
         editorPanel = new JPanel();
         initComponents();
 
-        preferences = new BinaryEditorPreferences(new org.exbin.bined.intellij.PreferencesWrapper(getPreferences(), BinaryEditorPreferences.PLUGIN_PREFIX));
+        preferences = new BinaryEditorPreferences(new PreferencesWrapper(getPreferences(), BinaryEditorPreferences.PLUGIN_PREFIX));
 
         codeArea = new ExtCodeArea();
         codeArea.setPainter(new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea));
