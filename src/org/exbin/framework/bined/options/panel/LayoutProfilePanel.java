@@ -15,6 +15,13 @@
  */
 package org.exbin.framework.bined.options.panel;
 
+import java.awt.BorderLayout;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.SelectionRange;
 import org.exbin.bined.capability.RowWrappingCapable;
@@ -23,14 +30,6 @@ import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfil
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.awt.*;
-import java.io.IOException;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Layout profile panel.
@@ -157,17 +156,17 @@ public class LayoutProfilePanel extends javax.swing.JPanel {
         rowPositionPanel.setLayout(rowPositionPanelLayout);
         rowPositionPanelLayout.setHorizontalGroup(
             rowPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(rowPositionPanelLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, rowPositionPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(rowPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(rowPositionLeftSpaceSpinner, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(showRowPositionCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(rowPositionRightSpaceSpinner, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(rowPositionPanelLayout.createSequentialGroup()
-                        .addGroup(rowPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rowPositionLeftSpaceLabel)
-                            .addComponent(rowPositionRightSpaceLabel))
-                        .addGap(0, 27, Short.MAX_VALUE)))
+                .addGroup(rowPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(showRowPositionCheckBox, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, rowPositionPanelLayout.createSequentialGroup()
+                        .addGroup(rowPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(rowPositionLeftSpaceLabel, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(rowPositionRightSpaceLabel, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(rowPositionLeftSpaceSpinner, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(rowPositionRightSpaceSpinner, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap())
         );
         rowPositionPanelLayout.setVerticalGroup(

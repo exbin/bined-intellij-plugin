@@ -16,6 +16,21 @@
  */
 package org.exbin.framework.bined.options.panel;
 
+import java.awt.Component;
+import java.awt.Dialog;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
 import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
 import org.exbin.framework.bined.preferences.LayoutParameters;
 import org.exbin.framework.gui.utils.LanguageUtils;
@@ -23,16 +38,6 @@ import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Manage list of layout profiles panel.
@@ -93,7 +98,7 @@ public class LayoutProfilesPanel extends javax.swing.JPanel implements ProfileLi
     private ProfilesListModel getProfilesListModel() {
         return ((ProfilesListModel) profilesList.getModel());
     }
-    
+
     public DefaultExtendedCodeAreaLayoutProfile getProfile(int profileIndex) {
         return getProfilesListModel().getElementAt(profileIndex).layoutProfile;
     }
@@ -285,6 +290,7 @@ public class LayoutProfilesPanel extends javax.swing.JPanel implements ProfileLi
         LayoutProfilePanel layoutProfilePanel = new LayoutProfilePanel();
         layoutProfilePanel.setLayoutProfile(new DefaultExtendedCodeAreaLayoutProfile());
         NamedProfilePanel namedProfilePanel = new NamedProfilePanel(layoutProfilePanel);
+        namedProfilePanel.setProfileName(getNewProfileName());
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
@@ -377,6 +383,7 @@ public class LayoutProfilesPanel extends javax.swing.JPanel implements ProfileLi
         NamedProfilePanel namedProfilePanel = new NamedProfilePanel(layoutProfilePanel);
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
+
         final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Copy Layout Profile", Dialog.ModalityType.APPLICATION_MODAL);
         layoutProfilePanel.setLayoutProfile(profileRecord.layoutProfile);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
@@ -571,5 +578,20 @@ public class LayoutProfilesPanel extends javax.swing.JPanel implements ProfileLi
         public Component getListCellRendererComponent(JList<? extends LayoutProfile> list, LayoutProfile value, int index, boolean isSelected, boolean cellHasFocus) {
             return defaultListCellRenderer.getListCellRendererComponent(list, value.profileName, index, isSelected, cellHasFocus);
         }
+    }
+
+    @Nonnull
+    private String getNewProfileName() {
+        String profileName = "Profile ";
+        int profileIndex = 1;
+        while (hasProfileWithName(profileName + profileIndex)) {
+            profileIndex++;
+        }
+
+        return profileName + profileIndex;
+    }
+
+    private boolean hasProfileWithName(String profileName) {
+        return getProfilesListModel().getProfiles().stream().anyMatch((profile) -> (profileName.equals(profile.profileName)));
     }
 }

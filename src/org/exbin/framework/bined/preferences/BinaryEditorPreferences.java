@@ -16,19 +16,22 @@
 package org.exbin.framework.bined.preferences;
 
 import com.intellij.ide.util.PropertiesComponent;
-import org.exbin.bined.intellij.FileHandlingMode;
-import org.exbin.framework.PreferencesWrapper;
 import org.exbin.framework.Preferences;
-import org.exbin.framework.bined.options.CodeAreaOptions;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
+import org.exbin.bined.intellij.FileHandlingMode;
+import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
+import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
+import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
+import org.exbin.framework.PreferencesWrapper;
+import org.exbin.framework.bined.options.CodeAreaOptions;
 
 /**
  * Hexadecimal editor preferences.
  *
- * @version 0.2.0 2019/03/22
+ * @version 0.2.0 2019/03/15
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -60,8 +63,8 @@ public class BinaryEditorPreferences {
         themeParameters = new ThemeParameters(preferences);
         colorParameters = new ColorParameters(preferences);
 
-//        String storedVersion = preferences.get(PREFERENCES_VERSION, "");
-/*        if ("".equals(storedVersion)) */ {
+        String storedVersion = preferences.get(PREFERENCES_VERSION, "");
+        if ("".equals(storedVersion)) {
             try {
                 importLegacyPreferences();
             } finally {
@@ -117,17 +120,39 @@ public class BinaryEditorPreferences {
         codeAreaParameters.setUseDefaultFont(legacyPreferences.isUseDefaultFont());
         codeAreaParameters.setCodeFont(legacyPreferences.getCodeFont(CodeAreaOptions.DEFAULT_FONT));
         codeAreaParameters.setCodeType(legacyPreferences.getCodeType());
-        codeAreaParameters.setRowWrapping(legacyPreferences.isRowWrapping());
+        codeAreaParameters.setRowWrapping(legacyPreferences.isLineWrapping());
         codeAreaParameters.setShowUnprintables(legacyPreferences.isShowNonprintables());
         codeAreaParameters.setCodeCharactersCase(legacyPreferences.getCodeCharactersCase());
         codeAreaParameters.setPositionCodeType(legacyPreferences.getPositionCodeType());
         codeAreaParameters.setViewMode(legacyPreferences.getViewMode());
         codeAreaParameters.setPaintRowPosBackground(legacyPreferences.isPaintRowPosBackground());
         codeAreaParameters.setCodeColorization(legacyPreferences.isCodeColorization());
-        // TODO legacyPreferences.getBackgroundPaintMode();
 
         editorParameters.setFileHandlingMode(legacyPreferences.isDeltaMemoryMode() ? FileHandlingMode.DELTA.name() : FileHandlingMode.MEMORY.name());
         editorParameters.setShowValuesPanel(legacyPreferences.isShowValuesPanel());
+
+        List<String> layoutProfiles = new ArrayList<>();
+        layoutProfiles.add("Imported profile");
+        DefaultExtendedCodeAreaLayoutProfile layoutProfile = new DefaultExtendedCodeAreaLayoutProfile();
+        layoutProfile.setShowHeader(legacyPreferences.isShowHeader());
+        layoutProfile.setShowRowPosition(legacyPreferences.isShowLineNumbers());
+        layoutProfile.setSpaceGroupSize(legacyPreferences.getByteGroupSize());
+        layoutProfile.setDoubleSpaceGroupSize(legacyPreferences.getSpaceGroupSize());
+        layoutParameters.setLayoutProfile(0, layoutProfile);
+        layoutParameters.setLayoutProfilesList(layoutProfiles);
+
+        List<String> themeProfiles = new ArrayList<>();
+        themeProfiles.add("Imported profile");
+        ExtendedCodeAreaThemeProfile themeProfile = new ExtendedCodeAreaThemeProfile();
+        themeProfile.setBackgroundPaintMode(legacyPreferences.getBackgroundPaintMode());
+        themeProfile.setPaintRowPosBackground(legacyPreferences.isPaintRowPosBackground());
+        themeProfile.setDecoration(ExtendedCodeAreaDecorations.HEADER_LINE, legacyPreferences.isDecorationHeaderLine());
+        themeProfile.setDecoration(ExtendedCodeAreaDecorations.ROW_POSITION_LINE, legacyPreferences.isDecorationLineNumLine());
+        themeProfile.setDecoration(ExtendedCodeAreaDecorations.SPLIT_LINE, legacyPreferences.isDecorationPreviewLine());
+        themeProfile.setDecoration(ExtendedCodeAreaDecorations.BOX_LINES, legacyPreferences.isDecorationBox());
+        themeParameters.setThemeProfile(0, themeProfile);
+        themeParameters.setThemeProfilesList(themeProfiles);
+
         preferences.flush();
     }
 }

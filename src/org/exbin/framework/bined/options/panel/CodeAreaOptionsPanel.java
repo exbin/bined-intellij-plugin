@@ -15,6 +15,10 @@
  */
 package org.exbin.framework.bined.options.panel;
 
+import java.awt.Font;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JPanel;
 import org.exbin.bined.CodeAreaViewMode;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
@@ -26,11 +30,6 @@ import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * Code area preference parameters panel.
@@ -59,7 +58,7 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel {
         options.setViewMode(CodeAreaViewMode.valueOf((String) viewModeComboBox.getSelectedItem()));
         options.setCodeColorization(codeColorizationCheckBox.isSelected());
         options.setUseDefaultFont(useDefaultFontCheckBox.isSelected());
-        options.setRowWrapping(wrapLineModeCheckBox.isSelected());
+        options.setRowWrapping(rowWrappingModeCheckBox.isSelected());
         options.setMaxBytesPerRow((Integer) maxBytesPerRowSpinner.getValue());
         options.setMinRowPositionLength((Integer) minRowPositionLengthSpinner.getValue());
         options.setMaxRowPositionLength((Integer) maxRowPositionLengthSpinner.getValue());
@@ -76,7 +75,7 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel {
         viewModeComboBox.setSelectedItem(options.getViewMode().name());
         codeColorizationCheckBox.setSelected(options.isCodeColorization());
         useDefaultFontCheckBox.setSelected(options.isUseDefaultFont());
-        wrapLineModeCheckBox.setSelected(options.isRowWrapping());
+        rowWrappingModeCheckBox.setSelected(options.isRowWrapping());
         maxBytesPerRowSpinner.setValue(options.getMaxBytesPerRow());
         minRowPositionLengthSpinner.setValue(options.getMinRowPositionLength());
         maxRowPositionLengthSpinner.setValue(options.getMaxRowPositionLength());
@@ -112,7 +111,7 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel {
         minRowPositionLengthSpinner = new javax.swing.JSpinner();
         maxRowPositionLengthLabel = new javax.swing.JLabel();
         maxRowPositionLengthSpinner = new javax.swing.JSpinner();
-        wrapLineModeCheckBox = new javax.swing.JCheckBox();
+        rowWrappingModeCheckBox = new javax.swing.JCheckBox();
 
         codeCharactersModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "LOWER", "UPPER" }));
 
@@ -195,7 +194,7 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel {
         maxRowPositionLengthSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
         maxRowPositionLengthSpinner.setValue(8);
 
-        wrapLineModeCheckBox.setText(resourceBundle.getString("wrapLineModeCheckBox.text")); // NOI18N
+        rowWrappingModeCheckBox.setText(resourceBundle.getString("wrapLineModeCheckBox.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -220,7 +219,7 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel {
                             .addComponent(positionCodeTypeLabel)
                             .addComponent(viewModeScrollModeLabel)
                             .addComponent(codeTypeScrollModeLabel)
-                            .addComponent(wrapLineModeCheckBox)
+                            .addComponent(rowWrappingModeCheckBox)
                             .addComponent(maxBytesPerRowLabel)
                             .addComponent(minRowPositionLengthLabel)
                             .addComponent(maxRowPositionLengthLabel))
@@ -253,7 +252,7 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(codeColorizationCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(wrapLineModeCheckBox)
+                .addComponent(rowWrappingModeCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(maxBytesPerRowLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -317,12 +316,12 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JSpinner minRowPositionLengthSpinner;
     private javax.swing.JComboBox<String> positionCodeTypeComboBox;
     private javax.swing.JLabel positionCodeTypeLabel;
+    private javax.swing.JCheckBox rowWrappingModeCheckBox;
     private javax.swing.JButton selectFontButton;
     private javax.swing.JCheckBox showNonprintableCharactersCheckBox;
     private javax.swing.JCheckBox useDefaultFontCheckBox;
     private javax.swing.JComboBox<String> viewModeComboBox;
     private javax.swing.JLabel viewModeScrollModeLabel;
-    private javax.swing.JCheckBox wrapLineModeCheckBox;
     // End of variables declaration//GEN-END:variables
 
     private void updateFontTextField() {

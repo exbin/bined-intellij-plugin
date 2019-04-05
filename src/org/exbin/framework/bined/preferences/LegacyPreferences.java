@@ -191,12 +191,12 @@ public class LegacyPreferences {
         preferences.putBoolean(PREFERENCES_MEMORY_DELTA_MODE, deltaMemoryMode);
     }
 
-    public boolean isRowWrapping() {
+    public boolean isLineWrapping() {
         return preferences.getBoolean(PREFERENCES_LINE_WRAPPING, false);
     }
 
-    public void setRowWrapping(boolean rowWrapping) {
-        preferences.putBoolean(PREFERENCES_LINE_WRAPPING, rowWrapping);
+    public void setLineWrapping(boolean lineWrapping) {
+        preferences.putBoolean(PREFERENCES_LINE_WRAPPING, lineWrapping);
     }
 
     public boolean isShowNonprintables() {
@@ -259,11 +259,75 @@ public class LegacyPreferences {
         preferences.putBoolean(PREFERENCES_CODE_COLORIZATION, codeColorization);
     }
 
-    public Boolean isUseDefaultFont() {
+    public boolean isUseDefaultFont() {
         return Boolean.valueOf(preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(true)));
     }
 
     public void setUseDefaultFont(boolean useDefaultFont) {
         preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(useDefaultFont));
+    }
+
+    public boolean isShowHeader() {
+        return Boolean.valueOf(preferences.get(PREFERENCES_SHOW_HEADER, Boolean.toString(true)));
+    }
+
+    public void setShowHeader(boolean showHeader) {
+        preferences.put(PREFERENCES_SHOW_HEADER, Boolean.toString(showHeader));
+    }
+
+    public boolean isShowLineNumbers() {
+        return Boolean.valueOf(preferences.get(PREFERENCES_SHOW_LINE_NUMBERS, Boolean.toString(true)));
+    }
+
+    public void setShowLineNumbers(boolean showLineNumbers) {
+        preferences.put(PREFERENCES_SHOW_LINE_NUMBERS, Boolean.toString(showLineNumbers));
+    }
+
+    public boolean isDecorationHeaderLine() {
+        return Boolean.valueOf(preferences.get(PREFERENCES_DECORATION_HEADER_LINE, Boolean.toString(true)));
+    }
+
+    public void setDecorationHeaderLine(boolean decorationHeaderLine) {
+        preferences.put(PREFERENCES_DECORATION_HEADER_LINE, Boolean.toString(decorationHeaderLine));
+    }
+
+    public boolean isDecorationLineNumLine() {
+        return Boolean.valueOf(preferences.get(PREFERENCES_DECORATION_LINENUM_LINE, Boolean.toString(true)));
+    }
+
+    public void setDecorationLineNumLine(boolean decorationLineNumLine) {
+        preferences.put(PREFERENCES_DECORATION_LINENUM_LINE, Boolean.toString(decorationLineNumLine));
+    }
+
+    public boolean isDecorationPreviewLine() {
+        return Boolean.valueOf(preferences.get(PREFERENCES_DECORATION_PREVIEW_LINE, Boolean.toString(true)));
+    }
+
+    public void setDecorationPreviewLine(boolean decorationPreviewLine) {
+        preferences.put(PREFERENCES_DECORATION_PREVIEW_LINE, Boolean.toString(decorationPreviewLine));
+    }
+
+    public boolean isDecorationBox() {
+        return Boolean.valueOf(preferences.get(PREFERENCES_DECORATION_BOX, Boolean.toString(false)));
+    }
+
+    public void setDecorationBox(boolean decorationBox) {
+        preferences.put(PREFERENCES_DECORATION_BOX, Boolean.toString(decorationBox));
+    }
+
+    public int getByteGroupSize() {
+        return preferences.getInt(PREFERENCES_BYTE_GROUP_SIZE, 1);
+    }
+
+    public void setByteGroupSize(int byteGroupSize) {
+        preferences.putInt(PREFERENCES_BYTE_GROUP_SIZE, byteGroupSize);
+    }
+
+    public int getSpaceGroupSize() {
+        return preferences.getInt(PREFERENCES_BYTE_GROUP_SIZE, 1);
+    }
+
+    public void setSpaceGroupSize(int spaceGroupSize) {
+        preferences.putInt(PREFERENCES_SPACE_GROUP_SIZE, spaceGroupSize);
     }
 }

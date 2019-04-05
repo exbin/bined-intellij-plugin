@@ -36,7 +36,7 @@
                           <Component id="positionCodeTypeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="viewModeScrollModeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="codeTypeScrollModeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="wrapLineModeCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="rowWrappingModeCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="maxBytesPerRowLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="minRowPositionLengthLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="maxRowPositionLengthLabel" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -74,7 +74,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="codeColorizationCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="wrapLineModeCheckBox" min="-2" max="-2" attributes="0"/>
+              <Component id="rowWrappingModeCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="maxBytesPerRowLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -322,7 +322,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JCheckBox" name="wrapLineModeCheckBox">
+    <Component class="javax.swing.JCheckBox" name="rowWrappingModeCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="org/exbin/framework/bined/options/panel/resources/CodeAreaOptionsPanel.properties" key="wrapLineModeCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>

@@ -105,19 +105,19 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="rowPositionLeftSpaceSpinner" alignment="1" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
                               <Component id="showRowPositionCheckBox" alignment="0" max="32767" attributes="0"/>
-                              <Component id="rowPositionRightSpaceSpinner" alignment="1" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="1" attributes="0">
                                       <Component id="rowPositionLeftSpaceLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="rowPositionRightSpaceLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="0" pref="27" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
+                              <Component id="rowPositionLeftSpaceSpinner" alignment="0" max="32767" attributes="0"/>
+                              <Component id="rowPositionRightSpaceSpinner" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -248,7 +248,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="headerBottomSpaceSpinner" alignment="1" max="32767" attributes="0"/>
+                              <Component id="headerBottomSpaceSpinner" max="32767" attributes="0"/>
                               <Component id="showHeaderCheckBox" alignment="0" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">

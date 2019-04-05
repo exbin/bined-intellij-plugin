@@ -16,6 +16,21 @@
  */
 package org.exbin.framework.bined.options.panel;
 
+import java.awt.Component;
+import java.awt.Dialog;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.framework.bined.preferences.ColorParameters;
 import org.exbin.framework.gui.utils.LanguageUtils;
@@ -23,16 +38,6 @@ import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Manage list of color profiles panel.
@@ -286,6 +291,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         ColorProfilePanel colorProfilePanel = new ColorProfilePanel();
         colorProfilePanel.setColorProfile(new ExtendedCodeAreaColorProfile());
         NamedProfilePanel namedProfilePanel = new NamedProfilePanel(colorProfilePanel);
+        namedProfilePanel.setProfileName(getNewProfileName());
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
@@ -574,5 +580,20 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         public Component getListCellRendererComponent(JList<? extends ColorProfile> list, ColorProfile value, int index, boolean isSelected, boolean cellHasFocus) {
             return defaultListCellRenderer.getListCellRendererComponent(list, value.profileName, index, isSelected, cellHasFocus);
         }
+    }
+
+    @Nonnull
+    private String getNewProfileName() {
+        String profileName = "Profile ";
+        int profileIndex = 1;
+        while (hasProfileWithName(profileName + profileIndex)) {
+            profileIndex++;
+        }
+
+        return profileName + profileIndex;
+    }
+
+    private boolean hasProfileWithName(String profileName) {
+        return getProfilesListModel().getProfiles().stream().anyMatch((profile) -> (profileName.equals(profile.profileName)));
     }
 }
