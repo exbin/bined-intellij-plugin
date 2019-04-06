@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * File system for hexadecimal editor.
@@ -35,6 +37,7 @@ import java.io.IOException;
 public class BinEdFileSystem extends VirtualFileSystem implements ApplicationComponent {
 
     private static final String PROTOCOL = "bined";
+    private List<VirtualFileListener> fileListeners = new ArrayList<>();
 
     public static BinEdFileSystem getInstance() {
         return ApplicationManager.getApplication().getComponent(BinEdFileSystem.class);
@@ -64,12 +67,12 @@ public class BinEdFileSystem extends VirtualFileSystem implements ApplicationCom
 
     @Override
     public void addVirtualFileListener(@NotNull VirtualFileListener virtualFileListener) {
-
+        fileListeners.add(virtualFileListener);
     }
 
     @Override
     public void removeVirtualFileListener(@NotNull VirtualFileListener virtualFileListener) {
-
+        fileListeners.remove(virtualFileListener);
     }
 
     @Override

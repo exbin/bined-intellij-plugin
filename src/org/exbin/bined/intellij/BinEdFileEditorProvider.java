@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.0 2018/11/10
  */
-public class BinEdWindowProvider implements FileEditorProvider, ApplicationComponent {
+public class BinEdFileEditorProvider implements FileEditorProvider, ApplicationComponent {
 
     public static final String BINED_EDITOR_TYPE_ID = "org.exbin.bined";
 
@@ -53,20 +53,25 @@ public class BinEdWindowProvider implements FileEditorProvider, ApplicationCompo
     @NotNull
     @Override
     public String getComponentName() {
-        return "BinEd.BinEdWindowProvider";
+        return "BinEd.BinEdFileEditorProvider";
     }
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        return file instanceof BinEdVirtualFile;
+        return file instanceof BinEdVirtualFile || BinEdFileType.DEFAULT_EXTENSION.equals(file.getExtension());
     }
 
     @NotNull
     @Override
     public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        BinEdVirtualFile binEdVirtualFile = (BinEdVirtualFile) virtualFile;
         BinEdFileEditor binEdFileEditor = new BinEdFileEditor(project);
-        binEdFileEditor.setDisplayName(binEdVirtualFile.getDisplayName());
+        if (virtualFile instanceof BinEdVirtualFile) {
+            BinEdVirtualFile binEdVirtualFile = (BinEdVirtualFile) virtualFile;
+            binEdFileEditor.setDisplayName(binEdVirtualFile.getDisplayName());
+        } else {
+            binEdFileEditor.setDisplayName(virtualFile.getName());
+        }
+
         return binEdFileEditor;
     }
 

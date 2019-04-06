@@ -281,7 +281,7 @@ public class BinEdFileEditor implements FileEditor {
                         OpenFileDescriptor descriptor = new OpenFileDescriptor(project, virtualFile, 0);
                         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
                         List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
-                        fileEditorManager.setSelectedEditor(virtualFile, BinEdWindowProvider.BINED_EDITOR_TYPE_ID);
+                        fileEditorManager.setSelectedEditor(virtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
                         for (FileEditor fileEditor : editors) {
                             if (fileEditor instanceof BinEdFileEditor) {
                                 ((BinEdFileEditor) fileEditor).reopenFile(virtualFile, codeArea.getContentData(), undoHandler);
