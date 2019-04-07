@@ -16,20 +16,19 @@
  */
 package org.exbin.framework.editor.text.panel;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import org.exbin.framework.Preferences;
+import org.exbin.framework.gui.options.api.OptionsPanel;
+import org.exbin.framework.gui.utils.LanguageUtils;
+
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.AbstractListModel;
+import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.exbin.framework.Preferences;
-import org.exbin.framework.gui.options.api.OptionsPanel;
-import org.exbin.framework.gui.options.api.OptionsPanel.ModifiedOptionListener;
-import org.exbin.framework.gui.options.api.OptionsPanel.PathItem;
-import org.exbin.framework.gui.utils.LanguageUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * Text encoding selection panel.
@@ -298,7 +297,7 @@ public class TextEncodingPanel extends javax.swing.JPanel implements OptionsPane
     @Override
     public List<PathItem> getPath() {
         ArrayList<OptionsPanel.PathItem> path = new ArrayList<>();
-        path.add(new PathItem("apperance", ""));
+        path.add(new PathItem("appearance", ""));
         path.add(new PathItem("encoding", resourceBundle.getString("options.Path.0")));
         return path;
     }

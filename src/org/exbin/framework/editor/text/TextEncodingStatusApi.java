@@ -29,7 +29,7 @@ public interface TextEncodingStatusApi {
      *
      * @return encoding
      */
-    public String getEncoding();
+    String getEncoding();
 
     /**
      * Reports currently active encoding.

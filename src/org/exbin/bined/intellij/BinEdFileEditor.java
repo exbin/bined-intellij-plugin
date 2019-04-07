@@ -52,6 +52,7 @@ import org.exbin.framework.bined.options.EditorOptions;
 import org.exbin.framework.bined.options.StatusOptions;
 import org.exbin.framework.bined.panel.BinaryStatusPanel;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
+import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.gui.about.panel.AboutPanel;
 import org.exbin.framework.gui.utils.WindowUtils;
@@ -145,6 +146,7 @@ public class BinEdFileEditor implements FileEditor {
                 codeArea.setCharset(Charset.forName(encodingName));
                 encodingStatus.setEncoding(encodingName);
                 preferences.getCodeAreaParameters().setSelectedEncoding(encodingName);
+                charsetChangeListener.charsetChanged();
             }
         });
 

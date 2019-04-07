@@ -26,11 +26,11 @@ import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdFileEditor;
 import org.exbin.bined.intellij.DialogUtils;
-import org.exbin.bined.intellij.EncodingsHandler;
 import org.exbin.bined.intellij.GoToPositionAction;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.panel.BinaryStatusPanel;
+import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.utils.binary_data.BinaryData;
 

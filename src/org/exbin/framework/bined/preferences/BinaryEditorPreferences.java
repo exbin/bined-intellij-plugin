@@ -16,22 +16,25 @@
 package org.exbin.framework.bined.preferences;
 
 import com.intellij.ide.util.PropertiesComponent;
-import org.exbin.framework.Preferences;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.intellij.FileHandlingMode;
 import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
+import org.exbin.framework.Preferences;
 import org.exbin.framework.PreferencesWrapper;
 import org.exbin.framework.bined.options.CodeAreaOptions;
+import org.exbin.framework.editor.text.EncodingsHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Hexadecimal editor preferences.
  *
- * @version 0.2.0 2019/03/15
+ * @version 0.2.0 2019/04/07
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -152,6 +155,13 @@ public class BinaryEditorPreferences {
         themeProfile.setDecoration(ExtendedCodeAreaDecorations.BOX_LINES, legacyPreferences.isDecorationBox());
         themeParameters.setThemeProfile(0, themeProfile);
         themeParameters.setThemeProfilesList(themeProfiles);
+
+        Collection<String> legacyEncodings = legacyPreferences.getEncodings();
+        List<String> encodings = new ArrayList<>(legacyEncodings);
+        if (!encodings.isEmpty() && !encodings.contains(EncodingsHandler.ENCODING_UTF8)) {
+            encodings.add(EncodingsHandler.ENCODING_UTF8);
+        }
+        charsetParameters.setEncodings(encodings);
 
         preferences.flush();
     }
