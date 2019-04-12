@@ -16,7 +16,6 @@
 package org.exbin.bined.intellij.panel;
 
 import org.exbin.bined.CodeType;
-import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
@@ -51,13 +50,11 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     public void applyFromCodeArea() {
         codeTypeComboBox.setSelectedIndex(codeArea.getCodeType().ordinal());
         showUnprintablesToggleButton.setSelected(codeArea.isShowUnprintables());
-        rowWrappingToggleButton.setSelected(codeArea.getRowWrapping() == RowWrappingCapable.RowWrappingMode.WRAPPING);
     }
 
     public void loadFromPreferences() {
         codeTypeComboBox.setSelectedIndex(preferences.getCodeAreaParameters().getCodeType().ordinal());
         showUnprintablesToggleButton.setSelected(preferences.getCodeAreaParameters().isShowNonprintables());
-        rowWrappingToggleButton.setSelected(preferences.getCodeAreaParameters().isRowWrapping());
     }
 
     public void updateUndoState() {
@@ -79,7 +76,6 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         saveFileButton = new javax.swing.JButton();
         undoEditButton = new javax.swing.JButton();
         redoEditButton = new javax.swing.JButton();
-        rowWrappingToggleButton = new javax.swing.JToggleButton();
         showUnprintablesToggleButton = new javax.swing.JToggleButton();
         separator1 = new javax.swing.JToolBar.Separator();
         separator2 = new javax.swing.JToolBar.Separator();
@@ -106,15 +102,6 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         redoEditButton.addActionListener(this::redoEditButtonActionPerformed);
         controlToolBar.add(redoEditButton);
         controlToolBar.add(separator2);
-
-        rowWrappingToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/bined-linewrap.png"))); // NOI18N
-        rowWrappingToggleButton.setToolTipText(resourceBundle.getString("rowWrappingToggleButton.toolTipText")); // NOI18N
-        rowWrappingToggleButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rowWrappingToggleButtonActionPerformed(evt);
-            }
-        });
-        controlToolBar.add(rowWrappingToggleButton);
 
         showUnprintablesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png"))); // NOI18N
         showUnprintablesToggleButton.setToolTipText(resourceBundle.getString("showUnprintablesToggleButton.toolTipText")); // NOI18N
@@ -153,14 +140,8 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void rowWrappingToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rowWrappingToggleButtonActionPerformed
-        codeArea.setRowWrapping(rowWrappingToggleButton.isSelected() ? RowWrappingCapable.RowWrappingMode.WRAPPING : RowWrappingCapable.RowWrappingMode.NO_WRAPPING);
-        preferences.getCodeAreaParameters().setRowWrapping(rowWrappingToggleButton.isSelected());
-    }//GEN-LAST:event_rowWrappingToggleButtonActionPerformed
-
     private void showUnprintablesToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showUnprintablesToggleButtonActionPerformed
         codeArea.setShowUnprintables(showUnprintablesToggleButton.isSelected());
-        preferences.getCodeAreaParameters().setShowUnprintables(rowWrappingToggleButton.isSelected());
     }//GEN-LAST:event_showUnprintablesToggleButtonActionPerformed
 
     private void codeTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_codeTypeComboBoxActionPerformed
@@ -172,7 +153,6 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> codeTypeComboBox;
     private javax.swing.JToolBar controlToolBar;
-    private javax.swing.JToggleButton rowWrappingToggleButton;
     private javax.swing.JToolBar.Separator separator1;
     private javax.swing.JToolBar.Separator separator2;
     private javax.swing.JToggleButton showUnprintablesToggleButton;

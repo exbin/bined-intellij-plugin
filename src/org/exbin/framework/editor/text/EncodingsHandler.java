@@ -184,13 +184,13 @@ public class EncodingsHandler implements TextEncodingPanelApi {
 
         if (encodings.isEmpty()) {
             toolsEncodingMenu.add(utfEncodingRadioButtonMenuItem, 0);
-            setSelectedEncoding(ENCODING_UTF8);
+            selectedEncoding = ENCODING_UTF8;
             utfEncodingRadioButtonMenuItem.setSelected(true);
         } else {
-            int selectedEncoding = encodings.indexOf(getSelectedEncoding());
+            int selectedEncodingIndex = encodings.indexOf(getSelectedEncoding());
             for (int index = 0; index < encodings.size(); index++) {
                 String encoding = encodings.get(index);
-                JRadioButtonMenuItem item = new JRadioButtonMenuItem(encoding, index == selectedEncoding);
+                JRadioButtonMenuItem item = new JRadioButtonMenuItem(encoding, index == selectedEncodingIndex);
                 item.addActionListener(encodingActionListener);
                 item.setToolTipText(ENCODING_TOOLTIP_PREFIX + encoding);
                 toolsEncodingMenu.add(item, index);
@@ -209,7 +209,7 @@ public class EncodingsHandler implements TextEncodingPanelApi {
 
     public void loadFromPreferences(BinaryEditorPreferences preferences) {
         this.preferences = preferences;
-        setSelectedEncoding(preferences.getCodeAreaParameters().getSelectedEncoding());
+        selectedEncoding = preferences.getCodeAreaParameters().getSelectedEncoding();
         encodings.clear();
         encodings.addAll(preferences.getCodeAreaParameters().getEncodings());
         rebuildEncodings();
@@ -218,12 +218,12 @@ public class EncodingsHandler implements TextEncodingPanelApi {
     public void cycleEncodings() {
         int menuIndex = 0;
         if (!encodings.isEmpty()) {
-            int selectedEncoding = encodings.indexOf(getSelectedEncoding());
-            if (selectedEncoding < 0 || selectedEncoding == encodings.size() - 1) {
+            int selectedEncodingIndex = encodings.indexOf(getSelectedEncoding());
+            if (selectedEncodingIndex < 0 || selectedEncodingIndex == encodings.size() - 1) {
                 setSelectedEncoding(encodings.get(0));
             } else {
-                setSelectedEncoding(encodings.get(selectedEncoding + 1));
-                menuIndex = selectedEncoding;
+                setSelectedEncoding(encodings.get(selectedEncodingIndex + 1));
+                menuIndex = selectedEncodingIndex;
             }
         }
 
@@ -239,10 +239,10 @@ public class EncodingsHandler implements TextEncodingPanelApi {
             utfEncoding.addActionListener(utfEncodingActionListener);
             popupMenu.add(utfEncoding);
         } else {
-            int selectedEncoding = encodings.indexOf(getSelectedEncoding());
+            int selectedEncodingIndex = encodings.indexOf(getSelectedEncoding());
             for (int index = 0; index < encodings.size(); index++) {
                 String encoding = encodings.get(index);
-                JRadioButtonMenuItem item = new JRadioButtonMenuItem(encoding, index == selectedEncoding);
+                JRadioButtonMenuItem item = new JRadioButtonMenuItem(encoding, index == selectedEncodingIndex);
                 item.addActionListener(encodingActionListener);
                 item.setToolTipText(ENCODING_TOOLTIP_PREFIX + encoding);
                 popupMenu.add(item, index);
