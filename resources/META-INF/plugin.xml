@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://bined.exbin.org/intellij-plugin">
-    <id>org.exbin.bined.intellij</id>
+    <id>org.exbin.deltahex.intellij</id>
     <name>BinEd - Binary/Hexadecimal Editor</name>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
     <vendor email="hajdam@users.sf.net" url="https://exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
@@ -32,8 +32,8 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
 <li>Updated to newer version of library</li>
 <li>Support for half-size space</li>
 <li>Support for layout, theme and colors profiles</li>
-<li>Added support for different numerical types in status bar</li>
-<li>Context aware popup menu</li>
+<li>Added support for different numerical bases in status bar</li>
+<li>Configurable address margin</li>
 <li>Fixed issue with copy as code for debug view</li>
 </ul>
     ]]>

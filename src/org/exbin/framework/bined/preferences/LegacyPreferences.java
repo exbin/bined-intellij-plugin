@@ -15,23 +15,21 @@
  */
 package org.exbin.framework.bined.preferences;
 
-import org.exbin.framework.Preferences;
-import java.awt.Font;
-import java.awt.font.TextAttribute;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaViewMode;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.PositionCodeType;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
+import org.exbin.framework.Preferences;
 import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.awt.*;
+import java.awt.font.TextAttribute;
+import java.util.*;
+import java.util.List;
 
 /**
  * Legacy parameters for version 0.1.
@@ -324,7 +322,7 @@ public class LegacyPreferences {
     }
 
     public int getSpaceGroupSize() {
-        return preferences.getInt(PREFERENCES_BYTE_GROUP_SIZE, 1);
+        return preferences.getInt(PREFERENCES_SPACE_GROUP_SIZE, 0);
     }
 
     public void setSpaceGroupSize(int spaceGroupSize) {

@@ -51,7 +51,7 @@ public class PreferencesWrapper implements Preferences {
     @Override
     public String get(String key, @Nullable String def) {
         String value = preferences.getValue(prefix + key, def == null ? "" : def);
-        return "".equals(value) ? null : value;
+        return "".equals(value) && def == null ? null : value;
     }
 
     @Override

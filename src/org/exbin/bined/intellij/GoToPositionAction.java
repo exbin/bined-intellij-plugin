@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij;
 
+import org.exbin.bined.basic.PositionScrollVisibility;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.panel.GoToBinaryPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
@@ -34,7 +35,7 @@ import java.util.ResourceBundle;
 /**
  * Go to handler.
  *
- * @version 0.2.0 2019/03/22
+ * @version 0.2.0 2019/04/13
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -61,6 +62,10 @@ public class GoToPositionAction implements ActionListener {
             if (actionType == DefaultControlHandler.ControlActionType.OK) {
                 goToPanel.acceptInput();
                 codeArea.setCaretPosition(goToPanel.getGoToPosition());
+                PositionScrollVisibility visibility = codeArea.getPainter().computePositionScrollVisibility(codeArea.getCaretPosition());
+                if (visibility != PositionScrollVisibility.VISIBLE) {
+                    codeArea.centerOnCursor();
+                }
             }
 
             dialog.close();

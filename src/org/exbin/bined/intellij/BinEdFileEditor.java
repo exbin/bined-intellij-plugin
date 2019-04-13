@@ -175,7 +175,7 @@ public class BinEdFileEditor implements FileEditor {
         setNewData();
         CodeAreaOperationCommandHandler commandHandler = new CodeAreaOperationCommandHandler(codeArea, undoHandler);
         codeArea.setCommandHandler(commandHandler);
-        editorPanel.add(codeArea, BorderLayout.CENTER);
+        codeAreaPanel.add(codeArea, BorderLayout.CENTER);
         editorPanel.add(statusPanel, BorderLayout.SOUTH);
         registerBinaryStatus(statusPanel);
         goToRowAction = new GoToPositionAction(codeArea);
@@ -860,6 +860,7 @@ public class BinEdFileEditor implements FileEditor {
                 }
                 if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
                     setApplyOptions(optionsPanel.getApplyOptions());
+                    encodingsHandler.setEncodings(optionsPanel.getApplyOptions().getCharsetOptions().getEncodings());
                     codeArea.repaint();
                 }
 

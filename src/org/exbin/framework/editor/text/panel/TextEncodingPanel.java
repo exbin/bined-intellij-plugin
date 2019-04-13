@@ -17,6 +17,7 @@
 package org.exbin.framework.editor.text.panel;
 
 import org.exbin.framework.Preferences;
+import org.exbin.framework.bined.options.CharsetOptions;
 import org.exbin.framework.gui.options.api.OptionsPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
 
@@ -330,6 +331,14 @@ public class TextEncodingPanel extends javax.swing.JPanel implements OptionsPane
             String value = encodings.get(i);
             preferences.put(PREFERENCES_TEXT_ENCODING_PREFIX + Integer.toString(i), value);
         }
+    }
+
+    public void loadFromOptions(CharsetOptions charsetOptions) {
+        setEncodingList(charsetOptions.getEncodings());
+    }
+
+    public void saveToOptions(CharsetOptions charsetOptions) {
+        charsetOptions.setEncodings(getEncodingList());
     }
 
     @Override

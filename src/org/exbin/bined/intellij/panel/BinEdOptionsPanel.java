@@ -169,10 +169,12 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         editorOptions.loadFromParameters(preferences.getEditorParameters());
         statusOptions.loadFromParameters(preferences.getStatusParameters());
         codeAreaOptions.loadFromParameters(preferences.getCodeAreaParameters());
+        charsetOptions.loadFromParameters(preferences.getCharsetParameters());
 
         editorParametersPanel.loadFromOptions(editorOptions);
         statusParametersPanel.loadFromOptions(statusOptions);
         codeAreaParametersPanel.loadFromOptions(codeAreaOptions);
+        charsetParametersPanel.loadFromOptions(charsetOptions);
 
         charsetOptions.loadFromParameters(preferences.getCharsetParameters());
         layoutProfilesPanel.loadFromParameters(preferences.getLayoutParameters());
@@ -181,17 +183,18 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         colorSelectionPanel.setDefaultProfile(preferences.getColorParameters().getSelectedProfile());
         themeProfilesPanel.loadFromParameters(preferences.getThemeParameters());
         themeSelectionPanel.setDefaultProfile(preferences.getThemeParameters().getSelectedProfile());
-        charsetParametersPanel.loadFromPreferences(preferences.getPreferences());
     }
 
     public void store() {
         editorParametersPanel.saveToOptions(editorOptions);
         statusParametersPanel.saveToOptions(statusOptions);
         codeAreaParametersPanel.saveToOptions(codeAreaOptions);
+        charsetParametersPanel.saveToOptions(charsetOptions);
 
         editorOptions.saveToParameters(preferences.getEditorParameters());
         statusOptions.saveToParameters(preferences.getStatusParameters());
         codeAreaOptions.saveToParameters(preferences.getCodeAreaParameters());
+        charsetOptions.saveToParameters(preferences.getCharsetParameters());
 
         layoutProfilesPanel.saveToParameters(preferences.getLayoutParameters());
         preferences.getLayoutParameters().setSelectedProfile(layoutSelectionPanel.getDefaultProfile());
@@ -199,7 +202,6 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         preferences.getColorParameters().setSelectedProfile(colorSelectionPanel.getDefaultProfile());
         themeProfilesPanel.saveToParameters(preferences.getThemeParameters());
         preferences.getThemeParameters().setSelectedProfile(themeSelectionPanel.getDefaultProfile());
-        charsetParametersPanel.saveToPreferences(preferences.getPreferences());
     }
 
     public void setApplyOptions(BinEdApplyOptions applyOptions) {

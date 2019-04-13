@@ -15,8 +15,18 @@
  */
 package org.exbin.framework.bined.preferences;
 
+import org.exbin.bined.CodeAreaViewMode;
+import org.exbin.bined.CodeCharactersCase;
+import org.exbin.bined.CodeType;
+import org.exbin.bined.PositionCodeType;
+import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.framework.Preferences;
-import java.awt.Font;
+import org.exbin.framework.editor.text.EncodingsHandler;
+import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,15 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.bined.CodeAreaViewMode;
-import org.exbin.bined.CodeCharactersCase;
-import org.exbin.bined.CodeType;
-import org.exbin.bined.PositionCodeType;
-import org.exbin.bined.capability.RowWrappingCapable;
-import org.exbin.framework.editor.text.EncodingsHandler;
-import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
 
 /**
  * Code area preferences.
@@ -44,7 +45,6 @@ import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
 public class CodeAreaParameters {
 
     public static final String PREFERENCES_CODE_TYPE = "codeType";
-    public static final String PREFERENCES_LINE_WRAPPING = "lineWrapping";
     public static final String PREFERENCES_SHOW_UNPRINTABLES = "showNonpritables";
     public static final String PREFERENCES_ENCODING_SELECTED = "selectedEncoding";
     public static final String PREFERENCES_ENCODING_PREFIX = "textEncoding.";
@@ -165,14 +165,6 @@ public class CodeAreaParameters {
             preferences.remove(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUBSCRIPT);
             preferences.remove(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUPERSCRIPT);
         }
-    }
-
-    public boolean isRowWrapping() {
-        return preferences.getBoolean(PREFERENCES_LINE_WRAPPING, false);
-    }
-
-    public void setRowWrapping(boolean rowWrapping) {
-        preferences.putBoolean(PREFERENCES_LINE_WRAPPING, rowWrapping);
     }
 
     @Nonnull
