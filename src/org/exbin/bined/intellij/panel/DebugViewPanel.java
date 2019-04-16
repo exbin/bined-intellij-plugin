@@ -18,6 +18,7 @@ package org.exbin.bined.intellij.panel;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBScrollPane;
+import org.exbin.bined.BasicCodeAreaZone;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.EditationOperation;
@@ -38,7 +39,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.charset.Charset;
 
@@ -115,22 +115,11 @@ public class DebugViewPanel extends JPanel {
 
         metaMask = metaMaskValue;
 
-        codeArea.addMouseListener(new MouseAdapter() {
+        codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                maybeShowPopup(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                maybeShowPopup(e);
-            }
-
-            private void maybeShowPopup(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    JPopupMenu popupMenu = createContextMenu();
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
+            public void show(Component invoker, int x, int y) {
+                JPopupMenu popupMenu = createContextMenu(x, y);
+                popupMenu.show(invoker, x, y);
             }
         });
 
@@ -215,8 +204,10 @@ public class DebugViewPanel extends JPanel {
         headerPanel.add(infoToolbar, java.awt.BorderLayout.CENTER);
     }
 
-    private JPopupMenu createContextMenu() {
+    private JPopupMenu createContextMenu(int x, int y) {
         final JPopupMenu result = new JPopupMenu();
+
+        BasicCodeAreaZone positionZone = codeArea.getPositionZone(x, y);
 
         final JMenuItem copyMenuItem = new JMenuItem("Copy");
         copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, metaMask));
