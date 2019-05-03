@@ -330,6 +330,33 @@ public class BinEdFileEditor implements FileEditor {
             public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
             }
         });
+
+//        FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+//        connect.subscribe(FileDocumentManagerListener.EP_NAME, new FileDocumentManagerAdapter() {
+//            @Override
+//            public void beforeDocumentSaving(@NotNull Document document) {
+//                if (virtualFile != null) {
+//                    if (!releaseFile()) {
+//                        // TODO Intercept close event instead of editor recreation
+//                        OpenFileDescriptor descriptor = new OpenFileDescriptor(project, virtualFile, 0);
+//                        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+//                        List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
+//                        fileEditorManager.setSelectedEditor(virtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
+//                        for (FileEditor fileEditor : editors) {
+//                            if (fileEditor instanceof BinEdFileEditor) {
+//                                ((BinEdFileEditor) fileEditor).reopenFile(virtualFile, codeArea.getContentData(), undoHandler);
+//                            }
+//                        }
+//                        closeData(false);
+//                    } else {
+//                        closeData(true);
+//                    }
+//                }
+//
+//                virtualFile = null;
+//            }
+//        });
+
         editorPanel.invalidate();
     }
 

@@ -18,7 +18,7 @@ package org.exbin.bined.intellij;
 /**
  * File handling mode.
  *
- * @version 0.2.0 2019/03/01
+ * @version 0.2.1 2019/05/03
  * @author ExBin Project (http://exbin.org)
  */
 public enum FileHandlingMode {
@@ -29,5 +29,9 @@ public enum FileHandlingMode {
     /**
      * File is handled using delta changes.
      */
-    DELTA;
+    DELTA,
+    /**
+     * IntelliJ native file wrapper.
+     */
+    NATIVE
 }
