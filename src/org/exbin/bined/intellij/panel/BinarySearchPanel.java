@@ -115,15 +115,22 @@ public class BinarySearchPanel extends javax.swing.JPanel {
         findComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
             private JPanel panel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
+            private Component previous = null;
 
             @Override
             public Component getListCellRendererComponent(JList<? extends SearchCondition> list, SearchCondition value, int index, boolean isSelected, boolean cellHasFocus) {
+                if (previous != null) {
+                    panel.remove(previous);
+                } else {
+                    panel.setLayout(new BorderLayout());
+                }
+
                 if (value == null) {
                     return panel;
                 }
 
                 if (value.getSearchMode() == SearchCondition.SearchMode.TEXT) {
-                    return listCellRenderer.getListCellRendererComponent(list, value.getSearchText(), index, isSelected, cellHasFocus);
+                    previous = listCellRenderer.getListCellRendererComponent(list, value.getSearchText(), index, isSelected, cellHasFocus);
                 } else {
                     hexadecimalRenderer.setContentData(value.getBinaryData());
                     hexadecimalRenderer.setPreferredSize(new Dimension(200, 20));
@@ -136,8 +143,10 @@ public class BinarySearchPanel extends javax.swing.JPanel {
 // TODO                    ColorsGroup mainColors = hexadecimalRenderer.getMainColors();
 // TODO                   mainColors.setBothBackgroundColors(backgroundColor);
 // TODO                   hexadecimalRenderer.setMainColors(mainColors);
-                    return hexadecimalRenderer;
+                    previous = hexadecimalRenderer;
                 }
+                panel.add(previous, BorderLayout.CENTER);
+                return panel;
             }
         });
         findComboBoxEditor = new ComboBoxEditor() {
@@ -200,15 +209,22 @@ public class BinarySearchPanel extends javax.swing.JPanel {
         replaceComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
             private JPanel panel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
+            private Component previous = null;
 
             @Override
             public Component getListCellRendererComponent(JList<? extends SearchCondition> list, SearchCondition value, int index, boolean isSelected, boolean cellHasFocus) {
+                if (previous != null) {
+                    panel.remove(previous);
+                } else {
+                    panel.setLayout(new BorderLayout());
+                }
+
                 if (value == null) {
                     return panel;
                 }
 
                 if (value.getSearchMode() == SearchCondition.SearchMode.TEXT) {
-                    return listCellRenderer.getListCellRendererComponent(list, value.getSearchText(), index, isSelected, cellHasFocus);
+                    previous = listCellRenderer.getListCellRendererComponent(list, value.getSearchText(), index, isSelected, cellHasFocus);
                 } else {
                     hexadecimalRenderer.setContentData(value.getBinaryData());
                     hexadecimalRenderer.setPreferredSize(new Dimension(200, 20));
@@ -221,8 +237,10 @@ public class BinarySearchPanel extends javax.swing.JPanel {
 // TODO                    ColorsGroup mainColors = hexadecimalRenderer.getMainColors();
 // TODO                   mainColors.setBothBackgroundColors(backgroundColor);
 // TODO                   hexadecimalRenderer.setMainColors(mainColors);
-                    return hexadecimalRenderer;
+                    previous = hexadecimalRenderer;
                 }
+                panel.add(previous, BorderLayout.CENTER);
+                return panel;
             }
         });
         replaceComboBoxEditor = new ComboBoxEditor() {
