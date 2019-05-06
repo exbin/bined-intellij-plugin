@@ -22,15 +22,15 @@ import org.exbin.bined.BasicCodeAreaZone;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.EditationOperation;
-import org.exbin.bined.capability.RowWrappingCapable;
-import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
-import org.exbin.bined.intellij.BinEdFileEditor;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.GoToPositionAction;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.PreferencesWrapper;
 import org.exbin.framework.bined.BinaryStatusApi;
+import org.exbin.framework.bined.options.CodeAreaOptions;
 import org.exbin.framework.bined.panel.BinaryStatusPanel;
+import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.utils.binary_data.BinaryData;
@@ -50,7 +50,7 @@ import java.nio.charset.Charset;
  */
 public class DebugViewPanel extends JPanel {
 
-    private PropertiesComponent preferences;
+    private BinaryEditorPreferences preferences;
     private JPanel headerPanel;
     private ExtCodeArea codeArea;
     private ValuesPanel valuesPanel = null;
@@ -69,7 +69,7 @@ public class DebugViewPanel extends JPanel {
 
     public DebugViewPanel() {
         setLayout(new BorderLayout());
-        preferences = BinEdFileEditor.getPreferences();
+        preferences = new BinaryEditorPreferences(new PreferencesWrapper(getPreferences(), BinaryEditorPreferences.PLUGIN_PREFIX));
 
         initComponents();
         codeArea = new ExtCodeArea();
@@ -98,7 +98,7 @@ public class DebugViewPanel extends JPanel {
         add(headerPanel, java.awt.BorderLayout.NORTH);
         add(statusPanel, java.awt.BorderLayout.SOUTH);
 
-        registerHexStatus(statusPanel);
+        registerBinaryStatus(statusPanel);
 
         loadFromPreferences();
 
@@ -151,16 +151,11 @@ public class DebugViewPanel extends JPanel {
     private javax.swing.JToolBar controlToolBar;
     private javax.swing.JPanel infoToolbar;
     private javax.swing.JToolBar.Separator jSeparator3;
-    private javax.swing.JButton saveFileButton;
-    private javax.swing.JButton undoEditButton;
-    private javax.swing.JButton redoEditButton;
-    private javax.swing.JToggleButton lineWrappingToggleButton;
     private javax.swing.JToggleButton showUnprintablesToggleButton;
 
     private void initComponents() {
         infoToolbar = new javax.swing.JPanel();
         controlToolBar = new javax.swing.JToolBar();
-        lineWrappingToggleButton = new javax.swing.JToggleButton();
         showUnprintablesToggleButton = new javax.swing.JToggleButton();
         jSeparator3 = new javax.swing.JToolBar.Separator();
         codeTypeComboBox = new ComboBox<>();
@@ -168,11 +163,6 @@ public class DebugViewPanel extends JPanel {
         controlToolBar.setBorder(null);
         controlToolBar.setFloatable(false);
         controlToolBar.setRollover(true);
-
-        lineWrappingToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/bined-linewrap.png")));
-        lineWrappingToggleButton.setToolTipText("Wrap line to window size");
-        lineWrappingToggleButton.addActionListener(this::lineWrappingToggleButtonActionPerformed);
-        controlToolBar.add(lineWrappingToggleButton);
 
         showUnprintablesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png")));
         showUnprintablesToggleButton.setToolTipText("Show symbols for unprintable/whitespace characters");
@@ -245,10 +235,6 @@ public class DebugViewPanel extends JPanel {
         return result;
     }
 
-    private void lineWrappingToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        codeArea.setRowWrapping(lineWrappingToggleButton.isSelected() ? RowWrappingCapable.RowWrappingMode.WRAPPING : RowWrappingCapable.RowWrappingMode.NO_WRAPPING);
-    }
-
     private void showUnprintablesToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {
         codeArea.setShowUnprintables(showUnprintablesToggleButton.isSelected());
     }
@@ -273,10 +259,9 @@ public class DebugViewPanel extends JPanel {
     private void applyFromCodeArea() {
         codeTypeComboBox.setSelectedIndex(codeArea.getCodeType().ordinal());
         showUnprintablesToggleButton.setSelected(codeArea.isShowUnprintables());
-        lineWrappingToggleButton.setSelected(codeArea.getRowWrapping() == RowWrappingCapable.RowWrappingMode.WRAPPING);
     }
 
-    public void registerHexStatus(BinaryStatusApi binaryStatusApi) {
+    public void registerBinaryStatus(BinaryStatusApi binaryStatusApi) {
         this.binaryStatus = binaryStatusApi;
         codeArea.addCaretMovedListener(caretPosition -> {
             binaryStatus.setCursorPosition(caretPosition);
@@ -314,96 +299,42 @@ public class DebugViewPanel extends JPanel {
     }
 
     private void loadFromPreferences() {
-//        CodeType codeType = CodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_CODE_TYPE, "HEXADECIMAL"));
-//        codeArea.setCodeType(codeType);
-//        codeTypeComboBox.setSelectedIndex(codeType.ordinal());
-//        String selectedEncoding = preferences.getValue(BinEdFileEditor.PREFERENCES_ENCODING_SELECTED, "UTF-8");
-//        statusPanel.setEncoding(selectedEncoding);
-//        codeArea.setCharset(Charset.forName(selectedEncoding));
-//        int bytesPerLine = preferences.getInt(BinEdFileEditor.PREFERENCES_BYTES_PER_LINE, 16);
-//        // TODO codeArea.setLineLength(bytesPerLine);
-//
-//        boolean showNonprintables = preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_UNPRINTABLES, false);
-//        showUnprintablesToggleButton.setSelected(showNonprintables);
-//        codeArea.setShowUnprintables(showNonprintables);
-//
-//        boolean lineWrapping = preferences.getBoolean(BinEdFileEditor.PREFERENCES_LINE_WRAPPING, false);
-//        codeArea.setRowWrapping(lineWrapping ? RowWrappingMode.WRAPPING : RowWrappingMode.NO_WRAPPING);
-//        lineWrappingToggleButton.setSelected(lineWrapping);
-//
-//        encodingsHandler.loadFromPreferences(preferences);
-//
-//        // Layout
-//        ExtendedCodeAreaLayoutProfile layoutProfile = codeArea.getLayoutProfile();
-//        layoutProfile.setShowHeader(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_HEADER, true));
-//        /* TODO String headerSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_HEADER_SPACE_TYPE, CodeAreaSpace.SpaceType.HALF_UNIT.name());
-//        codeArea.setHeaderSpaceType(CodeAreaSpace.SpaceType.valueOf(headerSpaceTypeName));
-//        codeArea.setHeaderSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_HEADER_SPACE, 0)); */
-//        layoutProfile.setShowRowPosition(preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_LINE_NUMBERS, true));
-//        codeArea.setLayoutProfile(layoutProfile);
-//        /* TODO String lineNumbersSpaceTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE_TYPE, CodeAreaSpace.SpaceType.ONE_UNIT.name());
-//        codeArea.setLineNumberSpaceType(CodeAreaSpace.SpaceType.valueOf(lineNumbersSpaceTypeName));
-//        codeArea.setLineNumberSpaceSize(preferences.getInt(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_SPACE, 8));
-//        String lineNumbersLengthTypeName = preferences.getValue(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_LENGTH_TYPE, CodeAreaLineNumberLength.LineNumberType.SPECIFIED.name());
-//        codeArea.setLineNumberType(CodeAreaLineNumberLength.LineNumberType.valueOf(lineNumbersLengthTypeName));
-//        codeArea.setLineNumberSpecifiedLength(preferences.getInt(BinEdFileEditor.PREFERENCES_LINE_NUMBERS_LENGTH, 8));
-//        codeArea.setByteGroupSize(preferences.getInt(BinEdFileEditor.PREFERENCES_BYTE_GROUP_SIZE, 1));
-//        codeArea.setSpaceGroupSize(preferences.getInt(BinEdFileEditor.PREFERENCES_SPACE_GROUP_SIZE, 0)); */
-//
-//        // Mode
-//        codeArea.setViewMode(CodeAreaViewMode.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_VIEW_MODE, CodeAreaViewMode.DUAL.name())));
-//        codeArea.setCodeType(CodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_CODE_TYPE, CodeType.HEXADECIMAL.name())));
-//        ((ExtendedHighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).setNonAsciiHighlightingEnabled(preferences.getBoolean(BinEdFileEditor.PREFERENCES_CODE_COLORIZATION, true));
-//        // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
-//
-//        // Decoration
-//        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
-//        themeProfile.setBackgroundPaintMode(convertBackgroundPaintMode(preferences.getValue(BinEdFileEditor.PREFERENCES_BACKGROUND_MODE, ExtendedBackgroundPaintMode.STRIPED.name())));
-//        themeProfile.setPaintRowPosBackground(preferences.getBoolean(BinEdFileEditor.PREFERENCES_PAINT_LINE_NUMBERS_BACKGROUND, true));
-//        codeArea.setThemeProfile(themeProfile);
-//        /*int decorationMode = (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_HEADER_LINE, true) ? CodeArea.DECORATION_HEADER_LINE : 0)
-//                + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_PREVIEW_LINE, true) ? CodeArea.DECORATION_PREVIEW_LINE : 0)
-//                + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_BOX, false) ? CodeArea.DECORATION_BOX : 0)
-//                + (preferences.getBoolean(BinEdFileEditor.PREFERENCES_DECORATION_LINENUM_LINE, true) ? CodeArea.DECORATION_LINENUM_LINE : 0);
-//        codeArea.setDecorationMode(decorationMode); */
-//        codeArea.setCodeCharactersCase(CodeCharactersCase.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_HEX_CHARACTERS_CASE, CodeCharactersCase.UPPER.name())));
-//        codeArea.setPositionCodeType(PositionCodeType.valueOf(preferences.getValue(BinEdFileEditor.PREFERENCES_POSITION_CODE_TYPE, PositionCodeType.HEXADECIMAL.name())));
-//
-//        // Font
-//        Boolean useDefaultColor = Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(true)));
-//
-//        if (!useDefaultColor) {
-//            String value;
-//            Map<TextAttribute, Object> attribs = new HashMap<>();
-//            value = preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_FAMILY, "MONOSPACED");
-//            attribs.put(TextAttribute.FAMILY, value);
-//            value = preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SIZE, "12");
-//            attribs.put(TextAttribute.SIZE, new Integer(value).floatValue());
-//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_UNDERLINE, "FALSE"))) {
-//                attribs.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
-//            }
-//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRIKETHROUGH, "FALSE"))) {
-//                attribs.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
-//            }
-//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRONG, "FALSE"))) {
-//                attribs.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
-//            }
-//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_ITALIC, "FALSE"))) {
-//                attribs.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
-//            }
-//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUBSCRIPT, "FALSE"))) {
-//                attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUB);
-//            }
-//            if (Boolean.valueOf(preferences.getValue(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUPERSCRIPT, "FALSE"))) {
-//                attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
-//            }
-//            Font derivedFont = codeArea.getCodeFont().deriveFont(attribs);
-//            codeArea.setCodeFont(derivedFont);
-//        }
-//        boolean showValuesPanel = preferences.getBoolean(BinEdFileEditor.PREFERENCES_SHOW_VALUES_PANEL, true);
-//        if (showValuesPanel) {
-//            showValuesPanel();
-//        }
+        CodeAreaOptions codeAreaOptions = new CodeAreaOptions();
+        codeAreaOptions.loadFromParameters(preferences.getCodeAreaParameters());
+        codeAreaOptions.applyToCodeArea(codeArea);
+        String selectedEncoding = preferences.getCodeAreaParameters().getSelectedEncoding();
+        statusPanel.setEncoding(selectedEncoding);
+        statusPanel.loadFromPreferences(preferences.getStatusParameters());
+        toolbarPanelLoadFromPreferences();
+
+        codeArea.setCharset(Charset.forName(selectedEncoding));
+        encodingsHandler.loadFromPreferences(preferences);
+
+        int selectedLayoutProfile = preferences.getLayoutParameters().getSelectedProfile();
+        if (selectedLayoutProfile >= 0) {
+            codeArea.setLayoutProfile(preferences.getLayoutParameters().getLayoutProfile(selectedLayoutProfile));
+        }
+
+        int selectedThemeProfile = preferences.getThemeParameters().getSelectedProfile();
+        if (selectedThemeProfile >= 0) {
+            codeArea.setThemeProfile(preferences.getThemeParameters().getThemeProfile(selectedThemeProfile));
+        }
+
+        int selectedColorProfile = preferences.getColorParameters().getSelectedProfile();
+        if (selectedColorProfile >= 0) {
+            codeArea.setColorsProfile(preferences.getColorParameters().getColorsProfile(selectedColorProfile));
+        }
+
+        // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
+        boolean showValuesPanel = preferences.getEditorParameters().isShowValuesPanel();
+        if (showValuesPanel) {
+            showValuesPanel();
+        }
+    }
+
+    private void toolbarPanelLoadFromPreferences() {
+        codeTypeComboBox.setSelectedIndex(preferences.getCodeAreaParameters().getCodeType().ordinal());
+        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaParameters().isShowNonprintables());
     }
 
     public void showValuesPanel() {
@@ -432,10 +363,8 @@ public class DebugViewPanel extends JPanel {
         }
     }
 
-    private static ExtendedBackgroundPaintMode convertBackgroundPaintMode(String value) {
-        if ("STRIPPED".equals(value))
-            return ExtendedBackgroundPaintMode.STRIPED;
-        return ExtendedBackgroundPaintMode.valueOf(value);
+    public static PropertiesComponent getPreferences() {
+        return PropertiesComponent.getInstance();
     }
 
     public interface CharsetChangeListener {
