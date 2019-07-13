@@ -60,23 +60,25 @@ import java.util.concurrent.ExecutionException;
 public class DebugViewBinaryAction extends XFetchValueActionBase {
 
     private static final boolean javaValueClassAvailable;
+
     static {
         boolean available = false;
-        try  {
+        try {
             Class.forName("com.intellij.debugger.engine.JavaValue");
             available = true;
-        }  catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
         }
         javaValueClassAvailable = available;
     }
 
     private static final boolean pythonValueClassAvailable;
+
     static {
         boolean available = false;
-        try  {
+        try {
             Class.forName("com.jetbrains.python.debugger.PyDebugValue");
             available = true;
-        }  catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
         }
         pythonValueClassAvailable = available;
     }
@@ -139,13 +141,13 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
     private static boolean isBasicType(ValueDescriptorImpl descriptor) {
         final String type = descriptor.getDeclaredType();
         return CommonClassNames.JAVA_LANG_BYTE.equals(type)
-        || CommonClassNames.JAVA_LANG_SHORT.equals(type)
-        || CommonClassNames.JAVA_LANG_SHORT.equals(type)
-        || CommonClassNames.JAVA_LANG_INTEGER.equals(type)
-        || CommonClassNames.JAVA_LANG_LONG.equals(type)
-        || CommonClassNames.JAVA_LANG_FLOAT.equals(type)
-        || CommonClassNames.JAVA_LANG_DOUBLE.equals(type)
-        || CommonClassNames.JAVA_LANG_CHARACTER.equals(type);
+                || CommonClassNames.JAVA_LANG_SHORT.equals(type)
+                || CommonClassNames.JAVA_LANG_SHORT.equals(type)
+                || CommonClassNames.JAVA_LANG_INTEGER.equals(type)
+                || CommonClassNames.JAVA_LANG_LONG.equals(type)
+                || CommonClassNames.JAVA_LANG_FLOAT.equals(type)
+                || CommonClassNames.JAVA_LANG_DOUBLE.equals(type)
+                || CommonClassNames.JAVA_LANG_CHARACTER.equals(type);
     }
 
     private static class DataDialog extends DialogWrapper {
@@ -276,12 +278,18 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
         }
 
         private BinaryData processSimpleValue(ValueDescriptorImpl descriptor) {
-            final String type = descriptor.getDeclaredType();
-            if (type == null)
-                return null;
+            String typeString = descriptor.getDeclaredType();
+            if (typeString == null) {
+                Type type = descriptor.getType();
+                if (type == null)
+                    return null;
 
-            switch (type) {
+                typeString = type.signature();
+            }
+
+            switch (typeString) {
                 case CommonClassNames.JAVA_LANG_BYTE:
+                case "B":
                 case "byte": {
                     ByteValue value = (ByteValue) getPrimitiveValue(descriptor);
                     byte[] byteArray = new byte[1];
@@ -289,6 +297,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
                     return new ByteArrayData(byteArray);
                 }
                 case CommonClassNames.JAVA_LANG_SHORT:
+                case "S":
                 case "short": {
                     ShortValue valueRecord = (ShortValue) getPrimitiveValue(descriptor);
                     byte[] byteArray = new byte[2];
@@ -298,6 +307,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
                     return new ByteArrayData(byteArray);
                 }
                 case CommonClassNames.JAVA_LANG_INTEGER:
+                case "I":
                 case "int": {
                     IntegerValue valueRecord = (IntegerValue) getPrimitiveValue(descriptor);
                     byte[] byteArray = new byte[4];
@@ -309,6 +319,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
                     return new ByteArrayData(byteArray);
                 }
                 case CommonClassNames.JAVA_LANG_LONG:
+                case "J":
                 case "long": {
                     LongValue valueRecord = (LongValue) getPrimitiveValue(descriptor);
                     byte[] byteArray = new byte[8];
@@ -322,6 +333,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
                     return new ByteArrayData(byteArray);
                 }
                 case CommonClassNames.JAVA_LANG_FLOAT:
+                case "F":
                 case "float": {
                     FloatValue valueRecord = (FloatValue) getPrimitiveValue(descriptor);
                     byte[] byteArray = new byte[4];
@@ -332,6 +344,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
                     return new ByteArrayData(byteArray);
                 }
                 case CommonClassNames.JAVA_LANG_DOUBLE:
+                case "D":
                 case "double": {
                     DoubleValue valueRecord = (DoubleValue) getPrimitiveValue(descriptor);
                     byte[] byteArray = new byte[8];
@@ -342,6 +355,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
                     return new ByteArrayData(byteArray);
                 }
                 case CommonClassNames.JAVA_LANG_CHARACTER:
+                case "C":
                 case "char": {
                     CharValue valueRecord = (CharValue) getPrimitiveValue(descriptor);
                     byte[] byteArray = new byte[2];
