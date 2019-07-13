@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.AbstractFuture;
 import com.intellij.debugger.engine.JavaValue;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
@@ -95,11 +96,15 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
             public void handleInCollector(Project project, String value, XDebuggerTree tree) {
                 String text = StringUtil.unquoteString(value);
                 if (dialog == null) {
-                    dialog = new DataDialog(project, text, node);
-                    dialog.setTitle("View as Binary Data");
-                    dialog.show();
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        dialog = new DataDialog(project, text, node);
+                        dialog.setTitle("View as Binary Data");
+                        dialog.setText(text);
+                        dialog.show();
+                    });
+                } else {
+                    dialog.setText(text);
                 }
-                dialog.setText(text);
             }
         };
     }
@@ -117,7 +122,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
         if (selectedNodes.size() == 1) {
             XValueNodeImpl node = selectedNodes.get(0);
             XValue container = node.getValueContainer();
-            if (javaValueClassAvailable && container instanceof JavaValue && container.getModifier() != null) {
+            if (javaValueClassAvailable && container instanceof JavaValue) {
                 ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
                 if (descriptor.isString() || descriptor.isArray() || descriptor.isPrimitive() || isBasicType(descriptor)) {
                     return node;
