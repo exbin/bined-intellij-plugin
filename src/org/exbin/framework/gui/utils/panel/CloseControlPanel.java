@@ -15,20 +15,25 @@
  */
 package org.exbin.framework.gui.utils.panel;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.gui.utils.LanguageUtils;
+import org.exbin.framework.gui.utils.OkCancelListener;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.handler.CloseControlHandler;
 
 /**
  * Basic close control panel.
  *
- * @version 0.2.0 2016/12/27
+ * @version 0.2.1 2019/07/14
  * @author ExBin Project (http://exbin.org)
  */
-public class CloseControlPanel extends javax.swing.JPanel implements CloseControlHandler.CloseControlListener {
+@ParametersAreNonnullByDefault
+public class CloseControlPanel extends javax.swing.JPanel implements CloseControlHandler.CloseControlService {
 
     private final java.util.ResourceBundle resourceBundle;
     private CloseControlHandler handler;
+    private OkCancelListener okCancelListener;
 
     public CloseControlPanel() {
         this(LanguageUtils.getResourceBundleByClass(CloseControlPanel.class));
@@ -37,6 +42,18 @@ public class CloseControlPanel extends javax.swing.JPanel implements CloseContro
     public CloseControlPanel(java.util.ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
         initComponents();
+
+        okCancelListener = new OkCancelListener() {
+            @Override
+            public void okEvent() {
+                performCloseClick();
+            }
+
+            @Override
+            public void cancelEvent() {
+                performCloseClick();
+            }
+        };
     }
 
     public void setHandler(CloseControlHandler handler) {
@@ -94,18 +111,15 @@ public class CloseControlPanel extends javax.swing.JPanel implements CloseContro
         WindowUtils.doButtonClick(closeButton);
     }
 
+    @Nonnull
     @Override
-    public WindowUtils.OkCancelListener createOkCancelListener() {
-        return new WindowUtils.OkCancelListener() {
-            @Override
-            public void okEvent() {
-                performCloseClick();
-            }
+    public OkCancelListener getOkCancelListener() {
+        return okCancelListener;
+    }
 
-            @Override
-            public void cancelEvent() {
-                performCloseClick();
-            }
-        };
+    @Nonnull
+    @Override
+    public CloseControlHandler.CloseControlEnablementListener createEnablementListener() {
+        return closeButton::setEnabled;
     }
 }

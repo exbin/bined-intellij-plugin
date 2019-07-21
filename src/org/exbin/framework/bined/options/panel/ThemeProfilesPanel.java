@@ -32,7 +32,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
-import org.exbin.framework.bined.preferences.ThemeParameters;
+import org.exbin.framework.bined.options.CodeAreaThemeOptions;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
@@ -42,7 +42,7 @@ import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
 /**
  * Manage list of theme profiles panel.
  *
- * @version 0.2.0 2019/03/11
+ * @version 0.2.1 2019/07/20
  * @author ExBin Project (http://exbin.org)
  */
 public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileListPanel {
@@ -294,7 +294,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Add Theme Profile", Dialog.ModalityType.APPLICATION_MODAL);
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Add Theme Profile", Dialog.ModalityType.APPLICATION_MODAL);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
             if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
                 if (!isValidProfileName(namedProfilePanel.getProfileName())) {
@@ -317,8 +317,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
 
             dialog.close();
         });
-        dialog.center();
-        dialog.show();
+        dialog.showCentered(this);
         dialog.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 
@@ -346,7 +345,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Edit Theme Profile", Dialog.ModalityType.APPLICATION_MODAL);
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Edit Theme Profile", Dialog.ModalityType.APPLICATION_MODAL);
         namedProfilePanel.setProfileName(profileRecord.profileName);
         themeProfilePanel.setThemeProfile(profileRecord.themeProfile);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
@@ -365,8 +364,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
 
             dialog.close();
         });
-        dialog.center();
-        dialog.show();
+        dialog.showCentered(this);
         dialog.dispose();
     }//GEN-LAST:event_editButtonActionPerformed
 
@@ -384,7 +382,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Copy Theme Profile", Dialog.ModalityType.APPLICATION_MODAL);
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Copy Theme Profile", Dialog.ModalityType.APPLICATION_MODAL);
         themeProfilePanel.setThemeProfile(profileRecord.themeProfile);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
             if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
@@ -409,8 +407,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
 
             dialog.close();
         });
-        dialog.center();
-        dialog.show();
+        dialog.showCentered(this);
         dialog.dispose();
     }//GEN-LAST:event_copyButtonActionPerformed
 
@@ -430,13 +427,13 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         return profileName != null && !"".equals(profileName.trim());
     }
 
-    public void loadFromParameters(ThemeParameters parameters) {
+    public void loadFromOptions(CodeAreaThemeOptions options) {
         List<ThemeProfile> profiles = new ArrayList<>();
-        List<String> profileNames = parameters.getThemeProfilesList();
+        List<String> profileNames = options.getProfileNames();
         for (int index = 0; index < profileNames.size(); index++) {
             ThemeProfile profile = new ThemeProfile();
             profile.profileName = profileNames.get(index);
-            profile.themeProfile = parameters.getThemeProfile(index);
+            profile.themeProfile = options.getThemeProfile(index);
             profiles.add(profile);
         }
 
@@ -444,21 +441,14 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         model.setProfiles(profiles);
     }
 
-    public void saveToParameters(ThemeParameters parameters) {
-        List<String> profileNames = parameters.getThemeProfilesList();
-        for (int index = 0; index < profileNames.size(); index++) {
-            parameters.clearTheme(index);
-        }
-
-        profileNames.clear();
+    public void saveToOptions(CodeAreaThemeOptions options) {
+        options.clearProfiles();
         ProfilesListModel model = getProfilesListModel();
         List<ThemeProfile> profiles = model.getProfiles();
         for (int index = 0; index < profiles.size(); index++) {
             ThemeProfile profile = profiles.get(index);
-            profileNames.add(profile.profileName);
-            parameters.setThemeProfile(index, profile.themeProfile);
+            options.addProfile(profile.profileName, profile.themeProfile);
         }
-        parameters.setThemeProfilesList(profileNames);
     }
 
     /**

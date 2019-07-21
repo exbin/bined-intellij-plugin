@@ -16,22 +16,30 @@
  */
 package org.exbin.framework.gui.utils.handler;
 
-import org.exbin.framework.gui.utils.WindowUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Handler for close control panel.
  *
- * @version 0.2.0 2016/12/27
+ * @version 0.2.1 2019/06/25
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public interface CloseControlHandler {
 
     void controlActionPerformed();
 
-    public interface CloseControlListener {
+    public interface CloseControlService extends OkCancelService {
 
         void performCloseClick();
 
-        WindowUtils.OkCancelListener createOkCancelListener();
+        @Nonnull
+        CloseControlEnablementListener createEnablementListener();
+    }
+
+    public interface CloseControlEnablementListener {
+
+        void closeActionEnabled(boolean enablement);
     }
 }

@@ -15,15 +15,18 @@
  */
 package org.exbin.bined.intellij.panel;
 
-import org.exbin.framework.bined.panel.ReplaceParameters;
-import org.exbin.framework.bined.panel.SearchParameters;
+import org.exbin.framework.bined.ReplaceParameters;
+import org.exbin.framework.bined.SearchParameters;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Hex search panel interface.
+ * Binary search panel interface.
  *
- * @version 0.1.1 2017/01/10
+ * @version 0.2.1 2019/07/21
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public interface BinarySearchPanelApi {
 
     void performFind(SearchParameters dialogSearchParameters);

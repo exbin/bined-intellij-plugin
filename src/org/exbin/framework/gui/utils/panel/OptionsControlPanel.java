@@ -15,20 +15,25 @@
  */
 package org.exbin.framework.gui.utils.panel;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.gui.utils.LanguageUtils;
+import org.exbin.framework.gui.utils.OkCancelListener;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.handler.OptionsControlHandler;
 
 /**
  * Default control panel for options dialogs.
  *
- * @version 0.2.0 2016/12/30
+ * @version 0.2.1 2019/06/25
  * @author ExBin Project (http://exbin.org)
  */
-public class OptionsControlPanel extends javax.swing.JPanel implements OptionsControlHandler.OptionsControlListener {
+@ParametersAreNonnullByDefault
+public class OptionsControlPanel extends javax.swing.JPanel implements OptionsControlHandler.OptionsControlService {
 
     private final java.util.ResourceBundle resourceBundle;
     private OptionsControlHandler handler;
+    private OkCancelListener okCancelListener;
 
     public OptionsControlPanel() {
         this(LanguageUtils.getResourceBundleByClass(OptionsControlPanel.class));
@@ -37,6 +42,18 @@ public class OptionsControlPanel extends javax.swing.JPanel implements OptionsCo
     public OptionsControlPanel(java.util.ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
         initComponents();
+
+        okCancelListener = new OkCancelListener() {
+            @Override
+            public void okEvent() {
+                performClick(OptionsControlHandler.ControlActionType.SAVE);
+            }
+
+            @Override
+            public void cancelEvent() {
+                performClick(OptionsControlHandler.ControlActionType.CANCEL);
+            }
+        };
     }
 
     public void setHandler(OptionsControlHandler handler) {
@@ -54,7 +71,7 @@ public class OptionsControlPanel extends javax.swing.JPanel implements OptionsCo
 
         cancelButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
-        setButton = new javax.swing.JButton();
+        applyOnceButton = new javax.swing.JButton();
 
         cancelButton.setText(resourceBundle.getString("cancelButton.text")); // NOI18N
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
@@ -70,10 +87,10 @@ public class OptionsControlPanel extends javax.swing.JPanel implements OptionsCo
             }
         });
 
-        setButton.setText(resourceBundle.getString("setButton.text")); // NOI18N
-        setButton.addActionListener(new java.awt.event.ActionListener() {
+        applyOnceButton.setText(resourceBundle.getString("applyOnceButton.text")); // NOI18N
+        applyOnceButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setButtonActionPerformed(evt);
+                applyOnceButtonActionPerformed(evt);
             }
         });
 
@@ -82,9 +99,9 @@ public class OptionsControlPanel extends javax.swing.JPanel implements OptionsCo
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(setButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addContainerGap()
+                .addComponent(applyOnceButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(saveButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cancelButton)
@@ -96,7 +113,7 @@ public class OptionsControlPanel extends javax.swing.JPanel implements OptionsCo
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
-                    .addComponent(setButton)
+                    .addComponent(applyOnceButton)
                     .addComponent(saveButton))
                 .addContainerGap())
         );
@@ -108,11 +125,11 @@ public class OptionsControlPanel extends javax.swing.JPanel implements OptionsCo
         }
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void setButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setButtonActionPerformed
+    private void applyOnceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyOnceButtonActionPerformed
         if (handler != null) {
-            handler.controlActionPerformed(OptionsControlHandler.ControlActionType.SET);
+            handler.controlActionPerformed(OptionsControlHandler.ControlActionType.APPLY_ONCE);
         }
-    }//GEN-LAST:event_setButtonActionPerformed
+    }//GEN-LAST:event_applyOnceButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         if (handler != null) {
@@ -121,9 +138,9 @@ public class OptionsControlPanel extends javax.swing.JPanel implements OptionsCo
     }//GEN-LAST:event_saveButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton applyOnceButton;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton saveButton;
-    private javax.swing.JButton setButton;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -133,28 +150,44 @@ public class OptionsControlPanel extends javax.swing.JPanel implements OptionsCo
                 WindowUtils.doButtonClick(saveButton);
                 break;
             }
-            case SET: {
-                WindowUtils.doButtonClick(setButton);
+            case APPLY_ONCE: {
+                WindowUtils.doButtonClick(applyOnceButton);
                 break;
             }
             case CANCEL: {
                 WindowUtils.doButtonClick(cancelButton);
                 break;
             }
+            default:
+                throw new IllegalStateException("Illegal action type " + actionType.name());
         }
     }
 
+    @Nonnull
     @Override
-    public WindowUtils.OkCancelListener createOkCancelListener() {
-        return new WindowUtils.OkCancelListener() {
-            @Override
-            public void okEvent() {
-                performClick(OptionsControlHandler.ControlActionType.SAVE);
-            }
+    public OkCancelListener getOkCancelListener() {
+        return okCancelListener;
+    }
 
-            @Override
-            public void cancelEvent() {
-                performClick(OptionsControlHandler.ControlActionType.CANCEL);
+    @Nonnull
+    @Override
+    public OptionsControlHandler.OptionsControlEnablementListener createEnablementListener() {
+        return (OptionsControlHandler.ControlActionType actionType, boolean enablement) -> {
+            switch (actionType) {
+                case APPLY_ONCE: {
+                    applyOnceButton.setEnabled(enablement);
+                    break;
+                }
+                case CANCEL: {
+                    cancelButton.setEnabled(enablement);
+                    break;
+                }
+                case SAVE: {
+                    saveButton.setEnabled(enablement);
+                    break;
+                }
+                default:
+                    throw new IllegalStateException("Illegal action type " + actionType.name());
             }
         };
     }

@@ -15,16 +15,14 @@
  */
 package org.exbin.framework.bined.preferences;
 
-import com.intellij.ide.util.PropertiesComponent;
 import org.exbin.bined.capability.RowWrappingCapable;
-import org.exbin.bined.intellij.FileHandlingMode;
 import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
-import org.exbin.framework.Preferences;
-import org.exbin.framework.PreferencesWrapper;
+import org.exbin.framework.api.Preferences;
+import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.options.CodeAreaOptions;
-import org.exbin.framework.editor.text.EncodingsHandler;
+import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -33,39 +31,37 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Hexadecimal editor preferences.
+ * Binary editor preferences.
  *
- * @version 0.2.0 2019/04/07
+ * @version 0.2.1 2019/07/21
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class BinaryEditorPreferences {
-
-    public static final String PLUGIN_PREFIX = "BinEdPlugin.";
 
     private final static String PREFERENCES_VERSION = "version";
     private final static String PREFERENCES_VERSION_VALUE = "0.2.0";
 
     private final Preferences preferences;
 
-    private final EditorParameters editorParameters;
-    private final StatusParameters statusParameters;
-    private final CodeAreaParameters codeAreaParameters;
-    private final CharsetParameters charsetParameters;
-    private final LayoutParameters layoutParameters;
-    private final ThemeParameters themeParameters;
-    private final ColorParameters colorParameters;
+    private final EditorPreferences editorParameters;
+    private final StatusPreferences statusParameters;
+    private final CodeAreaPreferences codeAreaParameters;
+    private final TextEncodingPreferences encodingParameters;
+    private final CodeAreaLayoutPreferences layoutParameters;
+    private final CodeAreaThemePreferences themeParameters;
+    private final CodeAreaColorPreferences colorParameters;
 
     public BinaryEditorPreferences(Preferences preferences) {
         this.preferences = preferences;
 
-        editorParameters = new EditorParameters(preferences);
-        statusParameters = new StatusParameters(preferences);
-        codeAreaParameters = new CodeAreaParameters(preferences);
-        charsetParameters = new CharsetParameters(preferences);
-        layoutParameters = new LayoutParameters(preferences);
-        themeParameters = new ThemeParameters(preferences);
-        colorParameters = new ColorParameters(preferences);
+        editorParameters = new EditorPreferences(preferences);
+        statusParameters = new StatusPreferences(preferences);
+        codeAreaParameters = new CodeAreaPreferences(preferences);
+        encodingParameters = new TextEncodingPreferences(preferences);
+        layoutParameters = new CodeAreaLayoutPreferences(preferences);
+        themeParameters = new CodeAreaThemePreferences(preferences);
+        colorParameters = new CodeAreaColorPreferences(preferences);
 
         final String legacyDef = "LEGACY";
         String storedVersion = preferences.get(PREFERENCES_VERSION, legacyDef);
@@ -85,43 +81,41 @@ public class BinaryEditorPreferences {
     }
 
     @Nonnull
-    public EditorParameters getEditorParameters() {
+    public EditorPreferences getEditorPreferences() {
         return editorParameters;
     }
 
     @Nonnull
-    public StatusParameters getStatusParameters() {
+    public StatusPreferences getStatusPreferences() {
         return statusParameters;
     }
 
     @Nonnull
-    public CodeAreaParameters getCodeAreaParameters() {
+    public CodeAreaPreferences getCodeAreaPreferences() {
         return codeAreaParameters;
     }
 
-    public CharsetParameters getCharsetParameters() {
-        return charsetParameters;
+    public TextEncodingPreferences getEncodingPreferences() {
+        return encodingParameters;
     }
 
     @Nonnull
-    public LayoutParameters getLayoutParameters() {
+    public CodeAreaLayoutPreferences getLayoutPreferences() {
         return layoutParameters;
     }
 
     @Nonnull
-    public ThemeParameters getThemeParameters() {
+    public CodeAreaThemePreferences getThemePreferences() {
         return themeParameters;
     }
 
     @Nonnull
-    public ColorParameters getColorParameters() {
+    public CodeAreaColorPreferences getColorPreferences() {
         return colorParameters;
     }
 
     private void importLegacyPreferences() {
-        LegacyPreferences legacyPreferences = new LegacyPreferences(new PreferencesWrapper(PropertiesComponent.getInstance(), ""));
-        codeAreaParameters.setSelectedEncoding(legacyPreferences.getSelectedEncoding());
-        codeAreaParameters.setEncodings(new ArrayList<>(legacyPreferences.getEncodings()));
+        LegacyPreferences legacyPreferences = new LegacyPreferences(preferences);
         codeAreaParameters.setUseDefaultFont(legacyPreferences.isUseDefaultFont());
         codeAreaParameters.setCodeFont(legacyPreferences.getCodeFont(CodeAreaOptions.DEFAULT_FONT));
         codeAreaParameters.setCodeType(legacyPreferences.getCodeType());
@@ -133,7 +127,7 @@ public class BinaryEditorPreferences {
         codeAreaParameters.setPaintRowPosBackground(legacyPreferences.isPaintRowPosBackground());
         codeAreaParameters.setCodeColorization(legacyPreferences.isCodeColorization());
 
-        editorParameters.setFileHandlingMode(legacyPreferences.isDeltaMemoryMode() ? FileHandlingMode.DELTA.name() : FileHandlingMode.MEMORY.name());
+        editorParameters.setFileHandlingMode(legacyPreferences.isDeltaMemoryMode() ? FileHandlingMode.DELTA : FileHandlingMode.MEMORY);
         editorParameters.setShowValuesPanel(legacyPreferences.isShowValuesPanel());
 
         List<String> layoutProfiles = new ArrayList<>();
@@ -158,12 +152,14 @@ public class BinaryEditorPreferences {
         themeParameters.setThemeProfile(0, themeProfile);
         themeParameters.setThemeProfilesList(themeProfiles);
 
+        encodingParameters.setSelectedEncoding(legacyPreferences.getSelectedEncoding());
+        encodingParameters.setEncodings(new ArrayList<>(legacyPreferences.getEncodings()));
         Collection<String> legacyEncodings = legacyPreferences.getEncodings();
         List<String> encodings = new ArrayList<>(legacyEncodings);
-        if (!encodings.isEmpty() && !encodings.contains(EncodingsHandler.ENCODING_UTF8)) {
-            encodings.add(EncodingsHandler.ENCODING_UTF8);
+        if (!encodings.isEmpty() && !encodings.contains(TextEncodingPreferences.ENCODING_UTF8)) {
+            encodings.add(TextEncodingPreferences.ENCODING_UTF8);
         }
-        charsetParameters.setEncodings(encodings);
+        encodingParameters.setEncodings(encodings);
 
         preferences.flush();
     }

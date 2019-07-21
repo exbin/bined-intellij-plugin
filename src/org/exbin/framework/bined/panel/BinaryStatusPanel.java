@@ -18,8 +18,10 @@ package org.exbin.framework.bined.panel;
 
 import org.exbin.bined.*;
 import org.exbin.framework.bined.BinaryStatusApi;
+import org.exbin.framework.bined.StatusCursorPositionFormat;
+import org.exbin.framework.bined.StatusDocumentSizeFormat;
 import org.exbin.framework.bined.options.StatusOptions;
-import org.exbin.framework.bined.preferences.StatusParameters;
+import org.exbin.framework.bined.preferences.StatusPreferences;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
@@ -33,9 +35,9 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
 
 /**
- * Hexadecimal editor status panel.
+ * Binary editor status panel.
  *
- * @version 0.2.0 2019/03/19
+ * @version 0.2.1 2019/06/18
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -46,9 +48,13 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     public static final String READONLY_EDITATION_MODE_LABEL = "RO";
     public static final String INPLACE_EDITATION_MODE_LABEL = "INP";
 
+    public static final String OCTAL_CODE_TYPE_LABEL = "OCT";
+    public static final String DECIMAL_CODE_TYPE_LABEL = "DEC";
+    public static final String HEXADECIMAL_CODE_TYPE_LABEL = "HEX";
+
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinaryStatusPanel.class);
 
-    private StatusParameters statusParameters;
+    private StatusPreferences statusParameters;
     private StatusControlHandler statusControlHandler;
 
     private StatusCursorPositionFormat cursorPositionFormat = new StatusCursorPositionFormat();
@@ -66,7 +72,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
         initComponents();
     }
 
-    public void loadFromPreferences(StatusParameters statusParameters) {
+    public void loadFromPreferences(StatusPreferences statusParameters) {
         this.statusParameters = statusParameters;
         cursorPositionFormat.setCodeType(statusParameters.getCursorPositionCodeType());
         cursorPositionFormat.setShowOffset(statusParameters.isCursorShowOffset());
@@ -97,6 +103,8 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
                 hexadecimalCursorPositionModeRadioButtonMenuItem.setSelected(true);
                 break;
             }
+            default:
+                throw new IllegalStateException("Unexpected code type " + cursorPositionFormat.getCodeType());
         }
         cursorPositionShowOffsetCheckBoxMenuItem.setSelected(cursorPositionFormat.isShowOffset());
 
@@ -113,6 +121,8 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
                 hexadecimalDocumentSizeModeRadioButtonMenuItem.setSelected(true);
                 break;
             }
+            default:
+                throw new IllegalStateException("Unexpected code type " + documentSizeFormat.getCodeType());
         }
         documentSizeShowRelativeCheckBoxMenuItem.setSelected(documentSizeFormat.isShowRelative());
     }
@@ -666,9 +676,9 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
         } else {
             long dataPosition = caretPosition.getDataPosition();
             tooltipText = "<html>" + resourceBundle.getString("cursorPositionLabel.toolTipText")
-                    + "<br>OCT: " + numberToPosition(dataPosition, PositionCodeType.OCTAL)
-                    + "<br>DEC: " + numberToPosition(dataPosition, PositionCodeType.DECIMAL)
-                    + "<br>HEX: " + numberToPosition(dataPosition, PositionCodeType.HEXADECIMAL)
+                    + "<br>" + OCTAL_CODE_TYPE_LABEL + ": " + numberToPosition(dataPosition, PositionCodeType.OCTAL)
+                    + "<br>" + DECIMAL_CODE_TYPE_LABEL + ": " + numberToPosition(dataPosition, PositionCodeType.DECIMAL)
+                    + "<br>" + HEXADECIMAL_CODE_TYPE_LABEL + ": " + numberToPosition(dataPosition, PositionCodeType.HEXADECIMAL)
                     + "</html>";
         }
         cursorPositionLabel.setToolTipText(tooltipText);
@@ -694,9 +704,9 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
 
     private void updateDocumentSizeToolTip() {
         String tooltipText = "<html>" + resourceBundle.getString("documentSizeLabel.toolTipText")
-                + "<br>OCT: " + numberToPosition(documentSize, PositionCodeType.OCTAL)
-                + "<br>DEC: " + numberToPosition(documentSize, PositionCodeType.DECIMAL)
-                + "<br>HEX: " + numberToPosition(documentSize, PositionCodeType.HEXADECIMAL)
+                + "<br>" + OCTAL_CODE_TYPE_LABEL + ": " + numberToPosition(documentSize, PositionCodeType.OCTAL)
+                + "<br>" + DECIMAL_CODE_TYPE_LABEL + ": " + numberToPosition(documentSize, PositionCodeType.DECIMAL)
+                + "<br>" + HEXADECIMAL_CODE_TYPE_LABEL + ": " + numberToPosition(documentSize, PositionCodeType.HEXADECIMAL)
                 + "</html>";
         documentSizeLabel.setToolTipText(tooltipText);
     }
@@ -721,6 +731,8 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
                 spaceGroupSize = hexadecimalSpaceGroupSize;
                 break;
             }
+            default:
+                throw new IllegalStateException("Unexpected code type " + codeType.name());
         }
 
         long remainder = value > 0 ? value : -value;

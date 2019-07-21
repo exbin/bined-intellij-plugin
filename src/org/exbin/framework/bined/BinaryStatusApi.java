@@ -16,21 +16,18 @@
  */
 package org.exbin.framework.bined;
 
+import java.awt.event.MouseEvent;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.EditationOperation;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.awt.event.MouseEvent;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Hexadecimal editor status interface.
  *
- * @version 0.2.1 2019/03/16
+ * @version 0.2.1 2019/06/16
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -47,6 +44,7 @@ public interface BinaryStatusApi {
      * Reports currently active editation mode.
      *
      * @param mode editation mode
+     * @param operation editation operation
      */
     void setEditationMode(EditationMode mode, EditationOperation operation);
 
@@ -61,9 +59,9 @@ public interface BinaryStatusApi {
      * Sets current document size.
      *
      * @param documentSize document size
-     * @param initialdocumentSize document size when file was opened
+     * @param initialDocumentSize document size when file was opened
      */
-    void setCurrentDocumentSize(long documentSize, long initialdocumentSize);
+    void setCurrentDocumentSize(long documentSize, long initialDocumentSize);
 
     /**
      * Sets current memory mode.
@@ -76,7 +74,7 @@ public interface BinaryStatusApi {
     public static interface StatusControlHandler {
 
         /**
-         * Requests change of editation operation from given mode.
+         * Requests change of editation mode from given mode.
          *
          * @param operation editation operation
          */
@@ -116,7 +114,6 @@ public interface BinaryStatusApi {
 
         private final String displayChar;
         private final String value;
-        private final static Map<String, MemoryMode> preferencesValueMap = new HashMap<>();
 
         private MemoryMode(String displayChar, String preferencesValue) {
             this.displayChar = displayChar;

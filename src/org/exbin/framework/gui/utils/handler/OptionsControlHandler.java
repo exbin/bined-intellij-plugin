@@ -16,26 +16,36 @@
  */
 package org.exbin.framework.gui.utils.handler;
 
-import org.exbin.framework.gui.utils.WindowUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Handler for options control panel.
  *
- * @version 0.2.0 2016/12/31
+ * @version 0.2.1 2019/06/25
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public interface OptionsControlHandler {
 
     void controlActionPerformed(ControlActionType actionType);
 
-    public interface OptionsControlListener {
+    @ParametersAreNonnullByDefault
+    public interface OptionsControlService extends OkCancelService {
 
         void performClick(ControlActionType actionType);
 
-        WindowUtils.OkCancelListener createOkCancelListener();
+        @Nonnull
+        OptionsControlEnablementListener createEnablementListener();
+    }
+
+    @ParametersAreNonnullByDefault
+    public interface OptionsControlEnablementListener {
+
+        void actionEnabled(ControlActionType actionType, boolean enablement);
     }
 
     public static enum ControlActionType {
-        SAVE, SET, CANCEL
+        SAVE, APPLY_ONCE, CANCEL
     }
 }

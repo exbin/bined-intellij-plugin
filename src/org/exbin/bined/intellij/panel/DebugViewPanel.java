@@ -23,16 +23,17 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.EditationOperation;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
+import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.GoToPositionAction;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.PreferencesWrapper;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.options.CodeAreaOptions;
 import org.exbin.framework.bined.panel.BinaryStatusPanel;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
+import org.exbin.framework.preferences.PreferencesWrapper;
 import org.exbin.utils.binary_data.BinaryData;
 
 import javax.swing.*;
@@ -43,10 +44,10 @@ import java.awt.event.MouseEvent;
 import java.nio.charset.Charset;
 
 /**
- * Debugger value hexadecimal editor panel.
+ * Debugger value binary editor panel.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.0 2018/11/10
+ * @version 0.2.1 2019/07/21
  */
 public class DebugViewPanel extends JPanel {
 
@@ -69,7 +70,7 @@ public class DebugViewPanel extends JPanel {
 
     public DebugViewPanel() {
         setLayout(new BorderLayout());
-        preferences = new BinaryEditorPreferences(new PreferencesWrapper(getPreferences(), BinaryEditorPreferences.PLUGIN_PREFIX));
+        preferences = new BinaryEditorPreferences(new PreferencesWrapper(getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
 
         initComponents();
         codeArea = new ExtCodeArea();
@@ -81,7 +82,9 @@ public class DebugViewPanel extends JPanel {
 
         statusPanel = new BinaryStatusPanel();
         registerEncodingStatus(statusPanel);
-        encodingsHandler = new EncodingsHandler(new TextEncodingStatusApi() {
+        encodingsHandler = new EncodingsHandler();
+        encodingsHandler.init();
+        encodingsHandler.setTextEncodingStatus(new TextEncodingStatusApi() {
             @Override
             public String getEncoding() {
                 return encodingStatus.getEncoding();
@@ -300,41 +303,41 @@ public class DebugViewPanel extends JPanel {
 
     private void loadFromPreferences() {
         CodeAreaOptions codeAreaOptions = new CodeAreaOptions();
-        codeAreaOptions.loadFromParameters(preferences.getCodeAreaParameters());
+        codeAreaOptions.loadFromParameters(preferences.getCodeAreaPreferences());
         codeAreaOptions.applyToCodeArea(codeArea);
-        String selectedEncoding = preferences.getCodeAreaParameters().getSelectedEncoding();
+        String selectedEncoding = preferences.getEncodingPreferences().getSelectedEncoding();
         statusPanel.setEncoding(selectedEncoding);
-        statusPanel.loadFromPreferences(preferences.getStatusParameters());
+        statusPanel.loadFromPreferences(preferences.getStatusPreferences());
         toolbarPanelLoadFromPreferences();
 
         codeArea.setCharset(Charset.forName(selectedEncoding));
-        encodingsHandler.loadFromPreferences(preferences);
+        encodingsHandler.loadFromPreferences(preferences.getEncodingPreferences());
 
-        int selectedLayoutProfile = preferences.getLayoutParameters().getSelectedProfile();
+        int selectedLayoutProfile = preferences.getLayoutPreferences().getSelectedProfile();
         if (selectedLayoutProfile >= 0) {
-            codeArea.setLayoutProfile(preferences.getLayoutParameters().getLayoutProfile(selectedLayoutProfile));
+            codeArea.setLayoutProfile(preferences.getLayoutPreferences().getLayoutProfile(selectedLayoutProfile));
         }
 
-        int selectedThemeProfile = preferences.getThemeParameters().getSelectedProfile();
+        int selectedThemeProfile = preferences.getThemePreferences().getSelectedProfile();
         if (selectedThemeProfile >= 0) {
-            codeArea.setThemeProfile(preferences.getThemeParameters().getThemeProfile(selectedThemeProfile));
+            codeArea.setThemeProfile(preferences.getThemePreferences().getThemeProfile(selectedThemeProfile));
         }
 
-        int selectedColorProfile = preferences.getColorParameters().getSelectedProfile();
+        int selectedColorProfile = preferences.getColorPreferences().getSelectedProfile();
         if (selectedColorProfile >= 0) {
-            codeArea.setColorsProfile(preferences.getColorParameters().getColorsProfile(selectedColorProfile));
+            codeArea.setColorsProfile(preferences.getColorPreferences().getColorsProfile(selectedColorProfile));
         }
 
         // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
-        boolean showValuesPanel = preferences.getEditorParameters().isShowValuesPanel();
+        boolean showValuesPanel = preferences.getEditorPreferences().isShowValuesPanel();
         if (showValuesPanel) {
             showValuesPanel();
         }
     }
 
     private void toolbarPanelLoadFromPreferences() {
-        codeTypeComboBox.setSelectedIndex(preferences.getCodeAreaParameters().getCodeType().ordinal());
-        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaParameters().isShowNonprintables());
+        codeTypeComboBox.setSelectedIndex(preferences.getCodeAreaPreferences().getCodeType().ordinal());
+        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaPreferences().isShowNonprintables());
     }
 
     public void showValuesPanel() {

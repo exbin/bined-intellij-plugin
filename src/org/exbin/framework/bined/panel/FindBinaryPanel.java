@@ -16,13 +16,20 @@
  */
 package org.exbin.framework.bined.panel;
 
+import org.exbin.framework.bined.ReplaceParameters;
+import org.exbin.framework.bined.SearchCondition;
+import org.exbin.framework.bined.SearchParameters;
+import org.exbin.framework.bined.SearchHistoryModel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.ComboBoxEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -34,7 +41,7 @@ import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
-import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
+import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
@@ -42,25 +49,26 @@ import org.exbin.utils.binary_data.ByteArrayEditableData;
 /**
  * Find text/hexadecimal data panel.
  *
- * @version 0.2.1 2018/12/22
+ * @version 0.2.1 2019/07/16
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class FindBinaryPanel extends javax.swing.JPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(FindBinaryPanel.class);
     public static final String POPUP_MENU_POSTFIX = ".searchFindHexPanel";
 
-    private final ExtCodeArea findHexadecimalRenderer = new ExtCodeArea();
+    private final ExtCodeArea findCodeArea = new ExtCodeArea();
     private BinarySearchComboBoxPanel findComboBoxEditorComponent;
     private ComboBoxEditor findComboBoxEditor;
     private List<SearchCondition> searchHistory = new ArrayList<>();
 
-    private final ExtCodeArea replaceHexadecimalRenderer = new ExtCodeArea();
+    private final ExtCodeArea replaceCodeArea = new ExtCodeArea();
     private BinarySearchComboBoxPanel replaceComboBoxEditorComponent;
     private ComboBoxEditor replaceComboBoxEditor;
     private List<SearchCondition> replaceHistory = new ArrayList<>();
 
-    private CodeAreaPopupMenuHandler hexCodePopupMenuHandler;
+    private CodeAreaPopupMenuHandler codeAreaPopupMenuHandler;
     private MultilineEditorListener multilineEditorListener = null;
 
     public FindBinaryPanel() {
@@ -70,21 +78,21 @@ public class FindBinaryPanel extends javax.swing.JPanel {
 
     private void init() {
         {
-            ExtendedCodeAreaLayoutProfile layoutProfile = findHexadecimalRenderer.getLayoutProfile();
+            ExtendedCodeAreaLayoutProfile layoutProfile = Objects.requireNonNull(findCodeArea.getLayoutProfile());
             layoutProfile.setShowHeader(false);
             layoutProfile.setShowRowPosition(false);
-            findHexadecimalRenderer.setLayoutProfile(layoutProfile);
+            findCodeArea.setLayoutProfile(layoutProfile);
         }
-        findHexadecimalRenderer.setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
-        findHexadecimalRenderer.setWrappingBytesGroupSize(0);
+        findCodeArea.setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
+        findCodeArea.setWrappingBytesGroupSize(0);
         {
-            ExtendedCodeAreaThemeProfile themeProfile = findHexadecimalRenderer.getThemeProfile();
+            ExtendedCodeAreaThemeProfile themeProfile = findCodeArea.getThemeProfile();
             themeProfile.setBackgroundPaintMode(ExtendedBackgroundPaintMode.PLAIN);
-            findHexadecimalRenderer.setThemeProfile(themeProfile);
+            findCodeArea.setThemeProfile(themeProfile);
         }
-        findHexadecimalRenderer.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
-        findHexadecimalRenderer.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
-        findHexadecimalRenderer.setContentData(new ByteArrayEditableData());
+        findCodeArea.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
+        findCodeArea.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
+        findCodeArea.setContentData(new ByteArrayEditableData());
 
         findComboBoxEditorComponent = new BinarySearchComboBoxPanel();
         findComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
@@ -100,8 +108,8 @@ public class FindBinaryPanel extends javax.swing.JPanel {
                 if (value.getSearchMode() == SearchCondition.SearchMode.TEXT) {
                     return listCellRenderer.getListCellRendererComponent(list, value.getSearchText(), index, isSelected, cellHasFocus);
                 } else {
-                    findHexadecimalRenderer.setContentData(value.getBinaryData());
-                    findHexadecimalRenderer.setPreferredSize(new Dimension(200, 20));
+                    findCodeArea.setContentData(value.getBinaryData());
+                    findCodeArea.setPreferredSize(new Dimension(200, 20));
                     Color backgroundColor;
                     if (isSelected) {
                         backgroundColor = list.getSelectionBackground();
@@ -111,7 +119,7 @@ public class FindBinaryPanel extends javax.swing.JPanel {
 // TODO                    ColorsGroup mainColors = new ColorsGroup(findHexadecimalRenderer.getMainColors());
 //                    mainColors.setBothBackgroundColors(backgroundColor);
 //                    findHexadecimalRenderer.setMainColors(mainColors);
-                    return findHexadecimalRenderer;
+                    return findCodeArea;
                 }
             }
         });
@@ -150,21 +158,21 @@ public class FindBinaryPanel extends javax.swing.JPanel {
         findComboBox.setModel(new SearchHistoryModel(searchHistory));
 
         {
-            ExtendedCodeAreaLayoutProfile layoutProfile = replaceHexadecimalRenderer.getLayoutProfile();
+            ExtendedCodeAreaLayoutProfile layoutProfile = Objects.requireNonNull(replaceCodeArea.getLayoutProfile());
             layoutProfile.setShowHeader(false);
             layoutProfile.setShowRowPosition(false);
-            replaceHexadecimalRenderer.setLayoutProfile(layoutProfile);
+            replaceCodeArea.setLayoutProfile(layoutProfile);
         }
-        replaceHexadecimalRenderer.setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
-        replaceHexadecimalRenderer.setWrappingBytesGroupSize(0);
+        replaceCodeArea.setRowWrapping(RowWrappingCapable.RowWrappingMode.WRAPPING);
+        replaceCodeArea.setWrappingBytesGroupSize(0);
         {
-            ExtendedCodeAreaThemeProfile themeProfile = replaceHexadecimalRenderer.getThemeProfile();
+            ExtendedCodeAreaThemeProfile themeProfile = replaceCodeArea.getThemeProfile();
             themeProfile.setBackgroundPaintMode(ExtendedBackgroundPaintMode.PLAIN);
-            replaceHexadecimalRenderer.setThemeProfile(themeProfile);
+            replaceCodeArea.setThemeProfile(themeProfile);
         }
-        replaceHexadecimalRenderer.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
-        replaceHexadecimalRenderer.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
-        replaceHexadecimalRenderer.setContentData(new ByteArrayEditableData());
+        replaceCodeArea.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
+        replaceCodeArea.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
+        replaceCodeArea.setContentData(new ByteArrayEditableData());
 
         replaceComboBoxEditorComponent = new BinarySearchComboBoxPanel();
         replaceComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
@@ -180,8 +188,8 @@ public class FindBinaryPanel extends javax.swing.JPanel {
                 if (value.getSearchMode() == SearchCondition.SearchMode.TEXT) {
                     return listCellRenderer.getListCellRendererComponent(list, value.getSearchText(), index, isSelected, cellHasFocus);
                 } else {
-                    replaceHexadecimalRenderer.setContentData(value.getBinaryData());
-                    replaceHexadecimalRenderer.setPreferredSize(new Dimension(200, 20));
+                    replaceCodeArea.setContentData(value.getBinaryData());
+                    replaceCodeArea.setPreferredSize(new Dimension(200, 20));
                     Color backgroundColor;
                     if (isSelected) {
                         backgroundColor = list.getSelectionBackground();
@@ -191,7 +199,7 @@ public class FindBinaryPanel extends javax.swing.JPanel {
 // TODO                    ColorsGroup mainColors = new ColorsGroup(replaceHexadecimalRenderer.getMainColors());
 //                    mainColors.setBothBackgroundColors(backgroundColor);
 //                    replaceHexadecimalRenderer.setMainColors(mainColors);
-                    return replaceHexadecimalRenderer;
+                    return replaceCodeArea;
                 }
             }
         });
@@ -269,10 +277,6 @@ public class FindBinaryPanel extends javax.swing.JPanel {
         searchTypeButton.setText(resourceBundle.getString("searchTypeButton.text")); // NOI18N
         searchTypeButton.setToolTipText(resourceBundle.getString("searchTypeButton.toolTipText")); // NOI18N
         searchTypeButton.setFocusable(false);
-        searchTypeButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        searchTypeButton.setMaximumSize(new java.awt.Dimension(27, 27));
-        searchTypeButton.setMinimumSize(new java.awt.Dimension(27, 27));
-        searchTypeButton.setPreferredSize(new java.awt.Dimension(27, 27));
         searchTypeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchTypeButtonActionPerformed(evt);
@@ -309,12 +313,12 @@ public class FindBinaryPanel extends javax.swing.JPanel {
                     .addComponent(matchCaseCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(searchFromCursorCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(findPanelLayout.createSequentialGroup()
-                        .addComponent(searchTypeButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(searchTypeButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(findComboBox, 0, 365, Short.MAX_VALUE)
+                        .addComponent(findComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(findMultilineButton))
-                    .addComponent(multipleMatchesCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(multipleMatchesCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                     .addGroup(findPanelLayout.createSequentialGroup()
                         .addComponent(findLabel)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -329,7 +333,7 @@ public class FindBinaryPanel extends javax.swing.JPanel {
                 .addGroup(findPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(findComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(findMultilineButton)
-                    .addComponent(searchTypeButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(searchTypeButton))
                 .addGap(18, 18, 18)
                 .addComponent(searchFromCursorCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -357,10 +361,6 @@ public class FindBinaryPanel extends javax.swing.JPanel {
         replaceTypeButton.setToolTipText(resourceBundle.getString("replaceTypeButton.toolTipText")); // NOI18N
         replaceTypeButton.setEnabled(false);
         replaceTypeButton.setFocusable(false);
-        replaceTypeButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        replaceTypeButton.setMaximumSize(new java.awt.Dimension(27, 27));
-        replaceTypeButton.setMinimumSize(new java.awt.Dimension(27, 27));
-        replaceTypeButton.setPreferredSize(new java.awt.Dimension(27, 27));
         replaceTypeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 replaceTypeButtonActionPerformed(evt);
@@ -396,9 +396,9 @@ public class FindBinaryPanel extends javax.swing.JPanel {
                         .addComponent(replaceLabel)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(replacePanelLayout.createSequentialGroup()
-                        .addComponent(replaceTypeButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(replaceTypeButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(replaceComboBox, 0, 365, Short.MAX_VALUE)
+                        .addComponent(replaceComboBox, 0, 283, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(replaceMultilineButton))
                     .addComponent(replaceAllMatchesCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -414,7 +414,7 @@ public class FindBinaryPanel extends javax.swing.JPanel {
                 .addGroup(replacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(replaceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(replaceMultilineButton)
-                    .addComponent(replaceTypeButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(replaceTypeButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(replaceAllMatchesCheckBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -577,13 +577,13 @@ public class FindBinaryPanel extends javax.swing.JPanel {
         replaceComboBox.setModel(new SearchHistoryModel(replaceHistory));
     }
 
-    public void setHexCodePopupMenuHandler(CodeAreaPopupMenuHandler hexCodePopupMenuHandler) {
-        this.hexCodePopupMenuHandler = hexCodePopupMenuHandler;
-        findComboBoxEditorComponent.setHexCodePopupMenuHandler(hexCodePopupMenuHandler, "FindHexPanel");
+    public void setCodeAreaPopupMenuHandler(CodeAreaPopupMenuHandler codeAreaPopupMenuHandler) {
+        this.codeAreaPopupMenuHandler = codeAreaPopupMenuHandler;
+        findComboBoxEditorComponent.setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler, "FindHexPanel");
     }
 
     public void detachMenu() {
-        hexCodePopupMenuHandler.dropPopupMenu(POPUP_MENU_POSTFIX);
+        codeAreaPopupMenuHandler.dropPopupMenu(POPUP_MENU_POSTFIX);
     }
 
     private void updateReplaceEnablement() {
@@ -599,8 +599,10 @@ public class FindBinaryPanel extends javax.swing.JPanel {
         this.multilineEditorListener = multilineEditorListener;
     }
 
+    @ParametersAreNonnullByDefault
     public static interface MultilineEditorListener {
 
+        @Nullable
         SearchCondition multilineEdit(SearchCondition condition);
     }
 }

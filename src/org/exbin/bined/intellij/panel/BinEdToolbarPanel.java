@@ -25,9 +25,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.event.ActionListener;
 
 /**
- * Hexadecimal editor toolbar panel.
+ * Binary editor toolbar panel.
  *
- * @version 0.2.0 2019/03/23
+ * @version 0.2.1 2019/07/21
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -53,8 +53,8 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     }
 
     public void loadFromPreferences() {
-        codeTypeComboBox.setSelectedIndex(preferences.getCodeAreaParameters().getCodeType().ordinal());
-        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaParameters().isShowNonprintables());
+        codeTypeComboBox.setSelectedIndex(preferences.getCodeAreaPreferences().getCodeType().ordinal());
+        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaPreferences().isShowNonprintables());
     }
 
     public void updateUndoState() {
@@ -147,7 +147,7 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     private void codeTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_codeTypeComboBoxActionPerformed
         CodeType codeType = CodeType.values()[codeTypeComboBox.getSelectedIndex()];
         codeArea.setCodeType(codeType);
-        preferences.getCodeAreaParameters().setCodeType(codeType);
+        preferences.getCodeAreaPreferences().setCodeType(codeType);
     }//GEN-LAST:event_codeTypeComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

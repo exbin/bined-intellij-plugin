@@ -16,19 +16,23 @@
  */
 package org.exbin.framework.bined.panel;
 
+import org.exbin.framework.bined.SearchCondition;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.util.ResourceBundle;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.CodeAreaPopupMenuHandler;
+import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.gui.utils.LanguageUtils;
+import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.utils.binary_data.EditableBinaryData;
 
 /**
  * Multiline search condition editor panel.
  *
- * @version 0.2.0 2018/10/27
+ * @version 0.2.1 2019/06/17
  * @author ExBin Project (http://exbin.org)
  */
 public class BinaryMultilinePanel extends javax.swing.JPanel {
@@ -41,7 +45,7 @@ public class BinaryMultilinePanel extends javax.swing.JPanel {
     private JTextArea textArea;
     private JScrollPane scrollPane;
     private ExtCodeArea codeArea;
-    private CodeAreaPopupMenuHandler hexCodePopupMenuHandler;
+    private CodeAreaPopupMenuHandler codeAreaPopupMenuHandler;
 
     public BinaryMultilinePanel() {
         initComponents();
@@ -60,6 +64,14 @@ public class BinaryMultilinePanel extends javax.swing.JPanel {
         setLayout(new java.awt.BorderLayout());
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Test method for this panel.
+     *
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        WindowUtils.invokeDialog(new BinaryMultilinePanel());
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
@@ -93,20 +105,26 @@ public class BinaryMultilinePanel extends javax.swing.JPanel {
             codeArea = new ExtCodeArea();
             codeArea.setContentData(condition.getBinaryData());
             add(codeArea, BorderLayout.CENTER);
-            if (hexCodePopupMenuHandler != null) {
-                codeArea.setComponentPopupMenu(hexCodePopupMenuHandler.createPopupMenu(codeArea, POPUP_MENU_POSTFIX));
+            if (codeAreaPopupMenuHandler != null) {
+                codeArea.setComponentPopupMenu(new JPopupMenu() {
+                    @Override
+                    public void show(Component invoker, int x, int y) {
+                        JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, POPUP_MENU_POSTFIX, x, y);
+                        popupMenu.show(invoker, x, y);
+                    }
+                });
             }
         }
         revalidate();
     }
 
-    public void setHexCodePopupMenuHandler(CodeAreaPopupMenuHandler hexCodePopupMenuHandler) {
-        this.hexCodePopupMenuHandler = hexCodePopupMenuHandler;
+    public void setCodeAreaPopupMenuHandler(CodeAreaPopupMenuHandler codeAreaPopupMenuHandler) {
+        this.codeAreaPopupMenuHandler = codeAreaPopupMenuHandler;
     }
 
     public void detachMenu() {
         if (condition.getSearchMode() == SearchCondition.SearchMode.BINARY) {
-            hexCodePopupMenuHandler.dropPopupMenu(POPUP_MENU_POSTFIX);
+            codeAreaPopupMenuHandler.dropPopupMenu(POPUP_MENU_POSTFIX);
         }
     }
 

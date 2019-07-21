@@ -28,7 +28,7 @@ import org.exbin.framework.gui.utils.WindowUtils;
 /**
  * Color cell panel for color profile panel.
  *
- * @version 0.2.0 2019/03/16
+ * @version 0.2.1 2019/07/17
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -107,7 +107,7 @@ public class ColorCellPanel extends javax.swing.JPanel {
         final JColorChooser colorChooser = new javax.swing.JColorChooser();
         JDialog dialog = JColorChooser.createDialog(this, "Select Color", true, colorChooser, (ActionEvent e) -> {
             Color color = colorChooser.getColor();
-            colorLabel.setBackground(color);
+            setColor(color);
             colorHandler.setColor(color);
         }, null);
         dialog.setVisible(true);
@@ -115,6 +115,7 @@ public class ColorCellPanel extends javax.swing.JPanel {
 
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         setColor(null);
+        colorHandler.setColor(null);
     }//GEN-LAST:event_clearButtonActionPerformed
 
     /**

@@ -1,5 +1,9 @@
 0.2.1
 - Context aware popup menu
+- Go-to dialog position to support position from end
+- Go-to dialog position to support different numerical bases
+- Support for ENTER key in preview section
+- Minor fix to view of native Java debug values
 
 0.2.0 (2019-04-13)
 - Renamed to BinEd

@@ -15,26 +15,28 @@
  */
 package org.exbin.framework.bined.preferences;
 
+import org.exbin.framework.api.Preferences;
+import java.awt.Font;
+import java.awt.font.TextAttribute;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaViewMode;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.PositionCodeType;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
-import org.exbin.framework.Preferences;
-import org.exbin.framework.editor.text.EncodingsHandler;
-import org.exbin.framework.editor.text.panel.TextFontOptionsPanel;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.awt.*;
-import java.awt.font.TextAttribute;
-import java.util.*;
-import java.util.List;
+import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
+import org.exbin.framework.editor.text.preferences.TextFontPreferences;
 
 /**
- * Legacy parameters for version 0.1.
+ * Legacy preferences for version 0.1.
  *
- * @version 0.2.0 2019/03/01
+ * @version 0.2.0 2019/06/08
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -77,7 +79,7 @@ public class LegacyPreferences {
 
     @Nonnull
     public String getSelectedEncoding() {
-        return preferences.get(PREFERENCES_ENCODING_SELECTED, EncodingsHandler.ENCODING_UTF8);
+        return preferences.get(PREFERENCES_ENCODING_SELECTED, TextEncodingPreferences.ENCODING_UTF8);
     }
 
     public void setSelectedEncoding(String encodingName) {
@@ -129,30 +131,30 @@ public class LegacyPreferences {
     public Font getCodeFont(Font initialFont) {
         String value;
         Map<TextAttribute, Object> attribs = new HashMap<>();
-        value = preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_FAMILY, null);
+        value = preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_FAMILY, null);
         if (value != null) {
             attribs.put(TextAttribute.FAMILY, value);
         }
-        value = preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SIZE, null);
+        value = preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_SIZE, null);
         if (value != null) {
             attribs.put(TextAttribute.SIZE, new Integer(value).floatValue());
         }
-        if (Boolean.valueOf(preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_UNDERLINE, null))) {
+        if (Boolean.valueOf(preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_UNDERLINE, null))) {
             attribs.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
         }
-        if (Boolean.valueOf(preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRIKETHROUGH, null))) {
+        if (Boolean.valueOf(preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_STRIKETHROUGH, null))) {
             attribs.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
         }
-        if (Boolean.valueOf(preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRONG, null))) {
+        if (Boolean.valueOf(preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_STRONG, null))) {
             attribs.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
         }
-        if (Boolean.valueOf(preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_ITALIC, null))) {
+        if (Boolean.valueOf(preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_ITALIC, null))) {
             attribs.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
         }
-        if (Boolean.valueOf(preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUBSCRIPT, null))) {
+        if (Boolean.valueOf(preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_SUBSCRIPT, null))) {
             attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUB);
         }
-        if (Boolean.valueOf(preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUPERSCRIPT, null))) {
+        if (Boolean.valueOf(preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_SUPERSCRIPT, null))) {
             attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
         }
         Font font = initialFont.deriveFont(attribs);
@@ -163,22 +165,22 @@ public class LegacyPreferences {
         Map<TextAttribute, ?> attribs = font.getAttributes();
         String value = (String) attribs.get(TextAttribute.FAMILY);
         if (value != null) {
-            preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_FAMILY, value);
+            preferences.put(TextFontPreferences.PREFERENCES_TEXT_FONT_FAMILY, value);
         } else {
-            preferences.remove(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_FAMILY);
+            preferences.remove(TextFontPreferences.PREFERENCES_TEXT_FONT_FAMILY);
         }
         Float fontSize = (Float) attribs.get(TextAttribute.SIZE);
         if (fontSize != null) {
-            preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SIZE, Integer.toString((int) (float) fontSize));
+            preferences.put(TextFontPreferences.PREFERENCES_TEXT_FONT_SIZE, Integer.toString((int) (float) fontSize));
         } else {
-            preferences.remove(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SIZE);
+            preferences.remove(TextFontPreferences.PREFERENCES_TEXT_FONT_SIZE);
         }
-        preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_UNDERLINE, Boolean.toString(TextAttribute.UNDERLINE_LOW_ONE_PIXEL.equals(attribs.get(TextAttribute.UNDERLINE))));
-        preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRIKETHROUGH, Boolean.toString(TextAttribute.STRIKETHROUGH_ON.equals(attribs.get(TextAttribute.STRIKETHROUGH))));
-        preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_STRONG, Boolean.toString(TextAttribute.WEIGHT_BOLD.equals(attribs.get(TextAttribute.WEIGHT))));
-        preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_ITALIC, Boolean.toString(TextAttribute.POSTURE_OBLIQUE.equals(attribs.get(TextAttribute.POSTURE))));
-        preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUBSCRIPT, Boolean.toString(TextAttribute.SUPERSCRIPT_SUB.equals(attribs.get(TextAttribute.SUPERSCRIPT))));
-        preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_SUPERSCRIPT, Boolean.toString(TextAttribute.SUPERSCRIPT_SUPER.equals(attribs.get(TextAttribute.SUPERSCRIPT))));
+        preferences.put(TextFontPreferences.PREFERENCES_TEXT_FONT_UNDERLINE, Boolean.toString(TextAttribute.UNDERLINE_LOW_ONE_PIXEL.equals(attribs.get(TextAttribute.UNDERLINE))));
+        preferences.put(TextFontPreferences.PREFERENCES_TEXT_FONT_STRIKETHROUGH, Boolean.toString(TextAttribute.STRIKETHROUGH_ON.equals(attribs.get(TextAttribute.STRIKETHROUGH))));
+        preferences.put(TextFontPreferences.PREFERENCES_TEXT_FONT_STRONG, Boolean.toString(TextAttribute.WEIGHT_BOLD.equals(attribs.get(TextAttribute.WEIGHT))));
+        preferences.put(TextFontPreferences.PREFERENCES_TEXT_FONT_ITALIC, Boolean.toString(TextAttribute.POSTURE_OBLIQUE.equals(attribs.get(TextAttribute.POSTURE))));
+        preferences.put(TextFontPreferences.PREFERENCES_TEXT_FONT_SUBSCRIPT, Boolean.toString(TextAttribute.SUPERSCRIPT_SUB.equals(attribs.get(TextAttribute.SUPERSCRIPT))));
+        preferences.put(TextFontPreferences.PREFERENCES_TEXT_FONT_SUPERSCRIPT, Boolean.toString(TextAttribute.SUPERSCRIPT_SUPER.equals(attribs.get(TextAttribute.SUPERSCRIPT))));
     }
 
     public boolean isDeltaMemoryMode() {
@@ -258,11 +260,11 @@ public class LegacyPreferences {
     }
 
     public boolean isUseDefaultFont() {
-        return Boolean.valueOf(preferences.get(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(true)));
+        return Boolean.valueOf(preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(true)));
     }
 
     public void setUseDefaultFont(boolean useDefaultFont) {
-        preferences.put(TextFontOptionsPanel.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(useDefaultFont));
+        preferences.put(TextFontPreferences.PREFERENCES_TEXT_FONT_DEFAULT, Boolean.toString(useDefaultFont));
     }
 
     public boolean isShowHeader() {

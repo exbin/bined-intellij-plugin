@@ -32,7 +32,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
-import org.exbin.framework.bined.preferences.ColorParameters;
+import org.exbin.framework.bined.options.CodeAreaColorOptions;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
@@ -42,7 +42,7 @@ import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
 /**
  * Manage list of color profiles panel.
  *
- * @version 0.2.0 2019/03/11
+ * @version 0.2.1 2019/07/20
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -51,6 +51,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ColorProfilesPanel.class);
 
     private boolean modified = false;
+    private CodeAreaColorOptions activeOptions = null;
 
     public ColorProfilesPanel() {
         initComponents();
@@ -295,7 +296,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Add Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Add Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
             if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
                 if (!isValidProfileName(namedProfilePanel.getProfileName())) {
@@ -318,8 +319,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
 
             dialog.close();
         });
-        dialog.center();
-        dialog.show();
+        dialog.showCentered(this);
         dialog.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 
@@ -339,7 +339,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Edit Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Edit Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
         namedProfilePanel.setProfileName(profileRecord.profileName);
         colorProfilePanel.setColorProfile(profileRecord.colorProfile);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
@@ -358,8 +358,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
 
             dialog.close();
         });
-        dialog.center();
-        dialog.show();
+        dialog.showCentered(this);
         dialog.dispose();
     }//GEN-LAST:event_editButtonActionPerformed
 
@@ -385,7 +384,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, null, "Copy Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Copy Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
         colorProfilePanel.setColorProfile(profileRecord.colorProfile);
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
             if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
@@ -410,8 +409,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
 
             dialog.close();
         });
-        dialog.center();
-        dialog.show();
+        dialog.showCentered(this);
         dialog.dispose();
     }//GEN-LAST:event_copyButtonActionPerformed
 
@@ -428,13 +426,15 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         return profileName != null && !"".equals(profileName.trim());
     }
 
-    public void loadFromParameters(ColorParameters parameters) {
+    public void loadFromOptions(CodeAreaColorOptions options) {
+        activeOptions = options;
+
         List<ColorProfile> profiles = new ArrayList<>();
-        List<String> profileNames = parameters.getColorProfilesList();
+        List<String> profileNames = options.getProfileNames();
         for (int index = 0; index < profileNames.size(); index++) {
             ColorProfile profile = new ColorProfile();
             profile.profileName = profileNames.get(index);
-            profile.colorProfile = parameters.getColorsProfile(index);
+            profile.colorProfile = options.getColorProfile(index);
             profiles.add(profile);
         }
 
@@ -442,21 +442,14 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         model.setProfiles(profiles);
     }
 
-    public void saveToParameters(ColorParameters parameters) {
-        List<String> profileNames = parameters.getColorProfilesList();
-        for (int index = 0; index < profileNames.size(); index++) {
-            parameters.clearColorsProfile(index);
-        }
-
-        profileNames.clear();
+    public void saveToOptions(CodeAreaColorOptions options) {
+        options.clearProfiles();
         ProfilesListModel model = getProfilesListModel();
         List<ColorProfile> profiles = model.getProfiles();
         for (int index = 0; index < profiles.size(); index++) {
             ColorProfile profile = profiles.get(index);
-            profileNames.add(profile.profileName);
-            parameters.setColorsProfile(index, profile.colorProfile);
+            options.addProfile(profile.profileName, profile.colorProfile);
         }
-        parameters.setColorProfilesList(profileNames);
     }
 
     /**

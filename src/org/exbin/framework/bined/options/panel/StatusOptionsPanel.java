@@ -15,22 +15,26 @@
  */
 package org.exbin.framework.bined.options.panel;
 
+import java.util.ResourceBundle;
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.PositionCodeType;
 import org.exbin.framework.bined.options.StatusOptions;
-import org.exbin.framework.bined.panel.StatusCursorPositionFormat;
-import org.exbin.framework.bined.panel.StatusDocumentSizeFormat;
+import org.exbin.framework.bined.StatusCursorPositionFormat;
+import org.exbin.framework.bined.StatusDocumentSizeFormat;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.gui.options.api.OptionsCapable;
+import org.exbin.framework.gui.options.api.OptionsModifiedListener;
 
 /**
- * Editor preference parameters panel.
+ * Editor status bar options panel.
  *
- * @version 0.2.0 2019/03/16
+ * @version 0.2.1 2019/07/20
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class StatusOptionsPanel extends javax.swing.JPanel {
+public class StatusOptionsPanel extends javax.swing.JPanel implements OptionsCapable<StatusOptions> {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(StatusOptionsPanel.class);
 
@@ -38,6 +42,13 @@ public class StatusOptionsPanel extends javax.swing.JPanel {
         initComponents();
     }
 
+    @Nonnull
+    @Override
+    public ResourceBundle getResourceBundle() {
+        return resourceBundle;
+    }
+
+    @Override
     public void saveToOptions(StatusOptions options) {
         StatusCursorPositionFormat cursorPositionFormat = new StatusCursorPositionFormat();
         cursorPositionFormat.setCodeType(PositionCodeType.valueOf((String) cursorPositionCodeTypeComboBox.getSelectedItem()));
@@ -54,6 +65,7 @@ public class StatusOptionsPanel extends javax.swing.JPanel {
         options.setHexadecimalSpaceGroupSize((int) hexadecimalGroupSizeSpinner.getValue());
     }
 
+    @Override
     public void loadFromOptions(StatusOptions options) {
         StatusCursorPositionFormat cursorPositionFormat = options.getCursorPositionFormat();
         cursorPositionCodeTypeComboBox.setSelectedIndex(cursorPositionFormat.getCodeType().ordinal());
@@ -193,4 +205,8 @@ public class StatusOptionsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel octalGroupSizeLabel;
     private javax.swing.JSpinner octalGroupSizeSpinner;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void setOptionsModifiedListener(OptionsModifiedListener listener) {
+    }
 }

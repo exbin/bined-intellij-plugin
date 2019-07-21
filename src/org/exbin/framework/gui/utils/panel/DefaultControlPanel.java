@@ -15,20 +15,25 @@
  */
 package org.exbin.framework.gui.utils.panel;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.gui.utils.LanguageUtils;
+import org.exbin.framework.gui.utils.OkCancelListener;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 
 /**
  * Basic default control panel.
  *
- * @version 0.2.0 2016/12/27
+ * @version 0.2.1 2019/07/14
  * @author ExBin Project (http://exbin.org)
  */
-public class DefaultControlPanel extends javax.swing.JPanel implements DefaultControlHandler.DefaultControlListener {
+@ParametersAreNonnullByDefault
+public class DefaultControlPanel extends javax.swing.JPanel implements DefaultControlHandler.DefaultControlService {
 
     private final java.util.ResourceBundle resourceBundle;
     private DefaultControlHandler handler;
+    private OkCancelListener okCancelListener;
 
     public DefaultControlPanel() {
         this(LanguageUtils.getResourceBundleByClass(DefaultControlPanel.class));
@@ -37,6 +42,18 @@ public class DefaultControlPanel extends javax.swing.JPanel implements DefaultCo
     public DefaultControlPanel(java.util.ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
         initComponents();
+        
+        okCancelListener = new OkCancelListener() {
+            @Override
+            public void okEvent() {
+                performClick(DefaultControlHandler.ControlActionType.OK);
+            }
+
+            @Override
+            public void cancelEvent() {
+                performClick(DefaultControlHandler.ControlActionType.CANCEL);
+            }
+        };
     }
 
     public void setHandler(DefaultControlHandler handler) {
@@ -113,17 +130,27 @@ public class DefaultControlPanel extends javax.swing.JPanel implements DefaultCo
         WindowUtils.doButtonClick(actionType == DefaultControlHandler.ControlActionType.OK ? okButton : cancelButton);
     }
 
+    @Nonnull
     @Override
-    public WindowUtils.OkCancelListener createOkCancelListener() {
-        return new WindowUtils.OkCancelListener() {
-            @Override
-            public void okEvent() {
-                performClick(DefaultControlHandler.ControlActionType.OK);
-            }
+    public OkCancelListener getOkCancelListener() {
+        return okCancelListener;
+    }
 
-            @Override
-            public void cancelEvent() {
-                performClick(DefaultControlHandler.ControlActionType.CANCEL);
+    @Nonnull
+    @Override
+    public DefaultControlHandler.DefaultControlEnablementListener createEnablementListener() {
+        return (DefaultControlHandler.ControlActionType actionType, boolean enablement) -> {
+            switch (actionType) {
+                case OK: {
+                    okButton.setEnabled(enablement);
+                    break;
+                }
+                case CANCEL: {
+                    cancelButton.setEnabled(enablement);
+                    break;
+                }
+                default:
+                    throw new IllegalStateException("Illegal action type " + actionType.name());
             }
         };
     }

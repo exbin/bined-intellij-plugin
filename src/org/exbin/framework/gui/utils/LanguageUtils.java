@@ -22,17 +22,25 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Static utility methods for central language support.
  *
- * @version 0.2.0 2016/08/18
+ * @version 0.2.1 2019/06/19
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class LanguageUtils {
 
     private static ClassLoader languageClassLoader = null;
 
+    private LanguageUtils() {
+    }
+
+    @Nullable
     public static ClassLoader getLanguageClassLoader() {
         return languageClassLoader;
     }
@@ -49,6 +57,7 @@ public class LanguageUtils {
      * @param targetClass target class
      * @return name path
      */
+    @Nonnull
     public static String getClassNamePath(Class<?> targetClass) {
         return targetClass.getCanonicalName().replace(".", "/");
     }
@@ -60,6 +69,7 @@ public class LanguageUtils {
      * @param targetClass target class
      * @return resource bundle
      */
+    @Nullable
     public static ResourceBundle getResourceBundleByClass(Class<?> targetClass) {
         if (languageClassLoader == null) {
             return ResourceBundle.getBundle(getResourceBaseNameBundleByClass(targetClass));
@@ -75,6 +85,7 @@ public class LanguageUtils {
      * @param targetClass target class
      * @return base name string
      */
+    @Nullable
     public static String getResourceBaseNameBundleByClass(Class<?> targetClass) {
         String classNamePath = getClassNamePath(targetClass);
         int classNamePos = classNamePath.lastIndexOf("/");
@@ -85,6 +96,7 @@ public class LanguageUtils {
      * Resource bundle which looks for language resources first and main
      * resources as fallback.
      */
+    @ParametersAreNonnullByDefault
     private static class LanguageResourceBundle extends ResourceBundle {
 
         private final ResourceBundle mainResourceBundle;
@@ -95,6 +107,7 @@ public class LanguageUtils {
             languageResourceBundle = ResourceBundle.getBundle(baseName, Locale.getDefault(), languageClassLoader);
         }
 
+        @Nullable
         @Override
         protected Object handleGetObject(String key) {
             Object object = languageResourceBundle.getObject(key);
@@ -105,6 +118,7 @@ public class LanguageUtils {
             return object;
         }
 
+        @Nonnull
         @Override
         public Enumeration<String> getKeys() {
             Set<String> keys = new HashSet<>();

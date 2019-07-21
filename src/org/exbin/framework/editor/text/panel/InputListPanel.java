@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 /**
  * Item list with text input.
@@ -55,20 +54,14 @@ public class InputListPanel extends javax.swing.JPanel {
                 return items[index];
             }
         });
-        itemList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!textUpdating) {
-                    String selectedValue = itemList.getSelectedValue();
-                    textField.setText(selectedValue);
-                }
+        itemList.addListSelectionListener((ListSelectionEvent e) -> {
+            if (!textUpdating) {
+                String selectedValue = itemList.getSelectedValue();
+                textField.setText(selectedValue);
             }
         });
-        textField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                valueChanged();
-            }
+        textField.addActionListener((ActionEvent e) -> {
+            valueChanged();
         });
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override

@@ -28,7 +28,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.util.List;
 
 /**
- * Open file in hexadecimal editor action.
+ * Open file in binary editor action.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.0 2018/12/23

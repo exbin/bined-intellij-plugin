@@ -22,14 +22,18 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.ImageObserver;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Icon;
 
 /**
  * Simple header panel.
  *
- * @version 0.2.0 2016/11/29
+ * @version 0.2.1 2019/07/14
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class WindowHeaderPanel extends javax.swing.JPanel {
 
     private BackgroundDecorationMode decorationMode = BackgroundDecorationMode.COLOR_BOTTOM_RIGHT_TRANSITION;
@@ -37,12 +41,7 @@ public class WindowHeaderPanel extends javax.swing.JPanel {
     private Image decorationImage = null;
     private boolean darkMode = false;
 
-    private final ImageObserver imageObserver = new ImageObserver() {
-        @Override
-        public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-            return true;
-        }
-    };
+    private final ImageObserver imageObserver = (Image img, int infoflags, int x, int y, int width, int height) -> true;
 
     public WindowHeaderPanel() {
         initComponents();
@@ -132,6 +131,7 @@ public class WindowHeaderPanel extends javax.swing.JPanel {
     private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables
 
+    @Nonnull
     public String getTitle() {
         return titleLabel.getText();
     }
@@ -140,6 +140,7 @@ public class WindowHeaderPanel extends javax.swing.JPanel {
         titleLabel.setText(title);
     }
 
+    @Nonnull
     public String getDescription() {
         return descriptionTextArea.getText();
     }
@@ -148,6 +149,7 @@ public class WindowHeaderPanel extends javax.swing.JPanel {
         descriptionTextArea.setText(description);
     }
 
+    @Nullable
     public Icon getIcon() {
         return iconLabel.getIcon();
     }
@@ -157,6 +159,7 @@ public class WindowHeaderPanel extends javax.swing.JPanel {
         iconLabel.setPreferredSize(new Dimension(icon == null ? 0 : 64, 64));
     }
 
+    @Nonnull
     public BackgroundDecorationMode getDecorationMode() {
         return decorationMode;
     }
@@ -166,6 +169,7 @@ public class WindowHeaderPanel extends javax.swing.JPanel {
         repaint();
     }
 
+    @Nullable
     public Color getTransitionColor() {
         return transitionColor;
     }
@@ -175,6 +179,7 @@ public class WindowHeaderPanel extends javax.swing.JPanel {
         repaint();
     }
 
+    @Nullable
     public Image getDecorationImage() {
         return decorationImage;
     }
@@ -216,10 +221,12 @@ public class WindowHeaderPanel extends javax.swing.JPanel {
                 }
                 break;
             }
+            default:
+                throw new IllegalStateException("Illegal decoration mode " + decorationMode.name());
         }
     }
 
-    public static enum BackgroundDecorationMode {
+    public enum BackgroundDecorationMode {
         PLAIN,
         COLOR_RIGHT_HORIZONTAL_TRANSITION,
         COLOR_TOP_RIGHT_TRANSITION,
@@ -230,7 +237,8 @@ public class WindowHeaderPanel extends javax.swing.JPanel {
     /**
      * Interface for decoration provider.
      */
-    public static interface WindowHeaderDecorationProvider {
+    @ParametersAreNonnullByDefault
+    public interface WindowHeaderDecorationProvider {
 
         /**
          * Configures provided instance of header panel.

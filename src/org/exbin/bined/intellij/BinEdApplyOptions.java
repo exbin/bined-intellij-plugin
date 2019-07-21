@@ -15,27 +15,29 @@
  */
 package org.exbin.bined.intellij;
 
+import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.options.CharsetOptions;
 import org.exbin.framework.bined.options.CodeAreaOptions;
 import org.exbin.framework.bined.options.EditorOptions;
 import org.exbin.framework.bined.options.StatusOptions;
+import org.exbin.framework.editor.text.options.TextEncodingOptions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.nio.charset.Charset;
 import java.util.Objects;
 
 /**
  * Options for apply operation.
  *
- * @version 0.2.0 2019/03/16
+ * @version 0.2.1 2019/07/21
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class BinEdApplyOptions {
 
     private CodeAreaOptions codeAreaOptions = new CodeAreaOptions();
-    private CharsetOptions charsetOptions = new CharsetOptions();
+    private TextEncodingOptions encodingOptions = new TextEncodingOptions();
     private EditorOptions editorOptions = new EditorOptions();
     private StatusOptions statusOptions = new StatusOptions();
 
@@ -49,12 +51,12 @@ public class BinEdApplyOptions {
     }
 
     @Nonnull
-    public CharsetOptions getCharsetOptions() {
-        return charsetOptions;
+    public TextEncodingOptions getEncodingOptions() {
+        return encodingOptions;
     }
 
-    public void setCharsetOptions(CharsetOptions charsetOptions) {
-        this.charsetOptions = Objects.requireNonNull(charsetOptions);
+    public void setEncodingOptions(TextEncodingOptions encodingOptions) {
+        this.encodingOptions = Objects.requireNonNull(encodingOptions);
     }
 
     @Nonnull
@@ -77,11 +79,11 @@ public class BinEdApplyOptions {
 
     public void applyFromCodeArea(ExtCodeArea codeArea) {
         codeAreaOptions.applyFromCodeArea(codeArea);
-        charsetOptions.applyFromCodeArea(codeArea);
+        encodingOptions.setSelectedEncoding(((CharsetCapable) codeArea).getCharset().name());
     }
 
     public void applyToCodeArea(ExtCodeArea codeArea) {
         codeAreaOptions.applyToCodeArea(codeArea);
-        charsetOptions.applyToCodeArea(codeArea);
+        ((CharsetCapable) codeArea).setCharset(Charset.forName(encodingOptions.getSelectedEncoding()));
     }
 }

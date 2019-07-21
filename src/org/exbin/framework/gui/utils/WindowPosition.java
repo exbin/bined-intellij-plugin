@@ -16,7 +16,8 @@
  */
 package org.exbin.framework.gui.utils;
 
-import java.util.prefs.Preferences;
+import javax.annotation.ParametersAreNonnullByDefault;
+import org.exbin.framework.api.Preferences;
 
 /**
  * Structure for window position.
@@ -24,6 +25,7 @@ import java.util.prefs.Preferences;
  * @version 0.2.0 2016/12/04
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class WindowPosition {
 
     public static final String PREFERENCES_SCREEN_INDEX = "screenIndex";
@@ -109,28 +111,28 @@ public class WindowPosition {
     }
 
     public void saveToPreferences(Preferences pref, String prefix) {
-        pref.put(prefix + PREFERENCES_SCREEN_INDEX, String.valueOf(screenIndex));
-        pref.put(prefix + PREFERENCES_SCREEN_WIDTH, String.valueOf(screenWidth));
-        pref.put(prefix + PREFERENCES_SCREEN_HEIGHT, String.valueOf(screenHeight));
-        pref.put(prefix + PREFERENCES_POSITION_X, String.valueOf(relativeX));
-        pref.put(prefix + PREFERENCES_POSITION_Y, String.valueOf(relativeY));
-        pref.put(prefix + PREFERENCES_WIDTH, String.valueOf(width));
-        pref.put(prefix + PREFERENCES_HEIGHT, String.valueOf(height));
-        pref.put(prefix + PREFERENCES_MAXIMIZED, String.valueOf(maximized));
+        pref.putInt(prefix + PREFERENCES_SCREEN_INDEX, screenIndex);
+        pref.putInt(prefix + PREFERENCES_SCREEN_WIDTH, screenWidth);
+        pref.putInt(prefix + PREFERENCES_SCREEN_HEIGHT, screenHeight);
+        pref.putInt(prefix + PREFERENCES_POSITION_X, relativeX);
+        pref.putInt(prefix + PREFERENCES_POSITION_Y, relativeY);
+        pref.putInt(prefix + PREFERENCES_WIDTH, width);
+        pref.putInt(prefix + PREFERENCES_HEIGHT, height);
+        pref.putBoolean(prefix + PREFERENCES_MAXIMIZED, maximized);
     }
-    
+
     public void loadFromPreferences(Preferences pref, String prefix) {
-        screenIndex = Integer.valueOf(pref.get(prefix + PREFERENCES_SCREEN_INDEX, "0"));
-        screenWidth = Integer.valueOf(pref.get(prefix + PREFERENCES_SCREEN_WIDTH, "0"));
-        screenHeight = Integer.valueOf(pref.get(prefix + PREFERENCES_SCREEN_HEIGHT, "0"));
-        relativeX = Integer.valueOf(pref.get(prefix + PREFERENCES_POSITION_X, "0"));
-        relativeY = Integer.valueOf(pref.get(prefix + PREFERENCES_POSITION_Y, "0"));
-        width = Integer.valueOf(pref.get(prefix + PREFERENCES_WIDTH, "0"));
-        height = Integer.valueOf(pref.get(prefix + PREFERENCES_HEIGHT, "0"));
-        maximized = Boolean.valueOf(pref.get(prefix + PREFERENCES_MAXIMIZED, Boolean.toString(Boolean.FALSE)));
+        screenIndex = pref.getInt(prefix + PREFERENCES_SCREEN_INDEX, 0);
+        screenWidth = pref.getInt(prefix + PREFERENCES_SCREEN_WIDTH, 0);
+        screenHeight = pref.getInt(prefix + PREFERENCES_SCREEN_HEIGHT, 0);
+        relativeX = pref.getInt(prefix + PREFERENCES_POSITION_X, 0);
+        relativeY = pref.getInt(prefix + PREFERENCES_POSITION_Y, 0);
+        width = pref.getInt(prefix + PREFERENCES_WIDTH, 0);
+        height = pref.getInt(prefix + PREFERENCES_HEIGHT, 0);
+        maximized = pref.getBoolean(prefix + PREFERENCES_MAXIMIZED, false);
     }
 
     public boolean preferencesExists(Preferences pref, String prefix) {
-        return pref.get(prefix + PREFERENCES_SCREEN_INDEX, null) != null;
+        return pref.exists(prefix + PREFERENCES_SCREEN_INDEX);
     }
 }

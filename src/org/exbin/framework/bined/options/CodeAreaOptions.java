@@ -15,6 +15,9 @@
  */
 package org.exbin.framework.bined.options;
 
+import java.awt.Font;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaViewMode;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
@@ -28,20 +31,17 @@ import org.exbin.bined.extended.capability.ShowUnprintablesCapable;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.preferences.CodeAreaParameters;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.awt.*;
+import org.exbin.framework.bined.preferences.CodeAreaPreferences;
+import org.exbin.framework.gui.options.api.OptionsData;
 
 /**
  * Code area options.
  *
- * @version 0.2.0 2019/03/16
+ * @version 0.2.1 2019/07/20
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class CodeAreaOptions {
+public class CodeAreaOptions implements OptionsData {
 
     private Font codeFont = null;
     private CodeType codeType = CodeType.HEXADECIMAL;
@@ -160,34 +160,34 @@ public class CodeAreaOptions {
         this.maxRowPositionLength = maxRowPositionLength;
     }
 
-    public void loadFromParameters(CodeAreaParameters parameters) {
-        codeFont = parameters.getCodeFont(DEFAULT_FONT);
-        codeType = parameters.getCodeType();
-        showUnprintables = parameters.isShowNonprintables();
-        codeCharactersCase = parameters.getCodeCharactersCase();
-        positionCodeType = parameters.getPositionCodeType();
-        viewMode = parameters.getViewMode();
-        codeColorization = parameters.isCodeColorization();
-        useDefaultFont = parameters.isUseDefaultFont();
-        rowWrappingMode = parameters.getRowWrappingMode();
-        maxBytesPerRow = parameters.getMaxBytesPerRow();
-        minRowPositionLength = parameters.getMinRowPositionLength();
-        maxRowPositionLength = parameters.getMaxRowPositionLength();
+    public void loadFromParameters(CodeAreaPreferences preferences) {
+        codeFont = preferences.getCodeFont(DEFAULT_FONT);
+        codeType = preferences.getCodeType();
+        showUnprintables = preferences.isShowNonprintables();
+        codeCharactersCase = preferences.getCodeCharactersCase();
+        positionCodeType = preferences.getPositionCodeType();
+        viewMode = preferences.getViewMode();
+        codeColorization = preferences.isCodeColorization();
+        useDefaultFont = preferences.isUseDefaultFont();
+        rowWrappingMode = preferences.getRowWrappingMode();
+        maxBytesPerRow = preferences.getMaxBytesPerRow();
+        minRowPositionLength = preferences.getMinRowPositionLength();
+        maxRowPositionLength = preferences.getMaxRowPositionLength();
     }
 
-    public void saveToParameters(CodeAreaParameters parameters) {
-        parameters.setCodeFont(codeFont);
-        parameters.setCodeType(codeType);
-        parameters.setShowUnprintables(showUnprintables);
-        parameters.setCodeCharactersCase(codeCharactersCase);
-        parameters.setPositionCodeType(positionCodeType);
-        parameters.setViewMode(viewMode);
-        parameters.setCodeColorization(codeColorization);
-        parameters.setUseDefaultFont(useDefaultFont);
-        parameters.setRowWrappingMode(rowWrappingMode);
-        parameters.setMaxBytesPerRow(maxBytesPerRow);
-        parameters.setMinRowPositionLength(minRowPositionLength);
-        parameters.setMaxRowPositionLength(maxRowPositionLength);
+    public void saveToParameters(CodeAreaPreferences preferences) {
+        preferences.setCodeFont(codeFont);
+        preferences.setCodeType(codeType);
+        preferences.setShowUnprintables(showUnprintables);
+        preferences.setCodeCharactersCase(codeCharactersCase);
+        preferences.setPositionCodeType(positionCodeType);
+        preferences.setViewMode(viewMode);
+        preferences.setCodeColorization(codeColorization);
+        preferences.setUseDefaultFont(useDefaultFont);
+        preferences.setRowWrappingMode(rowWrappingMode);
+        preferences.setMaxBytesPerRow(maxBytesPerRow);
+        preferences.setMinRowPositionLength(minRowPositionLength);
+        preferences.setMaxRowPositionLength(maxRowPositionLength);
     }
 
     public void applyFromCodeArea(ExtCodeArea codeArea) {
