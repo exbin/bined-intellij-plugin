@@ -22,7 +22,9 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.util.List;
@@ -31,19 +33,25 @@ import java.util.List;
  * Open file in binary editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.0 2018/12/23
+ * @version 0.2.1 2019/08/04
  */
-public class FileOpenAsBinaryAction extends AnAction {
+public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
 
     public FileOpenAsBinaryAction() {
         super("Open As Binary" + DialogUtils.DIALOG_MENUITEM_EXT);
     }
 
     @Override
+    public void update(AnActionEvent event) {
+        super.update(event);
+        event.getPresentation().setEnabledAndVisible(true);
+    }
+
+    @Override
     public void actionPerformed(AnActionEvent event) {
-        final Project project = event.getProject();
+        Project project = event.getProject();
         if (project == null) {
-            return;
+            project = ProjectManager.getInstance().getDefaultProject();
         }
 
         FileChooserDescriptor chooserDescriptor = new FileChooserDescriptor(true, false, true, false, false, false);

@@ -16,23 +16,26 @@
  */
 package org.exbin.framework.bined.panel;
 
-import org.exbin.bined.*;
-import org.exbin.framework.bined.BinaryStatusApi;
-import org.exbin.framework.bined.StatusCursorPositionFormat;
 import org.exbin.framework.bined.StatusDocumentSizeFormat;
-import org.exbin.framework.bined.options.StatusOptions;
-import org.exbin.framework.bined.preferences.StatusPreferences;
-import org.exbin.framework.editor.text.TextEncodingStatusApi;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import java.awt.*;
+import org.exbin.framework.bined.StatusCursorPositionFormat;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JToolTip;
+import org.exbin.bined.CodeAreaCaretPosition;
+import org.exbin.bined.CodeAreaUtils;
+import org.exbin.bined.EditationMode;
+import org.exbin.bined.EditationOperation;
+import org.exbin.bined.PositionCodeType;
+import org.exbin.framework.editor.text.TextEncodingStatusApi;
+import org.exbin.framework.gui.utils.LanguageUtils;
+import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.bined.BinaryStatusApi;
+import org.exbin.framework.bined.options.StatusOptions;
+import org.exbin.framework.bined.preferences.StatusPreferences;
 
 /**
  * Binary editor status panel.

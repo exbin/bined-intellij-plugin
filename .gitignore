@@ -1,5 +1,11 @@
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
 .gradle
-.idea/workspace.xml
 out/
 *~
 bined-intellij-plugin.jar

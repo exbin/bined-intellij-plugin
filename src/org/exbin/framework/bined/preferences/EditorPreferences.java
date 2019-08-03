@@ -25,7 +25,7 @@ import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.FileHandlingMode;
 
 /**
- * Binary editor preferences.
+ * Hexadecimal editor preferences.
  *
  * @version 0.2.1 2019/07/17
  * @author ExBin Project (http://exbin.org)

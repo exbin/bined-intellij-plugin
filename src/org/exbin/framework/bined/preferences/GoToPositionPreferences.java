@@ -21,12 +21,12 @@ import org.exbin.framework.api.Preferences;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.PositionCodeType;
-import org.exbin.framework.bined.panel.GoToBinaryPanel.GoToBinaryPositionMode;
+import org.exbin.framework.bined.panel.GoToBinaryPositionMode;
 
 /**
- * Hexadecimal editor preferences.
+ * Binary editor preferences.
  *
- * @version 0.2.1 2019/07/12
+ * @version 0.2.1 2019/07/30
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault

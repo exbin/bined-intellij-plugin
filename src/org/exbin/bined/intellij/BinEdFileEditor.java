@@ -137,6 +137,7 @@ public class BinEdFileEditor implements FileEditor {
         editorPanel.add(toolbarPanel, BorderLayout.NORTH);
         registerEncodingStatus(statusPanel);
         encodingsHandler = new EncodingsHandler();
+        encodingsHandler.setParentComponent(this.getComponent());
         encodingsHandler.init();
         encodingsHandler.setTextEncodingStatus(new TextEncodingStatusApi() {
             @Override
@@ -163,12 +164,14 @@ public class BinEdFileEditor implements FileEditor {
             public void undoCommandPositionChanged() {
                 codeArea.repaint();
                 toolbarPanel.updateUndoState();
+                updateCurrentDocumentSize();
                 notifyModified();
             }
 
             @Override
             public void undoCommandAdded(final BinaryDataCommand command) {
                 toolbarPanel.updateUndoState();
+                updateCurrentDocumentSize();
                 notifyModified();
             }
         });
@@ -253,16 +256,16 @@ public class BinEdFileEditor implements FileEditor {
                     int keyCode = keyEvent.getKeyCode();
                     switch (keyCode) {
                         case KeyEvent.VK_F: {
-                            searchAction.actionPerformed(null);
+                            searchAction.actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
                             searchAction.switchReplaceMode(BinarySearchPanel.SearchOperation.FIND);
                             break;
                         }
                         case KeyEvent.VK_G: {
-                            goToRowAction.actionPerformed(null);
+                            goToRowAction.actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
                             break;
                         }
                         case KeyEvent.VK_S: {
-                            saveFileButtonActionPerformed(null);
+                            saveFileButtonActionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
                             break;
                         }
                     }
@@ -479,7 +482,7 @@ public class BinEdFileEditor implements FileEditor {
 
             @Override
             public void changeCursorPosition() {
-                goToRowAction.actionPerformed(null);
+                goToRowAction.actionPerformed(new ActionEvent(editorPanel, 0, ""));
             }
 
             @Override

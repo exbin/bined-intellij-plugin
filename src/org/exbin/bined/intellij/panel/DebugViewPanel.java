@@ -38,6 +38,7 @@ import org.exbin.utils.binary_data.BinaryData;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -83,6 +84,7 @@ public class DebugViewPanel extends JPanel {
         statusPanel = new BinaryStatusPanel();
         registerEncodingStatus(statusPanel);
         encodingsHandler = new EncodingsHandler();
+        encodingsHandler.setParentComponent(this);
         encodingsHandler.init();
         encodingsHandler.setTextEncodingStatus(new TextEncodingStatusApi() {
             @Override
@@ -140,7 +142,7 @@ public class DebugViewPanel extends JPanel {
                             break;
                         }
                         case KeyEvent.VK_G: {
-                            goToRowAction.actionPerformed(null);
+                            goToRowAction.actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
                             break;
                         }
                     }

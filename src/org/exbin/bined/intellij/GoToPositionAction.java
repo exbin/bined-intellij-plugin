@@ -61,7 +61,7 @@ public class GoToPositionAction implements ActionListener {
         goToControlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
             if (actionType == DefaultControlHandler.ControlActionType.OK) {
                 goToPanel.acceptInput();
-                codeArea.setCaretPosition(goToPanel.getGoToPosition());
+                codeArea.setCaretPosition(goToPanel.getTargetPosition());
                 PositionScrollVisibility visibility = codeArea.getPainter().computePositionScrollVisibility(codeArea.getCaretPosition());
                 if (visibility != PositionScrollVisibility.VISIBLE) {
                     codeArea.centerOnCursor();

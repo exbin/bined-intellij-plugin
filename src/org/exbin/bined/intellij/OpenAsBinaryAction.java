@@ -21,7 +21,9 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.util.List;
@@ -30,9 +32,9 @@ import java.util.List;
  * Open file in binary editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.0 2018/12/23
+ * @version 0.2.1 2019/08/04
  */
-public class OpenAsBinaryAction extends AnAction {
+public class OpenAsBinaryAction extends AnAction implements DumbAware {
 
     public OpenAsBinaryAction() {
         super("Open As Binary");
@@ -41,20 +43,16 @@ public class OpenAsBinaryAction extends AnAction {
     @Override
     public void update(AnActionEvent event) {
         super.update(event);
-        final Project project = event.getProject();
-        if (project == null) {
-            return;
-        }
-
-        event.getPresentation().setEnabled(true);
+        event.getPresentation().setEnabledAndVisible(true);
     }
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-        final Project project = event.getProject();
+        Project project = event.getProject();
         if (project == null) {
-            return;
+            project = ProjectManager.getInstance().getDefaultProject();
         }
+
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
         if (virtualFile != null && virtualFile.isValid() && !virtualFile.isDirectory()) {
             BinEdVirtualFile binEdVirtualFile = new BinEdVirtualFile(virtualFile);
