@@ -33,6 +33,14 @@ public class StatusCursorPositionFormat {
     private PositionCodeType positionCodeType = PositionCodeType.DECIMAL;
     private boolean showOffset = true;
 
+    public StatusCursorPositionFormat() {
+    }
+
+    public StatusCursorPositionFormat(PositionCodeType positionCodeType, boolean showOffset) {
+        this.positionCodeType = positionCodeType;
+        this.showOffset = showOffset;
+    }
+
     @Nonnull
     public PositionCodeType getCodeType() {
         return positionCodeType;

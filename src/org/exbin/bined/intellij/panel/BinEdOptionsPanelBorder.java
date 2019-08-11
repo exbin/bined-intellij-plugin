@@ -15,15 +15,12 @@
  */
 package org.exbin.bined.intellij.panel;
 
-import org.exbin.bined.intellij.BinEdApplyOptions;
-
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Hexadecimal editor options panel with border.
+ * Binary editor options panel with border.
  *
- * @version 0.2.0 2019/03/16
+ * @version 0.2.1 2019/03/16
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -55,20 +52,7 @@ public class BinEdOptionsPanelBorder extends javax.swing.JPanel {
     private org.exbin.bined.intellij.panel.BinEdOptionsPanel optionsPanel;
     // End of variables declaration//GEN-END:variables
 
-    @Nonnull
-    public BinEdApplyOptions getApplyOptions() {
-        return optionsPanel.getApplyOptions();
-    }
-
-    public void setApplyOptions(BinEdApplyOptions applyOptions) {
-        optionsPanel.setApplyOptions(applyOptions);;
-    }
-
-    public void load() {
-        optionsPanel.load();
-    }
-
-    public void store() {
-        optionsPanel.store();
+    public BinEdOptionsPanel getOptionsPanel() {
+        return optionsPanel;
     }
 }

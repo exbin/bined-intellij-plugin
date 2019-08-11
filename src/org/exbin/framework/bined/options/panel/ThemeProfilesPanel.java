@@ -32,7 +32,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
-import org.exbin.framework.bined.options.CodeAreaThemeOptions;
+import org.exbin.framework.bined.options.impl.CodeAreaThemeOptionsImpl;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
@@ -316,9 +316,9 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
             }
 
             dialog.close();
+            dialog.dispose();
         });
         dialog.showCentered(this);
-        dialog.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
@@ -363,9 +363,9 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
             }
 
             dialog.close();
+            dialog.dispose();
         });
         dialog.showCentered(this);
-        dialog.dispose();
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void hideButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hideButtonActionPerformed
@@ -406,9 +406,9 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
             }
 
             dialog.close();
+            dialog.dispose();
         });
         dialog.showCentered(this);
-        dialog.dispose();
     }//GEN-LAST:event_copyButtonActionPerformed
 
     public boolean isModified() {
@@ -427,7 +427,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         return profileName != null && !"".equals(profileName.trim());
     }
 
-    public void loadFromOptions(CodeAreaThemeOptions options) {
+    public void loadFromOptions(CodeAreaThemeOptionsImpl options) {
         List<ThemeProfile> profiles = new ArrayList<>();
         List<String> profileNames = options.getProfileNames();
         for (int index = 0; index < profileNames.size(); index++) {
@@ -441,7 +441,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         model.setProfiles(profiles);
     }
 
-    public void saveToOptions(CodeAreaThemeOptions options) {
+    public void saveToOptions(CodeAreaThemeOptionsImpl options) {
         options.clearProfiles();
         ProfilesListModel model = getProfilesListModel();
         List<ThemeProfile> profiles = model.getProfiles();

@@ -37,7 +37,7 @@ import org.exbin.utils.binary_data.ByteArrayEditableData;
 /**
  * Theme profile panel.
  *
- * @version 0.2.0 2019/02/28
+ * @version 0.2.0 2019/08/05
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -86,6 +86,7 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
         decoratorRowPosLineCheckBox.setSelected(themeProfile.hasDecoration(ExtendedCodeAreaDecorations.ROW_POSITION_LINE));
         decoratorSplitLineCheckBox.setSelected(themeProfile.hasDecoration(ExtendedCodeAreaDecorations.SPLIT_LINE));
         decoratorBoxCheckBox.setSelected(themeProfile.hasDecoration(ExtendedCodeAreaDecorations.BOX_LINES));
+        verticalLineByteGroupSizeSpinner.setValue(themeProfile.getVerticalLineByteGroupSize());
     }
 
     /**
@@ -107,6 +108,8 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
         decoratorSplitLineCheckBox = new javax.swing.JCheckBox();
         decoratorBoxCheckBox = new javax.swing.JCheckBox();
         decoratorHeaderLineCheckBox = new javax.swing.JCheckBox();
+        verticalLineByteGroupSizeSpinner = new javax.swing.JSpinner();
+        verticalLineByteGroupSizeLabel = new javax.swing.JLabel();
         previewPanel = new javax.swing.JPanel();
         previewLabel = new javax.swing.JLabel();
 
@@ -184,6 +187,15 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
                 .addComponent(decoratorBoxCheckBox))
         );
 
+        verticalLineByteGroupSizeSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
+        verticalLineByteGroupSizeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                verticalLineByteGroupSizeSpinnerStateChanged(evt);
+            }
+        });
+
+        verticalLineByteGroupSizeLabel.setText(resourceBundle.getString("verticalLineByteGroupSizeLabel.text")); // NOI18N
+
         javax.swing.GroupLayout preferencesPanelLayout = new javax.swing.GroupLayout(preferencesPanel);
         preferencesPanel.setLayout(preferencesPanelLayout);
         preferencesPanelLayout.setHorizontalGroup(
@@ -191,10 +203,15 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
             .addGroup(preferencesPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(preferencesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(backgroundModeLabel)
                     .addComponent(paintRowPosBackgroundCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(backgroundModeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(linesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(linesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(verticalLineByteGroupSizeSpinner)
+                    .addGroup(preferencesPanelLayout.createSequentialGroup()
+                        .addGroup(preferencesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(backgroundModeLabel)
+                            .addComponent(verticalLineByteGroupSizeLabel))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         preferencesPanelLayout.setVerticalGroup(
@@ -208,7 +225,11 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
                 .addComponent(paintRowPosBackgroundCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(linesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(verticalLineByteGroupSizeLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(verticalLineByteGroupSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(358, Short.MAX_VALUE))
         );
 
         preferencesScrollPane.setViewportView(preferencesPanel);
@@ -280,6 +301,15 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
         codeArea.setThemeProfile(themeProfile);
     }//GEN-LAST:event_decoratorHeaderLineCheckBoxItemStateChanged
 
+    private void verticalLineByteGroupSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_verticalLineByteGroupSizeSpinnerStateChanged
+        int byteGroupSize = (Integer) verticalLineByteGroupSizeSpinner.getValue();
+        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        if (themeProfile != null) {
+            themeProfile.setVerticalLineByteGroupSize(byteGroupSize);
+        }
+        codeArea.setThemeProfile(themeProfile);
+    }//GEN-LAST:event_verticalLineByteGroupSizeSpinnerStateChanged
+
     /**
      * Test method for this panel.
      *
@@ -302,5 +332,7 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane preferencesScrollPane;
     private javax.swing.JLabel previewLabel;
     private javax.swing.JPanel previewPanel;
+    private javax.swing.JLabel verticalLineByteGroupSizeLabel;
+    private javax.swing.JSpinner verticalLineByteGroupSizeSpinner;
     // End of variables declaration//GEN-END:variables
 }

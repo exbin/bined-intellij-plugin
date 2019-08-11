@@ -32,7 +32,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
-import org.exbin.framework.bined.options.CodeAreaColorOptions;
+import org.exbin.framework.bined.options.impl.CodeAreaColorOptionsImpl;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
@@ -51,7 +51,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ColorProfilesPanel.class);
 
     private boolean modified = false;
-    private CodeAreaColorOptions activeOptions = null;
+    private CodeAreaColorOptionsImpl activeOptions = null;
 
     public ColorProfilesPanel() {
         initComponents();
@@ -318,9 +318,9 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
             }
 
             dialog.close();
+            dialog.dispose();
         });
         dialog.showCentered(this);
-        dialog.dispose();
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
@@ -357,9 +357,9 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
             }
 
             dialog.close();
+            dialog.dispose();
         });
         dialog.showCentered(this);
-        dialog.dispose();
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void hideButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hideButtonActionPerformed
@@ -408,9 +408,9 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
             }
 
             dialog.close();
+            dialog.dispose();
         });
         dialog.showCentered(this);
-        dialog.dispose();
     }//GEN-LAST:event_copyButtonActionPerformed
 
     public boolean isModified() {
@@ -426,7 +426,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         return profileName != null && !"".equals(profileName.trim());
     }
 
-    public void loadFromOptions(CodeAreaColorOptions options) {
+    public void loadFromOptions(CodeAreaColorOptionsImpl options) {
         activeOptions = options;
 
         List<ColorProfile> profiles = new ArrayList<>();
@@ -434,7 +434,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         for (int index = 0; index < profileNames.size(); index++) {
             ColorProfile profile = new ColorProfile();
             profile.profileName = profileNames.get(index);
-            profile.colorProfile = options.getColorProfile(index);
+            profile.colorProfile = options.getColorsProfile(index);
             profiles.add(profile);
         }
 
@@ -442,7 +442,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         model.setProfiles(profiles);
     }
 
-    public void saveToOptions(CodeAreaColorOptions options) {
+    public void saveToOptions(CodeAreaColorOptionsImpl options) {
         options.clearProfiles();
         ProfilesListModel model = getProfilesListModel();
         List<ColorProfile> profiles = model.getProfiles();

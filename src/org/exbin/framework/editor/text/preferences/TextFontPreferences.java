@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.api.Preferences;
+import org.exbin.framework.editor.text.options.TextFontOptions;
 
 /**
  * Text font preferences.
@@ -30,7 +31,7 @@ import org.exbin.framework.api.Preferences;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class TextFontPreferences {
+public class TextFontPreferences implements TextFontOptions {
 
     public static final String PREFERENCES_TEXT_FONT_PREFIX = "textFont.";
     public static final String PREFERENCES_TEXT_FONT_DEFAULT = PREFERENCES_TEXT_FONT_PREFIX + "default";
@@ -49,23 +50,27 @@ public class TextFontPreferences {
         this.preferences = preferences;
     }
 
+    @Override
     public boolean isUseDefaultFont() {
         return preferences.getBoolean(PREFERENCES_TEXT_FONT_DEFAULT, true);
     }
 
+    @Override
     public void setUseDefaultFont(boolean defaultFont) {
         preferences.putBoolean(PREFERENCES_TEXT_FONT_DEFAULT, defaultFont);
     }
 
     @Nonnull
+    @Override
     public Font getFont(Font initialFont) {
-        Map<TextAttribute, Object> attribs = getFontAttribs();
+        Map<TextAttribute, Object> attribs = getFontAttributes();
         Font font = initialFont.deriveFont(attribs);
         return font;
     }
 
     @Nonnull
-    public Map<TextAttribute, Object> getFontAttribs() {
+    @Override
+    public Map<TextAttribute, Object> getFontAttributes() {
         String value;
         Map<TextAttribute, Object> attribs = new HashMap<>();
         value = preferences.get(PREFERENCES_TEXT_FONT_FAMILY);
@@ -100,7 +105,7 @@ public class TextFontPreferences {
     public void setFont(Font font) {
         if (font != null) {
             Map<TextAttribute, ?> attribs = font.getAttributes();
-            setFontAttribs(attribs);
+            setFontAttributes((Map<TextAttribute, Object>) attribs);
         } else {
             preferences.remove(PREFERENCES_TEXT_FONT_FAMILY);
             preferences.remove(PREFERENCES_TEXT_FONT_SIZE);
@@ -113,7 +118,8 @@ public class TextFontPreferences {
         }
     }
 
-    public void setFontAttribs(Map<TextAttribute, ?> attribs) {
+    @Override
+    public void setFontAttributes(Map<TextAttribute, Object> attribs) {
         String value = (String) attribs.get(TextAttribute.FAMILY);
         if (value != null) {
             preferences.put(PREFERENCES_TEXT_FONT_FAMILY, value);

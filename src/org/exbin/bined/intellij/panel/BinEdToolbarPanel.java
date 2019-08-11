@@ -54,7 +54,7 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
 
     public void loadFromPreferences() {
         codeTypeComboBox.setSelectedIndex(preferences.getCodeAreaPreferences().getCodeType().ordinal());
-        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaPreferences().isShowNonprintables());
+        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaPreferences().isShowUnprintables());
     }
 
     public void updateUndoState() {

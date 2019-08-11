@@ -16,8 +16,6 @@
 package org.exbin.framework.bined.options;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.framework.bined.preferences.BinaryAppearancePreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
 
 /**
  * Binary component appearance options.
@@ -26,45 +24,17 @@ import org.exbin.framework.gui.options.api.OptionsData;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinaryAppearanceOptions implements OptionsData {
+public interface BinaryAppearanceOptions {
 
-    private boolean lineWrapping;
-    private boolean showValuesPanel;
-    private boolean multiTabMode;
+    boolean isLineWrapping();
 
-    public boolean isLineWrapping() {
-        return lineWrapping;
-    }
+    boolean isMultiTabMode();
 
-    public void setLineWrapping(boolean lineWrapping) {
-        this.lineWrapping = lineWrapping;
-    }
+    boolean isShowValuesPanel();
 
-    public boolean isShowValuesPanel() {
-        return showValuesPanel;
-    }
+    void setLineWrapping(boolean lineWrapping);
 
-    public void setShowValuesPanel(boolean showValuesPanel) {
-        this.showValuesPanel = showValuesPanel;
-    }
+    void setMultiTabMode(boolean multiTabMode);
 
-    public boolean isMultiTabMode() {
-        return multiTabMode;
-    }
-
-    public void setMultiTabMode(boolean multiTabMode) {
-        this.multiTabMode = multiTabMode;
-    }
-
-    public void loadFromParameters(BinaryAppearancePreferences preferences) {
-        lineWrapping = preferences.isLineWrapping();
-        showValuesPanel = preferences.isShowValuesPanel();
-        multiTabMode = preferences.isMultiTabMode();
-    }
-
-    public void saveToParameters(BinaryAppearancePreferences preferences) {
-        preferences.setLineWrapping(lineWrapping);
-        preferences.setShowValuesPanel(showValuesPanel);
-        preferences.setMultiTabMode(multiTabMode);
-    }
+    void setShowValuesPanel(boolean showValuesPanel);
 }

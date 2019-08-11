@@ -240,7 +240,13 @@ public class LegacyPreferences {
 
     @Nonnull
     public CodeAreaViewMode getViewMode() {
-        return CodeAreaViewMode.valueOf(preferences.get(PREFERENCES_VIEW_MODE, CodeAreaViewMode.DUAL.name()));
+        String codeType = preferences.get(PREFERENCES_VIEW_MODE, CodeAreaViewMode.DUAL.name());
+        if ("HEXADECIMAL".equals(codeType)) {
+            return CodeAreaViewMode.CODE_MATRIX;
+        } else if ("PREVIEW".equals(codeType)) {
+            return CodeAreaViewMode.TEXT_PREVIEW;
+        }
+        return CodeAreaViewMode.valueOf(codeType);
     }
 
     public void setViewMode(CodeAreaViewMode viewMode) {

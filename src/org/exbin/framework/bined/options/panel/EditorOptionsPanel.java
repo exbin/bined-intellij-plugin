@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.EnterKeyHandlingMode;
 import org.exbin.framework.bined.FileHandlingMode;
-import org.exbin.framework.bined.options.EditorOptions;
+import org.exbin.framework.bined.options.impl.EditorOptionsImpl;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.options.api.OptionsCapable;
@@ -33,7 +33,7 @@ import org.exbin.framework.gui.options.api.OptionsModifiedListener;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class EditorOptionsPanel extends javax.swing.JPanel implements OptionsCapable<EditorOptions> {
+public class EditorOptionsPanel extends javax.swing.JPanel implements OptionsCapable<EditorOptionsImpl> {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(EditorOptionsPanel.class);
 
@@ -48,16 +48,16 @@ public class EditorOptionsPanel extends javax.swing.JPanel implements OptionsCap
     }
 
     @Override
-    public void saveToOptions(EditorOptions options) {
+    public void saveToOptions(EditorOptionsImpl options) {
         options.setFileHandlingMode(FileHandlingMode.valueOf((String) fileHandlingModeComboBox.getSelectedItem()));
-        options.setIsShowValuesPanel(showValuesPanelCheckBox.isSelected());
+        options.setShowValuesPanel(showValuesPanelCheckBox.isSelected());
         options.setEnterKeyHandlingMode(EnterKeyHandlingMode.valueOf((String) enterKeyHandlingModeComboBox.getSelectedItem()));
     }
 
     @Override
-    public void loadFromOptions(EditorOptions options) {
+    public void loadFromOptions(EditorOptionsImpl options) {
         fileHandlingModeComboBox.setSelectedIndex(options.getFileHandlingMode().ordinal());
-        showValuesPanelCheckBox.setSelected(options.isIsShowValuesPanel());
+        showValuesPanelCheckBox.setSelected(options.isShowValuesPanel());
         enterKeyHandlingModeComboBox.setSelectedIndex(options.getEnterKeyHandlingMode().ordinal());
     }
 

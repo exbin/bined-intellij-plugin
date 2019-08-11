@@ -22,17 +22,26 @@ import org.exbin.bined.BasicCodeAreaZone;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.EditationOperation;
+import org.exbin.bined.capability.CharsetCapable;
+import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
+import org.exbin.bined.intellij.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.GoToPositionAction;
+import org.exbin.bined.swing.basic.DefaultCodeAreaCommandHandler;
+import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.BinaryStatusApi;
-import org.exbin.framework.bined.options.CodeAreaOptions;
+import org.exbin.framework.bined.options.*;
+import org.exbin.framework.bined.options.impl.CodeAreaOptionsImpl;
 import org.exbin.framework.bined.panel.BinaryStatusPanel;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
+import org.exbin.framework.editor.text.options.TextEncodingOptions;
+import org.exbin.framework.gui.utils.ActionUtils;
 import org.exbin.framework.preferences.PreferencesWrapper;
 import org.exbin.utils.binary_data.BinaryData;
 
@@ -57,8 +66,10 @@ public class DebugViewPanel extends JPanel {
     private ExtCodeArea codeArea;
     private ValuesPanel valuesPanel = null;
     private boolean valuesPanelVisible = false;
+    private final ExtendedCodeAreaLayoutProfile defaultLayoutProfile;
+    private final ExtendedCodeAreaThemeProfile defaultThemeProfile;
+    private final CodeAreaColorsProfile defaultColorProfile;
 
-    private final int metaMask;
     private BinaryStatusPanel statusPanel;
     private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi encodingStatus;
@@ -80,6 +91,9 @@ public class DebugViewPanel extends JPanel {
         codeArea.setPainter(new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea));
         codeArea.setCodeFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.getCaret().setBlinkRate(300);
+        defaultLayoutProfile = codeArea.getLayoutProfile();
+        defaultThemeProfile = codeArea.getThemeProfile();
+        defaultColorProfile = codeArea.getColorsProfile();
 
         statusPanel = new BinaryStatusPanel();
         registerEncodingStatus(statusPanel);
@@ -105,20 +119,11 @@ public class DebugViewPanel extends JPanel {
 
         registerBinaryStatus(statusPanel);
 
-        loadFromPreferences();
+        initialLoadFromPreferences();
 
         goToRowAction = new GoToPositionAction(codeArea);
 
         applyFromCodeArea();
-
-        int metaMaskValue;
-        try {
-            metaMaskValue = java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-        } catch (java.awt.HeadlessException ex) {
-            metaMaskValue = java.awt.Event.CTRL_MASK;
-        }
-
-        metaMask = metaMaskValue;
 
         codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
@@ -134,7 +139,7 @@ public class DebugViewPanel extends JPanel {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
                 int modifiers = keyEvent.getModifiers();
-                if (modifiers == metaMask) {
+                if (modifiers == ActionUtils.getMetaMask()) {
                     int keyCode = keyEvent.getKeyCode();
                     switch (keyCode) {
                         case KeyEvent.VK_F: {
@@ -205,7 +210,7 @@ public class DebugViewPanel extends JPanel {
         BasicCodeAreaZone positionZone = codeArea.getPositionZone(x, y);
 
         final JMenuItem copyMenuItem = new JMenuItem("Copy");
-        copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, metaMask));
+        copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionUtils.getMetaMask()));
         copyMenuItem.setEnabled(codeArea.hasSelection());
         copyMenuItem.addActionListener(e -> {
             codeArea.copy();
@@ -224,7 +229,7 @@ public class DebugViewPanel extends JPanel {
         result.addSeparator();
 
         final JMenuItem selectAllMenuItem = new JMenuItem("Select All");
-        selectAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, metaMask));
+        selectAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionUtils.getMetaMask()));
         selectAllMenuItem.addActionListener(e -> {
             codeArea.selectAll();
             result.setVisible(false);
@@ -233,7 +238,7 @@ public class DebugViewPanel extends JPanel {
         result.addSeparator();
 
         final JMenuItem goToMenuItem = new JMenuItem("Go To" + DialogUtils.DIALOG_MENUITEM_EXT);
-        goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, metaMask));
+        goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionUtils.getMetaMask()));
         goToMenuItem.addActionListener(goToRowAction);
         result.add(goToMenuItem);
 
@@ -303,43 +308,93 @@ public class DebugViewPanel extends JPanel {
         });
     }
 
-    private void loadFromPreferences() {
-        CodeAreaOptions codeAreaOptions = new CodeAreaOptions();
-        codeAreaOptions.loadFromParameters(preferences.getCodeAreaPreferences());
-        codeAreaOptions.applyToCodeArea(codeArea);
-        String selectedEncoding = preferences.getEncodingPreferences().getSelectedEncoding();
-        statusPanel.setEncoding(selectedEncoding);
+    private void initialLoadFromPreferences() {
+        applyOptions(new BinEdApplyOptions() {
+            @Override
+            public CodeAreaOptions getCodeAreaOptions() {
+                return preferences.getCodeAreaPreferences();
+            }
+
+            @Override
+            public TextEncodingOptions getEncodingOptions() {
+                return preferences.getEncodingPreferences();
+            }
+
+            @Override
+            public EditorOptions getEditorOptions() {
+                return preferences.getEditorPreferences();
+            }
+
+            @Override
+            public StatusOptions getStatusOptions() {
+                return preferences.getStatusPreferences();
+            }
+
+            @Override
+            public CodeAreaLayoutOptions getLayoutOptions() {
+                return preferences.getLayoutPreferences();
+            }
+
+            @Override
+            public CodeAreaColorOptions getColorOptions() {
+                return preferences.getColorPreferences();
+            }
+
+            @Override
+            public CodeAreaThemeOptions getThemeOptions() {
+                return preferences.getThemePreferences();
+            }
+        });
+
+        encodingsHandler.loadFromPreferences(preferences.getEncodingPreferences());
         statusPanel.loadFromPreferences(preferences.getStatusPreferences());
         toolbarPanelLoadFromPreferences();
+    }
 
-        codeArea.setCharset(Charset.forName(selectedEncoding));
-        encodingsHandler.loadFromPreferences(preferences.getEncodingPreferences());
+    private void applyOptions(BinEdApplyOptions applyOptions) {
+        CodeAreaOptionsImpl.applyToCodeArea(applyOptions.getCodeAreaOptions(), codeArea);
 
-        int selectedLayoutProfile = preferences.getLayoutPreferences().getSelectedProfile();
-        if (selectedLayoutProfile >= 0) {
-            codeArea.setLayoutProfile(preferences.getLayoutPreferences().getLayoutProfile(selectedLayoutProfile));
-        }
+        ((CharsetCapable) codeArea).setCharset(Charset.forName(applyOptions.getEncodingOptions().getSelectedEncoding()));
+        encodingsHandler.setEncodings(applyOptions.getEncodingOptions().getEncodings());
 
-        int selectedThemeProfile = preferences.getThemePreferences().getSelectedProfile();
-        if (selectedThemeProfile >= 0) {
-            codeArea.setThemeProfile(preferences.getThemePreferences().getThemeProfile(selectedThemeProfile));
-        }
-
-        int selectedColorProfile = preferences.getColorPreferences().getSelectedProfile();
-        if (selectedColorProfile >= 0) {
-            codeArea.setColorsProfile(preferences.getColorPreferences().getColorsProfile(selectedColorProfile));
-        }
-
-        // Memory mode handled from outside by isDeltaMemoryMode() method, worth fixing?
-        boolean showValuesPanel = preferences.getEditorPreferences().isShowValuesPanel();
-        if (showValuesPanel) {
+        EditorOptions editorOptions = applyOptions.getEditorOptions();
+        if (editorOptions.isShowValuesPanel()) {
             showValuesPanel();
+        }
+        ((DefaultCodeAreaCommandHandler) codeArea.getCommandHandler()).setEnterKeyHandlingMode(editorOptions.getEnterKeyHandlingMode());
+
+        StatusOptions statusOptions = applyOptions.getStatusOptions();
+        statusPanel.setStatusOptions(statusOptions);
+        toolbarPanelLoadFromPreferences();
+
+        CodeAreaLayoutOptions layoutOptions = applyOptions.getLayoutOptions();
+        int selectedLayoutProfile = layoutOptions.getSelectedProfile();
+        if (selectedLayoutProfile >= 0) {
+            codeArea.setLayoutProfile(layoutOptions.getLayoutProfile(selectedLayoutProfile));
+        } else {
+            codeArea.setLayoutProfile(defaultLayoutProfile);
+        }
+
+        CodeAreaThemeOptions themeOptions = applyOptions.getThemeOptions();
+        int selectedThemeProfile = themeOptions.getSelectedProfile();
+        if (selectedThemeProfile >= 0) {
+            codeArea.setThemeProfile(themeOptions.getThemeProfile(selectedThemeProfile));
+        } else {
+            codeArea.setThemeProfile(defaultThemeProfile);
+        }
+
+        CodeAreaColorOptions colorOptions = applyOptions.getColorOptions();
+        int selectedColorProfile = colorOptions.getSelectedProfile();
+        if (selectedColorProfile >= 0) {
+            codeArea.setColorsProfile(colorOptions.getColorsProfile(selectedColorProfile));
+        } else {
+            codeArea.setColorsProfile(defaultColorProfile);
         }
     }
 
     private void toolbarPanelLoadFromPreferences() {
         codeTypeComboBox.setSelectedIndex(preferences.getCodeAreaPreferences().getCodeType().ordinal());
-        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaPreferences().isShowNonprintables());
+        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaPreferences().isShowUnprintables());
     }
 
     public void showValuesPanel() {

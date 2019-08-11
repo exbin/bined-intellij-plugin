@@ -90,12 +90,13 @@ public class EncodingsHandler {
             public void actionPerformed(ActionEvent e) {
                 final TextEncodingPanel textEncodingPanel = new TextEncodingPanel();
                 textEncodingPanel.setPreferredSize(new Dimension(536, 358));
+                textEncodingPanel.setEncodingList(textEncodingService.getEncodings());
                 final OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
                 JPanel dialogPanel = WindowUtils.createDialogPanel(textEncodingPanel, optionsControlPanel);
                 final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, parentComponent, "Manage Encodings", Dialog.ModalityType.APPLICATION_MODAL);
                 optionsControlPanel.setHandler((OptionsControlHandler.ControlActionType actionType) -> {
                     if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
-                        // TODO textEncodingService.set
+                        textEncodingService.setEncodings(textEncodingPanel.getEncodingList());
                         rebuildEncodings();
                         if (actionType == OptionsControlHandler.ControlActionType.SAVE) {
                             preferences.setEncodings(textEncodingPanel.getEncodingList());
@@ -103,6 +104,7 @@ public class EncodingsHandler {
                     }
 
                     dialog.close();
+                    dialog.dispose();
                 });
                 textEncodingPanel.setAddEncodingsOperation((List<String> usedEncodings) -> {
                     final List<String> result = new ArrayList<>();
@@ -117,13 +119,12 @@ public class EncodingsHandler {
                         }
 
                         addEncodingDialog.close();
+                        addEncodingDialog.dispose();
                     });
                     addEncodingDialog.showCentered(addEncodingPanel);
-                    addEncodingDialog.dispose();
                     return result;
                 });
                 dialog.showCentered(parentComponent);
-                dialog.dispose();
             }
         };
         ActionUtils.setupAction(manageEncodingsAction, resourceBundle, "manageEncodingsAction");

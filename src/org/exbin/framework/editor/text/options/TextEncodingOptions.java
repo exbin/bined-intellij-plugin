@@ -1,3 +1,5 @@
+package org.exbin.framework.editor.text.options;
+
 /*
  * Copyright (C) ExBin Project
  *
@@ -13,59 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.framework.editor.text.options;
-
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
 
 /**
  * Text encoding options.
  *
- * @version 0.2.1 2019/07/19
+ * @version 0.2.1 2019/08/06
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class TextEncodingOptions implements OptionsData {
-
-    private String selectedEncoding = TextEncodingPreferences.ENCODING_UTF8;
-    private List<String> encodings = new ArrayList<>();
+public interface TextEncodingOptions {
 
     @Nonnull
-    public String getSelectedEncoding() {
-        return selectedEncoding;
-    }
+    List<String> getEncodings();
 
     @Nonnull
-    public void setSelectedEncoding(String selectedEncoding) {
-        this.selectedEncoding = selectedEncoding;
-    }
+    String getSelectedEncoding();
+
+    void setEncodings(List<String> encodings);
 
     @Nonnull
-    public List<String> getEncodings() {
-        return encodings;
-    }
-
-    public void setEncodings(List<String> encodings) {
-        this.encodings = encodings;
-    }
-
-    public void loadFromParameters(TextEncodingPreferences preferences) {
-        selectedEncoding = preferences.getSelectedEncoding();
-        encodings = preferences.getEncodings();
-    }
-
-    public void saveToParameters(TextEncodingPreferences preferences) {
-        preferences.setSelectedEncoding(selectedEncoding);
-        preferences.setEncodings(encodings);
-    }
-
-    public void setOptions(TextEncodingOptions options) {
-        selectedEncoding = options.selectedEncoding;
-        encodings = new ArrayList<>();
-        encodings.addAll(options.encodings);
-    }
+    void setSelectedEncoding(String selectedEncoding);
 }

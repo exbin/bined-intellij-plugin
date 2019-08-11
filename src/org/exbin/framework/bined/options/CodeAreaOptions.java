@@ -22,17 +22,7 @@ import org.exbin.bined.CodeAreaViewMode;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.PositionCodeType;
-import org.exbin.bined.capability.CodeCharactersCaseCapable;
-import org.exbin.bined.capability.CodeTypeCapable;
-import org.exbin.bined.capability.RowWrappingCapable.RowWrappingMode;
-import org.exbin.bined.capability.ViewModeCapable;
-import org.exbin.bined.extended.capability.PositionCodeTypeCapable;
-import org.exbin.bined.extended.capability.ShowUnprintablesCapable;
-import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
-import org.exbin.bined.swing.capability.FontCapable;
-import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.preferences.CodeAreaPreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
+import org.exbin.bined.capability.RowWrappingCapable;
 
 /**
  * Code area options.
@@ -41,195 +31,59 @@ import org.exbin.framework.gui.options.api.OptionsData;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class CodeAreaOptions implements OptionsData {
-
-    private Font codeFont = null;
-    private CodeType codeType = CodeType.HEXADECIMAL;
-    private boolean showUnprintables = true;
-    private CodeCharactersCase codeCharactersCase = CodeCharactersCase.UPPER;
-    private PositionCodeType positionCodeType = PositionCodeType.HEXADECIMAL;
-    private CodeAreaViewMode viewMode = CodeAreaViewMode.DUAL;
-    private boolean codeColorization = true;
-    private boolean useDefaultFont = true;
-    private RowWrappingMode rowWrappingMode;
-    private int maxBytesPerRow;
-    private int minRowPositionLength;
-    private int maxRowPositionLength;
-
-    public static final Font DEFAULT_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+public interface CodeAreaOptions {
 
     @Nonnull
-    public Font getCodeFont() {
-        return codeFont;
-    }
-
-    public void setCodeFont(Font codeFont) {
-        this.codeFont = codeFont;
-    }
+    CodeCharactersCase getCodeCharactersCase();
 
     @Nonnull
-    public CodeType getCodeType() {
-        return codeType;
-    }
-
-    public void setCodeType(CodeType codeType) {
-        this.codeType = codeType;
-    }
-
-    public boolean isShowUnprintables() {
-        return showUnprintables;
-    }
-
-    public void setShowUnprintables(boolean showUnprintables) {
-        this.showUnprintables = showUnprintables;
-    }
+    Font getCodeFont();
 
     @Nonnull
-    public CodeCharactersCase getCodeCharactersCase() {
-        return codeCharactersCase;
-    }
+    CodeType getCodeType();
 
-    public void setCodeCharactersCase(CodeCharactersCase codeCharactersCase) {
-        this.codeCharactersCase = codeCharactersCase;
-    }
+    int getMaxBytesPerRow();
 
-    @Nonnull
-    public PositionCodeType getPositionCodeType() {
-        return positionCodeType;
-    }
+    int getMaxRowPositionLength();
 
-    public void setPositionCodeType(PositionCodeType positionCodeType) {
-        this.positionCodeType = positionCodeType;
-    }
+    int getMinRowPositionLength();
 
     @Nonnull
-    public CodeAreaViewMode getViewMode() {
-        return viewMode;
-    }
-
-    public void setViewMode(CodeAreaViewMode viewMode) {
-        this.viewMode = viewMode;
-    }
-
-    public boolean isCodeColorization() {
-        return codeColorization;
-    }
-
-    public void setCodeColorization(boolean codeColorization) {
-        this.codeColorization = codeColorization;
-    }
-
-    public boolean isUseDefaultFont() {
-        return useDefaultFont;
-    }
-
-    public void setUseDefaultFont(boolean useDefaultFont) {
-        this.useDefaultFont = useDefaultFont;
-    }
+    PositionCodeType getPositionCodeType();
 
     @Nonnull
-    public RowWrappingMode getRowWrappingMode() {
-        return rowWrappingMode;
-    }
+    RowWrappingCapable.RowWrappingMode getRowWrappingMode();
 
-    public void setRowWrappingMode(RowWrappingMode rowWrappingMode) {
-        this.rowWrappingMode = rowWrappingMode;
-    }
+    @Nonnull
+    CodeAreaViewMode getViewMode();
 
-    public int getMaxBytesPerRow() {
-        return maxBytesPerRow;
-    }
+    boolean isCodeColorization();
 
-    public void setMaxBytesPerRow(int maxBytesPerRow) {
-        this.maxBytesPerRow = maxBytesPerRow;
-    }
+    boolean isShowUnprintables();
 
-    public int getMinRowPositionLength() {
-        return minRowPositionLength;
-    }
+    boolean isUseDefaultFont();
 
-    public void setMinRowPositionLength(int minRowPositionLength) {
-        this.minRowPositionLength = minRowPositionLength;
-    }
+    void setCodeCharactersCase(CodeCharactersCase codeCharactersCase);
 
-    public int getMaxRowPositionLength() {
-        return maxRowPositionLength;
-    }
+    void setCodeColorization(boolean codeColorization);
 
-    public void setMaxRowPositionLength(int maxRowPositionLength) {
-        this.maxRowPositionLength = maxRowPositionLength;
-    }
+    void setCodeFont(Font codeFont);
 
-    public void loadFromParameters(CodeAreaPreferences preferences) {
-        codeFont = preferences.getCodeFont(DEFAULT_FONT);
-        codeType = preferences.getCodeType();
-        showUnprintables = preferences.isShowNonprintables();
-        codeCharactersCase = preferences.getCodeCharactersCase();
-        positionCodeType = preferences.getPositionCodeType();
-        viewMode = preferences.getViewMode();
-        codeColorization = preferences.isCodeColorization();
-        useDefaultFont = preferences.isUseDefaultFont();
-        rowWrappingMode = preferences.getRowWrappingMode();
-        maxBytesPerRow = preferences.getMaxBytesPerRow();
-        minRowPositionLength = preferences.getMinRowPositionLength();
-        maxRowPositionLength = preferences.getMaxRowPositionLength();
-    }
+    void setCodeType(CodeType codeType);
 
-    public void saveToParameters(CodeAreaPreferences preferences) {
-        preferences.setCodeFont(codeFont);
-        preferences.setCodeType(codeType);
-        preferences.setShowUnprintables(showUnprintables);
-        preferences.setCodeCharactersCase(codeCharactersCase);
-        preferences.setPositionCodeType(positionCodeType);
-        preferences.setViewMode(viewMode);
-        preferences.setCodeColorization(codeColorization);
-        preferences.setUseDefaultFont(useDefaultFont);
-        preferences.setRowWrappingMode(rowWrappingMode);
-        preferences.setMaxBytesPerRow(maxBytesPerRow);
-        preferences.setMinRowPositionLength(minRowPositionLength);
-        preferences.setMaxRowPositionLength(maxRowPositionLength);
-    }
+    void setMaxBytesPerRow(int maxBytesPerRow);
 
-    public void applyFromCodeArea(ExtCodeArea codeArea) {
-        codeFont = ((FontCapable) codeArea).getCodeFont();
-        codeType = ((CodeTypeCapable) codeArea).getCodeType();
-        showUnprintables = ((ShowUnprintablesCapable) codeArea).isShowUnprintables();
-        codeCharactersCase = ((CodeCharactersCaseCapable) codeArea).getCodeCharactersCase();
-        positionCodeType = ((PositionCodeTypeCapable) codeArea).getPositionCodeType();
-        viewMode = ((ViewModeCapable) codeArea).getViewMode();
-        codeColorization = ((ExtendedHighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).isNonAsciiHighlightingEnabled();
-        rowWrappingMode = codeArea.getRowWrapping();
-        maxBytesPerRow = codeArea.getMaxBytesPerRow();
-        minRowPositionLength = codeArea.getMinRowPositionLength();
-        maxRowPositionLength = codeArea.getMaxRowPositionLength();
-    }
+    void setMaxRowPositionLength(int maxRowPositionLength);
 
-    public void applyToCodeArea(ExtCodeArea codeArea) {
-        ((FontCapable) codeArea).setCodeFont(useDefaultFont ? DEFAULT_FONT : codeFont);
-        ((CodeTypeCapable) codeArea).setCodeType(codeType);
-        ((ShowUnprintablesCapable) codeArea).setShowUnprintables(showUnprintables);
-        ((CodeCharactersCaseCapable) codeArea).setCodeCharactersCase(codeCharactersCase);
-        ((PositionCodeTypeCapable) codeArea).setPositionCodeType(positionCodeType);
-        ((ViewModeCapable) codeArea).setViewMode(viewMode);
-        ((ExtendedHighlightNonAsciiCodeAreaPainter) codeArea.getPainter()).setNonAsciiHighlightingEnabled(codeColorization);
-        codeArea.setRowWrapping(rowWrappingMode);
-        codeArea.setMaxBytesPerRow(maxBytesPerRow);
-        codeArea.setMinRowPositionLength(minRowPositionLength);
-        codeArea.setMaxRowPositionLength(maxRowPositionLength);
-    }
+    void setMinRowPositionLength(int minRowPositionLength);
 
-    public void setOptions(CodeAreaOptions codeAreaOptions) {
-        codeFont = codeAreaOptions.codeFont;
-        codeType = codeAreaOptions.codeType;
-        showUnprintables = codeAreaOptions.showUnprintables;
-        codeCharactersCase = codeAreaOptions.codeCharactersCase;
-        positionCodeType = codeAreaOptions.positionCodeType;
-        viewMode = codeAreaOptions.viewMode;
-        codeColorization = codeAreaOptions.codeColorization;
-        useDefaultFont = codeAreaOptions.useDefaultFont;
-        rowWrappingMode = codeAreaOptions.rowWrappingMode;
-        maxBytesPerRow = codeAreaOptions.maxBytesPerRow;
-        minRowPositionLength = codeAreaOptions.minRowPositionLength;
-        maxRowPositionLength = codeAreaOptions.maxRowPositionLength;
-    }
+    void setPositionCodeType(PositionCodeType positionCodeType);
+
+    void setRowWrappingMode(RowWrappingCapable.RowWrappingMode rowWrappingMode);
+
+    void setShowUnprintables(boolean showUnprintables);
+
+    void setUseDefaultFont(boolean useDefaultFont);
+
+    void setViewMode(CodeAreaViewMode viewMode);
 }

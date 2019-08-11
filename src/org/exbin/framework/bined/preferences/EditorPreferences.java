@@ -23,6 +23,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.EnterKeyHandlingMode;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.options.EditorOptions;
 
 /**
  * Hexadecimal editor preferences.
@@ -31,7 +32,7 @@ import org.exbin.framework.bined.FileHandlingMode;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class EditorPreferences {
+public class EditorPreferences implements EditorOptions {
 
     public static final String PREFERENCES_FILE_HANDLING_MODE = "fileHandlingMode";
     public static final String PREFERENCES_SHOW_VALUES_PANEL = "valuesPanel";
@@ -45,6 +46,7 @@ public class EditorPreferences {
     }
 
     @Nonnull
+    @Override
     public FileHandlingMode getFileHandlingMode() {
         FileHandlingMode defaultFileHandlingMode = FileHandlingMode.DELTA;
         try {
@@ -55,14 +57,17 @@ public class EditorPreferences {
         }
     }
 
+    @Override
     public void setFileHandlingMode(FileHandlingMode fileHandlingMode) {
         preferences.put(PREFERENCES_FILE_HANDLING_MODE, fileHandlingMode.name());
     }
 
+    @Override
     public boolean isShowValuesPanel() {
         return preferences.getBoolean(PREFERENCES_SHOW_VALUES_PANEL, true);
     }
 
+    @Override
     public void setShowValuesPanel(boolean showValuesPanel) {
         preferences.putBoolean(PREFERENCES_SHOW_VALUES_PANEL, showValuesPanel);
     }
@@ -77,6 +82,7 @@ public class EditorPreferences {
     }
 
     @Nonnull
+    @Override
     public EnterKeyHandlingMode getEnterKeyHandlingMode() {
         EnterKeyHandlingMode defaultValue = EnterKeyHandlingMode.PLATFORM_SPECIFIC;
         try {
@@ -86,6 +92,7 @@ public class EditorPreferences {
         }
     }
 
+    @Override
     public void setEnterKeyHandlingMode(EnterKeyHandlingMode enterKeyHandlingMode) {
         preferences.put(PREFERENCES_ENTER_KEY_HANDLING_MODE, enterKeyHandlingMode.name());
     }

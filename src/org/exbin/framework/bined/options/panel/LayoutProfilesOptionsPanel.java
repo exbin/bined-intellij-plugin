@@ -19,7 +19,7 @@ package org.exbin.framework.bined.options.panel;
 import java.awt.BorderLayout;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
-import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
+import org.exbin.framework.bined.options.impl.CodeAreaLayoutOptionsImpl;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.options.api.OptionsCapable;
@@ -31,7 +31,7 @@ import org.exbin.framework.gui.options.api.OptionsModifiedListener;
  * @version 0.2.1 2019/07/20
  * @author ExBin Project (http://exbin.org)
  */
-public class LayoutProfilesOptionsPanel extends javax.swing.JPanel implements OptionsCapable<CodeAreaLayoutOptions> {
+public class LayoutProfilesOptionsPanel extends javax.swing.JPanel implements OptionsCapable<CodeAreaLayoutOptionsImpl> {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(LayoutProfilesOptionsPanel.class);
 
@@ -57,13 +57,13 @@ public class LayoutProfilesOptionsPanel extends javax.swing.JPanel implements Op
     }
 
     @Override
-    public void loadFromOptions(CodeAreaLayoutOptions options) {
+    public void loadFromOptions(CodeAreaLayoutOptionsImpl options) {
         profilesPanel.loadFromOptions(options);
         selectionPanel.setDefaultProfile(options.getSelectedProfile());
     }
 
     @Override
-    public void saveToOptions(CodeAreaLayoutOptions options) {
+    public void saveToOptions(CodeAreaLayoutOptionsImpl options) {
         profilesPanel.saveToOptions(options);
         options.setSelectedProfile(selectionPanel.getDefaultProfile());
     }

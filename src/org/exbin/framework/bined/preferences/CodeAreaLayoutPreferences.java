@@ -21,6 +21,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
+import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
 
 /**
  * Code area layout preferences.
@@ -29,7 +30,7 @@ import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfil
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class CodeAreaLayoutPreferences {
+public class CodeAreaLayoutPreferences implements CodeAreaLayoutOptions {
 
     public static final String PREFERENCES_LAYOUT_PROFILES_COUNT = "layoutProfilesCount";
     public static final String PREFERENCES_LAYOUT_PROFILE_SELECTED = "layoutProfileSelected";
@@ -76,15 +77,18 @@ public class CodeAreaLayoutPreferences {
         }
     }
 
+    @Override
     public int getSelectedProfile() {
         return preferences.getInt(PREFERENCES_LAYOUT_PROFILE_SELECTED, -1);
     }
 
+    @Override
     public void setSelectedProfile(int profileIndex) {
         preferences.putInt(PREFERENCES_LAYOUT_PROFILE_SELECTED, profileIndex);
     }
 
     @Nonnull
+    @Override
     public DefaultExtendedCodeAreaLayoutProfile getLayoutProfile(int profileIndex) {
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = new DefaultExtendedCodeAreaLayoutProfile();
         String layoutPrefix = PREFERENCES_LAYOUT_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
@@ -103,6 +107,7 @@ public class CodeAreaLayoutPreferences {
         return layoutProfile;
     }
 
+    @Override
     public void setLayoutProfile(int profileIndex, DefaultExtendedCodeAreaLayoutProfile layoutProfile) {
         String layoutPrefix = PREFERENCES_LAYOUT_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
         preferences.putBoolean(layoutPrefix + LAYOUT_SHOW_HEADER, layoutProfile.isShowHeader());
@@ -118,7 +123,8 @@ public class CodeAreaLayoutPreferences {
         preferences.putInt(layoutPrefix + LAYOUT_DOUBLE_SPACE_GROUP_SIZE, layoutProfile.getDoubleSpaceGroupSize());
     }
 
-    public void clearLayout(int profileIndex) {
+    @Override
+    public void removeLayoutProfile(int profileIndex) {
         String layoutPrefix = PREFERENCES_LAYOUT_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
         preferences.remove(layoutPrefix + LAYOUT_SHOW_HEADER);
         preferences.remove(layoutPrefix + LAYOUT_SHOW_ROW_POSITION);

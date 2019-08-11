@@ -28,6 +28,7 @@ import org.exbin.bined.extended.color.CodeAreaUnprintablesColorType;
 import org.exbin.bined.highlight.swing.color.CodeAreaColorizationColorType;
 import org.exbin.bined.highlight.swing.color.CodeAreaMatchColorType;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
+import org.exbin.framework.bined.options.CodeAreaColorOptions;
 
 /**
  * Color layout preferences.
@@ -36,7 +37,7 @@ import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class CodeAreaColorPreferences {
+public class CodeAreaColorPreferences implements CodeAreaColorOptions {
 
     public static final String PREFERENCES_COLOR_PROFILES_COUNT = "colorProfilesCount";
     public static final String PREFERENCES_COLOR_PROFILE_SELECTED = "colorProfileSelected";
@@ -96,15 +97,18 @@ public class CodeAreaColorPreferences {
         }
     }
 
+    @Override
     public int getSelectedProfile() {
         return preferences.getInt(PREFERENCES_COLOR_PROFILE_SELECTED, -1);
     }
 
+    @Override
     public void setSelectedProfile(int profileIndex) {
         preferences.putInt(PREFERENCES_COLOR_PROFILE_SELECTED, profileIndex);
     }
 
     @Nonnull
+    @Override
     public ExtendedCodeAreaColorProfile getColorsProfile(int profileIndex) {
         ExtendedCodeAreaColorProfile colorProfile = new ExtendedCodeAreaColorProfile();
         String colorProfilePrefix = PREFERENCES_COLOR_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
@@ -137,6 +141,7 @@ public class CodeAreaColorPreferences {
         return colorProfile;
     }
 
+    @Override
     public void setColorsProfile(int profileIndex, ExtendedCodeAreaColorProfile colorProfile) {
         String colorProfilePrefix = PREFERENCES_COLOR_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
 
@@ -166,7 +171,8 @@ public class CodeAreaColorPreferences {
         preferences.put(colorProfilePrefix + UNPRINTABLES_BACKGROUND, colorAsText(colorProfile.getColor(CodeAreaUnprintablesColorType.UNPRINTABLES_BACKGROUND)));
     }
 
-    public void clearColorsProfile(int profileIndex) {
+    @Override
+    public void removeColorsProfile(int profileIndex) {
         String colorProfilePrefix = PREFERENCES_COLOR_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
 
         preferences.remove(colorProfilePrefix + COLOR_TEXT_COLOR);

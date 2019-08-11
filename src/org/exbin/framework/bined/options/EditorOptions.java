@@ -19,8 +19,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.EnterKeyHandlingMode;
 import org.exbin.framework.bined.FileHandlingMode;
-import org.exbin.framework.bined.preferences.EditorPreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
 
 /**
  * Binary editor preferences.
@@ -29,53 +27,19 @@ import org.exbin.framework.gui.options.api.OptionsData;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class EditorOptions implements OptionsData {
-
-    private FileHandlingMode fileHandlingMode = FileHandlingMode.DELTA;
-    private boolean isShowValuesPanel = true;
-    private EnterKeyHandlingMode enterKeyHandlingMode = EnterKeyHandlingMode.PLATFORM_SPECIFIC;
+public interface EditorOptions {
 
     @Nonnull
-    public FileHandlingMode getFileHandlingMode() {
-        return fileHandlingMode;
-    }
-
-    public void setFileHandlingMode(FileHandlingMode fileHandlingMode) {
-        this.fileHandlingMode = fileHandlingMode;
-    }
-
-    public boolean isIsShowValuesPanel() {
-        return isShowValuesPanel;
-    }
-
-    public void setIsShowValuesPanel(boolean isShowValuesPanel) {
-        this.isShowValuesPanel = isShowValuesPanel;
-    }
+    EnterKeyHandlingMode getEnterKeyHandlingMode();
 
     @Nonnull
-    public EnterKeyHandlingMode getEnterKeyHandlingMode() {
-        return enterKeyHandlingMode;
-    }
+    FileHandlingMode getFileHandlingMode();
 
-    public void setEnterKeyHandlingMode(EnterKeyHandlingMode enterKeyHandlingMode) {
-        this.enterKeyHandlingMode = enterKeyHandlingMode;
-    }
+    boolean isShowValuesPanel();
 
-    public void loadFromParameters(EditorPreferences preferences) {
-        fileHandlingMode = preferences.getFileHandlingMode();
-        isShowValuesPanel = preferences.isShowValuesPanel();
-        enterKeyHandlingMode = preferences.getEnterKeyHandlingMode();
-    }
+    void setEnterKeyHandlingMode(EnterKeyHandlingMode enterKeyHandlingMode);
 
-    public void saveToParameters(EditorPreferences preferences) {
-        preferences.setFileHandlingMode(fileHandlingMode);
-        preferences.setShowValuesPanel(isShowValuesPanel);
-        preferences.setEnterKeyHandlingMode(enterKeyHandlingMode);
-    }
+    void setFileHandlingMode(FileHandlingMode fileHandlingMode);
 
-    public void setOptions(EditorOptions editorOptions) {
-        fileHandlingMode = editorOptions.fileHandlingMode;
-        isShowValuesPanel = editorOptions.isShowValuesPanel;
-        enterKeyHandlingMode = editorOptions.enterKeyHandlingMode;
-    }
+    void setShowValuesPanel(boolean showValuesPanel);
 }

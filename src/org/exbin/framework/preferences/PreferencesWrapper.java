@@ -25,7 +25,7 @@ import java.util.Objects;
 /**
  * Wrapper for preferences.
  *
- * @version 0.2.1 2019/07/21
+ * @version 0.2.1 2019/08/08
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -41,7 +41,7 @@ public class PreferencesWrapper implements Preferences {
 
     @Override
     public boolean exists(String key) {
-        return preferences.isValueSet(key);
+        return preferences.isValueSet(prefix + key);
     }
 
     @Nullable

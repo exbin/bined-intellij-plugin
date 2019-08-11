@@ -18,7 +18,7 @@ package org.exbin.framework.bined.options.panel;
 
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
-import org.exbin.framework.bined.options.BinaryAppearanceOptions;
+import org.exbin.framework.bined.options.impl.BinaryAppearanceOptionsImpl;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.options.api.OptionsCapable;
@@ -30,7 +30,7 @@ import org.exbin.framework.gui.options.api.OptionsModifiedListener;
  * @version 0.2.1 2019/07/20
  * @author ExBin Project (http://exbin.org)
  */
-public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements OptionsCapable<BinaryAppearanceOptions> {
+public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements OptionsCapable<BinaryAppearanceOptionsImpl> {
 
     private OptionsModifiedListener optionsModifiedListener;
     private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinaryAppearanceOptionsPanel.class);
@@ -46,14 +46,14 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
     }
 
     @Override
-    public void loadFromOptions(BinaryAppearanceOptions options) {
+    public void loadFromOptions(BinaryAppearanceOptionsImpl options) {
         lineWrapCheckBox.setSelected(options.isLineWrapping());
         showValuesPanelCheckBox.setSelected(options.isShowValuesPanel());
         multiTabModeCheckBox.setSelected(options.isMultiTabMode());
     }
 
     @Override
-    public void saveToOptions(BinaryAppearanceOptions options) {
+    public void saveToOptions(BinaryAppearanceOptionsImpl options) {
         options.setLineWrapping(lineWrapCheckBox.isSelected());
         options.setShowValuesPanel(showValuesPanelCheckBox.isSelected());
         options.setMultiTabMode(multiTabModeCheckBox.isSelected());

@@ -15,75 +15,39 @@
  */
 package org.exbin.bined.intellij;
 
-import org.exbin.bined.capability.CharsetCapable;
-import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.options.CodeAreaOptions;
-import org.exbin.framework.bined.options.EditorOptions;
-import org.exbin.framework.bined.options.StatusOptions;
+import org.exbin.framework.bined.options.*;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.nio.charset.Charset;
-import java.util.Objects;
 
 /**
  * Options for apply operation.
  *
- * @version 0.2.1 2019/07/21
+ * @version 0.2.1 2019/08/06
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdApplyOptions {
-
-    private CodeAreaOptions codeAreaOptions = new CodeAreaOptions();
-    private TextEncodingOptions encodingOptions = new TextEncodingOptions();
-    private EditorOptions editorOptions = new EditorOptions();
-    private StatusOptions statusOptions = new StatusOptions();
+public interface BinEdApplyOptions {
 
     @Nonnull
-    public CodeAreaOptions getCodeAreaOptions() {
-        return codeAreaOptions;
-    }
-
-    public void setCodeAreaOptions(CodeAreaOptions codeAreaOptions) {
-        this.codeAreaOptions = Objects.requireNonNull(codeAreaOptions);
-    }
+    CodeAreaOptions getCodeAreaOptions();
 
     @Nonnull
-    public TextEncodingOptions getEncodingOptions() {
-        return encodingOptions;
-    }
-
-    public void setEncodingOptions(TextEncodingOptions encodingOptions) {
-        this.encodingOptions = Objects.requireNonNull(encodingOptions);
-    }
+    TextEncodingOptions getEncodingOptions();
 
     @Nonnull
-    public EditorOptions getEditorOptions() {
-        return editorOptions;
-    }
-
-    public void setEditorOptions(EditorOptions editorOptions) {
-        this.editorOptions = Objects.requireNonNull(editorOptions);
-    }
+    EditorOptions getEditorOptions();
 
     @Nonnull
-    public StatusOptions getStatusOptions() {
-        return statusOptions;
-    }
+    StatusOptions getStatusOptions();
 
-    public void setStatusOptions(StatusOptions statusOptions) {
-        this.statusOptions = Objects.requireNonNull(statusOptions);
-    }
+    @Nonnull
+    CodeAreaLayoutOptions getLayoutOptions();
 
-    public void applyFromCodeArea(ExtCodeArea codeArea) {
-        codeAreaOptions.applyFromCodeArea(codeArea);
-        encodingOptions.setSelectedEncoding(((CharsetCapable) codeArea).getCharset().name());
-    }
+    @Nonnull
+    CodeAreaColorOptions getColorOptions();
 
-    public void applyToCodeArea(ExtCodeArea codeArea) {
-        codeAreaOptions.applyToCodeArea(codeArea);
-        ((CharsetCapable) codeArea).setCharset(Charset.forName(encodingOptions.getSelectedEncoding()));
-    }
+    @Nonnull
+    CodeAreaThemeOptions getThemeOptions();
 }

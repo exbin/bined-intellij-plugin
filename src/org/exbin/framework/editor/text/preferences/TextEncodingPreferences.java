@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import org.exbin.framework.editor.text.options.TextEncodingOptions;
 
 /**
  * Text editor encodings preferences.
@@ -28,7 +29,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class TextEncodingPreferences {
+public class TextEncodingPreferences implements TextEncodingOptions {
 
     public static final String ENCODING_UTF8 = "UTF-8";
 
@@ -52,15 +53,18 @@ public class TextEncodingPreferences {
     }
 
     @Nonnull
+    @Override
     public String getSelectedEncoding() {
         return preferences.get(PREFERENCES_TEXT_ENCODING_SELECTED, ENCODING_UTF8);
     }
 
+    @Override
     public void setSelectedEncoding(String encodingName) {
         preferences.put(PREFERENCES_TEXT_ENCODING_SELECTED, encodingName);
     }
 
     @Nonnull
+    @Override
     public List<String> getEncodings() {
         List<String> encodings = new ArrayList<>();
         String value;
@@ -76,6 +80,7 @@ public class TextEncodingPreferences {
         return encodings;
     }
 
+    @Override
     public void setEncodings(List<String> encodings) {
         for (int i = 0; i < encodings.size(); i++) {
             preferences.put(PREFERENCES_TEXT_ENCODING_PREFIX + Integer.toString(i), encodings.get(i));

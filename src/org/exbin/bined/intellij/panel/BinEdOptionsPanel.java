@@ -15,13 +15,12 @@
  */
 package org.exbin.bined.intellij.panel;
 
-import com.intellij.ide.util.PropertiesComponent;
 import org.exbin.bined.intellij.BinEdApplyOptions;
-import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.framework.bined.options.*;
+import org.exbin.framework.bined.options.impl.*;
 import org.exbin.framework.bined.options.panel.*;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
-import org.exbin.framework.editor.text.options.TextEncodingOptions;
+import org.exbin.framework.editor.text.options.impl.TextEncodingOptionsImpl;
 import org.exbin.framework.editor.text.options.panel.TextEncodingOptionsPanel;
 import org.exbin.framework.editor.text.panel.AddEncodingPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
@@ -29,9 +28,7 @@ import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
-import org.exbin.framework.preferences.PreferencesWrapper;
 
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -46,27 +43,27 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdOptionsPanel extends javax.swing.JPanel {
+public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyOptions {
 
-    private final BinaryEditorPreferences preferences;
+    private BinaryEditorPreferences preferences;
 //    private final org.exbin.bined.intellij.panel.BinEdOptionsPanelController controller;
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinEdOptionsPanel.class);
 
     private DefaultListModel<CategoryItem> categoryModel = new DefaultListModel<>();
     private JPanel currentCategoryPanel = null;
 
-    private final EditorOptions editorOptions = new EditorOptions();
-    private final StatusOptions statusOptions = new StatusOptions();
-    private final TextEncodingOptions encodingOptions = new TextEncodingOptions();
-    private final CodeAreaOptions codeAreaOptions = new CodeAreaOptions();
-    private final CodeAreaLayoutOptions layoutOptions = new CodeAreaLayoutOptions();
-    private final CodeAreaColorOptions colorOptions = new CodeAreaColorOptions();
-    private final CodeAreaThemeOptions themeOptions = new CodeAreaThemeOptions();
+    private final EditorOptionsImpl editorOptions = new EditorOptionsImpl();
+    private final StatusOptionsImpl statusOptions = new StatusOptionsImpl();
+    private final TextEncodingOptionsImpl encodingOptions = new TextEncodingOptionsImpl();
+    private final CodeAreaOptionsImpl codeAreaOptions = new CodeAreaOptionsImpl();
+    private final CodeAreaLayoutOptionsImpl layoutOptions = new CodeAreaLayoutOptionsImpl();
+    private final CodeAreaColorOptionsImpl colorOptions = new CodeAreaColorOptionsImpl();
+    private final CodeAreaThemeOptionsImpl themeOptions = new CodeAreaThemeOptionsImpl();
 
-    private final EditorOptionsPanel editorParametersPanel = new EditorOptionsPanel();
-    private final StatusOptionsPanel statusParametersPanel = new StatusOptionsPanel();
-    private final CodeAreaOptionsPanel codeAreaParametersPanel = new CodeAreaOptionsPanel();
-    private final TextEncodingOptionsPanel encodingParametersPanel = new TextEncodingOptionsPanel();
+    private final EditorOptionsPanel editorOptionsPanel = new EditorOptionsPanel();
+    private final StatusOptionsPanel statusOptionsPanel = new StatusOptionsPanel();
+    private final CodeAreaOptionsPanel codeAreaOptionsPanel = new CodeAreaOptionsPanel();
+    private final TextEncodingOptionsPanel encodingOptionsPanel = new TextEncodingOptionsPanel();
     private final LayoutProfilesPanel layoutProfilesPanel = new LayoutProfilesPanel();
     private final ProfileSelectionPanel layoutSelectionPanel = new ProfileSelectionPanel(layoutProfilesPanel);
     private final ThemeProfilesPanel themeProfilesPanel = new ThemeProfilesPanel();
@@ -76,12 +73,11 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
 
     public BinEdOptionsPanel() {
         initComponents();
-        preferences = new BinaryEditorPreferences(new PreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
 
-        categoryModel.addElement(new CategoryItem("Editor", editorParametersPanel));
-        categoryModel.addElement(new CategoryItem("Status Panel", statusParametersPanel));
-        categoryModel.addElement(new CategoryItem("Code Area", codeAreaParametersPanel));
-        categoryModel.addElement(new CategoryItem("Charset", encodingParametersPanel));
+        categoryModel.addElement(new CategoryItem("Editor", editorOptionsPanel));
+        categoryModel.addElement(new CategoryItem("Status Panel", statusOptionsPanel));
+        categoryModel.addElement(new CategoryItem("Code Area", codeAreaOptionsPanel));
+        categoryModel.addElement(new CategoryItem("Encoding", encodingOptionsPanel));
         categoryModel.addElement(new CategoryItem("Layout Profiles", layoutSelectionPanel));
         categoryModel.addElement(new CategoryItem("Theme Profiles", themeSelectionPanel));
         categoryModel.addElement(new CategoryItem("Colors Profiles", colorSelectionPanel));
@@ -107,7 +103,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         });
         categoriesList.setSelectedIndex(0);
 
-        encodingParametersPanel.setAddEncodingsOperation((List<String> usedEncodings) -> {
+        encodingOptionsPanel.setAddEncodingsOperation((List<String> usedEncodings) -> {
             final List<String> result = new ArrayList<>();
             final AddEncodingPanel addEncodingPanel = new AddEncodingPanel();
             addEncodingPanel.setUsedEncodings(usedEncodings);
@@ -124,6 +120,10 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
             addEncodingDialog.show();
             return result;
         });
+    }
+
+    public void setPreferences(BinaryEditorPreferences preferences) {
+        this.preferences = preferences;
     }
 
     /**
@@ -167,72 +167,93 @@ public class BinEdOptionsPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public void load() {
-        editorOptions.loadFromParameters(preferences.getEditorPreferences());
-        statusOptions.loadFromParameters(preferences.getStatusPreferences());
-        codeAreaOptions.loadFromParameters(preferences.getCodeAreaPreferences());
-        encodingOptions.loadFromParameters(preferences.getEncodingPreferences());
-        layoutOptions.loadFromParameters(preferences.getLayoutPreferences());
-        colorOptions.loadFromParameters(preferences.getColorPreferences());
-        themeOptions.loadFromParameters(preferences.getThemePreferences());
+    public void loadFromPreferences() {
+        editorOptions.loadFromPreferences(preferences.getEditorPreferences());
+        statusOptions.loadFromPreferences(preferences.getStatusPreferences());
+        codeAreaOptions.loadFromPreferences(preferences.getCodeAreaPreferences());
+        encodingOptions.loadFromPreferences(preferences.getEncodingPreferences());
+        layoutOptions.loadFromPreferences(preferences.getLayoutPreferences());
+        colorOptions.loadFromPreferences(preferences.getColorPreferences());
+        themeOptions.loadFromPreferences(preferences.getThemePreferences());
 
-        editorParametersPanel.loadFromOptions(editorOptions);
-        statusParametersPanel.loadFromOptions(statusOptions);
-        codeAreaParametersPanel.loadFromOptions(codeAreaOptions);
-        encodingParametersPanel.loadFromOptions(encodingOptions);
+        editorOptionsPanel.loadFromOptions(editorOptions);
+        statusOptionsPanel.loadFromOptions(statusOptions);
+        codeAreaOptionsPanel.loadFromOptions(codeAreaOptions);
+        encodingOptionsPanel.loadFromOptions(encodingOptions);
 
         layoutProfilesPanel.loadFromOptions(layoutOptions);
-        layoutSelectionPanel.setDefaultProfile(preferences.getLayoutPreferences().getSelectedProfile());
+        layoutSelectionPanel.setDefaultProfile(layoutOptions.getSelectedProfile());
         colorProfilesPanel.loadFromOptions(colorOptions);
-        colorSelectionPanel.setDefaultProfile(preferences.getColorPreferences().getSelectedProfile());
+        colorSelectionPanel.setDefaultProfile(colorOptions.getSelectedProfile());
         themeProfilesPanel.loadFromOptions(themeOptions);
-        themeSelectionPanel.setDefaultProfile(preferences.getThemePreferences().getSelectedProfile());
+        themeSelectionPanel.setDefaultProfile(themeOptions.getSelectedProfile());
     }
 
-    public void store() {
-        editorParametersPanel.saveToOptions(editorOptions);
-        statusParametersPanel.saveToOptions(statusOptions);
-        codeAreaParametersPanel.saveToOptions(codeAreaOptions);
-        encodingParametersPanel.saveToOptions(encodingOptions);
+    public void saveToPreferences() {
+        applyToOptions();
 
-        editorOptions.saveToParameters(preferences.getEditorPreferences());
-        statusOptions.saveToParameters(preferences.getStatusPreferences());
-        codeAreaOptions.saveToParameters(preferences.getCodeAreaPreferences());
-        encodingOptions.saveToParameters(preferences.getEncodingPreferences());
+        editorOptions.saveToPreferences(preferences.getEditorPreferences());
+        statusOptions.saveToPreferences(preferences.getStatusPreferences());
+        codeAreaOptions.saveToPreferences(preferences.getCodeAreaPreferences());
+        encodingOptions.saveToPreferences(preferences.getEncodingPreferences());
+
+        layoutOptions.saveToPreferences(preferences.getLayoutPreferences());
+        colorOptions.saveToPreferences(preferences.getColorPreferences());
+        themeOptions.saveToPreferences(preferences.getThemePreferences());
+    }
+
+    public void applyToOptions() {
+        editorOptionsPanel.saveToOptions(editorOptions);
+        statusOptionsPanel.saveToOptions(statusOptions);
+        codeAreaOptionsPanel.saveToOptions(codeAreaOptions);
+        encodingOptionsPanel.saveToOptions(encodingOptions);
 
         layoutProfilesPanel.saveToOptions(layoutOptions);
-        preferences.getLayoutPreferences().setSelectedProfile(layoutSelectionPanel.getDefaultProfile());
+        layoutOptions.setSelectedProfile(layoutSelectionPanel.getDefaultProfile());
         colorProfilesPanel.saveToOptions(colorOptions);
-        preferences.getColorPreferences().setSelectedProfile(colorSelectionPanel.getDefaultProfile());
+        colorOptions.setSelectedProfile(colorSelectionPanel.getDefaultProfile());
         themeProfilesPanel.saveToOptions(themeOptions);
-        preferences.getThemePreferences().setSelectedProfile(themeSelectionPanel.getDefaultProfile());
-
-        layoutOptions.saveToParameters(preferences.getLayoutPreferences());
-        colorOptions.saveToParameters(preferences.getColorPreferences());
-        themeOptions.saveToParameters(preferences.getThemePreferences());
-    }
-
-    public void setApplyOptions(BinEdApplyOptions applyOptions) {
-        codeAreaOptions.setOptions(applyOptions.getCodeAreaOptions());
-        encodingOptions.setOptions(applyOptions.getEncodingOptions());
-        editorOptions.setOptions(applyOptions.getEditorOptions());
-        statusOptions.setOptions(applyOptions.getStatusOptions());
-    }
-
-    @Nonnull
-    public BinEdApplyOptions getApplyOptions() {
-        BinEdApplyOptions options = new BinEdApplyOptions();
-        options.setCodeAreaOptions(codeAreaOptions);
-        options.setEncodingOptions(encodingOptions);
-        options.setEditorOptions(editorOptions);
-        options.setStatusOptions(statusOptions);
-
-        return options;
+        themeOptions.setSelectedProfile(themeSelectionPanel.getDefaultProfile());
     }
 
     boolean valid() {
         // TODO check whether form is consistent and complete
         return true;
+    }
+
+    @Override
+    public CodeAreaOptions getCodeAreaOptions() {
+        return codeAreaOptions;
+    }
+
+    @Override
+    public TextEncodingOptionsImpl getEncodingOptions() {
+        return encodingOptions;
+    }
+
+    @Override
+    public EditorOptions getEditorOptions() {
+        return editorOptions;
+    }
+
+    @Override
+    public StatusOptions getStatusOptions() {
+        return statusOptions;
+    }
+
+    @Override
+    public CodeAreaLayoutOptions getLayoutOptions() {
+        return layoutOptions;
+    }
+
+    @Override
+    public CodeAreaColorOptions getColorOptions() {
+        return colorOptions;
+    }
+
+    @Override
+    public CodeAreaThemeOptions getThemeOptions() {
+        return themeOptions;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

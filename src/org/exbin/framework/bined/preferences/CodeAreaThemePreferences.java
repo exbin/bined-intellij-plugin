@@ -23,6 +23,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
+import org.exbin.framework.bined.options.CodeAreaThemeOptions;
 
 /**
  * Code area theme preferences.
@@ -31,7 +32,7 @@ import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class CodeAreaThemePreferences {
+public class CodeAreaThemePreferences implements CodeAreaThemeOptions {
 
     public static final String PREFERENCES_THEMES_COUNT = "themeProfilesCount";
     public static final String PREFERENCES_THEME_PROFILE_SELECTED = "themeProfilesSelected";
@@ -77,15 +78,18 @@ public class CodeAreaThemePreferences {
         }
     }
 
+    @Override
     public int getSelectedProfile() {
         return preferences.getInt(PREFERENCES_THEME_PROFILE_SELECTED, -1);
     }
 
+    @Override
     public void setSelectedProfile(int profileIndex) {
         preferences.putInt(PREFERENCES_THEME_PROFILE_SELECTED, profileIndex);
     }
 
     @Nonnull
+    @Override
     public ExtendedCodeAreaThemeProfile getThemeProfile(int profileIndex) {
         ExtendedCodeAreaThemeProfile themeProfile = new ExtendedCodeAreaThemeProfile();
         String themePrefix = PREFERENCES_THEME_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
@@ -102,6 +106,7 @@ public class CodeAreaThemePreferences {
         return themeProfile;
     }
 
+    @Override
     public void setThemeProfile(int profileIndex, ExtendedCodeAreaThemeProfile themeProfile) {
         String themePrefix = PREFERENCES_THEME_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
         preferences.put(themePrefix + THEME_BACKGROUND_PAINT_MODE, themeProfile.getBackgroundPaintMode().name());
@@ -114,7 +119,8 @@ public class CodeAreaThemePreferences {
         preferences.putBoolean(themePrefix + THEME_DECORATION_GROUP_LINES, themeProfile.hasDecoration(ExtendedCodeAreaDecorations.GROUP_LINES));
     }
 
-    public void clearTheme(int profileIndex) {
+    @Override
+    public void removeThemeProfile(int profileIndex) {
         String themePrefix = PREFERENCES_THEME_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
         preferences.remove(themePrefix + THEME_BACKGROUND_PAINT_MODE);
         preferences.remove(themePrefix + THEME_PAINT_ROWPOS_BACKGROUND);

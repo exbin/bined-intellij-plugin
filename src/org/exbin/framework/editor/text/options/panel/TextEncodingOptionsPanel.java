@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import org.exbin.framework.editor.text.options.TextEncodingOptions;
+import org.exbin.framework.editor.text.options.impl.TextEncodingOptionsImpl;
 import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
@@ -38,7 +38,7 @@ import org.exbin.framework.editor.text.service.TextEncodingService;
  * @version 0.2.1 2019/07/21
  * @author ExBin Project (http://exbin.org)
  */
-public class TextEncodingOptionsPanel extends javax.swing.JPanel implements OptionsCapable<TextEncodingOptions> {
+public class TextEncodingOptionsPanel extends javax.swing.JPanel implements OptionsCapable<TextEncodingOptionsImpl> {
 
     private OptionsModifiedListener optionsModifiedListener;
     private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(TextEncodingOptionsPanel.class);
@@ -75,13 +75,13 @@ public class TextEncodingOptionsPanel extends javax.swing.JPanel implements Opti
     }
 
     @Override
-    public void saveToOptions(TextEncodingOptions options) {
+    public void saveToOptions(TextEncodingOptionsImpl options) {
         encodingPanel.saveToOptions(options);
         options.setSelectedEncoding((String) defaultEncodingComboBox.getSelectedItem());
     }
 
     @Override
-    public void loadFromOptions(TextEncodingOptions options) {
+    public void loadFromOptions(TextEncodingOptionsImpl options) {
         encodingPanel.loadFromOptions(options);
         defaultEncodingComboBox.setSelectedItem(options.getSelectedEncoding());
         updateEncodings();

@@ -29,6 +29,7 @@ import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.PositionCodeType;
 import org.exbin.bined.capability.RowWrappingCapable;
+import org.exbin.framework.bined.options.CodeAreaOptions;
 import org.exbin.framework.editor.text.preferences.TextFontPreferences;
 
 /**
@@ -38,7 +39,7 @@ import org.exbin.framework.editor.text.preferences.TextFontPreferences;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class CodeAreaPreferences {
+public class CodeAreaPreferences implements CodeAreaOptions {
 
     public static final String PREFERENCES_CODE_TYPE = "codeType";
     public static final String PREFERENCES_SHOW_UNPRINTABLES = "showNonpritables";
@@ -55,6 +56,8 @@ public class CodeAreaPreferences {
     public static final String PREFERENCES_MIN_ROW_POSITION_LENGTH = "minRowPositionLength";
     public static final String PREFERENCES_MAX_ROW_POSITION_LENGTH = "maxRowPositionLength";
 
+    public static final Font DEFAULT_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+
     private final Preferences preferences;
 
     public CodeAreaPreferences(Preferences preferences) {
@@ -62,7 +65,8 @@ public class CodeAreaPreferences {
     }
 
     @Nonnull
-    public Font getCodeFont(Font initialFont) {
+    @Override
+    public Font getCodeFont() {
         String value;
         Map<TextAttribute, Object> attribs = new HashMap<>();
         value = preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_FAMILY);
@@ -91,10 +95,11 @@ public class CodeAreaPreferences {
         if (Boolean.valueOf(preferences.get(TextFontPreferences.PREFERENCES_TEXT_FONT_SUPERSCRIPT, null))) {
             attribs.put(TextAttribute.SUPERSCRIPT, TextAttribute.SUPERSCRIPT_SUPER);
         }
-        Font font = initialFont.deriveFont(attribs);
+        Font font = DEFAULT_FONT.deriveFont(attribs);
         return font;
     }
 
+    @Override
     public void setCodeFont(Font font) {
         if (font != null) {
             Map<TextAttribute, ?> attribs = font.getAttributes();
@@ -129,6 +134,7 @@ public class CodeAreaPreferences {
     }
 
     @Nonnull
+    @Override
     public CodeType getCodeType() {
         CodeType defaultCodeType = CodeType.HEXADECIMAL;
         try {
@@ -139,19 +145,23 @@ public class CodeAreaPreferences {
         }
     }
 
+    @Override
     public void setCodeType(CodeType codeType) {
         preferences.put(PREFERENCES_CODE_TYPE, codeType.name());
     }
 
-    public boolean isShowNonprintables() {
+    @Override
+    public boolean isShowUnprintables() {
         return preferences.getBoolean(PREFERENCES_SHOW_UNPRINTABLES, false);
     }
 
+    @Override
     public void setShowUnprintables(boolean showUnprintables) {
         preferences.putBoolean(PREFERENCES_SHOW_UNPRINTABLES, showUnprintables);
     }
 
     @Nonnull
+    @Override
     public CodeCharactersCase getCodeCharactersCase() {
         CodeCharactersCase defaultCharactersCase = CodeCharactersCase.UPPER;
         try {
@@ -162,11 +172,13 @@ public class CodeAreaPreferences {
         }
     }
 
+    @Override
     public void setCodeCharactersCase(CodeCharactersCase codeCharactersCase) {
         preferences.put(PREFERENCES_HEX_CHARACTERS_CASE, codeCharactersCase.name());
     }
 
     @Nonnull
+    @Override
     public PositionCodeType getPositionCodeType() {
         PositionCodeType defaultCodeType = PositionCodeType.HEXADECIMAL;
         try {
@@ -177,11 +189,13 @@ public class CodeAreaPreferences {
         }
     }
 
+    @Override
     public void setPositionCodeType(PositionCodeType positionCodeType) {
         preferences.put(PREFERENCES_POSITION_CODE_TYPE, positionCodeType.name());
     }
 
     @Nonnull
+    @Override
     public CodeAreaViewMode getViewMode() {
         CodeAreaViewMode defaultMode = CodeAreaViewMode.DUAL;
         try {
@@ -192,6 +206,7 @@ public class CodeAreaPreferences {
         }
     }
 
+    @Override
     public void setViewMode(CodeAreaViewMode viewMode) {
         preferences.put(PREFERENCES_VIEW_MODE, viewMode.name());
     }
@@ -204,23 +219,28 @@ public class CodeAreaPreferences {
         preferences.putBoolean(PREFERENCES_PAINT_LINE_NUMBERS_BACKGROUND, paintRowPosBackground);
     }
 
+    @Override
     public boolean isCodeColorization() {
         return preferences.getBoolean(PREFERENCES_CODE_COLORIZATION, true);
     }
 
+    @Override
     public void setCodeColorization(boolean codeColorization) {
         preferences.putBoolean(PREFERENCES_CODE_COLORIZATION, codeColorization);
     }
 
+    @Override
     public boolean isUseDefaultFont() {
         return preferences.getBoolean(TextFontPreferences.PREFERENCES_TEXT_FONT_DEFAULT, true);
     }
 
+    @Override
     public void setUseDefaultFont(boolean useDefaultFont) {
         preferences.putBoolean(TextFontPreferences.PREFERENCES_TEXT_FONT_DEFAULT, useDefaultFont);
     }
 
     @Nonnull
+    @Override
     public RowWrappingCapable.RowWrappingMode getRowWrappingMode() {
         RowWrappingCapable.RowWrappingMode defaultMode = RowWrappingCapable.RowWrappingMode.NO_WRAPPING;
         try {
@@ -231,30 +251,37 @@ public class CodeAreaPreferences {
         }
     }
 
+    @Override
     public void setRowWrappingMode(RowWrappingCapable.RowWrappingMode rowWrappingMode) {
         preferences.put(PREFERENCES_ROW_WRAPPING_MODE, rowWrappingMode.name());
     }
 
+    @Override
     public int getMaxBytesPerRow() {
         return preferences.getInt(PREFERENCES_MAX_BYTES_PER_ROW, 16);
     }
 
+    @Override
     public void setMaxBytesPerRow(int maxBytesPerRow) {
         preferences.putInt(PREFERENCES_MAX_BYTES_PER_ROW, maxBytesPerRow);
     }
 
+    @Override
     public int getMinRowPositionLength() {
         return preferences.getInt(PREFERENCES_MIN_ROW_POSITION_LENGTH, 0);
     }
 
+    @Override
     public void setMinRowPositionLength(int minRowPositionLength) {
         preferences.putInt(PREFERENCES_MIN_ROW_POSITION_LENGTH, minRowPositionLength);
     }
 
+    @Override
     public int getMaxRowPositionLength() {
         return preferences.getInt(PREFERENCES_MAX_ROW_POSITION_LENGTH, 0);
     }
 
+    @Override
     public void setMaxRowPositionLength(int maxRowPositionLength) {
         preferences.putInt(PREFERENCES_MAX_ROW_POSITION_LENGTH, maxRowPositionLength);
     }
