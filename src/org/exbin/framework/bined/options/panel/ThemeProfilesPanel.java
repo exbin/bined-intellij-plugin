@@ -17,7 +17,6 @@
 package org.exbin.framework.bined.options.panel;
 
 import java.awt.Component;
-import java.awt.Dialog;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -25,9 +24,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComponent;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
@@ -35,14 +33,11 @@ import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.options.impl.CodeAreaThemeOptionsImpl;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
-import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
-import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
 
 /**
  * Manage list of theme profiles panel.
  *
- * @version 0.2.1 2019/07/20
+ * @version 0.2.1 2019/08/20
  * @author ExBin Project (http://exbin.org)
  */
 public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileListPanel {
@@ -50,6 +45,10 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ThemeProfilesPanel.class);
 
     private boolean modified = false;
+
+    private AddProfileOperation addProfileOperation = null;
+    private EditProfileOperation editProfileOperation = null;
+    private CopyProfileOperation copyProfileOperation = null;
 
     public ThemeProfilesPanel() {
         initComponents();
@@ -60,6 +59,18 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         profilesList.setModel(new ProfilesListModel());
         profilesList.setCellRenderer(new ProfileCellRenderer());
         profilesList.addListSelectionListener((ListSelectionEvent e) -> updateStates());
+    }
+
+    public void setAddProfileOperation(AddProfileOperation addProfileOperation) {
+        this.addProfileOperation = addProfileOperation;
+    }
+
+    public void setEditProfileOperation(EditProfileOperation editProfileOperation) {
+        this.editProfileOperation = editProfileOperation;
+    }
+
+    public void setCopyProfileOperation(CopyProfileOperation copyProfileOperation) {
+        this.copyProfileOperation = copyProfileOperation;
     }
 
     private void updateStates() {
@@ -234,7 +245,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(profilesListScrollPane)
+                .addComponent(profilesListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(profilesControlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -287,25 +298,10 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         ProfilesListModel model = getProfilesListModel();
         int selectedIndex = profilesList.getSelectedIndex();
-        ThemeProfilePanel themeProfilePanel = new ThemeProfilePanel();
-        themeProfilePanel.setThemeProfile(new ExtendedCodeAreaThemeProfile());
-        NamedProfilePanel namedProfilePanel = new NamedProfilePanel(themeProfilePanel);
-        namedProfilePanel.setProfileName(getNewProfileName());
-        DefaultControlPanel controlPanel = new DefaultControlPanel();
-        JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Add Theme Profile", Dialog.ModalityType.APPLICATION_MODAL);
-        controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
-            if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
-                if (!isValidProfileName(namedProfilePanel.getProfileName())) {
-                    JOptionPane.showMessageDialog(this, "Invalid profile name", "Profile Editation Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                ThemeProfile newProfileRecord = new ThemeProfile();
-                ExtendedCodeAreaThemeProfile themeProfile = themeProfilePanel.getThemeProfile();
-                newProfileRecord.profileName = namedProfilePanel.getProfileName();
-                newProfileRecord.themeProfile = themeProfile;
+        if (addProfileOperation != null) {
+            ThemeProfilesPanel.ThemeProfile newProfileRecord = addProfileOperation.run(this, getNewProfileName());
+            if (newProfileRecord != null) {
                 if (selectedIndex >= 0) {
                     profilesList.clearSelection();
                     model.add(selectedIndex, newProfileRecord);
@@ -314,11 +310,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
                 }
                 wasModified();
             }
-
-            dialog.close();
-            dialog.dispose();
-        });
-        dialog.showCentered(this);
+        }
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
@@ -339,33 +331,18 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
         ProfilesListModel model = getProfilesListModel();
         int selectedIndex = profilesList.getSelectedIndex();
-        ThemeProfile profileRecord = model.getElementAt(selectedIndex);
-        ThemeProfilePanel themeProfilePanel = new ThemeProfilePanel();
-        NamedProfilePanel namedProfilePanel = new NamedProfilePanel(themeProfilePanel);
-        DefaultControlPanel controlPanel = new DefaultControlPanel();
-        JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
+        ThemeProfile oldProfileRecord = model.getElementAt(selectedIndex);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Edit Theme Profile", Dialog.ModalityType.APPLICATION_MODAL);
-        namedProfilePanel.setProfileName(profileRecord.profileName);
-        themeProfilePanel.setThemeProfile(profileRecord.themeProfile);
-        controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
-            if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
-                if (!isValidProfileName(namedProfilePanel.getProfileName())) {
-                    JOptionPane.showMessageDialog(this, "Invalid profile name", "Profile Editation Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                ExtendedCodeAreaThemeProfile themeProfile = themeProfilePanel.getThemeProfile();
-                profileRecord.profileName = namedProfilePanel.getProfileName();
-                profileRecord.themeProfile = themeProfile;
+        if (editProfileOperation != null) {
+            ThemeProfile newProfileRecord = editProfileOperation.run(this, oldProfileRecord);
+            if (newProfileRecord != null) {
+                ThemeProfile profileRecord = model.getElementAt(selectedIndex);
+                profileRecord.profileName = newProfileRecord.getProfileName();
+                profileRecord.themeProfile = newProfileRecord.themeProfile;
                 model.notifyProfileModified(selectedIndex);
                 wasModified();
             }
-
-            dialog.close();
-            dialog.dispose();
-        });
-        dialog.showCentered(this);
+        }
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void hideButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hideButtonActionPerformed
@@ -375,26 +352,12 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
         ProfilesListModel model = getProfilesListModel();
         int selectedIndex = profilesList.getSelectedIndex();
-        ThemeProfile profileRecord = model.getElementAt(selectedIndex);
-        ThemeProfilePanel themeProfilePanel = new ThemeProfilePanel();
-        themeProfilePanel.setThemeProfile(new ExtendedCodeAreaThemeProfile());
-        NamedProfilePanel namedProfilePanel = new NamedProfilePanel(themeProfilePanel);
-        DefaultControlPanel controlPanel = new DefaultControlPanel();
-        JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
+        ThemeProfile sourceProfile = model.getElementAt(selectedIndex);
+        ThemeProfile profileRecord = new ThemeProfile(sourceProfile.profileName, sourceProfile.themeProfile);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Copy Theme Profile", Dialog.ModalityType.APPLICATION_MODAL);
-        themeProfilePanel.setThemeProfile(profileRecord.themeProfile);
-        controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
-            if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
-                if (!isValidProfileName(namedProfilePanel.getProfileName())) {
-                    JOptionPane.showMessageDialog(this, "Invalid profile name", "Profile Editation Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                ThemeProfile newProfileRecord = new ThemeProfile();
-                ExtendedCodeAreaThemeProfile themeProfile = themeProfilePanel.getThemeProfile();
-                newProfileRecord.profileName = namedProfilePanel.getProfileName();
-                newProfileRecord.themeProfile = themeProfile;
+        if (copyProfileOperation != null) {
+            ThemeProfile newProfileRecord = copyProfileOperation.run(this, profileRecord);
+            if (newProfileRecord != null) {
                 if (selectedIndex >= 0) {
                     model.add(selectedIndex + 1, newProfileRecord);
                     profilesList.setSelectedIndex(selectedIndex + 1);
@@ -404,11 +367,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
                 }
                 wasModified();
             }
-
-            dialog.close();
-            dialog.dispose();
-        });
-        dialog.showCentered(this);
+        }
     }//GEN-LAST:event_copyButtonActionPerformed
 
     public boolean isModified() {
@@ -431,9 +390,10 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         List<ThemeProfile> profiles = new ArrayList<>();
         List<String> profileNames = options.getProfileNames();
         for (int index = 0; index < profileNames.size(); index++) {
-            ThemeProfile profile = new ThemeProfile();
-            profile.profileName = profileNames.get(index);
-            profile.themeProfile = options.getThemeProfile(index);
+            ThemeProfile profile = new ThemeProfile(
+                    profileNames.get(index),
+                    options.getThemeProfile(index)
+            );
             profiles.add(profile);
         }
 
@@ -474,11 +434,27 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private javax.swing.JButton upButton;
     // End of variables declaration//GEN-END:variables
 
-    private final static class ThemeProfile {
+    @ParametersAreNonnullByDefault
+    public final static class ThemeProfile {
 
-        String profileName;
-        boolean visible = true;
-        ExtendedCodeAreaThemeProfile themeProfile;
+        private String profileName;
+        private boolean visible = true;
+        private ExtendedCodeAreaThemeProfile themeProfile;
+
+        public ThemeProfile(String profileName, ExtendedCodeAreaThemeProfile themeProfile) {
+            this.profileName = profileName;
+            this.themeProfile = themeProfile;
+        }
+
+        @Nonnull
+        public String getProfileName() {
+            return profileName;
+        }
+
+        @Nonnull
+        public ExtendedCodeAreaThemeProfile getThemeProfile() {
+            return themeProfile;
+        }
     }
 
     @ParametersAreNonnullByDefault
@@ -587,5 +563,26 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
 
     private boolean hasProfileWithName(String profileName) {
         return getProfilesListModel().getProfiles().stream().anyMatch((profile) -> (profileName.equals(profile.profileName)));
+    }
+
+    @ParametersAreNonnullByDefault
+    public static interface AddProfileOperation {
+
+        @Nullable
+        ThemeProfilesPanel.ThemeProfile run(JComponent parentComponent, String profileName);
+    }
+
+    @ParametersAreNonnullByDefault
+    public static interface EditProfileOperation {
+
+        @Nullable
+        ThemeProfilesPanel.ThemeProfile run(JComponent parentComponent, ThemeProfilesPanel.ThemeProfile profileRecord);
+    }
+
+    @ParametersAreNonnullByDefault
+    public static interface CopyProfileOperation {
+
+        @Nullable
+        ThemeProfilesPanel.ThemeProfile run(JComponent parentComponent, ThemeProfilesPanel.ThemeProfile profileRecord);
     }
 }

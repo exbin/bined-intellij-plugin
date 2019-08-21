@@ -25,6 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -204,7 +205,13 @@ public class BinarySearchComboBoxPanel extends JPanel {
         codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
             public void show(Component invoker, int x, int y) {
-                JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, ".search" + postfix, x, y);
+                int clickedX = x;
+                int clickedY = y;
+                if (invoker instanceof JViewport) {
+                    clickedX += ((JViewport) invoker).getParent().getX();
+                    clickedY += ((JViewport) invoker).getParent().getY();
+                }
+                JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, ".search" + postfix, clickedX, clickedY);
                 popupMenu.show(invoker, x, y);
             }
         });

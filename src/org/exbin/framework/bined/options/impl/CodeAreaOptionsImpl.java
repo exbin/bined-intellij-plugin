@@ -16,7 +16,6 @@
 package org.exbin.framework.bined.options.impl;
 
 import org.exbin.framework.bined.options.CodeAreaOptions;
-import java.awt.Font;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaViewMode;
@@ -30,7 +29,6 @@ import org.exbin.bined.capability.ViewModeCapable;
 import org.exbin.bined.extended.capability.PositionCodeTypeCapable;
 import org.exbin.bined.extended.capability.ShowUnprintablesCapable;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
-import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.preferences.CodeAreaPreferences;
 import org.exbin.framework.gui.options.api.OptionsData;
@@ -38,35 +36,22 @@ import org.exbin.framework.gui.options.api.OptionsData;
 /**
  * Code area options.
  *
- * @version 0.2.1 2019/07/20
+ * @version 0.2.1 2019/08/21
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class CodeAreaOptionsImpl implements OptionsData, CodeAreaOptions {
 
-    private Font codeFont = null;
     private CodeType codeType = CodeType.HEXADECIMAL;
     private boolean showUnprintables = true;
     private CodeCharactersCase codeCharactersCase = CodeCharactersCase.UPPER;
     private PositionCodeType positionCodeType = PositionCodeType.HEXADECIMAL;
     private CodeAreaViewMode viewMode = CodeAreaViewMode.DUAL;
     private boolean codeColorization = true;
-    private boolean useDefaultFont = true;
     private RowWrappingMode rowWrappingMode;
     private int maxBytesPerRow;
     private int minRowPositionLength;
     private int maxRowPositionLength;
-
-    @Nonnull
-    @Override
-    public Font getCodeFont() {
-        return codeFont;
-    }
-
-    @Override
-    public void setCodeFont(Font codeFont) {
-        this.codeFont = codeFont;
-    }
 
     @Nonnull
     @Override
@@ -132,16 +117,6 @@ public class CodeAreaOptionsImpl implements OptionsData, CodeAreaOptions {
         this.codeColorization = codeColorization;
     }
 
-    @Override
-    public boolean isUseDefaultFont() {
-        return useDefaultFont;
-    }
-
-    @Override
-    public void setUseDefaultFont(boolean useDefaultFont) {
-        this.useDefaultFont = useDefaultFont;
-    }
-
     @Nonnull
     @Override
     public RowWrappingMode getRowWrappingMode() {
@@ -184,14 +159,12 @@ public class CodeAreaOptionsImpl implements OptionsData, CodeAreaOptions {
     }
 
     public void loadFromPreferences(CodeAreaPreferences preferences) {
-        codeFont = preferences.getCodeFont();
         codeType = preferences.getCodeType();
         showUnprintables = preferences.isShowUnprintables();
         codeCharactersCase = preferences.getCodeCharactersCase();
         positionCodeType = preferences.getPositionCodeType();
         viewMode = preferences.getViewMode();
         codeColorization = preferences.isCodeColorization();
-        useDefaultFont = preferences.isUseDefaultFont();
         rowWrappingMode = preferences.getRowWrappingMode();
         maxBytesPerRow = preferences.getMaxBytesPerRow();
         minRowPositionLength = preferences.getMinRowPositionLength();
@@ -199,14 +172,12 @@ public class CodeAreaOptionsImpl implements OptionsData, CodeAreaOptions {
     }
 
     public void saveToPreferences(CodeAreaPreferences preferences) {
-        preferences.setCodeFont(codeFont);
         preferences.setCodeType(codeType);
         preferences.setShowUnprintables(showUnprintables);
         preferences.setCodeCharactersCase(codeCharactersCase);
         preferences.setPositionCodeType(positionCodeType);
         preferences.setViewMode(viewMode);
         preferences.setCodeColorization(codeColorization);
-        preferences.setUseDefaultFont(useDefaultFont);
         preferences.setRowWrappingMode(rowWrappingMode);
         preferences.setMaxBytesPerRow(maxBytesPerRow);
         preferences.setMinRowPositionLength(minRowPositionLength);
@@ -214,7 +185,6 @@ public class CodeAreaOptionsImpl implements OptionsData, CodeAreaOptions {
     }
 
     public static void applyFromCodeArea(CodeAreaOptions codeAreaOptions, ExtCodeArea codeArea) {
-        codeAreaOptions.setCodeFont(((FontCapable) codeArea).getCodeFont());
         codeAreaOptions.setCodeType(((CodeTypeCapable) codeArea).getCodeType());
         codeAreaOptions.setShowUnprintables(((ShowUnprintablesCapable) codeArea).isShowUnprintables());
         codeAreaOptions.setCodeCharactersCase(((CodeCharactersCaseCapable) codeArea).getCodeCharactersCase());
@@ -228,7 +198,6 @@ public class CodeAreaOptionsImpl implements OptionsData, CodeAreaOptions {
     }
 
     public static void applyToCodeArea(CodeAreaOptions codeAreaOptions, ExtCodeArea codeArea) {
-        ((FontCapable) codeArea).setCodeFont(codeAreaOptions.isUseDefaultFont() ? CodeAreaPreferences.DEFAULT_FONT : codeAreaOptions.getCodeFont());
         ((CodeTypeCapable) codeArea).setCodeType(codeAreaOptions.getCodeType());
         ((ShowUnprintablesCapable) codeArea).setShowUnprintables(codeAreaOptions.isShowUnprintables());
         ((CodeCharactersCaseCapable) codeArea).setCodeCharactersCase(codeAreaOptions.getCodeCharactersCase());
@@ -242,14 +211,12 @@ public class CodeAreaOptionsImpl implements OptionsData, CodeAreaOptions {
     }
 
     public void setOptions(CodeAreaOptionsImpl codeAreaOptions) {
-        codeFont = codeAreaOptions.codeFont;
         codeType = codeAreaOptions.codeType;
         showUnprintables = codeAreaOptions.showUnprintables;
         codeCharactersCase = codeAreaOptions.codeCharactersCase;
         positionCodeType = codeAreaOptions.positionCodeType;
         viewMode = codeAreaOptions.viewMode;
         codeColorization = codeAreaOptions.codeColorization;
-        useDefaultFont = codeAreaOptions.useDefaultFont;
         rowWrappingMode = codeAreaOptions.rowWrappingMode;
         maxBytesPerRow = codeAreaOptions.maxBytesPerRow;
         minRowPositionLength = codeAreaOptions.minRowPositionLength;

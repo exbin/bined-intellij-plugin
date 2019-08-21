@@ -41,7 +41,7 @@ import org.exbin.framework.bined.preferences.StatusPreferences;
 /**
  * Binary editor status panel.
  *
- * @version 0.2.1 2019/06/18
+ * @version 0.2.1 2019/08/18
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault

@@ -27,7 +27,7 @@ import org.exbin.framework.gui.options.api.OptionsModifiedListener;
 /**
  * Binary viewer/editor appearance options panel.
  *
- * @version 0.2.1 2019/07/20
+ * @version 0.2.1 2019/08/16
  * @author ExBin Project (http://exbin.org)
  */
 public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements OptionsCapable<BinaryAppearanceOptionsImpl> {
@@ -47,14 +47,12 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
 
     @Override
     public void loadFromOptions(BinaryAppearanceOptionsImpl options) {
-        lineWrapCheckBox.setSelected(options.isLineWrapping());
         showValuesPanelCheckBox.setSelected(options.isShowValuesPanel());
         multiTabModeCheckBox.setSelected(options.isMultiTabMode());
     }
 
     @Override
     public void saveToOptions(BinaryAppearanceOptionsImpl options) {
-        options.setLineWrapping(lineWrapCheckBox.isSelected());
         options.setShowValuesPanel(showValuesPanelCheckBox.isSelected());
         options.setMultiTabMode(multiTabModeCheckBox.isSelected());
     }
@@ -68,15 +66,10 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lineWrapCheckBox = new javax.swing.JCheckBox();
         multiTabModeCheckBox = new javax.swing.JCheckBox();
         showValuesPanelCheckBox = new javax.swing.JCheckBox();
 
         setName("Form"); // NOI18N
-
-        lineWrapCheckBox.setSelected(true);
-        lineWrapCheckBox.setText(resourceBundle.getString("lineWrapCheckBox.text")); // NOI18N
-        lineWrapCheckBox.setName("lineWrapCheckBox"); // NOI18N
 
         multiTabModeCheckBox.setText(resourceBundle.getString("multiTabModeCheckBox.text")); // NOI18N
         multiTabModeCheckBox.setEnabled(false);
@@ -93,17 +86,14 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lineWrapCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
-                    .addComponent(showValuesPanelCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
-                    .addComponent(multiTabModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))
+                    .addComponent(showValuesPanelCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(multiTabModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lineWrapCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(showValuesPanelCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(multiTabModeCheckBox)
@@ -121,7 +111,6 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox lineWrapCheckBox;
     private javax.swing.JCheckBox multiTabModeCheckBox;
     private javax.swing.JCheckBox showValuesPanelCheckBox;
     // End of variables declaration//GEN-END:variables

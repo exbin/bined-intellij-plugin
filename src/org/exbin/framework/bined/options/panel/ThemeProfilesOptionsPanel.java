@@ -19,6 +19,7 @@ package org.exbin.framework.bined.options.panel;
 import java.awt.BorderLayout;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.bined.options.impl.CodeAreaThemeOptionsImpl;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
@@ -28,9 +29,10 @@ import org.exbin.framework.gui.options.api.OptionsModifiedListener;
 /**
  * Theme profiles options panel.
  *
- * @version 0.2.1 2019/07/20
+ * @version 0.2.1 2019/08/20
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class ThemeProfilesOptionsPanel extends javax.swing.JPanel implements OptionsCapable<CodeAreaThemeOptionsImpl> {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ThemeProfilesOptionsPanel.class);
@@ -54,6 +56,18 @@ public class ThemeProfilesOptionsPanel extends javax.swing.JPanel implements Opt
     @Override
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
+    }
+
+    public void setAddProfileOperation(ThemeProfilesPanel.AddProfileOperation addProfileOperation) {
+        profilesPanel.setAddProfileOperation(addProfileOperation);
+    }
+
+    public void setEditProfileOperation(ThemeProfilesPanel.EditProfileOperation editProfileOperation) {
+        profilesPanel.setEditProfileOperation(editProfileOperation);
+    }
+
+    public void setCopyProfileOperation(ThemeProfilesPanel.CopyProfileOperation copyProfileOperation) {
+        profilesPanel.setCopyProfileOperation(copyProfileOperation);
     }
 
     @Override

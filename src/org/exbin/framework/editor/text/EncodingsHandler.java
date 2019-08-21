@@ -15,11 +15,29 @@
  */
 package org.exbin.framework.editor.text;
 
-import org.exbin.framework.editor.text.options.panel.TextEncodingPanel;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSeparator;
 import org.exbin.framework.editor.text.panel.AddEncodingPanel;
+import org.exbin.framework.editor.text.options.panel.TextEncodingPanel;
 import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
-import org.exbin.framework.editor.text.service.TextEncodingService;
-import org.exbin.framework.editor.text.service.impl.TextEncodingServiceImpl;
 import org.exbin.framework.gui.utils.ActionUtils;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
@@ -28,17 +46,8 @@ import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
 import org.exbin.framework.gui.utils.handler.OptionsControlHandler;
 import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
 import org.exbin.framework.gui.utils.panel.OptionsControlPanel;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import org.exbin.framework.editor.text.service.TextEncodingService;
+import org.exbin.framework.editor.text.service.impl.TextEncodingServiceImpl;
 
 /**
  * Encodings handler.
@@ -129,11 +138,10 @@ public class EncodingsHandler {
         };
         ActionUtils.setupAction(manageEncodingsAction, resourceBundle, "manageEncodingsAction");
         manageEncodingsAction.putValue(ActionUtils.ACTION_DIALOG_MODE, true);
-        manageEncodingsAction.putValue(Action.NAME, manageEncodingsAction.getValue(Action.NAME) + ActionUtils.DIALOG_MENUITEM_EXT);
 
         toolsEncodingMenu = new JMenu();
         toolsEncodingMenu.addSeparator();
-        toolsEncodingMenu.add(manageEncodingsAction);
+        toolsEncodingMenu.add(ActionUtils.actionToMenuItem(manageEncodingsAction));
         toolsEncodingMenu.setText(resourceBundle.getString("toolsEncodingMenu.text"));
         toolsEncodingMenu.setToolTipText(resourceBundle.getString("toolsEncodingMenu.shortDescription"));
         EncodingsHandler.this.rebuildEncodings();
@@ -223,7 +231,7 @@ public class EncodingsHandler {
         }
 
         popupMenu.add(new JSeparator());
-        popupMenu.add(manageEncodingsAction);
+        popupMenu.add(ActionUtils.actionToMenuItem(manageEncodingsAction));
 
         popupMenu.show((Component) mouseEvent.getSource(), mouseEvent.getX(), mouseEvent.getY());
     }

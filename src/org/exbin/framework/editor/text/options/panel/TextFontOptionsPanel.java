@@ -16,24 +16,26 @@
  */
 package org.exbin.framework.editor.text.options.panel;
 
-import java.awt.Font;
+import org.exbin.framework.editor.text.options.impl.TextFontOptionsImpl;
+import org.exbin.framework.editor.text.service.TextFontService;
+import org.exbin.framework.gui.options.api.OptionsCapable;
+import org.exbin.framework.gui.options.api.OptionsModifiedListener;
+import org.exbin.framework.gui.utils.LanguageUtils;
+import org.exbin.framework.gui.utils.WindowUtils;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.font.TextAttribute;
 import java.util.Map;
 import java.util.ResourceBundle;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.framework.editor.text.options.impl.TextFontOptionsImpl;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.options.api.OptionsCapable;
-import org.exbin.framework.gui.options.api.OptionsModifiedListener;
-import org.exbin.framework.editor.text.service.TextFontService;
 
 /**
  * Text font options panel.
  *
- * @version 0.2.1 2019/07/19
+ * @version 0.2.1 2019/08/21
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -43,7 +45,7 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
     private FontChangeAction fontChangeAction;
     private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(TextFontOptionsPanel.class);
     private TextFontService textFontService;
-    private Font font;
+    private Font codeFont;
 
     public TextFontOptionsPanel() {
         initComponents();
@@ -62,7 +64,7 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
     @Override
     public void saveToOptions(TextFontOptionsImpl options) {
         options.setUseDefaultFont(defaultFontCheckBox.isSelected());
-        options.setFontAttributes(font != null ? (Map<TextAttribute, Object>) font.getAttributes() : null);
+        options.setFontAttributes(codeFont != null ? (Map<TextAttribute, Object>) codeFont.getAttributes() : null);
     }
 
     @Override
@@ -71,16 +73,16 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
         defaultFontCheckBox.setSelected(useDefaultFont);
         setEnabled(!useDefaultFont);
 
-        font = textFontService.getDefaultFont().deriveFont(options.getFontAttributes());
-        fontPreviewLabel.setFont(font);
+        codeFont = textFontService == null ? options.getFont(new Font(Font.MONOSPACED, Font.PLAIN, 12)) : textFontService.getDefaultFont().deriveFont(options.getFontAttributes());
+        updateFontFields();
     }
 
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         fontPreviewLabel.setEnabled(enabled);
-        fillDefaultFontButton.setEnabled(enabled);
-        fillCurrentFontButton.setEnabled(enabled);
+        fillDefaultFontButton.setEnabled(enabled && textFontService != null);
+        fillCurrentFontButton.setEnabled(enabled && textFontService != null);
         changeFontButton.setEnabled(enabled);
     }
 
@@ -99,6 +101,7 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
         changeFontButton = new javax.swing.JButton();
         fontPreviewLabel = new javax.swing.JLabel();
         fillCurrentFontButton = new javax.swing.JButton();
+        fontTextField = new javax.swing.JTextField();
 
         colorChooser.setName("colorChooser"); // NOI18N
 
@@ -148,16 +151,20 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
             }
         });
 
+        fontTextField.setEditable(false);
+        fontTextField.setName("fontTextField"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(fontPreviewLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(fontTextField, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(defaultFontCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(changeFontButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(fillDefaultFontButton)
@@ -171,6 +178,8 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(defaultFontCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(fontTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(fontPreviewLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -192,7 +201,8 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
     }//GEN-LAST:event_defaultFontCheckBoxItemStateChanged
 
     private void fillDefaultFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillDefaultFontButtonActionPerformed
-        fontPreviewLabel.setFont(textFontService.getDefaultFont());
+        codeFont = textFontService.getDefaultFont();
+        updateFontFields();
         setModified(true);
     }//GEN-LAST:event_fillDefaultFontButtonActionPerformed
 
@@ -200,14 +210,16 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
         if (fontChangeAction != null) {
             Font resultFont = fontChangeAction.changeFont(fontPreviewLabel.getFont());
             if (resultFont != null) {
-                fontPreviewLabel.setFont(resultFont);
+                codeFont = resultFont;
+                updateFontFields();
                 setModified(true);
             }
         }
     }//GEN-LAST:event_changeFontButtonActionPerformed
 
     private void fillCurrentFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillCurrentFontButtonActionPerformed
-        fontPreviewLabel.setFont(textFontService.getCurrentFont());
+        codeFont = textFontService.getCurrentFont();
+        updateFontFields();
         setModified(true);
     }//GEN-LAST:event_fillCurrentFontButtonActionPerformed
 
@@ -227,7 +239,24 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
     private javax.swing.JButton fillCurrentFontButton;
     private javax.swing.JButton fillDefaultFontButton;
     private javax.swing.JLabel fontPreviewLabel;
+    private javax.swing.JTextField fontTextField;
     // End of variables declaration//GEN-END:variables
+
+    private void updateFontFields() {
+        int fontStyle = codeFont.getStyle();
+        String fontStyleName;
+        if ((fontStyle & (Font.BOLD + Font.ITALIC)) == Font.BOLD + Font.ITALIC) {
+            fontStyleName = "Bold Italic";
+        } else if ((fontStyle & Font.BOLD) > 0) {
+            fontStyleName = "Bold";
+        } else if ((fontStyle & Font.ITALIC) > 0) {
+            fontStyleName = "Italic";
+        } else {
+            fontStyleName = "Plain";
+        }
+        fontTextField.setText(codeFont.getFamily() + " " + String.valueOf(codeFont.getSize()) + " " + fontStyleName);
+        fontPreviewLabel.setFont(codeFont);
+    }
 
     private void setModified(boolean b) {
         if (optionsModifiedListener != null) {
@@ -244,8 +273,10 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
         this.fontChangeAction = fontChangeAction;
     }
 
+    @ParametersAreNonnullByDefault
     public static interface FontChangeAction {
 
+        @Nullable
         Font changeFont(Font currentFont);
     }
 }

@@ -41,6 +41,7 @@ import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
+import org.exbin.framework.editor.text.options.TextFontOptions;
 import org.exbin.framework.gui.utils.ActionUtils;
 import org.exbin.framework.preferences.PreferencesWrapper;
 import org.exbin.utils.binary_data.BinaryData;
@@ -69,6 +70,7 @@ public class DebugViewPanel extends JPanel {
     private final ExtendedCodeAreaLayoutProfile defaultLayoutProfile;
     private final ExtendedCodeAreaThemeProfile defaultThemeProfile;
     private final CodeAreaColorsProfile defaultColorProfile;
+    private final Font defaultFont;
 
     private BinaryStatusPanel statusPanel;
     private BinaryStatusApi binaryStatus;
@@ -89,7 +91,8 @@ public class DebugViewPanel extends JPanel {
         codeArea.setEditationMode(EditationMode.READ_ONLY);
 
         codeArea.setPainter(new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea));
-        codeArea.setCodeFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+        codeArea.setCodeFont(defaultFont);
         codeArea.getCaret().setBlinkRate(300);
         defaultLayoutProfile = codeArea.getLayoutProfile();
         defaultThemeProfile = codeArea.getThemeProfile();
@@ -128,7 +131,13 @@ public class DebugViewPanel extends JPanel {
         codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
             public void show(Component invoker, int x, int y) {
-                JPopupMenu popupMenu = createContextMenu(x, y);
+                int clickedX = x;
+                int clickedY = y;
+                if (invoker instanceof JViewport) {
+                    clickedX += ((JViewport) invoker).getParent().getX();
+                    clickedY += ((JViewport) invoker).getParent().getY();
+                }
+                JPopupMenu popupMenu = createContextMenu(clickedX, clickedY);
                 popupMenu.show(invoker, x, y);
             }
         });
@@ -318,6 +327,11 @@ public class DebugViewPanel extends JPanel {
             @Override
             public TextEncodingOptions getEncodingOptions() {
                 return preferences.getEncodingPreferences();
+            }
+
+            @Override
+            public TextFontOptions getFontOptions() {
+                return preferences.getFontPreferences();
             }
 
             @Override

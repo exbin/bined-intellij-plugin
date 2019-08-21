@@ -95,7 +95,7 @@ public class PreferencesWrapper implements Preferences {
 
     @Override
     public void putBoolean(String key, boolean value) {
-        preferences.setValue(prefix + key, value);
+        preferences.setValue(prefix + key, value, !value);
     }
 
     @Override

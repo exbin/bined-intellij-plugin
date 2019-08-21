@@ -26,12 +26,13 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="fontPreviewLabel" max="32767" attributes="0"/>
-                  <Component id="defaultFontCheckBox" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
+                  <Component id="fontTextField" alignment="0" max="32767" attributes="0"/>
+                  <Component id="defaultFontCheckBox" alignment="1" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
                       <Component id="changeFontButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="fillDefaultFontButton" min="-2" max="-2" attributes="0"/>
@@ -49,6 +50,8 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="defaultFontCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="fontTextField" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="fontPreviewLabel" min="-2" pref="39" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -129,6 +132,12 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fillCurrentFontButtonActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JTextField" name="fontTextField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="name" type="java.lang.String" value="fontTextField" noResource="true"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

@@ -48,7 +48,7 @@ import org.exbin.utils.binary_data.EditableBinaryData;
 /**
  * Values side panel.
  *
- * @version 0.2.1 2019/07/16
+ * @version 0.2.1 2019/08/15
  * @author ExBin Project (http://exbin.org)
  */
 public class ValuesPanel extends javax.swing.JPanel {
@@ -893,6 +893,9 @@ public class ValuesPanel extends javax.swing.JPanel {
                 byteOrder = getByteOrder();
                 signed = isSigned();
                 values = valuesCache;
+                if (clearFields) {
+                    values[0] = 0;
+                }
                 updateStarted();
             }
 

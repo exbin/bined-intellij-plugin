@@ -31,7 +31,7 @@ public interface EditorOptionsService {
 
     void setFileHandlingMode(FileHandlingMode fileHandlingMode);
 
-    void setIsShowValuesPanel(boolean isShowValuesPanel);
+    void setShowValuesPanel(boolean isShowValuesPanel);
 
     void setEditorHandlingMode(EnterKeyHandlingMode enterKeyHandlingMode);
 }

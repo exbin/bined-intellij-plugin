@@ -285,8 +285,11 @@ public class TextEncodingOptionsPanel extends javax.swing.JPanel implements Opti
 
         public void setAvailableEncodings(List<String> encodings) {
             availableEncodings = new ArrayList<>();
-            availableEncodings.add(TextEncodingPreferences.ENCODING_UTF8);
-            availableEncodings.addAll(encodings);
+            if (encodings.isEmpty()) {
+                availableEncodings.add(TextEncodingPreferences.ENCODING_UTF8);
+            } else {
+                availableEncodings.addAll(encodings);
+            }
             int position = availableEncodings.indexOf(selectedEncoding);
             selectedEncoding = availableEncodings.get(position > 0 ? position : 0);
 

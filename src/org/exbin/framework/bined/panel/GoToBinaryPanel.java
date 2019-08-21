@@ -24,7 +24,7 @@ import org.exbin.framework.gui.utils.WindowUtils;
 /**
  * Go-to position panel for binary editor.
  *
- * @version 0.2.1 2019/07/30
+ * @version 0.2.1 2019/08/18
  * @author ExBin Project (http://exbin.org)
  */
 public class GoToBinaryPanel extends javax.swing.JPanel {
@@ -38,6 +38,7 @@ public class GoToBinaryPanel extends javax.swing.JPanel {
     public GoToBinaryPanel() {
         initComponents();
 
+        baseSwitchableSpinnerPanel.setMinimum(0l);
         baseSwitchableSpinnerPanel.addChangeListener((javax.swing.event.ChangeEvent evt) -> {
             updateTargetPosition();
         });

@@ -16,15 +16,16 @@
  */
 package org.exbin.framework.gui.utils;
 
-import java.awt.AWTEvent;
-import java.awt.EventQueue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.util.Map;
 import java.util.ResourceBundle;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.text.JTextComponent;
 
 /**
  * Some simple static methods usable for actions, menus and toolbars.
@@ -118,6 +119,50 @@ public class ActionUtils {
         textActionMap.get(actionName).actionPerformed(actionEvent);
     }
 
+    @Nonnull
+    public static JMenuItem actionToMenuItem(Action action) {
+        return actionToMenuItem(action, null);
+    }
+
+    @Nonnull
+    public static JMenuItem actionToMenuItem(Action action, @Nullable Map<String, ButtonGroup> buttonGroups) {
+        JMenuItem menuItem;
+        ActionUtils.ActionType actionType = (ActionUtils.ActionType) action.getValue(ActionUtils.ACTION_TYPE);
+        if (actionType != null) {
+            switch (actionType) {
+                case CHECK: {
+                    menuItem = new JCheckBoxMenuItem(action);
+                    break;
+                }
+                case RADIO: {
+                    menuItem = new JRadioButtonMenuItem(action);
+                    String radioGroup = (String) action.getValue(ActionUtils.ACTION_RADIO_GROUP);
+                    if (buttonGroups != null) {
+                        ButtonGroup buttonGroup = buttonGroups.get(radioGroup);
+                        if (buttonGroup == null) {
+                            buttonGroup = new ButtonGroup();
+                            buttonGroups.put(radioGroup, buttonGroup);
+                        }
+                        buttonGroup.add(menuItem);
+                    }
+                    break;
+                }
+                default: {
+                    menuItem = new JMenuItem(action);
+                }
+            }
+        } else {
+            menuItem = new JMenuItem(action);
+        }
+
+        Object dialogMode = action.getValue(ActionUtils.ACTION_DIALOG_MODE);
+        if (dialogMode instanceof Boolean && ((Boolean) dialogMode)) {
+            menuItem.setText(menuItem.getText() + ActionUtils.DIALOG_MENUITEM_EXT);
+        }
+
+        return menuItem;
+    }
+
     /**
      * This method was lifted from JTextComponent.java.
      */
@@ -148,6 +193,10 @@ public class ActionUtils {
          * Radion type checking, where only one item in radio group can be
          * checked.
          */
-        RADIO
+        RADIO,
+        /**
+         * Action to cycle thru list of options.
+         */
+        CYCLE
     }
 }

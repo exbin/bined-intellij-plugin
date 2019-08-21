@@ -26,7 +26,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Window provider for hexadecimal editor.
+ * Window provider for binary editor.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.0 2018/11/10

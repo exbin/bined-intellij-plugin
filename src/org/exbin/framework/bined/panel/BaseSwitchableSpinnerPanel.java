@@ -138,7 +138,7 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(baseSwitchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(spinner, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
+                .addComponent(spinner))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

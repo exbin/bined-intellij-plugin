@@ -17,7 +17,6 @@
 package org.exbin.framework.bined.options.panel;
 
 import java.awt.Component;
-import java.awt.Dialog;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -25,9 +24,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComponent;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
@@ -35,14 +33,11 @@ import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.framework.bined.options.impl.CodeAreaColorOptionsImpl;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
-import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
-import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
 
 /**
  * Manage list of color profiles panel.
  *
- * @version 0.2.1 2019/07/20
+ * @version 0.2.1 2019/08/20
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -51,7 +46,10 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ColorProfilesPanel.class);
 
     private boolean modified = false;
-    private CodeAreaColorOptionsImpl activeOptions = null;
+
+    private AddProfileOperation addProfileOperation = null;
+    private EditProfileOperation editProfileOperation = null;
+    private CopyProfileOperation copyProfileOperation = null;
 
     public ColorProfilesPanel() {
         initComponents();
@@ -62,6 +60,18 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         profilesList.setModel(new ProfilesListModel());
         profilesList.setCellRenderer(new ProfileCellRenderer());
         profilesList.addListSelectionListener((ListSelectionEvent e) -> updateStates());
+    }
+
+    public void setAddProfileOperation(AddProfileOperation addProfileOperation) {
+        this.addProfileOperation = addProfileOperation;
+    }
+
+    public void setEditProfileOperation(EditProfileOperation editProfileOperation) {
+        this.editProfileOperation = editProfileOperation;
+    }
+
+    public void setCopyProfileOperation(CopyProfileOperation copyProfileOperation) {
+        this.copyProfileOperation = copyProfileOperation;
     }
 
     private void updateStates() {
@@ -236,7 +246,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(profilesListScrollPane)
+                .addComponent(profilesListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(profilesControlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -289,25 +299,10 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         ProfilesListModel model = getProfilesListModel();
         int selectedIndex = profilesList.getSelectedIndex();
-        ColorProfilePanel colorProfilePanel = new ColorProfilePanel();
-        colorProfilePanel.setColorProfile(new ExtendedCodeAreaColorProfile());
-        NamedProfilePanel namedProfilePanel = new NamedProfilePanel(colorProfilePanel);
-        namedProfilePanel.setProfileName(getNewProfileName());
-        DefaultControlPanel controlPanel = new DefaultControlPanel();
-        JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Add Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
-        controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
-            if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
-                if (!isValidProfileName(namedProfilePanel.getProfileName())) {
-                    JOptionPane.showMessageDialog(this, "Invalid profile name", "Profile Editation Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                ColorProfile newProfileRecord = new ColorProfile();
-                ExtendedCodeAreaColorProfile colorProfile = colorProfilePanel.getColorProfile();
-                newProfileRecord.profileName = namedProfilePanel.getProfileName();
-                newProfileRecord.colorProfile = colorProfile;
+        if (addProfileOperation != null) {
+            ColorProfile newProfileRecord = addProfileOperation.run(this, getNewProfileName());
+            if (newProfileRecord != null) {
                 if (selectedIndex >= 0) {
                     profilesList.clearSelection();
                     model.add(selectedIndex, newProfileRecord);
@@ -316,11 +311,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
                 }
                 wasModified();
             }
-
-            dialog.close();
-            dialog.dispose();
-        });
-        dialog.showCentered(this);
+        }
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
@@ -333,33 +324,18 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
         ProfilesListModel model = getProfilesListModel();
         int selectedIndex = profilesList.getSelectedIndex();
-        ColorProfile profileRecord = model.getElementAt(selectedIndex);
-        ColorProfilePanel colorProfilePanel = new ColorProfilePanel();
-        NamedProfilePanel namedProfilePanel = new NamedProfilePanel(colorProfilePanel);
-        DefaultControlPanel controlPanel = new DefaultControlPanel();
-        JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
+        ColorProfile oldProfileRecord = model.getElementAt(selectedIndex);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Edit Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
-        namedProfilePanel.setProfileName(profileRecord.profileName);
-        colorProfilePanel.setColorProfile(profileRecord.colorProfile);
-        controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
-            if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
-                if (!isValidProfileName(namedProfilePanel.getProfileName())) {
-                    JOptionPane.showMessageDialog(this, "Invalid profile name", "Profile Editation Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                ExtendedCodeAreaColorProfile colorProfile = colorProfilePanel.getColorProfile();
-                profileRecord.profileName = namedProfilePanel.getProfileName();
-                profileRecord.colorProfile = colorProfile;
+        if (editProfileOperation != null) {
+            ColorProfile newProfileRecord = editProfileOperation.run(this, oldProfileRecord);
+            if (newProfileRecord != null) {
+                ColorProfile profileRecord = model.getElementAt(selectedIndex);
+                profileRecord.profileName = newProfileRecord.getProfileName();
+                profileRecord.colorProfile = newProfileRecord.colorProfile;
                 model.notifyProfileModified(selectedIndex);
                 wasModified();
             }
-
-            dialog.close();
-            dialog.dispose();
-        });
-        dialog.showCentered(this);
+        }
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void hideButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hideButtonActionPerformed
@@ -377,26 +353,12 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
         ProfilesListModel model = getProfilesListModel();
         int selectedIndex = profilesList.getSelectedIndex();
-        ColorProfile profileRecord = model.getElementAt(selectedIndex);
-        ColorProfilePanel colorProfilePanel = new ColorProfilePanel();
-        colorProfilePanel.setColorProfile(new ExtendedCodeAreaColorProfile());
-        NamedProfilePanel namedProfilePanel = new NamedProfilePanel(colorProfilePanel);
-        DefaultControlPanel controlPanel = new DefaultControlPanel();
-        JPanel dialogPanel = WindowUtils.createDialogPanel(namedProfilePanel, controlPanel);
+        ColorProfile sourceProfile = model.getElementAt(selectedIndex);
+        ColorProfile profileRecord = new ColorProfile(sourceProfile.profileName, sourceProfile.colorProfile);
 
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, WindowUtils.getWindow(this), "Copy Colors Profile", Dialog.ModalityType.APPLICATION_MODAL);
-        colorProfilePanel.setColorProfile(profileRecord.colorProfile);
-        controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
-            if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
-                if (!isValidProfileName(namedProfilePanel.getProfileName())) {
-                    JOptionPane.showMessageDialog(this, "Invalid profile name", "Profile Editation Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                ColorProfile newProfileRecord = new ColorProfile();
-                ExtendedCodeAreaColorProfile colorProfile = colorProfilePanel.getColorProfile();
-                newProfileRecord.profileName = namedProfilePanel.getProfileName();
-                newProfileRecord.colorProfile = colorProfile;
+        if (copyProfileOperation != null) {
+            ColorProfile newProfileRecord = copyProfileOperation.run(this, profileRecord);
+            if (newProfileRecord != null) {
                 if (selectedIndex >= 0) {
                     model.add(selectedIndex + 1, newProfileRecord);
                     profilesList.setSelectedIndex(selectedIndex + 1);
@@ -406,11 +368,7 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
                 }
                 wasModified();
             }
-
-            dialog.close();
-            dialog.dispose();
-        });
-        dialog.showCentered(this);
+        }
     }//GEN-LAST:event_copyButtonActionPerformed
 
     public boolean isModified() {
@@ -422,19 +380,14 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
         updateStates();
     }
 
-    private boolean isValidProfileName(@Nullable String profileName) {
-        return profileName != null && !"".equals(profileName.trim());
-    }
-
     public void loadFromOptions(CodeAreaColorOptionsImpl options) {
-        activeOptions = options;
-
         List<ColorProfile> profiles = new ArrayList<>();
         List<String> profileNames = options.getProfileNames();
         for (int index = 0; index < profileNames.size(); index++) {
-            ColorProfile profile = new ColorProfile();
-            profile.profileName = profileNames.get(index);
-            profile.colorProfile = options.getColorsProfile(index);
+            ColorProfile profile = new ColorProfile(
+                    profileNames.get(index),
+                    options.getColorsProfile(index)
+            );
             profiles.add(profile);
         }
 
@@ -475,11 +428,27 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private javax.swing.JButton upButton;
     // End of variables declaration//GEN-END:variables
 
-    private final static class ColorProfile {
+    @ParametersAreNonnullByDefault
+    public final static class ColorProfile {
 
-        String profileName;
-        boolean visible = true;
-        ExtendedCodeAreaColorProfile colorProfile;
+        private String profileName;
+        private boolean visible = true;
+        private ExtendedCodeAreaColorProfile colorProfile;
+
+        public ColorProfile(String profileName, ExtendedCodeAreaColorProfile colorProfile) {
+            this.profileName = profileName;
+            this.colorProfile = colorProfile;
+        }
+
+        @Nonnull
+        public String getProfileName() {
+            return profileName;
+        }
+
+        @Nonnull
+        public ExtendedCodeAreaColorProfile getColorProfile() {
+            return colorProfile;
+        }
     }
 
     @ParametersAreNonnullByDefault
@@ -588,5 +557,26 @@ public class ColorProfilesPanel extends javax.swing.JPanel implements ProfileLis
 
     private boolean hasProfileWithName(String profileName) {
         return getProfilesListModel().getProfiles().stream().anyMatch((profile) -> (profileName.equals(profile.profileName)));
+    }
+
+    @ParametersAreNonnullByDefault
+    public static interface AddProfileOperation {
+
+        @Nullable
+        ColorProfile run(JComponent parentComponent, String profileName);
+    }
+
+    @ParametersAreNonnullByDefault
+    public static interface EditProfileOperation {
+
+        @Nullable
+        ColorProfile run(JComponent parentComponent, ColorProfile profileRecord);
+    }
+
+    @ParametersAreNonnullByDefault
+    public static interface CopyProfileOperation {
+
+        @Nullable
+        ColorProfile run(JComponent parentComponent, ColorProfile profileRecord);
     }
 }

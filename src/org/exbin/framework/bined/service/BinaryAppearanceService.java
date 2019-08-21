@@ -21,7 +21,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 /**
  * Appearance service interface.
  *
- * @version 0.2.1 2019/07/13
+ * @version 0.2.1 2019/08/16
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -41,5 +41,10 @@ public interface BinaryAppearanceService {
      */
     void setWordWrapMode(boolean mode);
 
+    /**
+     * Sets values panel visibility.
+     *
+     * @param showValuesPanel
+     */
     void setShowValuesPanel(boolean showValuesPanel);
 }

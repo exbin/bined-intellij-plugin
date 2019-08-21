@@ -18,7 +18,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="profilesListScrollPane" max="32767" attributes="1"/>
+              <Component id="profilesListScrollPane" pref="20" max="32767" attributes="1"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="profilesControlPanel" min="-2" max="-2" attributes="0"/>
           </Group>

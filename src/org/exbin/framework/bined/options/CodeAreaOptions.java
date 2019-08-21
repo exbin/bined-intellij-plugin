@@ -15,7 +15,6 @@
  */
 package org.exbin.framework.bined.options;
 
-import java.awt.Font;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaViewMode;
@@ -27,7 +26,7 @@ import org.exbin.bined.capability.RowWrappingCapable;
 /**
  * Code area options.
  *
- * @version 0.2.1 2019/07/20
+ * @version 0.2.1 2019/08/21
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -35,9 +34,6 @@ public interface CodeAreaOptions {
 
     @Nonnull
     CodeCharactersCase getCodeCharactersCase();
-
-    @Nonnull
-    Font getCodeFont();
 
     @Nonnull
     CodeType getCodeType();
@@ -61,13 +57,9 @@ public interface CodeAreaOptions {
 
     boolean isShowUnprintables();
 
-    boolean isUseDefaultFont();
-
     void setCodeCharactersCase(CodeCharactersCase codeCharactersCase);
 
     void setCodeColorization(boolean codeColorization);
-
-    void setCodeFont(Font codeFont);
 
     void setCodeType(CodeType codeType);
 
@@ -82,8 +74,6 @@ public interface CodeAreaOptions {
     void setRowWrappingMode(RowWrappingCapable.RowWrappingMode rowWrappingMode);
 
     void setShowUnprintables(boolean showUnprintables);
-
-    void setUseDefaultFont(boolean useDefaultFont);
 
     void setViewMode(CodeAreaViewMode viewMode);
 }
