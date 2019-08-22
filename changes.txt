@@ -1,9 +1,11 @@
-0.2.1
+0.2.1 (2019-08-22)
+- Minor GUI improvements
 - Context aware popup menu
 - Go-to dialog position to support position from end (issue #14)
 - Go-to dialog position to support different numerical bases (issue #11)
 - Support for ENTER key in preview section
 - Minor fix to view of native Java debug values
+- Minor fix to integration (issues #7, #18)
 
 0.2.0 (2019-04-13)
 - Renamed to BinEd

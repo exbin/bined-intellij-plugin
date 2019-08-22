@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij;
 
+import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.jetbrains.annotations.NotNull;
@@ -25,15 +26,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Virtual file for hexadecimal editor.
+ * Virtual file for binary editor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.3 2017/03/20
+ * @version 0.2.1 2019/08/22
  */
 public class BinEdVirtualFile extends VirtualFile {
 
+    private static final String PATH_PREFIX = "bined://";
+
     private final VirtualFile parentFile;
     private String displayName;
+    private BinEdEditorPanel editorPanel;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
         this.parentFile = parentFile;
@@ -44,6 +48,14 @@ public class BinEdVirtualFile extends VirtualFile {
         } else {
             this.displayName = "";
         }
+    }
+
+    public BinEdEditorPanel getEditorPanel() {
+        if (editorPanel == null) {
+            editorPanel = new BinEdEditorPanel();
+        }
+
+        return editorPanel;
     }
 
     @NotNull
@@ -65,7 +77,7 @@ public class BinEdVirtualFile extends VirtualFile {
     @NotNull
     @Override
     public String getPath() {
-        return parentFile.getPath();
+        return PATH_PREFIX + parentFile.getPath();
     }
 
     @Override
@@ -148,5 +160,10 @@ public class BinEdVirtualFile extends VirtualFile {
     public int hashCode() {
         String path = getPath();
         return path != null ? path.hashCode() : 0;
+    }
+
+    public boolean isMoved() {
+        Boolean closingToReopen = getUserData(FileEditorManagerImpl.CLOSING_TO_REOPEN);
+        return closingToReopen != null && closingToReopen;
     }
 }

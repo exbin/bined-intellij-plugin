@@ -31,12 +31,12 @@ public class BinEdFileTypeFactory extends FileTypeFactory {
 
     @NotNull
     public static FileType getFileType() {
-        return FileTypeManager.getInstance().getFileTypeByExtension(BinEdFileType.DEFAULT_EXTENSION);
+        return FileTypeManager.getInstance().getFileTypeByExtension(GenericBinaryFileType.DEFAULT_EXTENSION);
     }
 
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer consumer) {
-        final FileType fileType = new BinEdFileType();
-        consumer.consume(fileType, BinEdFileType.DEFAULT_EXTENSION);
+        final FileType fileType = new GenericBinaryFileType();
+        consumer.consume(fileType, GenericBinaryFileType.DEFAULT_EXTENSION);
     }
 }

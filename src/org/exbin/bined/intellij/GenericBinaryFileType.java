@@ -28,13 +28,13 @@ import javax.swing.*;
  * File type for generic binary file.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.0 2019/04/06
+ * @version 0.2.1 2019/08/22
  */
-public class BinEdFileType implements FileType {
+public class GenericBinaryFileType implements FileType {
 
     public static final String DEFAULT_EXTENSION = "bin";
 
-    public static final BinEdFileType INSTANCE = new BinEdFileType();
+    public static final GenericBinaryFileType INSTANCE = new GenericBinaryFileType();
 
     @NotNull
     @Override

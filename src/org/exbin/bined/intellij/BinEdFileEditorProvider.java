@@ -26,10 +26,10 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Window provider for binary editor.
+ * File editor provider for binary files.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.0 2018/11/10
+ * @version 0.2.1 2019/08/22
  */
 public class BinEdFileEditorProvider implements FileEditorProvider, ApplicationComponent {
 
@@ -58,19 +58,21 @@ public class BinEdFileEditorProvider implements FileEditorProvider, ApplicationC
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        return file instanceof BinEdVirtualFile || BinEdFileType.DEFAULT_EXTENSION.equals(file.getExtension());
+        return file instanceof BinEdVirtualFile || GenericBinaryFileType.DEFAULT_EXTENSION.equals(file.getExtension());
     }
 
     @NotNull
     @Override
     public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        BinEdFileEditor binEdFileEditor = new BinEdFileEditor(project);
+        BinEdVirtualFile binEdVirtualFile;
         if (virtualFile instanceof BinEdVirtualFile) {
-            BinEdVirtualFile binEdVirtualFile = (BinEdVirtualFile) virtualFile;
-            binEdFileEditor.setDisplayName(binEdVirtualFile.getDisplayName());
+            binEdVirtualFile = (BinEdVirtualFile) virtualFile;
         } else {
-            binEdFileEditor.setDisplayName(virtualFile.getName());
+            binEdVirtualFile = new BinEdVirtualFile(virtualFile);
         }
+
+        BinEdFileEditor binEdFileEditor = new BinEdFileEditor(project, binEdVirtualFile);
+        binEdFileEditor.setDisplayName(binEdVirtualFile.getDisplayName());
 
         return binEdFileEditor;
     }

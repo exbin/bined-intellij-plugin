@@ -32,7 +32,7 @@ import java.util.List;
  * Open file in binary editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.1 2019/08/04
+ * @version 0.2.1 2019/08/22
  */
 public class OpenAsBinaryAction extends AnAction implements DumbAware {
 
@@ -59,10 +59,14 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
             OpenFileDescriptor descriptor = new OpenFileDescriptor(project, binEdVirtualFile, 0);
             FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
             List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
-            fileEditorManager.setSelectedEditor(virtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
+            fileEditorManager.setSelectedEditor(binEdVirtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
             for (FileEditor fileEditor : editors) {
                 if (fileEditor instanceof BinEdFileEditor) {
-                    ((BinEdFileEditor) fileEditor).openFile(binEdVirtualFile);
+                    binEdVirtualFile.getEditorPanel().openFile(binEdVirtualFile);
+                    // ((BinEdFileEditor) fileEditor).openFile(binEdVirtualFile);
+                } else {
+                    // TODO: Drop other editors
+                    fileEditor.dispose();
                 }
             }
         }

@@ -16,7 +16,6 @@
 package org.exbin.bined.intellij.panel;
 
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBScrollPane;
 import org.exbin.bined.BasicCodeAreaZone;
 import org.exbin.bined.CodeType;
@@ -42,6 +41,7 @@ import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.options.TextFontOptions;
+import org.exbin.framework.gui.menu.component.DropDownButton;
 import org.exbin.framework.gui.utils.ActionUtils;
 import org.exbin.framework.preferences.PreferencesWrapper;
 import org.exbin.utils.binary_data.BinaryData;
@@ -81,6 +81,14 @@ public class DebugViewPanel extends JPanel {
     private boolean findTextPanelVisible = false;
     private BinarySearchPanel binarySearchPanel = null;
     private JScrollPane valuesPanelScrollPane = null;
+
+    private final AbstractAction cycleCodeTypesAction;
+    private final JRadioButtonMenuItem binaryCodeTypeAction;
+    private final JRadioButtonMenuItem octalCodeTypeAction;
+    private final JRadioButtonMenuItem decimalCodeTypeAction;
+    private final JRadioButtonMenuItem hexadecimalCodeTypeAction;
+    private final ButtonGroup codeTypeButtonGroup;
+    private DropDownButton codeTypeDropDown;
 
     public DebugViewPanel() {
         setLayout(new BorderLayout());
@@ -122,11 +130,49 @@ public class DebugViewPanel extends JPanel {
 
         registerBinaryStatus(statusPanel);
 
-        initialLoadFromPreferences();
-
-        goToRowAction = new GoToPositionAction(codeArea);
-
-        applyFromCodeArea();
+        codeTypeButtonGroup = new ButtonGroup();
+        binaryCodeTypeAction = new JRadioButtonMenuItem(new AbstractAction("Binary") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeArea.setCodeType(CodeType.BINARY);
+                updateCycleButtonName();
+            }
+        });
+        codeTypeButtonGroup.add(binaryCodeTypeAction);
+        octalCodeTypeAction = new JRadioButtonMenuItem(new AbstractAction("Octal") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeArea.setCodeType(CodeType.OCTAL);
+                updateCycleButtonName();
+            }
+        });
+        codeTypeButtonGroup.add(octalCodeTypeAction);
+        decimalCodeTypeAction = new JRadioButtonMenuItem(new AbstractAction("Decimal") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeArea.setCodeType(CodeType.DECIMAL);
+                updateCycleButtonName();
+            }
+        });
+        codeTypeButtonGroup.add(decimalCodeTypeAction);
+        hexadecimalCodeTypeAction = new JRadioButtonMenuItem(new AbstractAction("Hexadecimal") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeArea.setCodeType(CodeType.HEXADECIMAL);
+                updateCycleButtonName();
+            }
+        });
+        codeTypeButtonGroup.add(hexadecimalCodeTypeAction);
+        cycleCodeTypesAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int codeTypePos = codeArea.getCodeType().ordinal();
+                CodeType[] values = CodeType.values();
+                CodeType next = codeTypePos + 1 >= values.length ? values[0] : values[codeTypePos + 1];
+                codeArea.setCodeType(next);
+                updateCycleButtonName();
+            }
+        };
 
         codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
@@ -141,8 +187,6 @@ public class DebugViewPanel extends JPanel {
                 popupMenu.show(invoker, x, y);
             }
         });
-
-        codeTypeComboBox.setSelectedIndex(codeArea.getCodeType().ordinal());
 
         codeArea.addKeyListener(new KeyAdapter() {
             @Override
@@ -164,53 +208,83 @@ public class DebugViewPanel extends JPanel {
             }
         });
 
+        init();
+
+        initialLoadFromPreferences();
+
+        goToRowAction = new GoToPositionAction(codeArea);
+
+        applyFromCodeArea();
+
     }
 
-    private ComboBox<String> codeTypeComboBox;
-    private javax.swing.JToolBar controlToolBar;
+    private void init() {
+        cycleCodeTypesAction.putValue(Action.SHORT_DESCRIPTION, "Cycle thru code types");
+        JPopupMenu cycleCodeTypesPopupMenu = new JPopupMenu();
+        cycleCodeTypesPopupMenu.add(binaryCodeTypeAction);
+        cycleCodeTypesPopupMenu.add(octalCodeTypeAction);
+        cycleCodeTypesPopupMenu.add(decimalCodeTypeAction);
+        cycleCodeTypesPopupMenu.add(hexadecimalCodeTypeAction);
+        codeTypeDropDown = new DropDownButton(cycleCodeTypesAction, cycleCodeTypesPopupMenu);
+        updateCycleButtonName();
+        controlToolBar.add(codeTypeDropDown);
+    }
+
+    private JPanel controlToolBar;
     private javax.swing.JPanel infoToolbar;
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JToggleButton showUnprintablesToggleButton;
 
     private void initComponents() {
         infoToolbar = new javax.swing.JPanel();
-        controlToolBar = new javax.swing.JToolBar();
+        infoToolbar.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        controlToolBar = infoToolbar;
         showUnprintablesToggleButton = new javax.swing.JToggleButton();
         jSeparator3 = new javax.swing.JToolBar.Separator();
-        codeTypeComboBox = new ComboBox<>();
 
-        controlToolBar.setBorder(null);
-        controlToolBar.setFloatable(false);
-        controlToolBar.setRollover(true);
-
-        showUnprintablesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png")));
+        showUnprintablesToggleButton.setFocusable(false);
+        showUnprintablesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow_disabled.png")));
+        showUnprintablesToggleButton.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png")));
         showUnprintablesToggleButton.setToolTipText("Show symbols for unprintable/whitespace characters");
         showUnprintablesToggleButton.addActionListener(this::showUnprintablesToggleButtonActionPerformed);
         controlToolBar.add(showUnprintablesToggleButton);
         controlToolBar.add(jSeparator3);
 
-        JPanel spacePanel = new JPanel();
-        spacePanel.setLayout(new BorderLayout());
-        codeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"BIN", "OCT", "DEC", "HEX"}));
-        codeTypeComboBox.addActionListener(this::codeTypeComboBoxActionPerformed);
-        spacePanel.add(codeTypeComboBox, BorderLayout.WEST);
-        controlToolBar.add(spacePanel);
-
-        javax.swing.GroupLayout infoToolbarLayout = new javax.swing.GroupLayout(infoToolbar);
-        infoToolbar.setLayout(infoToolbarLayout);
-        infoToolbarLayout.setHorizontalGroup(
-                infoToolbarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(infoToolbarLayout.createSequentialGroup()
-                                .addComponent(controlToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
-        );
-        infoToolbarLayout.setVerticalGroup(
-                infoToolbarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(controlToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 25, Short.MAX_VALUE)
-        );
-
         headerPanel = new JPanel();
         headerPanel.setLayout(new java.awt.BorderLayout());
         headerPanel.add(infoToolbar, java.awt.BorderLayout.CENTER);
+    }
+
+    private void updateCycleButtonName() {
+        CodeType codeType = codeArea.getCodeType();
+        codeTypeDropDown.setActionText(codeType.name().substring(0, 3));
+        switch (codeType) {
+            case BINARY: {
+                if (!binaryCodeTypeAction.isSelected()) {
+                    binaryCodeTypeAction.setSelected(true);
+                }
+                break;
+            }
+            case OCTAL: {
+                if (!octalCodeTypeAction.isSelected()) {
+                    octalCodeTypeAction.setSelected(true);
+                }
+                break;
+            }
+            case DECIMAL: {
+                if (!decimalCodeTypeAction.isSelected()) {
+                    decimalCodeTypeAction.setSelected(true);
+                }
+                break;
+            }
+            case HEXADECIMAL: {
+                if (!hexadecimalCodeTypeAction.isSelected()) {
+                    hexadecimalCodeTypeAction.setSelected(true);
+                }
+                break;
+            }
+        }
     }
 
     private JPopupMenu createContextMenu(int x, int y) {
@@ -219,6 +293,7 @@ public class DebugViewPanel extends JPanel {
         BasicCodeAreaZone positionZone = codeArea.getPositionZone(x, y);
 
         final JMenuItem copyMenuItem = new JMenuItem("Copy");
+        copyMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-copy.png")));
         copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionUtils.getMetaMask()));
         copyMenuItem.setEnabled(codeArea.hasSelection());
         copyMenuItem.addActionListener(e -> {
@@ -238,6 +313,7 @@ public class DebugViewPanel extends JPanel {
         result.addSeparator();
 
         final JMenuItem selectAllMenuItem = new JMenuItem("Select All");
+        selectAllMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-select-all.png")));
         selectAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionUtils.getMetaMask()));
         selectAllMenuItem.addActionListener(e -> {
             codeArea.selectAll();
@@ -258,11 +334,6 @@ public class DebugViewPanel extends JPanel {
         codeArea.setShowUnprintables(showUnprintablesToggleButton.isSelected());
     }
 
-    private void codeTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {
-        CodeType codeType = CodeType.values()[codeTypeComboBox.getSelectedIndex()];
-        codeArea.setCodeType(codeType);
-    }
-
     public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi) {
         this.encodingStatus = encodingStatusApi;
         setCharsetChangeListener(() -> {
@@ -276,7 +347,7 @@ public class DebugViewPanel extends JPanel {
     }
 
     private void applyFromCodeArea() {
-        codeTypeComboBox.setSelectedIndex(codeArea.getCodeType().ordinal());
+        updateCycleButtonName();
         showUnprintablesToggleButton.setSelected(codeArea.isShowUnprintables());
     }
 
@@ -407,7 +478,8 @@ public class DebugViewPanel extends JPanel {
     }
 
     private void toolbarPanelLoadFromPreferences() {
-        codeTypeComboBox.setSelectedIndex(preferences.getCodeAreaPreferences().getCodeType().ordinal());
+        codeArea.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
+        updateCycleButtonName();
         showUnprintablesToggleButton.setSelected(preferences.getCodeAreaPreferences().isShowUnprintables());
     }
 
