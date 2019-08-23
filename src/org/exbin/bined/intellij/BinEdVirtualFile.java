@@ -29,7 +29,7 @@ import java.io.OutputStream;
  * Virtual file for binary editor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.1 2019/08/22
+ * @version 0.2.1 2019/08/23
  */
 public class BinEdVirtualFile extends VirtualFile {
 
@@ -38,6 +38,7 @@ public class BinEdVirtualFile extends VirtualFile {
     private final VirtualFile parentFile;
     private String displayName;
     private BinEdEditorPanel editorPanel;
+    private boolean closed = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
         this.parentFile = parentFile;
@@ -165,5 +166,13 @@ public class BinEdVirtualFile extends VirtualFile {
     public boolean isMoved() {
         Boolean closingToReopen = getUserData(FileEditorManagerImpl.CLOSING_TO_REOPEN);
         return closingToReopen != null && closingToReopen;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
     }
 }

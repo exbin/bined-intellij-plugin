@@ -48,7 +48,6 @@ public class BinEdFileEditor implements FileEditor {
     private String displayName;
     private BinEdVirtualFile virtualFile;
     private BinEdFileEditorState fileEditorState = new BinEdFileEditorState();
-    private boolean closeHandled = false;
 
     public BinEdFileEditor(Project project, final BinEdVirtualFile virtualFile) {
         this.project = project;
@@ -61,8 +60,8 @@ public class BinEdFileEditor implements FileEditor {
         connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerAdapter() {
             @Override
             public void fileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile virtualFile) {
-                if (virtualFile instanceof BinEdVirtualFile && !((BinEdVirtualFile) virtualFile).isMoved() && !closeHandled) {
-                    closeHandled = true;
+                if (virtualFile instanceof BinEdVirtualFile && !((BinEdVirtualFile) virtualFile).isMoved() && !((BinEdVirtualFile) virtualFile).isClosed()) {
+                    ((BinEdVirtualFile) virtualFile).setClosed(true);
                     BinEdEditorPanel editorPanel = ((BinEdVirtualFile) virtualFile).getEditorPanel();
                     if (!editorPanel.releaseFile()) {
                         // TODO Intercept close event instead of editor recreation

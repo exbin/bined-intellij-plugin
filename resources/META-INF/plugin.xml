@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://bined.exbin.org/intellij-plugin">
     <id>org.exbin.deltahex.intellij</id>
     <name>BinEd - Binary/Hexadecimal Editor</name>
-    <version>0.2.1</version>
+    <version>0.2.2.snapshot</version>
     <vendor email="hajdam@users.sf.net" url="https://exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
