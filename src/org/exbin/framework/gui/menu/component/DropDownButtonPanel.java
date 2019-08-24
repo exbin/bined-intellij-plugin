@@ -16,16 +16,16 @@
  */
 package org.exbin.framework.gui.menu.component;
 
-import java.awt.Component;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import org.exbin.framework.gui.utils.WindowUtils;
+
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicArrowButton;
-import org.exbin.framework.gui.utils.WindowUtils;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Drop down button panel.
@@ -37,6 +37,7 @@ import org.exbin.framework.gui.utils.WindowUtils;
 public class DropDownButtonPanel extends javax.swing.JPanel {
 
     public DropDownButtonPanel() {
+        setBorder(new EmptyBorder(0, 0, 0, 0));
         initComponents();
 
         actionLabel.addMouseListener(new MouseListener() {

@@ -16,15 +16,9 @@
  */
 package org.exbin.framework.gui.menu.component;
 
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Drop down button.
@@ -35,14 +29,15 @@ import javax.swing.JPopupMenu;
 @ParametersAreNonnullByDefault
 public class DropDownButton extends JButton {
 
-    private final DropDownButtonPanel buttonPanel;
+//    private final DropDownButtonPanel buttonPanel;
     private final JPopupMenu popupMenu;
 
     public DropDownButton(Action action, JPopupMenu popupMenu) {
         this.popupMenu = popupMenu;
-        buttonPanel = new DropDownButtonPanel();
+//        buttonPanel = new DropDownButtonPanel();
 
         init(action);
+        setComponentPopupMenu(popupMenu);
     }
 
     private void init(Action action) {
@@ -51,64 +46,66 @@ public class DropDownButton extends JButton {
         addActionListener(action);
 
         setMargin(new Insets(0, 0, 0, 0));
-        add(buttonPanel);
-        JLabel actionButton = buttonPanel.getActionButton();
-        JButton menuButton = buttonPanel.getMenuButton();
+        // add(buttonPanel);
+//        JLabel actionButton = buttonPanel.getActionButton();
+//        JButton menuButton = buttonPanel.getMenuButton();
+//
+//        MouseAdapter ma = new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent me) {
+//            }
+//
+//            @Override
+//            public void mousePressed(MouseEvent me) {
+//                if (me.getSource() == actionButton) {
+//                    menuButton.setSelected(true);
+//                }
+//            }
+//
+//            @Override
+//            public void mouseReleased(MouseEvent me) {
+//                if (me.getSource() == actionButton) {
+//                    menuButton.setSelected(false);
+//                }
+//            }
+//
+//            @Override
+//            public void mouseEntered(MouseEvent me) {
+//                setRolloverBorder();
+//            }
+//
+//            @Override
+//            public void mouseExited(MouseEvent me) {
+//                unsetRolloverBorder();
+//            }
+//        };
 
-        MouseAdapter ma = new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent me) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent me) {
-                if (me.getSource() == actionButton) {
-                    menuButton.setSelected(true);
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent me) {
-                if (me.getSource() == actionButton) {
-                    menuButton.setSelected(false);
-                }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent me) {
-                setRolloverBorder();
-            }
-
-            @Override
-            public void mouseExited(MouseEvent me) {
-                unsetRolloverBorder();
-            }
-        };
-
-        actionButton.addMouseListener(ma);
-        menuButton.addMouseListener(ma);
-
-        menuButton.addActionListener((ActionEvent ae) -> {
-            popupMenu.show(actionButton, 0, actionButton.getSize().height);
-        });
+//        actionButton.addMouseListener(ma);
+//        menuButton.addMouseListener(ma);
+//
+//        menuButton.addActionListener((ActionEvent ae) -> {
+//            popupMenu.show(actionButton, 0, actionButton.getSize().height);
+//        });
     }
 
     protected void setRolloverBorder() {
-        JButton menuButton = buttonPanel.getMenuButton();
-        menuButton.setBorderPainted(true);
+//        JButton menuButton = buttonPanel.getMenuButton();
+//        menuButton.setBorderPainted(true);
     }
 
     protected void unsetRolloverBorder() {
-        JButton menuButton = buttonPanel.getMenuButton();
-        menuButton.setBorderPainted(false);
+//        JButton menuButton = buttonPanel.getMenuButton();
+//        menuButton.setBorderPainted(false);
     }
 
     public void setActionText(String value) {
-        buttonPanel.getActionButton().setText(" " + value + " ");
+        setText(value);
+        //buttonPanel.getActionButton().setText(" " + value + " ");
     }
 
     public void setActionTooltip(String text) {
-        buttonPanel.getActionButton().setToolTipText(text);
-        buttonPanel.getMenuButton().setToolTipText(text);
+        super.setToolTipText(text);
+//        buttonPanel.getActionButton().setToolTipText(text);
+//        buttonPanel.getMenuButton().setToolTipText(text);
     }
 }
