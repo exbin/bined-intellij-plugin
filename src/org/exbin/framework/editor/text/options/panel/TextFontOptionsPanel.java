@@ -16,21 +16,20 @@
  */
 package org.exbin.framework.editor.text.options.panel;
 
-import org.exbin.framework.editor.text.options.impl.TextFontOptionsImpl;
-import org.exbin.framework.editor.text.service.TextFontService;
-import org.exbin.framework.gui.options.api.OptionsCapable;
-import org.exbin.framework.gui.options.api.OptionsModifiedListener;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.awt.*;
+import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.font.TextAttribute;
 import java.util.Map;
 import java.util.ResourceBundle;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import org.exbin.framework.editor.text.options.impl.TextFontOptionsImpl;
+import org.exbin.framework.gui.utils.LanguageUtils;
+import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.gui.options.api.OptionsCapable;
+import org.exbin.framework.gui.options.api.OptionsModifiedListener;
+import org.exbin.framework.editor.text.service.TextFontService;
 
 /**
  * Text font options panel.

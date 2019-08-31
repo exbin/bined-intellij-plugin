@@ -26,6 +26,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.exbin.framework.gui.utils.ActionUtils;
 
 import java.util.List;
 
@@ -38,7 +39,7 @@ import java.util.List;
 public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
 
     public FileOpenAsBinaryAction() {
-        super("Open As Binary" + DialogUtils.DIALOG_MENUITEM_EXT);
+        super("Open As Binary" + ActionUtils.DIALOG_MENUITEM_EXT);
     }
 
     @Override

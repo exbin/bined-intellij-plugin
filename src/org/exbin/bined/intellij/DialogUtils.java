@@ -29,8 +29,6 @@ import javax.swing.*;
  */
 public class DialogUtils {
 
-    public static final String DIALOG_MENUITEM_EXT = "...";
-
     public static DialogWrapper createDialog(JComponent dialogPanel, String dialogTitle) {
         return new BinEdDialogWrapper(dialogPanel, dialogTitle);
     }

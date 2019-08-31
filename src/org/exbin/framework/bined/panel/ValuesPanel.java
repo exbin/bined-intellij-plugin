@@ -25,6 +25,8 @@ import java.util.InputMismatchException;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.exbin.bined.CaretMovedListener;
@@ -48,9 +50,10 @@ import org.exbin.utils.binary_data.EditableBinaryData;
 /**
  * Values side panel.
  *
- * @version 0.2.1 2019/08/15
+ * @version 0.2.1 2019/08/31
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class ValuesPanel extends javax.swing.JPanel {
 
     public static final int UBYTE_MAX_VALUE = 255;
@@ -712,7 +715,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     private javax.swing.JTextField wordTextField;
     // End of variables declaration//GEN-END:variables
 
-    public void setCodeArea(ExtCodeArea codeArea, BinaryDataUndoHandler undoHandler) {
+    public void setCodeArea(ExtCodeArea codeArea, @Nullable BinaryDataUndoHandler undoHandler) {
         this.codeArea = codeArea;
         this.undoHandler = undoHandler;
     }
@@ -738,7 +741,9 @@ public class ValuesPanel extends javax.swing.JPanel {
                 updateValues();
             }
         };
-        undoHandler.addUndoUpdateListener(undoUpdateListener);
+        if (undoHandler != null) {
+            undoHandler.addUndoUpdateListener(undoUpdateListener);
+        }
         updateEditationMode();
         updateValues();
     }
@@ -746,7 +751,9 @@ public class ValuesPanel extends javax.swing.JPanel {
     public void disableUpdate() {
         codeArea.removeDataChangedListener(dataChangedListener);
         codeArea.removeCaretMovedListener(caretMovedListener);
-        undoHandler.addUndoUpdateListener(undoUpdateListener);
+        if (undoHandler != null) {
+            undoHandler.addUndoUpdateListener(undoUpdateListener);
+        }
     }
 
     public void updateEditationMode() {
@@ -791,10 +798,12 @@ public class ValuesPanel extends javax.swing.JPanel {
         long oldDataPosition = dataPosition;
         if (dataPosition == codeArea.getDataSize()) {
             InsertDataCommand insertCommand = new InsertDataCommand(codeArea, dataPosition, byteArrayData);
-            try {
-                undoHandler.execute(insertCommand);
-            } catch (BinaryDataOperationException ex) {
-                Logger.getLogger(ValuesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            if (undoHandler != null) {
+                try {
+                    undoHandler.execute(insertCommand);
+                } catch (BinaryDataOperationException ex) {
+                    Logger.getLogger(ValuesPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         } else {
             BinaryDataCommand command;
@@ -809,10 +818,12 @@ public class ValuesPanel extends javax.swing.JPanel {
                 command = new ModifyDataCommand(codeArea, dataPosition, byteArrayData);
             }
 
-            try {
-                undoHandler.execute(command);
-            } catch (BinaryDataOperationException ex) {
-                Logger.getLogger(ValuesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            if (undoHandler != null) {
+                try {
+                    undoHandler.execute(command);
+                } catch (BinaryDataOperationException ex) {
+                    Logger.getLogger(ValuesPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         codeArea.setCaretPosition(oldDataPosition);
@@ -854,6 +865,7 @@ public class ValuesPanel extends javax.swing.JPanel {
         STRING
     }
 
+    @ParametersAreNonnullByDefault
     private class ValuesUpdater {
 
         private boolean updateInProgress = false;

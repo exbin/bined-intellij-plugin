@@ -26,7 +26,6 @@ import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
-import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.bined.intellij.GoToPositionAction;
 import org.exbin.bined.swing.basic.DefaultCodeAreaCommandHandler;
 import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
@@ -36,6 +35,7 @@ import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.options.*;
 import org.exbin.framework.bined.options.impl.CodeAreaOptionsImpl;
 import org.exbin.framework.bined.panel.BinaryStatusPanel;
+import org.exbin.framework.bined.panel.ValuesPanel;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
@@ -322,7 +322,7 @@ public class DebugViewPanel extends JPanel {
         result.add(selectAllMenuItem);
         result.addSeparator();
 
-        final JMenuItem goToMenuItem = new JMenuItem("Go To" + DialogUtils.DIALOG_MENUITEM_EXT);
+        final JMenuItem goToMenuItem = new JMenuItem("Go To" + ActionUtils.DIALOG_MENUITEM_EXT);
         goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionUtils.getMetaMask()));
         goToMenuItem.addActionListener(goToRowAction);
         result.add(goToMenuItem);

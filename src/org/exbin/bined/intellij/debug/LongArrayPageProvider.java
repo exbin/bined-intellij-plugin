@@ -17,7 +17,7 @@ package org.exbin.bined.intellij.debug;
 
 import com.sun.jdi.*;
 import org.exbin.bined.intellij.DebugViewDataSource;
-import org.exbin.bined.intellij.panel.ValuesPanel;
+import org.exbin.framework.bined.panel.ValuesPanel;
 
 import java.math.BigInteger;
 import java.util.List;

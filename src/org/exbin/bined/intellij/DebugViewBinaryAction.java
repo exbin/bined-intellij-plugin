@@ -37,7 +37,7 @@ import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.*;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.bined.intellij.panel.DebugViewPanel;
-import org.exbin.bined.intellij.panel.ValuesPanel;
+import org.exbin.framework.bined.panel.ValuesPanel;
 import org.exbin.utils.binary_data.BinaryData;
 import org.exbin.utils.binary_data.ByteArrayData;
 import org.jetbrains.annotations.NotNull;
