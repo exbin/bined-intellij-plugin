@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij;
+package org.exbin.bined.intellij.debug;
 
 import com.google.common.util.concurrent.AbstractFuture;
 import com.intellij.debugger.engine.JavaValue;
@@ -34,9 +34,9 @@ import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.jetbrains.python.debugger.PyDebugValue;
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.debug.*;
+import org.exbin.bined.intellij.debug.jdi.*;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
-import org.exbin.bined.intellij.panel.DebugViewPanel;
+import org.exbin.bined.intellij.debug.panel.DebugViewPanel;
 import org.exbin.framework.bined.panel.ValuesPanel;
 import org.exbin.utils.binary_data.BinaryData;
 import org.exbin.utils.binary_data.ByteArrayData;
@@ -100,7 +100,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
                 if (dialog == null) {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         dialog = new DataDialog(project, text, node);
-                        dialog.setTitle("View as Binary Data");
+                        dialog.setTitle("View as Binary");
                         dialog.setText(text);
                         dialog.show();
                     });
@@ -115,7 +115,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
     public void update(@NotNull AnActionEvent event) {
         super.update(event);
         if (getDataNode(event) != null) {
-            event.getPresentation().setText("View Binary");
+            event.getPresentation().setText("View as Binary");
         }
     }
 
@@ -407,7 +407,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
 
         @Override
         protected String getDimensionServiceKey() {
-            return "#org.exbin.bined.intellij.DebugViewBinaryAction";
+            return "#org.exbin.bined.intellij.debug.DebugViewBinaryAction";
         }
 
         @Override

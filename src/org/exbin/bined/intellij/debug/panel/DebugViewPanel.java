@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.panel;
+package org.exbin.bined.intellij.debug.panel;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.ui.components.JBScrollPane;
@@ -27,6 +27,7 @@ import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAre
 import org.exbin.bined.intellij.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.GoToPositionAction;
+import org.exbin.bined.intellij.panel.BinarySearchPanel;
 import org.exbin.bined.swing.basic.DefaultCodeAreaCommandHandler;
 import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
 import org.exbin.bined.swing.extended.ExtCodeArea;

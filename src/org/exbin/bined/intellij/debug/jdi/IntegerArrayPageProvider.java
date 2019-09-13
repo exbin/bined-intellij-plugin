@@ -13,37 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.debug;
+package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.DebugViewDataSource;
+import org.exbin.bined.intellij.debug.DebugViewDataSource;
 
 import java.util.List;
 
 /**
- * Character array data source for debugger view.
+ * Integer array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.6 2018/03/05
+ * @version 0.1.6 2018/03/03
  */
-public class CharArrayPageProvider implements DebugViewDataSource.PageProvider {
+public class IntegerArrayPageProvider implements DebugViewDataSource.PageProvider {
 
     private final ArrayReference arrayRef;
 
-    public CharArrayPageProvider(ArrayReference arrayRef) {
+    public IntegerArrayPageProvider(ArrayReference arrayRef) {
         this.arrayRef = arrayRef;
     }
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int pageSize = DebugViewDataSource.PAGE_SIZE / 2;
+        int pageSize = DebugViewDataSource.PAGE_SIZE / 4;
         int startPos = (int) (pageIndex * pageSize);
         int length = pageSize;
         if (arrayRef.length() - startPos < pageSize) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length * 2];
+        byte[] result = new byte[length * 4];
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
             if (rawValue instanceof ObjectReference) {
@@ -51,10 +51,12 @@ public class CharArrayPageProvider implements DebugViewDataSource.PageProvider {
                 rawValue = ((ObjectReference) rawValue).getValue(field);
             }
 
-            int value = (int) (rawValue instanceof CharValue ? ((CharValue) rawValue).value() : 0);
+            int value = rawValue instanceof IntegerValue ? ((IntegerValue) rawValue).value() : 0;
 
-            result[i * 2 ] = (byte) ((value >> 8) & 0xff);
-            result[i * 2 + 1] = (byte) (value & 0xff);
+            result[i * 4] = (byte) (value >> 24);
+            result[i * 4 + 1] = (byte) ((value >> 16) & 0xff);
+            result[i * 4 + 2] = (byte) ((value >> 8) & 0xff);
+            result[i * 4 + 3] = (byte) (value & 0xff);
         }
 
         return result;
@@ -62,6 +64,6 @@ public class CharArrayPageProvider implements DebugViewDataSource.PageProvider {
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length() * 2;
+        return arrayRef.length() * 4;
     }
 }

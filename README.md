@@ -22,6 +22,7 @@ Features
  - Searching for text / hexadecimal code with found matches highlighting
  - Support for undo/redo
  - Support for files with size up to exabytes
+ - Show debug variables as binary data
 
 Compiling
 ---------

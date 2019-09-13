@@ -13,41 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.debug;
+package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.DebugViewDataSource;
+import org.exbin.bined.intellij.debug.DebugViewDataSource;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
- * Double array data source for debugger view.
+ * Float array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
  */
-public class DoubleArrayPageProvider implements DebugViewDataSource.PageProvider {
+public class FloatArrayPageProvider implements DebugViewDataSource.PageProvider {
 
-    private final byte[] valuesCache = new byte[8];
+    private final byte[] valuesCache = new byte[4];
     private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
 
     private final ArrayReference arrayRef;
 
-    public DoubleArrayPageProvider(ArrayReference arrayRef) {
+    public FloatArrayPageProvider(ArrayReference arrayRef) {
         this.arrayRef = arrayRef;
     }
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int pageSize = DebugViewDataSource.PAGE_SIZE / 8;
+        int pageSize = DebugViewDataSource.PAGE_SIZE / 4;
         int startPos = (int) (pageIndex * pageSize);
         int length = pageSize;
         if (arrayRef.length() - startPos < pageSize) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length * 8];
+        byte[] result = new byte[length * 4];
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
             if (rawValue instanceof ObjectReference) {
@@ -55,11 +55,11 @@ public class DoubleArrayPageProvider implements DebugViewDataSource.PageProvider
                 rawValue = ((ObjectReference) rawValue).getValue(field);
             }
 
-            double value = rawValue instanceof DoubleValue ? ((DoubleValue) rawValue).value() : 0;
+            float value = rawValue instanceof FloatValue ? ((FloatValue) rawValue).value() : 0;
 
             byteBuffer.rewind();
-            byteBuffer.putDouble(value);
-            System.arraycopy(valuesCache, 0, result, i * 8, 8);
+            byteBuffer.putFloat(value);
+            System.arraycopy(valuesCache, 0, result, i * 4, 4);
         }
 
         return result;
@@ -67,6 +67,6 @@ public class DoubleArrayPageProvider implements DebugViewDataSource.PageProvider
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length() * 8;
+        return arrayRef.length() * 4;
     }
 }

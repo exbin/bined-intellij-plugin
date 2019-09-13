@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.debug;
+package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.DebugViewDataSource;
+import org.exbin.bined.intellij.debug.DebugViewDataSource;
 
 import java.util.List;
 

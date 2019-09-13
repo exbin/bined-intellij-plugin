@@ -13,39 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.debug;
+package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.DebugViewDataSource;
-import org.exbin.framework.bined.panel.ValuesPanel;
+import org.exbin.bined.intellij.debug.DebugViewDataSource;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Long array data source for debugger view.
+ * Short array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
  */
-public class LongArrayPageProvider implements DebugViewDataSource.PageProvider {
+public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider {
 
     private final ArrayReference arrayRef;
 
-    public LongArrayPageProvider(ArrayReference arrayRef) {
+    public ShortArrayPageProvider(ArrayReference arrayRef) {
         this.arrayRef = arrayRef;
     }
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int pageSize = DebugViewDataSource.PAGE_SIZE / 8;
+        int pageSize = DebugViewDataSource.PAGE_SIZE / 2;
         int startPos = (int) (pageIndex * pageSize);
         int length = pageSize;
         if (arrayRef.length() - startPos < pageSize) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length * 8];
+        byte[] result = new byte[length * 2];
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
             if (rawValue instanceof ObjectReference) {
@@ -53,14 +51,9 @@ public class LongArrayPageProvider implements DebugViewDataSource.PageProvider {
                 rawValue = ((ObjectReference) rawValue).getValue(field);
             }
 
-            long value = rawValue instanceof LongValue ? ((LongValue) rawValue).value() : 0;
-
-            BigInteger bigInteger = BigInteger.valueOf(value);
-            for (int bit = 0; bit < 7; bit++) {
-                BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
-                result[i * 8 + 7 - bit] = nextByte.byteValue();
-                bigInteger = bigInteger.shiftRight(8);
-            }
+            short value = rawValue instanceof ShortValue ? ((ShortValue) rawValue).value() : 0;
+            result[i * 2] = (byte) (value >> 8);
+            result[i * 2 + 1] = (byte) (value & 0xff);
         }
 
         return result;
@@ -68,6 +61,6 @@ public class LongArrayPageProvider implements DebugViewDataSource.PageProvider {
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length() * 8;
+        return arrayRef.length() * 2;
     }
 }

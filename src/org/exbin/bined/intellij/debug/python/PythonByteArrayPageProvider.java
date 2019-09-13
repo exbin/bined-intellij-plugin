@@ -15,7 +15,7 @@
  */
 package org.exbin.bined.intellij.debug.python;
 
-import org.exbin.bined.intellij.DebugViewDataSource;
+import org.exbin.bined.intellij.debug.DebugViewDataSource;
 import org.exbin.utils.binary_data.OutOfBoundsException;
 import org.jetbrains.annotations.NotNull;
 

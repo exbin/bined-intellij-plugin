@@ -13,41 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.debug;
+package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.DebugViewDataSource;
+import org.exbin.bined.intellij.debug.DebugViewDataSource;
+import org.exbin.framework.bined.panel.ValuesPanel;
 
-import java.nio.ByteBuffer;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Float array data source for debugger view.
+ * Long array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
  */
-public class FloatArrayPageProvider implements DebugViewDataSource.PageProvider {
-
-    private final byte[] valuesCache = new byte[4];
-    private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
+public class LongArrayPageProvider implements DebugViewDataSource.PageProvider {
 
     private final ArrayReference arrayRef;
 
-    public FloatArrayPageProvider(ArrayReference arrayRef) {
+    public LongArrayPageProvider(ArrayReference arrayRef) {
         this.arrayRef = arrayRef;
     }
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int pageSize = DebugViewDataSource.PAGE_SIZE / 4;
+        int pageSize = DebugViewDataSource.PAGE_SIZE / 8;
         int startPos = (int) (pageIndex * pageSize);
         int length = pageSize;
         if (arrayRef.length() - startPos < pageSize) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length * 4];
+        byte[] result = new byte[length * 8];
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
             if (rawValue instanceof ObjectReference) {
@@ -55,11 +53,14 @@ public class FloatArrayPageProvider implements DebugViewDataSource.PageProvider 
                 rawValue = ((ObjectReference) rawValue).getValue(field);
             }
 
-            float value = rawValue instanceof FloatValue ? ((FloatValue) rawValue).value() : 0;
+            long value = rawValue instanceof LongValue ? ((LongValue) rawValue).value() : 0;
 
-            byteBuffer.rewind();
-            byteBuffer.putFloat(value);
-            System.arraycopy(valuesCache, 0, result, i * 4, 4);
+            BigInteger bigInteger = BigInteger.valueOf(value);
+            for (int bit = 0; bit < 7; bit++) {
+                BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
+                result[i * 8 + 7 - bit] = nextByte.byteValue();
+                bigInteger = bigInteger.shiftRight(8);
+            }
         }
 
         return result;
@@ -67,6 +68,6 @@ public class FloatArrayPageProvider implements DebugViewDataSource.PageProvider 
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length() * 4;
+        return arrayRef.length() * 8;
     }
 }

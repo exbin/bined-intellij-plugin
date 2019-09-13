@@ -13,37 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.debug;
+package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.DebugViewDataSource;
+import org.exbin.bined.intellij.debug.DebugViewDataSource;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
- * Short array data source for debugger view.
+ * Double array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
  */
-public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider {
+public class DoubleArrayPageProvider implements DebugViewDataSource.PageProvider {
+
+    private final byte[] valuesCache = new byte[8];
+    private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
 
     private final ArrayReference arrayRef;
 
-    public ShortArrayPageProvider(ArrayReference arrayRef) {
+    public DoubleArrayPageProvider(ArrayReference arrayRef) {
         this.arrayRef = arrayRef;
     }
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int pageSize = DebugViewDataSource.PAGE_SIZE / 2;
+        int pageSize = DebugViewDataSource.PAGE_SIZE / 8;
         int startPos = (int) (pageIndex * pageSize);
         int length = pageSize;
         if (arrayRef.length() - startPos < pageSize) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);
-        byte[] result = new byte[length * 2];
+        byte[] result = new byte[length * 8];
         for (int i = 0; i < values.size(); i++) {
             Value rawValue = values.get(i);
             if (rawValue instanceof ObjectReference) {
@@ -51,9 +55,11 @@ public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider 
                 rawValue = ((ObjectReference) rawValue).getValue(field);
             }
 
-            short value = rawValue instanceof ShortValue ? ((ShortValue) rawValue).value() : 0;
-            result[i * 2] = (byte) (value >> 8);
-            result[i * 2 + 1] = (byte) (value & 0xff);
+            double value = rawValue instanceof DoubleValue ? ((DoubleValue) rawValue).value() : 0;
+
+            byteBuffer.rewind();
+            byteBuffer.putDouble(value);
+            System.arraycopy(valuesCache, 0, result, i * 8, 8);
         }
 
         return result;
@@ -61,6 +67,6 @@ public class ShortArrayPageProvider implements DebugViewDataSource.PageProvider 
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length() * 2;
+        return arrayRef.length() * 8;
     }
 }
