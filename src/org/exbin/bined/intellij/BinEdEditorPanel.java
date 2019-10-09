@@ -67,6 +67,7 @@ import org.exbin.utils.binary_data.EditableBinaryData;
 import org.exbin.utils.binary_data.PagedData;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -645,7 +646,7 @@ public class BinEdEditorPanel extends JPanel {
     }
 
     private void updateCurrentDocumentSize() {
-        long dataSize = codeArea.getContentData().getDataSize();
+        long dataSize = codeArea.getDataSize();
         binaryStatus.setCurrentDocumentSize(dataSize, documentOriginalSize);
     }
 
@@ -671,10 +672,12 @@ public class BinEdEditorPanel extends JPanel {
         }
     }
 
+    @Nullable
     public BinEdVirtualFile getVirtualFile() {
         return virtualFile;
     }
 
+    @Nonnull
     public static synchronized SegmentsRepository getSegmentsRepository() {
         if (segmentsRepository == null) {
             segmentsRepository = new SegmentsRepository();
@@ -823,19 +826,22 @@ public class BinEdEditorPanel extends JPanel {
             BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
             optionsPanel.setPreferences(preferences);
             optionsPanel.setTextFontService(new TextFontService() {
+                @Nonnull
                 @Override
                 public Font getCurrentFont() {
-                    return codeArea.getCodeFont();
+                    Font codeFont = codeArea.getCodeFont();
+                    return codeFont == null ? getDefaultFont() : codeFont;
                 }
 
+                @Nonnull
                 @Override
                 public Font getDefaultFont() {
                     return defaultFont;
                 }
 
                 @Override
-                public void setCurrentFont(Font font) {
-                    codeArea.setCodeFont(font);
+                public void setCurrentFont(@Nonnull Font codeFont) {
+                    codeArea.setCodeFont(codeFont);
                 }
             });
             optionsPanel.loadFromPreferences();
@@ -876,9 +882,7 @@ public class BinEdEditorPanel extends JPanel {
                     CloseControlPanel closeControlPanel = new CloseControlPanel();
                     JPanel dialogPanel = WindowUtils.createDialogPanel(aboutPanel, closeControlPanel);
                     DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) e.getSource(), "About Plugin", Dialog.ModalityType.APPLICATION_MODAL);
-                    closeControlPanel.setHandler(() -> {
-                        dialog.close();
-                    });
+                    closeControlPanel.setHandler(dialog::close);
                     //            dialog.setSize(650, 460);
                     dialog.showCentered((Component) e.getSource());
                 });
@@ -1035,41 +1039,49 @@ public class BinEdEditorPanel extends JPanel {
 
     private void initialLoadFromPreferences() {
         applyOptions(new BinEdApplyOptions() {
+            @Nonnull
             @Override
             public CodeAreaOptions getCodeAreaOptions() {
                 return preferences.getCodeAreaPreferences();
             }
 
+            @Nonnull
             @Override
             public TextEncodingOptions getEncodingOptions() {
                 return preferences.getEncodingPreferences();
             }
 
+            @Nonnull
             @Override
             public TextFontOptions getFontOptions() {
                 return preferences.getFontPreferences();
             }
 
+            @Nonnull
             @Override
             public EditorOptions getEditorOptions() {
                 return preferences.getEditorPreferences();
             }
 
+            @Nonnull
             @Override
             public StatusOptions getStatusOptions() {
                 return preferences.getStatusPreferences();
             }
 
+            @Nonnull
             @Override
             public CodeAreaLayoutOptions getLayoutOptions() {
                 return preferences.getLayoutPreferences();
             }
 
+            @Nonnull
             @Override
             public CodeAreaColorOptions getColorOptions() {
                 return preferences.getColorPreferences();
             }
 
+            @Nonnull
             @Override
             public CodeAreaThemeOptions getThemeOptions() {
                 return preferences.getThemePreferences();

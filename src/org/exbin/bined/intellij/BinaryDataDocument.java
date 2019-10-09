@@ -72,6 +72,7 @@ public class BinaryDataDocument implements Document {
     }
 
     @NotNull
+    @Deprecated
     @Override
     public char[] getChars() {
         return null;

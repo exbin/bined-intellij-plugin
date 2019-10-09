@@ -57,7 +57,7 @@ public class BinEdFileEditor implements FileEditor {
 
         MessageBus messageBus = project.getMessageBus();
         MessageBusConnection connect = messageBus.connect();
-        connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerAdapter() {
+        connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
             public void fileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile virtualFile) {
                 if (virtualFile instanceof BinEdVirtualFile && !((BinEdVirtualFile) virtualFile).isMoved() && !((BinEdVirtualFile) virtualFile).isClosed()) {

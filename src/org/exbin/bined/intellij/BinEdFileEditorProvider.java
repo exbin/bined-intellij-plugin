@@ -31,29 +31,15 @@ import org.jetbrains.annotations.NotNull;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.1 2019/08/22
  */
-public class BinEdFileEditorProvider implements FileEditorProvider, ApplicationComponent {
+public class BinEdFileEditorProvider implements FileEditorProvider {
 
     public static final String BINED_EDITOR_TYPE_ID = "org.exbin.bined";
-
-    @Override
-    public void initComponent() {
-    }
-
-    @Override
-    public void disposeComponent() {
-    }
 
     @Override
     public void disposeEditor(@NotNull FileEditor editor) {
         if (editor instanceof BinEdFileEditor) {
             editor.dispose();
         }
-    }
-
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return "BinEd.BinEdFileEditorProvider";
     }
 
     @Override

@@ -19,5 +19,6 @@
     <orderEntry type="library" name="bined-operation-swing-0.2.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="bined-swing-0.2.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="bined-swing-extended-0.2.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="pycharm-pydev" level="project" />
   </component>
 </module>

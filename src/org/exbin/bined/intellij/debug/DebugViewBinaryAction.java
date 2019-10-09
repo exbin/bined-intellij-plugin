@@ -243,6 +243,10 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
             if (arrayType != null) {
                 final String componentType = arrayType.componentTypeName();
                 switch (componentType) {
+                    case CommonClassNames.JAVA_LANG_BOOLEAN:
+                    case "boolean": {
+                        return new DebugViewDataSource(new BooleanArrayPageProvider(arrayRef));
+                    }
                     case CommonClassNames.JAVA_LANG_BYTE:
                     case "byte": {
                         return new DebugViewDataSource(new ByteArrayPageProvider(arrayRef));

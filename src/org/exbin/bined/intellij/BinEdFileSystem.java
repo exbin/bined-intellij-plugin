@@ -16,7 +16,6 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.vcs.vfs.VcsFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileListener;
@@ -34,7 +33,7 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.0 2016/12/11
  */
-public class BinEdFileSystem extends VirtualFileSystem implements ApplicationComponent {
+public class BinEdFileSystem extends VirtualFileSystem {
 
     private static final String PROTOCOL = "bined";
     private List<VirtualFileListener> fileListeners = new ArrayList<>();
@@ -111,19 +110,5 @@ public class BinEdFileSystem extends VirtualFileSystem implements ApplicationCom
     @Override
     public boolean isReadOnly() {
         return false;
-    }
-
-    @Override
-    public void initComponent() {
-    }
-
-    @Override
-    public void disposeComponent() {
-    }
-
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return "BinEd.BinEdFileSystem";
     }
 }

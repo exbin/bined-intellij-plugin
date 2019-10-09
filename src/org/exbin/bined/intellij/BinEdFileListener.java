@@ -15,8 +15,8 @@
  */
 package org.exbin.bined.intellij;
 
-import com.intellij.openapi.vfs.VirtualFileAdapter;
 import com.intellij.openapi.vfs.VirtualFileEvent;
+import com.intellij.openapi.vfs.VirtualFileListener;
 
 import javax.swing.*;
 
@@ -26,7 +26,7 @@ import javax.swing.*;
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.0 2016/12/08
  */
-public class BinEdFileListener extends VirtualFileAdapter {
+public class BinEdFileListener implements VirtualFileListener {
 
     private JPanel editor;
 
