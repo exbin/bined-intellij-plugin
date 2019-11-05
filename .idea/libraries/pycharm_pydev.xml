@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="pycharm-pydev">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/jetbrains/pycharm-pydev.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

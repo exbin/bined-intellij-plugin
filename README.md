@@ -31,11 +31,7 @@ Java Development Kit (JDK) version 8 or later is required to build this project.
 
 IntelliJ Idea platform is necessary for build of this plugin. See. http://jetbrains.org  
 
-Project uses combined IntelliJ Community SDK (in Project settings/Platform settings/SDKs):
-
- - add pycharm-pydev.jar from PyCharm Community SDK
-
-Use "Plugin" run configuration to execute.
+Create / use "Plugin" run configuration to execute.
 
 License
 -------

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="jetbrains-libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-intellij-2019.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-pycharm-2019.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-phpstorm-2019.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

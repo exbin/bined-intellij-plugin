@@ -32,6 +32,8 @@ import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
+import com.jetbrains.php.debug.xdebug.debugger.XdebugValue;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
 import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.jdi.*;
@@ -55,32 +57,28 @@ import java.util.concurrent.ExecutionException;
  * Show debugger value in hexadecimal editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.7 2018/08/22
+ * @version 0.2.2 2019/11/05
  */
 public class DebugViewBinaryAction extends XFetchValueActionBase {
 
-    private static final boolean javaValueClassAvailable;
+    private static boolean classesDetected = false;
+    private static boolean javaValueClassAvailable = false;
+    private static boolean pythonValueClassAvailable = false;
 
-    static {
-        boolean available = false;
+    private static void detectClasses() {
+        classesDetected = true;
+
         try {
             Class.forName("com.intellij.debugger.engine.JavaValue");
-            available = true;
-        } catch (ClassNotFoundException e) {
+            javaValueClassAvailable = true;
+        } catch (ClassNotFoundException ignore) {
         }
-        javaValueClassAvailable = available;
-    }
 
-    private static final boolean pythonValueClassAvailable;
-
-    static {
-        boolean available = false;
         try {
             Class.forName("com.jetbrains.python.debugger.PyDebugValue");
-            available = true;
-        } catch (ClassNotFoundException e) {
+            pythonValueClassAvailable = true;
+        } catch (ClassNotFoundException ignore) {
         }
-        pythonValueClassAvailable = available;
     }
 
     @Override
@@ -120,6 +118,8 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
     }
 
     private static XValueNodeImpl getDataNode(@NotNull AnActionEvent event) {
+        if (!classesDetected) detectClasses();
+
         List<XValueNodeImpl> selectedNodes = XDebuggerTreeActionBase.getSelectedNodes(event.getDataContext());
         if (selectedNodes.size() == 1) {
             XValueNodeImpl node = selectedNodes.get(0);
@@ -134,14 +134,17 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
             if (pythonValueClassAvailable && container instanceof PyDebugValue) {
                 return node;
             }
+//            if (phpValueClassAvailable && container instanceof XdebugValue) {
+//                return node;
+//            }
         }
         return null;
     }
 
     private static boolean isBasicType(ValueDescriptorImpl descriptor) {
         final String type = descriptor.getDeclaredType();
-        return CommonClassNames.JAVA_LANG_BYTE.equals(type)
-                || CommonClassNames.JAVA_LANG_SHORT.equals(type)
+        return CommonClassNames.JAVA_LANG_BOOLEAN.equals(type)
+                || CommonClassNames.JAVA_LANG_BYTE.equals(type)
                 || CommonClassNames.JAVA_LANG_SHORT.equals(type)
                 || CommonClassNames.JAVA_LANG_INTEGER.equals(type)
                 || CommonClassNames.JAVA_LANG_LONG.equals(type)
@@ -180,6 +183,8 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
 
         @NotNull
         private BinaryData identifyData(@Nullable String initialValue) {
+            if (!classesDetected) detectClasses();
+
             BinaryData data = null;
             if (myDataNode != null) {
                 XValue container = myDataNode.getValueContainer();
@@ -217,6 +222,12 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
                         }
                     }
                 }
+//                else if (phpValueClassAvailable && container instanceof XdebugValue) {
+//                    PhpType dataType = ((XdebugValue) container).getType();
+//                    switch (dataType) {
+//                        case
+//                    }
+//                }
 
                 if (data == null) {
                     String rawValue = myDataNode.getRawValue();
