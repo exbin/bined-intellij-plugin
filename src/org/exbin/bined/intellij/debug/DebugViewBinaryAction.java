@@ -37,6 +37,7 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
 import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.jdi.*;
+import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.panel.DebugViewPanel;
 import org.exbin.framework.bined.panel.ValuesPanel;
@@ -65,17 +66,21 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
     private static boolean javaValueClassAvailable = false;
     private static boolean pythonValueClassAvailable = false;
 
+    private static final String JAVA_VALUE_CLASS = "com.intellij.debugger.engine.JavaValue";
+    private static final String PYTHON_VALUE_CLASS = "com.jetbrains.python.debugger.PyDebugValue";
+    private static final String PHP_VALUE_CLASS = "com.jetbrains.php.debug.xdebug.debugger.XdebugValue";
+
     private static void detectClasses() {
         classesDetected = true;
 
         try {
-            Class.forName("com.intellij.debugger.engine.JavaValue");
+            Class.forName(JAVA_VALUE_CLASS);
             javaValueClassAvailable = true;
         } catch (ClassNotFoundException ignore) {
         }
 
         try {
-            Class.forName("com.jetbrains.python.debugger.PyDebugValue");
+            Class.forName(PYTHON_VALUE_CLASS);
             pythonValueClassAvailable = true;
         } catch (ClassNotFoundException ignore) {
         }
@@ -134,9 +139,11 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
             if (pythonValueClassAvailable && container instanceof PyDebugValue) {
                 return node;
             }
-//            if (phpValueClassAvailable && container instanceof XdebugValue) {
-//                return node;
-//            }
+
+            String valueCanonicalName = container.getClass().getCanonicalName();
+            if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {
+                return node;
+            }
         }
         return null;
     }
@@ -222,6 +229,16 @@ public class DebugViewBinaryAction extends XFetchValueActionBase {
                         }
                     }
                 }
+
+                String valueCanonicalName = container.getClass().getCanonicalName();
+                if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {
+//                    try {
+//                        data = new DebugViewDataSource(new PhpByteArrayPageProvider(value.get(), dataType));
+//                    } catch (ExecutionException | InterruptedException e) {
+                        data = null;
+//                    }
+                }
+
 //                else if (phpValueClassAvailable && container instanceof XdebugValue) {
 //                    PhpType dataType = ((XdebugValue) container).getType();
 //                    switch (dataType) {

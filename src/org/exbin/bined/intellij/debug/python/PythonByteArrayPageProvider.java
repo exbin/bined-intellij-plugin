@@ -21,26 +21,30 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Python bytearray data source for debugger view.
- *
+ * <p>
  * It seems that binary value is currently available only in text encoded form.
  *
+ * TODO: Rework to use something different as direct mode fails for higher than 127 character anyway...
+ *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.7 2018/08/18
+ * @version 0.2.2 2019/11/06
  */
 public class PythonByteArrayPageProvider implements DebugViewDataSource.PageProvider {
 
+    private final Mode mode;
     private final String value;
     private final String prefix;
 
     public PythonByteArrayPageProvider(@NotNull String value, String prefix) {
         this.value = value;
         this.prefix = prefix;
+        mode = value.startsWith(prefix) ? Mode.DESCRIPTION_STRING : Mode.DIRECT_STRING;
     }
 
     @Override
     public byte[] getPage(long pageIndex) {
         long documentSize = getDocumentSize();
-        if (pageIndex > documentSize / DebugViewDataSource.PAGE_SIZE )
+        if (pageIndex > documentSize / DebugViewDataSource.PAGE_SIZE)
             throw new OutOfBoundsException();
 
         int length;
@@ -51,13 +55,31 @@ public class PythonByteArrayPageProvider implements DebugViewDataSource.PageProv
         }
         byte[] page = new byte[length];
 
-        int position = (int) (prefix.length() + 3 + (pageIndex * DebugViewDataSource.PAGE_SIZE * 4));
-        int offset = 0;
-        while (offset < length) {
-            byte byteValue = (byte) ((hexCharToInt(value.charAt(position + 2)) << 4) + hexCharToInt(value.charAt(position + 3)));
-            page[offset] = byteValue;
-            offset++;
-            position += 4;
+        switch (mode) {
+            case DIRECT_STRING: {
+                int position = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE);
+                int offset = 0;
+                while (offset < length) {
+                    byte byteValue = (byte) value.charAt(position);
+                    page[offset] = byteValue;
+                    offset++;
+                    position++;
+                }
+
+                break;
+            }
+            case DESCRIPTION_STRING: {
+                int position = (int) (prefix.length() + 3 + (pageIndex * DebugViewDataSource.PAGE_SIZE * 4));
+                int offset = 0;
+                while (offset < length) {
+                    byte byteValue = (byte) ((hexCharToInt(value.charAt(position + 2)) << 4) + hexCharToInt(value.charAt(position + 3)));
+                    page[offset] = byteValue;
+                    offset++;
+                    position += 4;
+                }
+
+                break;
+            }
         }
 
         return page;
@@ -69,6 +91,18 @@ public class PythonByteArrayPageProvider implements DebugViewDataSource.PageProv
 
     @Override
     public long getDocumentSize() {
-        return (value.length() - prefix.length() - 4) / 4;
+        switch (mode) {
+            case DESCRIPTION_STRING:
+                return (value.length() - prefix.length() - 4) / 4;
+            case DIRECT_STRING:
+                return value.length();
+        }
+
+        return 0;
+    }
+
+    private enum Mode {
+        DESCRIPTION_STRING,
+        DIRECT_STRING
     }
 }
