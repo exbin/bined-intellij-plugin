@@ -1,5 +1,6 @@
 0.2.2
 - Fixed opening via dialog crashes IntelliJ (mac) (#issue 22)
+- Fixed "HIDE_DEFAULT_EDITOR is supported only for DumbAware providers" error message (issue #24)
 
 0.2.1 (2019-08-22)
 - Minor GUI improvements

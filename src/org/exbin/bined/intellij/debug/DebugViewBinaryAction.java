@@ -20,6 +20,7 @@ import com.intellij.debugger.engine.JavaValue;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.text.StringUtil;
@@ -60,7 +61,7 @@ import java.util.concurrent.ExecutionException;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.2 2019/11/05
  */
-public class DebugViewBinaryAction extends XFetchValueActionBase {
+public class DebugViewBinaryAction extends XFetchValueActionBase implements DumbAware {
 
     private static boolean classesDetected = false;
     private static boolean javaValueClassAvailable = false;

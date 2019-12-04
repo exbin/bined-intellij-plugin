@@ -25,6 +25,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -41,13 +42,13 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
     }
 
     @Override
-    public void update(AnActionEvent event) {
+    public void update(@NotNull AnActionEvent event) {
         super.update(event);
         event.getPresentation().setEnabledAndVisible(true);
     }
 
     @Override
-    public void actionPerformed(AnActionEvent event) {
+    public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
         if (project == null) {
             project = ProjectManager.getInstance().getDefaultProject();
