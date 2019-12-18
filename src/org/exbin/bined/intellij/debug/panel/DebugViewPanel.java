@@ -45,7 +45,7 @@ import org.exbin.framework.editor.text.options.TextFontOptions;
 import org.exbin.framework.gui.menu.component.DropDownButton;
 import org.exbin.framework.gui.utils.ActionUtils;
 import org.exbin.framework.preferences.PreferencesWrapper;
-import org.exbin.utils.binary_data.BinaryData;
+import org.exbin.auxiliary.paged_data.BinaryData;
 
 import javax.swing.*;
 import java.awt.*;

@@ -35,7 +35,7 @@ import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.utils.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 
 /**
  * Color profile panel.

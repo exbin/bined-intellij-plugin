@@ -15,8 +15,8 @@
  */
 package org.exbin.bined.intellij.debug;
 
-import org.exbin.utils.binary_data.BinaryData;
-import org.exbin.utils.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

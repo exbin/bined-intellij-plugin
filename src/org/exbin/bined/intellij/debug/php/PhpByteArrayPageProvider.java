@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij.debug.php;
 
 import org.exbin.bined.intellij.debug.DebugViewDataSource;
-import org.exbin.utils.binary_data.OutOfBoundsException;
+import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -21,7 +21,7 @@ import com.intellij.openapi.editor.RangeMarker;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
-import org.exbin.utils.binary_data.EditableBinaryData;
+import org.exbin.auxiliary.paged_data.EditableBinaryData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

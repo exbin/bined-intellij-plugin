@@ -28,7 +28,7 @@ import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.utils.binary_data.EditableBinaryData;
+import org.exbin.auxiliary.paged_data.EditableBinaryData;
 
 /**
  * Multiline search condition editor panel.

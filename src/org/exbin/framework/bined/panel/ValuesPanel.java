@@ -35,7 +35,7 @@ import org.exbin.bined.DataChangedListener;
 import org.exbin.bined.capability.EditationModeCapable;
 import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.BinaryDataOperationException;
-import org.exbin.bined.operation.swing.command.HexCompoundCommand;
+import org.exbin.bined.operation.swing.command.BinaryCompoundCommand;
 import org.exbin.bined.operation.swing.command.InsertDataCommand;
 import org.exbin.bined.operation.swing.command.ModifyDataCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
@@ -43,9 +43,9 @@ import org.exbin.bined.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.utils.binary_data.BinaryData;
-import org.exbin.utils.binary_data.ByteArrayEditableData;
-import org.exbin.utils.binary_data.EditableBinaryData;
+import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
+import org.exbin.auxiliary.paged_data.EditableBinaryData;
 
 /**
  * Values side panel.
@@ -811,9 +811,9 @@ public class ValuesPanel extends javax.swing.JPanel {
                 long modifiedDataSize = codeArea.getDataSize() - dataPosition;
                 EditableBinaryData modifiedData = (EditableBinaryData) byteArrayData.copy(0, modifiedDataSize);
                 EditableBinaryData insertedData = (EditableBinaryData) byteArrayData.copy(modifiedDataSize, byteArrayData.getDataSize() - modifiedDataSize);
-                command = new HexCompoundCommand(codeArea);
-                ((HexCompoundCommand) command).appendCommand(new ModifyDataCommand(codeArea, dataPosition, modifiedData));
-                ((HexCompoundCommand) command).appendCommand(new InsertDataCommand(codeArea, dataPosition + modifiedDataSize, insertedData));
+                command = new BinaryCompoundCommand(codeArea);
+                ((BinaryCompoundCommand) command).appendCommand(new ModifyDataCommand(codeArea, dataPosition, modifiedData));
+                ((BinaryCompoundCommand) command).appendCommand(new InsertDataCommand(codeArea, dataPosition + modifiedDataSize, insertedData));
             } else {
                 command = new ModifyDataCommand(codeArea, dataPosition, byteArrayData);
             }

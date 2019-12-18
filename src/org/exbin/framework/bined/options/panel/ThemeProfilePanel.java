@@ -33,7 +33,7 @@ import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.utils.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 
 /**
  * Theme profile panel.
