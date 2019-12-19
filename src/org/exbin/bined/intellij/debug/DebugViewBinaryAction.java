@@ -29,6 +29,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
 import com.intellij.xdebugger.frame.XValue;
+import com.intellij.xdebugger.frame.XValuePlace;
 import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
@@ -36,11 +37,16 @@ import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.jetbrains.php.debug.xdebug.debugger.XdebugValue;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
+import com.jetbrains.python.debugger.PyFrameAccessor;
+import com.jetbrains.python.debugger.PyFullValueEvaluator;
 import com.sun.jdi.*;
+import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.bined.intellij.debug.jdi.*;
 import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.panel.DebugViewPanel;
+import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.framework.bined.panel.ValuesPanel;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
@@ -456,6 +462,18 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
             super();
 
             XFullValueEvaluator fullValueEvaluator = dataNode.getFullValueEvaluator();
+            if (fullValueEvaluator == null) {
+                dataNode.getValueContainer().computePresentation(dataNode, XValuePlace.TREE);
+                fullValueEvaluator = dataNode.getFullValueEvaluator();
+
+                if (fullValueEvaluator == null) {
+                    throw new UnsupportedOperationException("Unable to create value evaluator");
+                }
+                // TODO: Extend PyFullValueEvaluator instead?
+//                String expression = ((PyDebugValue) dataNode.getValueContainer()).getEvaluationExpression();
+//                PyFrameAccessor myFrameAccessor = ((PyDebugValue) dataNode.getValueContainer()).getFrameAccessor();
+//                fullValueEvaluator = new PyFullValueEvaluator(myFrameAccessor, expression);
+            }
             fullValueEvaluator.startEvaluation(new XFullValueEvaluator.XFullValueEvaluationCallback() {
                 public boolean isObsolete() {
                     return false;

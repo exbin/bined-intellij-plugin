@@ -32,12 +32,8 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
 
     <change-notes><![CDATA[
 <ul><li>Minor GUI improvements</li>
-<li>Context aware popup menu</li>
-<li>Go-to dialog position to support position from end</li>
-<li>Go-to dialog position to support different numerical bases</li>
-<li>Support for ENTER key in preview section</li>
-<li>Minor fix to view of native Java debug values</li>
-<li>Minor fix to integration</li>
+<li>Fixed opening via dialog crashes IntelliJ (mac)</li>
+<li>Fixed "HIDE_DEFAULT_EDITOR is supported only for DumbAware providers" error message</li>
 </ul>
     ]]>
     </change-notes>
