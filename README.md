@@ -29,9 +29,9 @@ Compiling
 
 Java Development Kit (JDK) version 8 or later is required to build this project (also add JDK/lib/tools.jar to SDK classpath for Java 8).
 
-IntelliJ Idea platform is necessary for build of this plugin. See. http://jetbrains.org  
+IntelliJ Idea platform is necessary to build this plugin. See. http://jetbrains.org  
 
-Create / use "Plugin" run configuration to execute.
+Assign SDK using 2019.1 IntelliJ platform / use "Plugin" run configuration to execute.
 
 License
 -------

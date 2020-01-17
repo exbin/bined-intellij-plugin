@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.debug.DebugViewDataSource;
+import org.exbin.bined.intellij.debug.DebugViewData;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
  */
-public class IntegerArrayPageProvider implements DebugViewDataSource.PageProvider {
+public class IntegerArrayPageProvider implements DebugViewData.PageProvider {
 
     private final ArrayReference arrayRef;
 
@@ -36,7 +36,7 @@ public class IntegerArrayPageProvider implements DebugViewDataSource.PageProvide
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int pageSize = DebugViewDataSource.PAGE_SIZE / 4;
+        int pageSize = DebugViewData.PAGE_SIZE / 4;
         int startPos = (int) (pageIndex * pageSize);
         int length = pageSize;
         if (arrayRef.length() - startPos < pageSize) {

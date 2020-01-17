@@ -2,6 +2,7 @@
 - Minor GUI improvements
 - Fixed opening via dialog crashes IntelliJ (mac) (#issue 22)
 - Fixed "HIDE_DEFAULT_EDITOR is supported only for DumbAware providers" error message (issue #24)
+- Support for multiple decoders in debugging view
 
 0.2.1 (2019-08-22)
 - Minor GUI improvements

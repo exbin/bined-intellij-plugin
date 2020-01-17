@@ -37,7 +37,7 @@ import java.util.List;
  * File editor using BinEd editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.1 2019/08/22
+ * @version 0.2.2 2020/01/17
  */
 @ParametersAreNonnullByDefault
 public class BinEdFileEditor implements FileEditor {

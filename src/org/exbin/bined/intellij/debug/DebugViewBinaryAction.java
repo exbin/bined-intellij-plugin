@@ -34,25 +34,18 @@ import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
-import com.jetbrains.php.debug.xdebug.debugger.XdebugValue;
-import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
-import com.jetbrains.python.debugger.PyFrameAccessor;
-import com.jetbrains.python.debugger.PyFullValueEvaluator;
 import com.sun.jdi.*;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.bined.intellij.debug.jdi.*;
-import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
-import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.panel.DebugViewPanel;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.framework.bined.panel.ValuesPanel;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigInteger;
@@ -65,7 +58,7 @@ import java.util.concurrent.ExecutionException;
  * Show debugger value in hexadecimal editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.2 2019/11/05
+ * @version 0.2.2 2020/01/17
  */
 public class DebugViewBinaryAction extends XFetchValueActionBase implements DumbAware {
 
@@ -188,27 +181,29 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
 
             viewPanel = new DebugViewPanel();
 
-            BinaryData data = identifyData(initialValue);
-
-            viewPanel.setData(data);
+            identifyData(viewPanel, initialValue);
 
             init();
         }
 
         @NotNull
-        private BinaryData identifyData(@Nullable String initialValue) {
+        private void identifyData(@Nonnull DebugViewPanel debugViewPanel, @Nullable String initialValue) {
             if (!classesDetected) detectClasses();
 
-            BinaryData data = null;
             if (myDataNode != null) {
                 XValue container = myDataNode.getValueContainer();
                 if (javaValueClassAvailable && container instanceof JavaValue) {
                     ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
                     if (descriptor.isPrimitive() || isBasicType(descriptor) || !descriptor.isNull()) {
                         if (descriptor.isArray()) {
-                            data = processArrayData(descriptor);
+                            BinaryData data = processArrayData(descriptor);
+                            if (data != null)
+                                debugViewPanel.addProvider(new DefaultDebugViewDataProvider("binary sequence from array", data));
                         } else {
-                            data = processSimpleValue(descriptor);
+                            BinaryData data = processSimpleValue(descriptor);
+                            if (data != null) {
+                                debugViewPanel.addProvider(new DefaultDebugViewDataProvider("binary value", data));
+                            }
                         }
                     }
                 }
@@ -229,9 +224,9 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
 //                            PyFullValueEvaluator fullValueEvaluator = new PyFullValueEvaluator(debugValue.getFrameAccessor(), debugValue.getEvaluationExpression());
 //                            fullValueNode.getRawValue()
                             try {
-                                data = new DebugViewDataSource(new PythonByteArrayPageProvider(value.get(), dataType));
+                                BinaryData data = new DebugViewData(new PythonByteArrayPageProvider(value.get(), dataType));
+                                debugViewPanel.addProvider(new DefaultDebugViewDataProvider("Python bytearray value", data));
                             } catch (ExecutionException | InterruptedException e) {
-                                data = null;
                             }
                         }
                     }
@@ -242,7 +237,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
 //                    try {
 //                        data = new DebugViewDataSource(new PhpByteArrayPageProvider(value.get(), dataType));
 //                    } catch (ExecutionException | InterruptedException e) {
-                        data = null;
+//                        data = null;
 //                    }
                 }
 
@@ -253,23 +248,30 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
 //                    }
 //                }
 
-                if (data == null) {
-                    String rawValue = myDataNode.getRawValue();
-                    if (rawValue != null) {
-                        data = new ByteArrayData(rawValue.getBytes(Charset.defaultCharset()));
+                String rawValue = myDataNode.getRawValue();
+                if (rawValue != null) {
+                    BinaryData data = new ByteArrayData(rawValue.getBytes(Charset.defaultCharset()));
+                    debugViewPanel.addProvider(new DefaultDebugViewDataProvider("RAW value", data));
+                }
+            }
+
+            debugViewPanel.addProvider(new DebugViewDataProvider() {
+                @NotNull
+                @Override
+                public String getName() {
+                    return "toString()";
+                }
+
+                @NotNull
+                @Override
+                public BinaryData getData() {
+                    if (initialValue != null) {
+                        return new ByteArrayData(initialValue.getBytes(Charset.defaultCharset()));
+                    } else {
+                        return new ByteArrayData();
                     }
                 }
-            }
-
-            if (data == null) {
-                if (initialValue != null) {
-                    data = new ByteArrayData(initialValue.getBytes(Charset.defaultCharset()));
-                } else {
-                    data = new ByteArrayData(new byte[0]);
-                }
-            }
-
-            return data;
+            });
         }
 
         private BinaryData processArrayData(ValueDescriptorImpl descriptor) {
@@ -280,35 +282,35 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                 switch (componentType) {
                     case CommonClassNames.JAVA_LANG_BOOLEAN:
                     case "boolean": {
-                        return new DebugViewDataSource(new BooleanArrayPageProvider(arrayRef));
+                        return new DebugViewData(new BooleanArrayPageProvider(arrayRef));
                     }
                     case CommonClassNames.JAVA_LANG_BYTE:
                     case "byte": {
-                        return new DebugViewDataSource(new ByteArrayPageProvider(arrayRef));
+                        return new DebugViewData(new ByteArrayPageProvider(arrayRef));
                     }
                     case CommonClassNames.JAVA_LANG_SHORT:
                     case "short": {
-                        return new DebugViewDataSource(new ShortArrayPageProvider(arrayRef));
+                        return new DebugViewData(new ShortArrayPageProvider(arrayRef));
                     }
                     case CommonClassNames.JAVA_LANG_INTEGER:
                     case "int": {
-                        return new DebugViewDataSource(new IntegerArrayPageProvider(arrayRef));
+                        return new DebugViewData(new IntegerArrayPageProvider(arrayRef));
                     }
                     case CommonClassNames.JAVA_LANG_LONG:
                     case "long": {
-                        return new DebugViewDataSource(new LongArrayPageProvider(arrayRef));
+                        return new DebugViewData(new LongArrayPageProvider(arrayRef));
                     }
                     case CommonClassNames.JAVA_LANG_FLOAT:
                     case "float": {
-                        return new DebugViewDataSource(new FloatArrayPageProvider(arrayRef));
+                        return new DebugViewData(new FloatArrayPageProvider(arrayRef));
                     }
                     case CommonClassNames.JAVA_LANG_DOUBLE:
                     case "double": {
-                        return new DebugViewDataSource(new DoubleArrayPageProvider(arrayRef));
+                        return new DebugViewData(new DoubleArrayPageProvider(arrayRef));
                     }
                     case CommonClassNames.JAVA_LANG_CHARACTER:
                     case "char": {
-                        return new DebugViewDataSource(new CharArrayPageProvider(arrayRef));
+                        return new DebugViewData(new CharArrayPageProvider(arrayRef));
                     }
                 }
             }

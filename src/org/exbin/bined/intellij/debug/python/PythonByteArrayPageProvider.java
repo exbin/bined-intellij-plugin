@@ -15,7 +15,7 @@
  */
 package org.exbin.bined.intellij.debug.python;
 
-import org.exbin.bined.intellij.debug.DebugViewDataSource;
+import org.exbin.bined.intellij.debug.DebugViewData;
 import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.2 2019/11/06
  */
-public class PythonByteArrayPageProvider implements DebugViewDataSource.PageProvider {
+public class PythonByteArrayPageProvider implements DebugViewData.PageProvider {
 
     private final Mode mode;
     private final String value;
@@ -44,20 +44,20 @@ public class PythonByteArrayPageProvider implements DebugViewDataSource.PageProv
     @Override
     public byte[] getPage(long pageIndex) {
         long documentSize = getDocumentSize();
-        if (pageIndex > documentSize / DebugViewDataSource.PAGE_SIZE)
+        if (pageIndex > documentSize / DebugViewData.PAGE_SIZE)
             throw new OutOfBoundsException();
 
         int length;
-        if (documentSize / DebugViewDataSource.PAGE_SIZE == pageIndex) {
-            length = (int) (documentSize % DebugViewDataSource.PAGE_SIZE);
+        if (documentSize / DebugViewData.PAGE_SIZE == pageIndex) {
+            length = (int) (documentSize % DebugViewData.PAGE_SIZE);
         } else {
-            length = DebugViewDataSource.PAGE_SIZE;
+            length = DebugViewData.PAGE_SIZE;
         }
         byte[] page = new byte[length];
 
         switch (mode) {
             case DIRECT_STRING: {
-                int position = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE);
+                int position = (int) (pageIndex * DebugViewData.PAGE_SIZE);
                 int offset = 0;
                 while (offset < length) {
                     byte byteValue = (byte) value.charAt(position);
@@ -69,7 +69,7 @@ public class PythonByteArrayPageProvider implements DebugViewDataSource.PageProv
                 break;
             }
             case DESCRIPTION_STRING: {
-                int position = (int) (prefix.length() + 3 + (pageIndex * DebugViewDataSource.PAGE_SIZE * 4));
+                int position = (int) (prefix.length() + 3 + (pageIndex * DebugViewData.PAGE_SIZE * 4));
                 int offset = 0;
                 while (offset < length) {
                     byte byteValue = (byte) ((hexCharToInt(value.charAt(position + 2)) << 4) + hexCharToInt(value.charAt(position + 3)));

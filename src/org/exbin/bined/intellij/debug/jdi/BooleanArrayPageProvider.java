@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.debug.DebugViewDataSource;
+import org.exbin.bined.intellij.debug.DebugViewData;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.2 2019/10/02
  */
-public class BooleanArrayPageProvider implements DebugViewDataSource.PageProvider {
+public class BooleanArrayPageProvider implements DebugViewData.PageProvider {
 
     private final ArrayReference arrayRef;
 
@@ -36,10 +36,10 @@ public class BooleanArrayPageProvider implements DebugViewDataSource.PageProvide
 
     @Override
     public byte[] getPage(long pageIndex) {
-        int startPos = (int) (pageIndex * DebugViewDataSource.PAGE_SIZE * 8);
-        int length = DebugViewDataSource.PAGE_SIZE * 8;
+        int startPos = (int) (pageIndex * DebugViewData.PAGE_SIZE * 8);
+        int length = DebugViewData.PAGE_SIZE * 8;
         long documentSize = getDocumentSize();
-        if (documentSize - startPos < DebugViewDataSource.PAGE_SIZE * 8) {
+        if (documentSize - startPos < DebugViewData.PAGE_SIZE * 8) {
             length = (int) (documentSize - startPos);
         }
         final List<Value> values = arrayRef.getValues(startPos, length);

@@ -19,6 +19,7 @@ import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +30,7 @@ import java.io.OutputStream;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.0 2019/03/15
  */
-public class DebugViewDataSource implements BinaryData {
+public class DebugViewData implements BinaryData {
 
     public static final int PAGE_SIZE = 2048;
 
@@ -38,7 +39,7 @@ public class DebugViewDataSource implements BinaryData {
     private final CachePage[] pages = new CachePage[2];
     private int nextPage = 0;
 
-    public DebugViewDataSource(@NotNull PageProvider pageProvider) {
+    public DebugViewData(@NotNull PageProvider pageProvider) {
         this.pageProvider = pageProvider;
         pages[0] = new CachePage();
         pages[1] = new CachePage();
@@ -83,11 +84,13 @@ public class DebugViewDataSource implements BinaryData {
         return page.data[pageOffset];
     }
 
+    @Nonnull
     @Override
     public BinaryData copy() {
         return copy(0, getDataSize());
     }
 
+    @Nonnull
     @Override
     public BinaryData copy(long startFrom, long length) {
         ByteArrayEditableData result = new ByteArrayEditableData();
