@@ -24,7 +24,7 @@ import java.util.List;
  * Boolean array data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.2 2019/10/02
+ * @version 0.2.2 2020/01/18
  */
 public class BooleanArrayPageProvider implements DebugViewData.PageProvider {
 
@@ -38,7 +38,7 @@ public class BooleanArrayPageProvider implements DebugViewData.PageProvider {
     public byte[] getPage(long pageIndex) {
         int startPos = (int) (pageIndex * DebugViewData.PAGE_SIZE * 8);
         int length = DebugViewData.PAGE_SIZE * 8;
-        long documentSize = getDocumentSize();
+        long documentSize = getDocumentSize() * 8;
         if (documentSize - startPos < DebugViewData.PAGE_SIZE * 8) {
             length = (int) (documentSize - startPos);
         }
@@ -74,6 +74,6 @@ public class BooleanArrayPageProvider implements DebugViewData.PageProvider {
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length();
+        return (arrayRef.length() + 7) / 8;
     }
 }

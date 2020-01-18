@@ -826,7 +826,9 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
         EditorOptions editorOptions = applyOptions.getEditorOptions();
         editorOptions.setShowValuesPanel(valuesPanelVisible);
         editorOptions.setFileHandlingMode(fileHandlingMode);
-        editorOptions.setEnterKeyHandlingMode(((CodeAreaOperationCommandHandler) codeArea.getCommandHandler()).getEnterKeyHandlingMode());
+        if (codeArea.getCommandHandler() instanceof CodeAreaOperationCommandHandler) {
+            editorOptions.setEnterKeyHandlingMode(((CodeAreaOperationCommandHandler) codeArea.getCommandHandler()).getEnterKeyHandlingMode());
+        }
 
         // TODO applyOptions.getStatusOptions().loadFromPreferences(preferences.getStatusPreferences());
     }
@@ -908,41 +910,49 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
 
     private void initialLoadFromPreferences() {
         applyOptions(new BinEdApplyOptions() {
+            @Nonnull
             @Override
             public CodeAreaOptions getCodeAreaOptions() {
                 return preferences.getCodeAreaPreferences();
             }
 
+            @Nonnull
             @Override
             public TextEncodingOptions getEncodingOptions() {
                 return preferences.getEncodingPreferences();
             }
 
+            @Nonnull
             @Override
             public TextFontOptions getFontOptions() {
                 return preferences.getFontPreferences();
             }
 
+            @Nonnull
             @Override
             public EditorOptions getEditorOptions() {
                 return preferences.getEditorPreferences();
             }
 
+            @Nonnull
             @Override
             public StatusOptions getStatusOptions() {
                 return preferences.getStatusPreferences();
             }
 
+            @Nonnull
             @Override
             public CodeAreaLayoutOptions getLayoutOptions() {
                 return preferences.getLayoutPreferences();
             }
 
+            @Nonnull
             @Override
             public CodeAreaColorOptions getColorOptions() {
                 return preferences.getColorPreferences();
             }
 
+            @Nonnull
             @Override
             public CodeAreaThemeOptions getThemeOptions() {
                 return preferences.getThemePreferences();
@@ -972,7 +982,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
             }
 
             @Override
-            public void undoCommandAdded(final BinaryDataCommand command) {
+            public void undoCommandAdded(@Nonnull final BinaryDataCommand command) {
                 updateCurrentDocumentSize();
                 notifyModified();
             }
