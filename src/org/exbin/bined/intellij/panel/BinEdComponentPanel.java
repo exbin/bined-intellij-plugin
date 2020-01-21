@@ -685,6 +685,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
         optionsMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/options/resources/icons/Preferences16.gif")));
         optionsMenuItem.addActionListener((ActionEvent e) -> {
             final BinEdOptionsPanelBorder optionsPanelWrapper = new BinEdOptionsPanelBorder();
+            optionsPanelWrapper.setPreferredSize(new Dimension(700, 460));
             BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
             optionsPanel.setPreferences(preferences);
             optionsPanel.setTextFontService(new TextFontService() {
@@ -720,7 +721,6 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
 
                 dialog.close();
             });
-            dialog.getWindow().setSize(650, 460);
             dialog.showCentered((Component) e.getSource());
             dialog.dispose();
         });

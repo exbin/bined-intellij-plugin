@@ -26,9 +26,9 @@
                   <Component id="codeTypeComboBox" alignment="0" max="32767" attributes="0"/>
                   <Component id="codeColorizationCheckBox" alignment="0" max="32767" attributes="0"/>
                   <Component id="showNonprintableCharactersCheckBox" alignment="0" max="32767" attributes="0"/>
-                  <Component id="maxBytesPerRowSpinner" alignment="1" max="32767" attributes="0"/>
-                  <Component id="minRowPositionLengthSpinner" alignment="1" max="32767" attributes="0"/>
-                  <Component id="maxRowPositionLengthSpinner" alignment="1" max="32767" attributes="0"/>
+                  <Component id="maxBytesPerRowSpinner" alignment="1" pref="0" max="32767" attributes="0"/>
+                  <Component id="minRowPositionLengthSpinner" alignment="1" pref="0" max="32767" attributes="0"/>
+                  <Component id="maxRowPositionLengthSpinner" alignment="1" pref="0" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="hexCharactersModeLabel" alignment="0" min="-2" max="-2" attributes="0"/>

@@ -15,22 +15,26 @@
  */
 package org.exbin.bined.intellij.panel;
 
+import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.gui.menu.component.DropDownButton;
 import org.exbin.framework.gui.utils.LanguageUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
  * Binary editor toolbar panel.
  *
- * @version 0.2.2 2020/01/16
+ * @version 0.2.2 2020/01/21
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -41,10 +45,12 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     private final BinaryEditorPreferences preferences;
     private final ExtCodeArea codeArea;
     private BinaryDataUndoHandler undoHandler;
+    private final ActionToolbarImpl toolbar;
+    final DefaultActionGroup actionGroup;
 
-    private JPanel controlToolBar;
+    private JComponent controlToolBar;
     private ActionListener saveAction = null;
-    private final AbstractAction cycleCodeTypesAction;
+    private final AnAction cycleCodeTypesAction;
     private final JRadioButtonMenuItem binaryCodeTypeAction;
     private final JRadioButtonMenuItem octalCodeTypeAction;
     private final JRadioButtonMenuItem decimalCodeTypeAction;
@@ -55,6 +61,11 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     public BinEdToolbarPanel(BinaryEditorPreferences preferences, ExtCodeArea codeArea) {
         this.preferences = preferences;
         this.codeArea = codeArea;
+
+        setLayout(new java.awt.BorderLayout());
+        actionGroup = new DefaultActionGroup();
+        toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actionGroup, true);
+        add(toolbar, BorderLayout.CENTER);
 
         codeTypeButtonGroup = new ButtonGroup();
         binaryCodeTypeAction = new JRadioButtonMenuItem(new AbstractAction("Binary") {
@@ -89,9 +100,13 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
             }
         });
         codeTypeButtonGroup.add(hexadecimalCodeTypeAction);
-        cycleCodeTypesAction = new AbstractAction() {
+        cycleCodeTypesAction = new AnAction(
+                "Cycle thru code types",
+                null,
+                null
+        ) {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 int codeTypePos = codeArea.getCodeType().ordinal();
                 CodeType[] values = CodeType.values();
                 CodeType next = codeTypePos + 1 >= values.length ? values[0] : values[codeTypePos + 1];
@@ -105,29 +120,27 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     }
 
     private void init() {
-        cycleCodeTypesAction.putValue(Action.SHORT_DESCRIPTION, "Cycle thru code types");
+// TODO        cycleCodeTypesAction.putValue(Action.SHORT_DESCRIPTION, "Cycle thru code types");
         JPopupMenu cycleCodeTypesPopupMenu = new JPopupMenu();
         cycleCodeTypesPopupMenu.add(binaryCodeTypeAction);
         cycleCodeTypesPopupMenu.add(octalCodeTypeAction);
         cycleCodeTypesPopupMenu.add(decimalCodeTypeAction);
         cycleCodeTypesPopupMenu.add(hexadecimalCodeTypeAction);
-        codeTypeDropDown = new DropDownButton(cycleCodeTypesAction, cycleCodeTypesPopupMenu);
+// TODO        codeTypeDropDown = new DropDownButton(cycleCodeTypesAction, cycleCodeTypesPopupMenu);
         updateCycleButtonName();
-        controlToolBar.add(codeTypeDropDown);
+//        controlToolBar.add(codeTypeDropDown);
     }
 
     public void setUndoHandler(BinaryDataUndoHandler undoHandler) {
         this.undoHandler = undoHandler;
 
-        int position = controlToolBar.getComponentZOrder(showUnprintablesToggleButton);
-        controlToolBar.add(separator2, null, position);
-        controlToolBar.add(redoEditButton, null, position);
-        controlToolBar.add(undoEditButton, null, position);
+        toolbar.getPresentation(undoEditButton).setVisible(true);
+        toolbar.getPresentation(redoEditButton).setVisible(true);
     }
 
     private void updateCycleButtonName() {
         CodeType codeType = codeArea.getCodeType();
-        codeTypeDropDown.setActionText(codeType.name().substring(0, 3));
+        // TODO codeTypeDropDown.setActionText(codeType.name().substring(0, 3));
         switch (codeType) {
             case BINARY: {
                 if (!binaryCodeTypeAction.isSelected()) {
@@ -158,22 +171,22 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
 
     public void applyFromCodeArea() {
         updateCycleButtonName();
-        showUnprintablesToggleButton.setSelected(codeArea.isShowUnprintables());
+        setActionSelection(showUnprintablesToggleButton, codeArea.isShowUnprintables());
     }
 
     public void loadFromPreferences() {
         codeArea.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
         updateCycleButtonName();
-        showUnprintablesToggleButton.setSelected(preferences.getCodeAreaPreferences().isShowUnprintables());
+        setActionSelection(showUnprintablesToggleButton, preferences.getCodeAreaPreferences().isShowUnprintables());
     }
 
     public void updateUndoState() {
-        undoEditButton.setEnabled(undoHandler.canUndo());
-        redoEditButton.setEnabled(undoHandler.canRedo());
+        toolbar.getPresentation(undoEditButton).setEnabled(undoHandler.canUndo());
+        toolbar.getPresentation(redoEditButton).setEnabled(undoHandler.canRedo());
     }
 
     public void updateModified(boolean modified) {
-        saveFileButton.setEnabled(saveAction != null && modified);
+        toolbar.getPresentation(saveFileButton).setEnabled(saveAction != null && modified);
         updateUndoState();
     }
 
@@ -185,63 +198,83 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     private void initComponents() {
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
-        controlToolBar = this;
+        controlToolBar = toolbar.getComponent();
 
-        saveFileButton = new JButton();
-        undoEditButton = new JButton();
-        redoEditButton = new JButton();
-        showUnprintablesToggleButton = new JToggleButton();
         separator1 = new javax.swing.JToolBar.Separator();
         separator2 = new javax.swing.JToolBar.Separator();
 
-        saveFileButton.setFocusable(false);
-        saveFileButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/document-save.png")));
-        saveFileButton.setToolTipText("Save current file");
-        saveFileButton.addActionListener(this::saveFileButtonActionPerformed);
-        saveFileButton.setEnabled(false);
-        controlToolBar.add(saveFileButton);
-
-        controlToolBar.add(separator1);
-
-        undoEditButton.setFocusable(false);
-        undoEditButton.setEnabled(false);
-        undoEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-undo.png")));
-        undoEditButton.setToolTipText("Undo last operation");
-        undoEditButton.addActionListener(this::undoEditButtonActionPerformed);
-
-        redoEditButton.setFocusable(false);
-        redoEditButton.setEnabled(false);
-        redoEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-redo.png")));
-        redoEditButton.setToolTipText("Redo last undid operation");
-        redoEditButton.addActionListener(this::redoEditButtonActionPerformed);
-
-        showUnprintablesToggleButton.setFocusable(false);
-        showUnprintablesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow_disabled.png"))); // NOI18N
-        showUnprintablesToggleButton.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png"))); // NOI18N
-        showUnprintablesToggleButton.setToolTipText(resourceBundle.getString("showUnprintablesToggleButton.toolTipText")); // NOI18N
-        showUnprintablesToggleButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showUnprintablesToggleButtonActionPerformed(evt);
+        saveFileButton = new AnAction(
+                "Save current file",
+                null,
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/document-save.png"))
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+//                if (saveAction != null) saveAction.actionPerformed(AnActionEvent.anActionEvent.evt);
             }
-        });
-        controlToolBar.add(showUnprintablesToggleButton);
-        controlToolBar.add(separator1);
+        };
+        actionGroup.add(saveFileButton);
+        toolbar.getPresentation(saveFileButton).setEnabled(false);
+        actionGroup.addSeparator();
+
+        undoEditButton = new AnAction(
+                "Undo last operation",
+                null,
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-undo.png"))
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                undoEditButtonActionPerformed();
+            }
+        };
+        actionGroup.add(undoEditButton);
+        toolbar.getPresentation(undoEditButton).setEnabled(false);
+        toolbar.getPresentation(undoEditButton).setVisible(false);
+
+        redoEditButton = new AnAction(
+                "Redo last undid operation",
+                null,
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-redo.png"))
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                redoEditButtonActionPerformed();
+            }
+        };
+        actionGroup.add(redoEditButton);
+        toolbar.getPresentation(redoEditButton).setEnabled(false);
+        toolbar.getPresentation(redoEditButton).setVisible(false);
+
+        showUnprintablesToggleButton = new AnAction(
+                resourceBundle.getString("showUnprintablesToggleButton.toolTipText"),
+                null,
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow_disabled.png"))
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                showUnprintablesToggleButtonActionPerformed(null);
+            }
+        };
+        actionGroup.add(showUnprintablesToggleButton);
+        toolbar.getPresentation(showUnprintablesToggleButton).setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png")));
+
+        actionGroup.addSeparator();
     }// </editor-fold>//GEN-END:initComponents
 
     private void showUnprintablesToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showUnprintablesToggleButtonActionPerformed
-        codeArea.setShowUnprintables(showUnprintablesToggleButton.isSelected());
+        codeArea.setShowUnprintables((Boolean) toolbar.getPresentation(showUnprintablesToggleButton).getClientProperty("selected"));
     }//GEN-LAST:event_showUnprintablesToggleButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToolBar.Separator separator1;
     private javax.swing.JToolBar.Separator separator2;
-    private JToggleButton showUnprintablesToggleButton;
-    private javax.swing.JButton saveFileButton;
-    private javax.swing.JButton undoEditButton;
-    private javax.swing.JButton redoEditButton;
+    private AnAction showUnprintablesToggleButton;
+    private AnAction saveFileButton;
+    private AnAction undoEditButton;
+    private AnAction redoEditButton;
     // End of variables declaration//GEN-END:variables
 
-    private void undoEditButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void undoEditButtonActionPerformed() {
         try {
             undoHandler.performUndo();
             codeArea.repaint();
@@ -251,7 +284,7 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         }
     }
 
-    private void redoEditButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void redoEditButtonActionPerformed() {
         try {
             undoHandler.performRedo();
             codeArea.repaint();
@@ -261,7 +294,7 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         }
     }
 
-    private void saveFileButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (saveAction != null) saveAction.actionPerformed(evt);
+    private void setActionSelection(AnAction action, boolean selected) {
+        toolbar.getPresentation(action).putClientProperty("selected", selected);
     }
 }

@@ -58,7 +58,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="baseSwitchButton" min="-2" pref="65" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="spinner" max="32767" attributes="0"/>
+              <Component id="spinner" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

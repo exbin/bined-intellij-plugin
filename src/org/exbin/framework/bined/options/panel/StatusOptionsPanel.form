@@ -26,9 +26,9 @@
                   <Component id="cursorPositionShowOffsetCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="documentSizeCodeTypeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="documentSizeShowRelativeCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="decimalGroupSizeSpinner" alignment="0" max="32767" attributes="0"/>
-                  <Component id="octalGroupSizeSpinner" alignment="0" max="32767" attributes="0"/>
-                  <Component id="hexadecimalGroupSizeSpinner" alignment="0" max="32767" attributes="0"/>
+                  <Component id="decimalGroupSizeSpinner" alignment="0" pref="0" max="32767" attributes="0"/>
+                  <Component id="octalGroupSizeSpinner" alignment="0" pref="0" max="32767" attributes="0"/>
+                  <Component id="hexadecimalGroupSizeSpinner" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Component id="decimalGroupSizeLabel" min="-2" max="-2" attributes="0"/>
                   <Component id="octalGroupSizeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="hexadecimalGroupSizeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
