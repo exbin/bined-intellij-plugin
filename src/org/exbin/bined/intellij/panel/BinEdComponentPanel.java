@@ -16,6 +16,8 @@
 package org.exbin.bined.intellij.panel;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
@@ -58,6 +60,7 @@ import org.exbin.framework.gui.utils.handler.OptionsControlHandler;
 import org.exbin.framework.gui.utils.panel.CloseControlPanel;
 import org.exbin.framework.gui.utils.panel.OptionsControlPanel;
 import org.exbin.framework.preferences.PreferencesWrapper;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -70,8 +73,8 @@ import java.util.Objects;
 /**
  * Binary editor component panel.
  *
- * @version 0.2.2 2020/01/16
  * @author ExBin Project (http://exbin.org)
+ * @version 0.2.2 2020/01/16
  */
 public class BinEdComponentPanel extends javax.swing.JPanel {
 
@@ -117,7 +120,13 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
         defaultLayoutProfile = codeArea.getLayoutProfile();
         defaultThemeProfile = codeArea.getThemeProfile();
         defaultColorProfile = codeArea.getColorsProfile();
-        toolbarPanel = new BinEdToolbarPanel(preferences, codeArea);
+        toolbarPanel = new BinEdToolbarPanel(preferences, codeArea,
+                new AnAction() {
+                    @Override
+                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                        createOptionsAction().actionPerformed(new ActionEvent(BinEdComponentPanel.this, 0, "COMMAND", 0));
+                    }
+                });
         statusPanel = new BinaryStatusPanel();
 
         goToRowAction = new GoToPositionAction(codeArea);
@@ -310,7 +319,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
                     oldData.dispose();
                 }
             }
-            undoHandler.clear();
+// TODO            undoHandler.clear();
             codeArea.notifyDataChanged();
             updateCurrentMemoryMode();
             fileHandlingMode = newHandlingMode;
@@ -524,7 +533,8 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify                     
     private javax.swing.JPanel codeAreaPanel;
-    // End of variables declaration                   
+
+    // End of variables declaration
     public void closeData() {
         BinaryData data = codeArea.getContentData();
         codeArea.setContentData(new ByteArrayData());
@@ -683,47 +693,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
 
         final JMenuItem optionsMenuItem = new JMenuItem("Options...");
         optionsMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/options/resources/icons/Preferences16.gif")));
-        optionsMenuItem.addActionListener((ActionEvent e) -> {
-            final BinEdOptionsPanelBorder optionsPanelWrapper = new BinEdOptionsPanelBorder();
-            optionsPanelWrapper.setPreferredSize(new Dimension(700, 460));
-            BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
-            optionsPanel.setPreferences(preferences);
-            optionsPanel.setTextFontService(new TextFontService() {
-                @Override
-                public Font getCurrentFont() {
-                    return codeArea.getCodeFont();
-                }
-
-                @Override
-                public Font getDefaultFont() {
-                    return defaultFont;
-                }
-
-                @Override
-                public void setCurrentFont(Font font) {
-                    codeArea.setCodeFont(font);
-                }
-            });
-            optionsPanel.loadFromPreferences();
-            updateApplyOptions(optionsPanel);
-            OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
-            JPanel dialogPanel = WindowUtils.createDialogPanel(optionsPanelWrapper, optionsControlPanel);
-            WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) e.getSource(), "Options", Dialog.ModalityType.APPLICATION_MODAL);
-            optionsControlPanel.setHandler((OptionsControlHandler.ControlActionType actionType) -> {
-                if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
-                    optionsPanel.applyToOptions();
-                    if (actionType == OptionsControlHandler.ControlActionType.SAVE) {
-                        optionsPanel.saveToPreferences();
-                    }
-                    applyOptions(optionsPanel);
-                    codeArea.repaint();
-                }
-
-                dialog.close();
-            });
-            dialog.showCentered((Component) e.getSource());
-            dialog.dispose();
-        });
+        optionsMenuItem.addActionListener(createOptionsAction());
         result.add(optionsMenuItem);
 
         switch (positionZone) {
@@ -752,6 +722,54 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
         }
 
         return result;
+    }
+
+    @Nonnull
+    private AbstractAction createOptionsAction() {
+        return new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final BinEdOptionsPanelBorder optionsPanelWrapper = new BinEdOptionsPanelBorder();
+                optionsPanelWrapper.setPreferredSize(new Dimension(700, 460));
+                BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
+                optionsPanel.setPreferences(preferences);
+                optionsPanel.setTextFontService(new TextFontService() {
+                    @Override
+                    public Font getCurrentFont() {
+                        return codeArea.getCodeFont();
+                    }
+
+                    @Override
+                    public Font getDefaultFont() {
+                        return defaultFont;
+                    }
+
+                    @Override
+                    public void setCurrentFont(Font font) {
+                        codeArea.setCodeFont(font);
+                    }
+                });
+                optionsPanel.loadFromPreferences();
+                updateApplyOptions(optionsPanel);
+                OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
+                JPanel dialogPanel = WindowUtils.createDialogPanel(optionsPanelWrapper, optionsControlPanel);
+                WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) e.getSource(), "Options", Dialog.ModalityType.APPLICATION_MODAL);
+                optionsControlPanel.setHandler((OptionsControlHandler.ControlActionType actionType) -> {
+                    if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
+                        optionsPanel.applyToOptions();
+                        if (actionType == OptionsControlHandler.ControlActionType.SAVE) {
+                            optionsPanel.saveToPreferences();
+                        }
+                        applyOptions(optionsPanel);
+                        codeArea.repaint();
+                    }
+
+                    dialog.close();
+                });
+                dialog.showCentered((Component) e.getSource());
+                dialog.dispose();
+            }
+        };
     }
 
     @Nonnull
