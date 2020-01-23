@@ -15,16 +15,13 @@
  */
 package org.exbin.bined.intellij.panel;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.util.IconLoader;
-import com.intellij.ui.IconManager;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
-import org.exbin.framework.gui.menu.component.DropDownButton;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +36,7 @@ import java.awt.event.ActionListener;
  * Binary editor toolbar panel.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.2 2020/01/22
+ * @version 0.2.2 2020/01/23
  */
 @ParametersAreNonnullByDefault
 public class BinEdToolbarPanel extends javax.swing.JPanel {
@@ -50,18 +47,17 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     private final ExtCodeArea codeArea;
     private final AnAction optionsAction;
     private BinaryDataUndoHandler undoHandler;
-    private final ActionToolbarImpl toolbar;
-    final DefaultActionGroup actionGroup;
 
-    private JComponent controlToolBar;
+    private final DefaultActionGroup actionGroup;
+    private final ActionGroup cycleActionGroup;
+    private final ActionToolbarImpl toolbar;
+
     private ActionListener saveAction = null;
-    private final SplitButtonAction cycleCodeTypesAction;
+    private final CodeTypeSplitAction cycleCodeTypesSplitAction;
     private final AnAction binaryCodeTypeAction;
     private final AnAction octalCodeTypeAction;
     private final AnAction decimalCodeTypeAction;
     private final AnAction hexadecimalCodeTypeAction;
-    private final ButtonGroup codeTypeButtonGroup;
-//    private DropDownButton codeTypeDropDown;
 
     public BinEdToolbarPanel(BinaryEditorPreferences preferences, ExtCodeArea codeArea, AnAction optionsAction) {
         this.preferences = preferences;
@@ -73,69 +69,67 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actionGroup, true);
         add(toolbar, BorderLayout.CENTER);
 
-        codeTypeButtonGroup = new ButtonGroup();
         binaryCodeTypeAction = new AnAction(
                 "Binary",
                 null,
-                load("/org/exbin/bined/intellij/resources/icons/codetype-bin.svg")
+                load("/org/exbin/bined/intellij/resources/icons/codetype-bin.png")
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 codeArea.setCodeType(CodeType.BINARY);
-                updateCycleButtonName();
+                updateCycleButtonState();
             }
         };
 
-//        codeTypeButtonGroup.add(binaryCodeTypeAction);
         octalCodeTypeAction = new AnAction(
                 "Octal",
                 null,
-                load("/org/exbin/bined/intellij/resources/icons/codetype-oct.svg")
+                load("/org/exbin/bined/intellij/resources/icons/codetype-oct.png")
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 codeArea.setCodeType(CodeType.OCTAL);
-                updateCycleButtonName();
+                updateCycleButtonState();
             }
         };
         decimalCodeTypeAction = new AnAction(
                 "Decimal",
                 null,
-                load("/org/exbin/bined/intellij/resources/icons/codetype-dec.svg")
+                load("/org/exbin/bined/intellij/resources/icons/codetype-dec.png")
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 codeArea.setCodeType(CodeType.DECIMAL);
-                updateCycleButtonName();
+                updateCycleButtonState();
             }
         };
         hexadecimalCodeTypeAction = new AnAction(
                 "Hexadecimal",
                 null,
-                load("/org/exbin/bined/intellij/resources/icons/codetype-hex.svg")
+                load("/org/exbin/bined/intellij/resources/icons/codetype-hex.png")
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 codeArea.setCodeType(CodeType.HEXADECIMAL);
-                updateCycleButtonName();
+                updateCycleButtonState();
             }
         };
-        cycleCodeTypesAction = new SplitButtonAction(new ActionGroup("Cycle thru code types", false) {
+
+        cycleActionGroup = new ActionGroup("Cycle thru code types", false) {
             @NotNull
             @Override
             public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
                 return new AnAction[]{binaryCodeTypeAction, octalCodeTypeAction, decimalCodeTypeAction, hexadecimalCodeTypeAction};
             }
-        }) {
+
             @Override
-            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                int codeTypePos = codeArea.getCodeType().ordinal();
-                CodeType[] values = CodeType.values();
-                CodeType next = codeTypePos + 1 >= values.length ? values[0] : values[codeTypePos + 1];
-                codeArea.setCodeType(next);
-                updateCycleButtonName();
+            public void update(@NotNull AnActionEvent e) {
+                if (e.getInputEvent() != null) {
+                    super.update(e);
+                }
             }
         };
+        cycleCodeTypesSplitAction = new CodeTypeSplitAction(cycleActionGroup);
 
         initComponents();
         init();
@@ -143,13 +137,13 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
 
     private void init() {
 // TODO        cycleCodeTypesAction.putValue(Action.SHORT_DESCRIPTION, "Cycle thru code types");
-        JPopupMenu cycleCodeTypesPopupMenu = new JPopupMenu();
+//        JPopupMenu cycleCodeTypesPopupMenu = new JPopupMenu();
 //        cycleCodeTypesPopupMenu.add(binaryCodeTypeAction);
 //        cycleCodeTypesPopupMenu.add(octalCodeTypeAction);
 //        cycleCodeTypesPopupMenu.add(decimalCodeTypeAction);
 //        cycleCodeTypesPopupMenu.add(hexadecimalCodeTypeAction);
 // TODO        codeTypeDropDown = new DropDownButton(cycleCodeTypesAction, cycleCodeTypesPopupMenu);
-        updateCycleButtonName();
+//        updateCycleButtonName();
 //        controlToolBar.add(codeTypeDropDown);
     }
 
@@ -160,45 +154,46 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         toolbar.getPresentation(redoEditButton).setVisible(true);
     }
 
-    private void updateCycleButtonName() {
+    private void updateCycleButtonState() {
         CodeType codeType = codeArea.getCodeType();
-        // TODO codeTypeDropDown.setActionText(codeType.name().substring(0, 3));
-//        switch (codeType) {
-//            case BINARY: {
-//                if (!binaryCodeTypeAction.isSelected()) {
-//                    binaryCodeTypeAction.setSelected(true);
-//                }
-//                break;
-//            }
-//            case OCTAL: {
-//                if (!octalCodeTypeAction.isSelected()) {
-//                    octalCodeTypeAction.setSelected(true);
-//                }
-//                break;
-//            }
-//            case DECIMAL: {
-//                if (!decimalCodeTypeAction.isSelected()) {
-//                    decimalCodeTypeAction.setSelected(true);
-//                }
-//                break;
-//            }
-//            case HEXADECIMAL: {
-//                if (!hexadecimalCodeTypeAction.isSelected()) {
-//                    hexadecimalCodeTypeAction.setSelected(true);
-//                }
-//                break;
-//            }
-//        }
+
+        switch (codeType) {
+            case BINARY: {
+                cycleCodeTypesSplitAction.setSelectedIndex(0);
+                break;
+            }
+            case OCTAL: {
+                cycleCodeTypesSplitAction.setSelectedIndex(1);
+                break;
+            }
+            case DECIMAL: {
+                cycleCodeTypesSplitAction.setSelectedIndex(2);
+                break;
+            }
+            case HEXADECIMAL: {
+                cycleCodeTypesSplitAction.setSelectedIndex(3);
+                break;
+            }
+        }
     }
 
+//    private void changeCycleAction(AnAction action) {
+//        DataManager instance = DataManager.getInstance();
+//        DataContext context = instance != null ? instance.getDataContext((Component) cycleActionButton) : DataContext.EMPTY_CONTEXT;
+//        AnActionEvent event = AnActionEvent.createFromAnAction(binaryCodeTypeAction, null, ActionPlaces.UNKNOWN, context);
+//        toolbar.getPresentation(cycleCodeTypesAction).setIcon(toolbar.getPresentation(action).getIcon());
+//        cycleActionButton.afterActionPerformed(cycleCodeTypesSplitAction, context, event);
+//        cycleActionButton.afterActionPerformed(cycleCodeTypesAction, context, event);
+//    }
+
     public void applyFromCodeArea() {
-        updateCycleButtonName();
+        updateCycleButtonState();
         setActionSelection(showUnprintablesToggleButton, codeArea.isShowUnprintables());
     }
 
     public void loadFromPreferences() {
         codeArea.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
-        updateCycleButtonName();
+        updateCycleButtonState();
         setActionSelection(showUnprintablesToggleButton, preferences.getCodeAreaPreferences().isShowUnprintables());
     }
 
@@ -219,8 +214,6 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
-
-        controlToolBar = toolbar.getComponent();
 
         saveFileButton = new AnAction(
                 "Save current file",
@@ -285,7 +278,9 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
             }
         };
         actionGroup.add(showUnprintablesToggleButton);
-        actionGroup.add(cycleCodeTypesAction);
+
+        actionGroup.add(cycleCodeTypesSplitAction);
+        updateCycleButtonState();
 
         actionGroup.addSeparator();
         AnAction settingsAction = new AnAction(
