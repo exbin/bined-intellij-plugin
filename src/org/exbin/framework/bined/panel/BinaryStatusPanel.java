@@ -30,6 +30,7 @@ import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.EditationOperation;
 import org.exbin.bined.PositionCodeType;
+import org.exbin.bined.SelectionRange;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
@@ -69,6 +70,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
 
     private EditationOperation editationOperation;
     private CodeAreaCaretPosition caretPosition;
+    private SelectionRange selection;
     private long documentSize;
     private long initialDocumentSize;
 
@@ -583,10 +585,16 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void setCursorPosition(CodeAreaCaretPosition caretPosition) {
+    public void setCursorPosition(CodeAreaCaretPosition caretPosition, SelectionRange selection) {
         this.caretPosition = caretPosition;
+        boolean selectionChanged = selection.equals(this.selection);
+        this.selection = selection;
         updateCaretPosition();
         updateCursorPositionToolTip();
+        if (selectionChanged) {
+            updateDocumentSize();
+            updateDocumentSizeToolTip();
+        }
     }
 
     @Override
@@ -664,28 +672,52 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
             cursorPositionLabel.setText("-");
         } else {
             StringBuilder labelBuilder = new StringBuilder();
-            labelBuilder.append(numberToPosition(caretPosition.getDataPosition(), cursorPositionFormat.getCodeType()));
-            if (cursorPositionFormat.isShowOffset()) {
-                labelBuilder.append(":");
-                labelBuilder.append(caretPosition.getCodeOffset());
+            if (selection != null && !selection.isEmpty()) {
+                long first = selection.getFirst();
+                long last = selection.getLast();
+                labelBuilder.append(numberToPosition(first, cursorPositionFormat.getCodeType()));
+                labelBuilder.append(" to ");
+                labelBuilder.append(numberToPosition(last, cursorPositionFormat.getCodeType()));
+            } else {
+                labelBuilder.append(numberToPosition(caretPosition.getDataPosition(), cursorPositionFormat.getCodeType()));
+                if (cursorPositionFormat.isShowOffset()) {
+                    labelBuilder.append(":");
+                    labelBuilder.append(caretPosition.getCodeOffset());
+                }
             }
             cursorPositionLabel.setText(labelBuilder.toString());
         }
     }
 
     private void updateCursorPositionToolTip() {
-        String tooltipText;
+        StringBuilder builder = new StringBuilder();
+        builder.append("<html>");
         if (caretPosition == null) {
-            tooltipText = resourceBundle.getString("cursorPositionLabel.toolTipText");
+            builder.append(resourceBundle.getString("cursorPositionLabel.toolTipText"));
         } else {
-            long dataPosition = caretPosition.getDataPosition();
-            tooltipText = "<html>" + resourceBundle.getString("cursorPositionLabel.toolTipText")
-                    + "<br>" + OCTAL_CODE_TYPE_LABEL + ": " + numberToPosition(dataPosition, PositionCodeType.OCTAL)
-                    + "<br>" + DECIMAL_CODE_TYPE_LABEL + ": " + numberToPosition(dataPosition, PositionCodeType.DECIMAL)
-                    + "<br>" + HEXADECIMAL_CODE_TYPE_LABEL + ": " + numberToPosition(dataPosition, PositionCodeType.HEXADECIMAL)
-                    + "</html>";
+            if (selection != null && !selection.isEmpty()) {
+                long first = selection.getFirst();
+                long last = selection.getLast();
+                builder.append(resourceBundle.getString("selectionFromLabel.toolTipText")).append("<br>");
+                builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.OCTAL)).append("<br>");
+                builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.DECIMAL)).append("<br>");
+                builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.HEXADECIMAL)).append("<br>");
+                builder.append("<br>");
+                builder.append(resourceBundle.getString("selectionToLabel.toolTipText")).append("<br>");
+                builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(last, PositionCodeType.OCTAL)).append("<br>");
+                builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(last, PositionCodeType.DECIMAL)).append("<br>");
+                builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.HEXADECIMAL)).append("<br>");
+            } else {
+                long dataPosition = caretPosition.getDataPosition();
+                builder.append(resourceBundle.getString("cursorPositionLabel.toolTipText")).append("<br>");
+                builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(dataPosition, PositionCodeType.OCTAL)).append("<br>");
+                builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(dataPosition, PositionCodeType.DECIMAL)).append("<br>");
+                builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(dataPosition, PositionCodeType.HEXADECIMAL));
+                builder.append("</html>");
+            }
         }
-        cursorPositionLabel.setToolTipText(tooltipText);
+
+        cursorPositionLabel.setToolTipText(builder.toString());
     }
 
     private void updateDocumentSize() {
@@ -693,13 +725,19 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
             documentSizeLabel.setText(documentSizeFormat.isShowRelative() ? "0 (0)" : "0");
         } else {
             StringBuilder labelBuilder = new StringBuilder();
-            labelBuilder.append(numberToPosition(documentSize, documentSizeFormat.getCodeType()));
-            if (documentSizeFormat.isShowRelative()) {
-                long difference = documentSize - initialDocumentSize;
-                labelBuilder.append(difference > 0 ? " (+" : " (");
-                labelBuilder.append(numberToPosition(difference, documentSizeFormat.getCodeType()));
-                labelBuilder.append(")");
+            if (selection != null && !selection.isEmpty()) {
+                labelBuilder.append(numberToPosition(selection.getLength(), documentSizeFormat.getCodeType()));
+                labelBuilder.append(" of ");
+                labelBuilder.append(numberToPosition(documentSize, documentSizeFormat.getCodeType()));
+            } else {
+                labelBuilder.append(numberToPosition(documentSize, documentSizeFormat.getCodeType()));
+                if (documentSizeFormat.isShowRelative()) {
+                    long difference = documentSize - initialDocumentSize;
+                    labelBuilder.append(difference > 0 ? " (+" : " (");
+                    labelBuilder.append(numberToPosition(difference, documentSizeFormat.getCodeType()));
+                    labelBuilder.append(")");
 
+                }
             }
 
             documentSizeLabel.setText(labelBuilder.toString());
@@ -707,12 +745,23 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     }
 
     private void updateDocumentSizeToolTip() {
-        String tooltipText = "<html>" + resourceBundle.getString("documentSizeLabel.toolTipText")
-                + "<br>" + OCTAL_CODE_TYPE_LABEL + ": " + numberToPosition(documentSize, PositionCodeType.OCTAL)
-                + "<br>" + DECIMAL_CODE_TYPE_LABEL + ": " + numberToPosition(documentSize, PositionCodeType.DECIMAL)
-                + "<br>" + HEXADECIMAL_CODE_TYPE_LABEL + ": " + numberToPosition(documentSize, PositionCodeType.HEXADECIMAL)
-                + "</html>";
-        documentSizeLabel.setToolTipText(tooltipText);
+        StringBuilder builder = new StringBuilder();
+        builder.append("<html>");
+        if (selection != null && !selection.isEmpty()) {
+            long length = selection.getLength();
+            builder.append(resourceBundle.getString("selectionLengthLabel.toolTipText")).append("<br>");
+            builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.OCTAL)).append("<br>");
+            builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.DECIMAL)).append("<br>");
+            builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.HEXADECIMAL)).append("<br>");
+            builder.append("<br>");
+        }
+
+        builder.append(resourceBundle.getString("documentSizeLabel.toolTipText")).append("<br>");
+        builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(documentSize, PositionCodeType.OCTAL)).append("<br>");
+        builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(documentSize, PositionCodeType.DECIMAL)).append("<br>");
+        builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(documentSize, PositionCodeType.HEXADECIMAL));
+        builder.append("</html>");
+        documentSizeLabel.setToolTipText(builder.toString());
     }
 
     @Nonnull

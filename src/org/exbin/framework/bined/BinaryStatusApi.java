@@ -23,11 +23,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.EditationOperation;
+import org.exbin.bined.SelectionRange;
 
 /**
- * Hexadecimal editor status interface.
+ * Binary editor status interface.
  *
- * @version 0.2.1 2019/06/16
+ * @version 0.2.1 2020/01/24
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -37,8 +38,9 @@ public interface BinaryStatusApi {
      * Reports cursor position.
      *
      * @param cursorPosition cursor position
+     * @param selection current selection
      */
-    void setCursorPosition(CodeAreaCaretPosition cursorPosition);
+    void setCursorPosition(CodeAreaCaretPosition cursorPosition, SelectionRange selection);
 
     /**
      * Reports currently active editation mode.

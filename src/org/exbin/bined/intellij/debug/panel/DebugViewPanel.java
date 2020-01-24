@@ -21,7 +21,9 @@ import java.util.List;
 import org.exbin.bined.EditationMode;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
+import org.exbin.bined.intellij.panel.BinEdComponentFileApi;
 import org.exbin.bined.intellij.panel.BinEdComponentPanel;
+import org.exbin.framework.bined.FileHandlingMode;
 
 /**
  * Panel to show debug view.
@@ -45,6 +47,24 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
     private void init() {
         componentPanel.getCodeArea().setEditationMode(EditationMode.READ_ONLY);
+        componentPanel.setFileApi(new BinEdComponentFileApi() {
+            @Override
+            public boolean isSaveSupported() {
+                return false;
+            }
+
+            @Override
+            public void saveDocument() {
+            }
+
+            @Override
+            public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
+            }
+
+            @Override
+            public void closeData() {
+            }
+        });
 
         this.add(componentPanel, BorderLayout.CENTER);
     }

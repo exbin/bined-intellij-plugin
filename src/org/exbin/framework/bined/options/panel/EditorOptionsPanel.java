@@ -78,7 +78,7 @@ public class EditorOptionsPanel extends javax.swing.JPanel implements OptionsCap
 
         fileHandlingModeLabel.setText(resourceBundle.getString("fileHandlingModeLabel.text")); // NOI18N
 
-        fileHandlingModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "DELTA", "MEMORY" }));
+        fileHandlingModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "MEMORY", "DELTA" }));
 
         showValuesPanelCheckBox.setText(resourceBundle.getString("showValuesPanelCheckBox.text")); // NOI18N
 

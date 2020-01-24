@@ -1,8 +1,10 @@
 0.2.2
 - Minor GUI improvements
-- Fixed opening via dialog crashes IntelliJ (mac) (#issue 22)
-- Fixed "HIDE_DEFAULT_EDITOR is supported only for DumbAware providers" error message (issue #24)
 - Support for multiple decoders in debugging view
+- Display the number of bytes selected (issue #26)
+- Fixed opening via dialog crashes IntelliJ (mac) (issue #22)
+- Fixed "HIDE_DEFAULT_EDITOR is supported only for DumbAware providers" error message (issue #24)
+- Fixed NullPointerException when trying to hex-view bytearray in Debug mode (issue #27)
 
 0.2.1 (2019-08-22)
 - Minor GUI improvements

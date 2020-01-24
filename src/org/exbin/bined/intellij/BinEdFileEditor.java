@@ -62,7 +62,7 @@ public class BinEdFileEditor implements FileEditor {
             public void fileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile virtualFile) {
                 if (virtualFile instanceof BinEdVirtualFile && !((BinEdVirtualFile) virtualFile).isMoved() && !((BinEdVirtualFile) virtualFile).isClosed()) {
                     ((BinEdVirtualFile) virtualFile).setClosed(true);
-                    BinEdEditorPanel editorPanel = ((BinEdVirtualFile) virtualFile).getEditorPanel();
+                    BinEdFile editorPanel = ((BinEdVirtualFile) virtualFile).getEditorFile();
                     if (!editorPanel.releaseFile()) {
                         // TODO Intercept close event instead of editor recreation
                         OpenFileDescriptor descriptor = new OpenFileDescriptor(project, virtualFile, 0);
@@ -145,7 +145,7 @@ public class BinEdFileEditor implements FileEditor {
 
     @Override
     public boolean isModified() {
-        return virtualFile.getEditorPanel().isModified();
+        return virtualFile.getEditorFile().isModified();
     }
 
     @Override

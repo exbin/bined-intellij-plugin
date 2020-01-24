@@ -21,6 +21,7 @@ import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,7 +38,7 @@ public class BinEdVirtualFile extends VirtualFile {
 
     private final VirtualFile parentFile;
     private String displayName;
-    private BinEdEditorPanel editorPanel;
+    private BinEdFile editorFile;
     private boolean closed = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
@@ -51,12 +52,16 @@ public class BinEdVirtualFile extends VirtualFile {
         }
     }
 
-    public BinEdEditorPanel getEditorPanel() {
-        if (editorPanel == null) {
-            editorPanel = new BinEdEditorPanel();
+    public BinEdFile getEditorFile() {
+        if (editorFile == null) {
+            editorFile = new BinEdFile();
         }
 
-        return editorPanel;
+        return editorFile;
+    }
+
+    public JPanel getEditorPanel() {
+        return getEditorFile().getPanel();
     }
 
     @NotNull

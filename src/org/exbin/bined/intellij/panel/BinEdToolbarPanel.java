@@ -209,6 +209,7 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
 
     public void setSaveAction(ActionListener saveAction) {
         this.saveAction = saveAction;
+        toolbar.getPresentation(saveFileButton).setVisible(true);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -227,6 +228,7 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         };
         actionGroup.add(saveFileButton);
         toolbar.getPresentation(saveFileButton).setEnabled(false);
+        toolbar.getPresentation(saveFileButton).setVisible(false);
         actionGroup.addSeparator();
 
         undoEditButton = new AnAction(
