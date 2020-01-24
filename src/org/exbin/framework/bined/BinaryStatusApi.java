@@ -38,9 +38,15 @@ public interface BinaryStatusApi {
      * Reports cursor position.
      *
      * @param cursorPosition cursor position
-     * @param selection current selection
      */
-    void setCursorPosition(CodeAreaCaretPosition cursorPosition, SelectionRange selection);
+    void setCursorPosition(CodeAreaCaretPosition cursorPosition);
+
+    /**
+     * Reports cursor position.
+     *
+     * @param selectionRange current selection
+     */
+    void setSelectionRange(SelectionRange selectionRange);
 
     /**
      * Reports currently active editation mode.

@@ -17,18 +17,15 @@
 package org.exbin.framework.bined.panel;
 
 import org.exbin.framework.bined.SearchCondition;
+
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.event.KeyListener;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
-import javax.swing.JViewport;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
 import org.exbin.bined.ScrollBarVisibility;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
@@ -42,8 +39,8 @@ import org.exbin.auxiliary.paged_data.EditableBinaryData;
 /**
  * Combo box panel supporting both binary and text values.
  *
- * @version 0.2.1 2018/12/11
  * @author ExBin Project (http://exbin.org)
+ * @version 0.2.1 2018/12/11
  */
 public class BinarySearchComboBoxPanel extends JPanel {
 
@@ -126,11 +123,14 @@ public class BinarySearchComboBoxPanel extends JPanel {
         this.item.setSearchMode(item.getSearchMode());
         switch (item.getSearchMode()) {
             case TEXT: {
-                this.item.setSearchText(item.getSearchText());
+                final String searchText = item.getSearchText();
+                this.item.setSearchText(searchText);
                 this.item.setBinaryData(null);
-                runningUpdate = true;
-                textField.setText(item.getSearchText());
-                runningUpdate = false;
+                SwingUtilities.invokeLater(() -> {
+                    runningUpdate = true;
+                    textField.setText(searchText);
+                    runningUpdate = false;
+                });
                 CardLayout layout = (CardLayout) getLayout();
                 layout.show(this, TEXT_MODE);
                 revalidate();
@@ -143,9 +143,11 @@ public class BinarySearchComboBoxPanel extends JPanel {
                     data.insert(0, item.getBinaryData());
                 }
                 this.item.setBinaryData(data);
-                runningUpdate = true;
-                codeArea.setContentData(data);
-                runningUpdate = false;
+                SwingUtilities.invokeLater(() -> {
+                    runningUpdate = true;
+                    codeArea.setContentData(data);
+                    runningUpdate = false;
+                });
                 CardLayout layout = (CardLayout) getLayout();
                 layout.show(this, BINARY_MODE);
                 revalidate();

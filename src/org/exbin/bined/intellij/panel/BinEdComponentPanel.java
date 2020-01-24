@@ -233,12 +233,10 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
     public void registerBinaryStatus(BinaryStatusApi binaryStatusApi) {
         this.binaryStatus = binaryStatusApi;
         codeArea.addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
-            SelectionRange selection = codeArea.getSelection();
-            binaryStatus.setCursorPosition(caretPosition, selection);
+            binaryStatus.setCursorPosition(caretPosition);
         });
-        codeArea.addSelectionChangedListener(selection -> {
-            CodeAreaCaretPosition caretPosition = codeArea.getCaretPosition();
-            binaryStatus.setCursorPosition(caretPosition, selection);
+        codeArea.addSelectionChangedListener(selectionRange -> {
+            binaryStatus.setSelectionRange(selectionRange);
         });
 
         codeArea.addEditationModeChangedListener(binaryStatus::setEditationMode);

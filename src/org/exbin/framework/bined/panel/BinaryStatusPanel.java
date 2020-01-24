@@ -70,7 +70,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
 
     private EditationOperation editationOperation;
     private CodeAreaCaretPosition caretPosition;
-    private SelectionRange selection;
+    private SelectionRange selectionRange;
     private long documentSize;
     private long initialDocumentSize;
 
@@ -585,16 +585,19 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void setCursorPosition(CodeAreaCaretPosition caretPosition, SelectionRange selection) {
+    public void setCursorPosition(CodeAreaCaretPosition caretPosition) {
         this.caretPosition = caretPosition;
-        boolean selectionChanged = selection.equals(this.selection);
-        this.selection = selection;
         updateCaretPosition();
         updateCursorPositionToolTip();
-        if (selectionChanged) {
-            updateDocumentSize();
-            updateDocumentSizeToolTip();
-        }
+    }
+
+    @Override
+    public void setSelectionRange(SelectionRange selectionRange) {
+        this.selectionRange = selectionRange;
+        updateCaretPosition();
+        updateCursorPositionToolTip();
+        updateDocumentSize();
+        updateDocumentSizeToolTip();
     }
 
     @Override
@@ -672,9 +675,9 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
             cursorPositionLabel.setText("-");
         } else {
             StringBuilder labelBuilder = new StringBuilder();
-            if (selection != null && !selection.isEmpty()) {
-                long first = selection.getFirst();
-                long last = selection.getLast();
+            if (selectionRange != null && !selectionRange.isEmpty()) {
+                long first = selectionRange.getFirst();
+                long last = selectionRange.getLast();
                 labelBuilder.append(numberToPosition(first, cursorPositionFormat.getCodeType()));
                 labelBuilder.append(" to ");
                 labelBuilder.append(numberToPosition(last, cursorPositionFormat.getCodeType()));
@@ -695,9 +698,9 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
         if (caretPosition == null) {
             builder.append(resourceBundle.getString("cursorPositionLabel.toolTipText"));
         } else {
-            if (selection != null && !selection.isEmpty()) {
-                long first = selection.getFirst();
-                long last = selection.getLast();
+            if (selectionRange != null && !selectionRange.isEmpty()) {
+                long first = selectionRange.getFirst();
+                long last = selectionRange.getLast();
                 builder.append(resourceBundle.getString("selectionFromLabel.toolTipText")).append("<br>");
                 builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.OCTAL)).append("<br>");
                 builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.DECIMAL)).append("<br>");
@@ -725,8 +728,8 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
             documentSizeLabel.setText(documentSizeFormat.isShowRelative() ? "0 (0)" : "0");
         } else {
             StringBuilder labelBuilder = new StringBuilder();
-            if (selection != null && !selection.isEmpty()) {
-                labelBuilder.append(numberToPosition(selection.getLength(), documentSizeFormat.getCodeType()));
+            if (selectionRange != null && !selectionRange.isEmpty()) {
+                labelBuilder.append(numberToPosition(selectionRange.getLength(), documentSizeFormat.getCodeType()));
                 labelBuilder.append(" of ");
                 labelBuilder.append(numberToPosition(documentSize, documentSizeFormat.getCodeType()));
             } else {
@@ -747,8 +750,8 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     private void updateDocumentSizeToolTip() {
         StringBuilder builder = new StringBuilder();
         builder.append("<html>");
-        if (selection != null && !selection.isEmpty()) {
-            long length = selection.getLength();
+        if (selectionRange != null && !selectionRange.isEmpty()) {
+            long length = selectionRange.getLength();
             builder.append(resourceBundle.getString("selectionLengthLabel.toolTipText")).append("<br>");
             builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.OCTAL)).append("<br>");
             builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.DECIMAL)).append("<br>");

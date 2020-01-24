@@ -35,6 +35,8 @@ import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.jetbrains.python.debugger.PyDebugValue;
+import com.jetbrains.python.debugger.PyFrameAccessor;
+import com.jetbrains.python.debugger.PyFullValueEvaluator;
 import com.sun.jdi.*;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
@@ -214,7 +216,13 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                         case "bytearray":
                         case "bytes": {
                             // Very primitive and inefficient data reading using existing readers via string
-                            PyValueFuture value = new PyValueFuture(myDataNode);
+                            try {
+                                String fullValue = myDataNode.getRawValue();
+                                if (initialValue != null && !initialValue.isEmpty()) {
+                                    fullValue = initialValue;
+                                } else if (fullValue == null || fullValue.isEmpty()) {
+                                    PyValueFuture value = new PyValueFuture(myDataNode);
+                                    fullValue = value.get();
 //                            PyDebugValue debugValue = (PyDebugValue) container;
 //                            XDebuggerTree parentTree = myDataNode.getTree();
 //                            XSourcePosition sourcePosition = debugValue.getFrameAccessor().getSourcePositionForType(debugValue.getType());
@@ -223,8 +231,8 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
 //                            debugValue.computePresentation(fullValueNode, XValuePlace.TREE);
 //                            PyFullValueEvaluator fullValueEvaluator = new PyFullValueEvaluator(debugValue.getFrameAccessor(), debugValue.getEvaluationExpression());
 //                            fullValueNode.getRawValue()
-                            try {
-                                BinaryData data = new DebugViewData(new PythonByteArrayPageProvider(value.get(), dataType));
+                                }
+                                BinaryData data = new DebugViewData(new PythonByteArrayPageProvider(fullValue));
                                 debugViewPanel.addProvider(new DefaultDebugViewDataProvider("Python bytearray value", data));
                             } catch (ExecutionException | InterruptedException e) {
                             }
@@ -470,11 +478,11 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
 
                 if (fullValueEvaluator == null) {
                     throw new UnsupportedOperationException("Unable to create value evaluator");
+                    // TODO: Extend PyFullValueEvaluator instead?
+//                    String expression = ((PyDebugValue) dataNode.getValueContainer()).getEvaluationExpression();
+//                    PyFrameAccessor myFrameAccessor = ((PyDebugValue) dataNode.getValueContainer()).getFrameAccessor();
+//                    fullValueEvaluator = new PyFullValueEvaluator(myFrameAccessor, expression);
                 }
-                // TODO: Extend PyFullValueEvaluator instead?
-//                String expression = ((PyDebugValue) dataNode.getValueContainer()).getEvaluationExpression();
-//                PyFrameAccessor myFrameAccessor = ((PyDebugValue) dataNode.getValueContainer()).getFrameAccessor();
-//                fullValueEvaluator = new PyFullValueEvaluator(myFrameAccessor, expression);
             }
             fullValueEvaluator.startEvaluation(new XFullValueEvaluator.XFullValueEvaluationCallback() {
                 public boolean isObsolete() {

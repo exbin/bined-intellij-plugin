@@ -20,25 +20,24 @@ import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Python bytearray data source for debugger view.
+ * Python bytes/bytearray data source for debugger view.
  * <p>
  * It seems that binary value is currently available only in text encoded form.
  *
- * TODO: Rework to use something different as direct mode fails for higher than 127 character anyway...
- *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.2 2019/11/06
+ * @version 0.2.2 2020/01/24
  */
 public class PythonByteArrayPageProvider implements DebugViewData.PageProvider {
 
-    private final Mode mode;
-    private final String value;
-    private final String prefix;
+    private static final String BYTEARRAY_PREFIX = "bytearray(";
 
-    public PythonByteArrayPageProvider(@NotNull String value, String prefix) {
+    private final String value;
+    private final long length;
+
+    public PythonByteArrayPageProvider(@NotNull String value) {
         this.value = value;
-        this.prefix = prefix;
-        mode = value.startsWith(prefix) ? Mode.DESCRIPTION_STRING : Mode.DIRECT_STRING;
+
+        length = computeLength(value);
     }
 
     @Override
@@ -55,32 +54,7 @@ public class PythonByteArrayPageProvider implements DebugViewData.PageProvider {
         }
         byte[] page = new byte[length];
 
-        switch (mode) {
-            case DIRECT_STRING: {
-                int position = (int) (pageIndex * DebugViewData.PAGE_SIZE);
-                int offset = 0;
-                while (offset < length) {
-                    byte byteValue = (byte) value.charAt(position);
-                    page[offset] = byteValue;
-                    offset++;
-                    position++;
-                }
-
-                break;
-            }
-            case DESCRIPTION_STRING: {
-                int position = (int) (prefix.length() + 3 + (pageIndex * DebugViewData.PAGE_SIZE * 4));
-                int offset = 0;
-                while (offset < length) {
-                    byte byteValue = (byte) ((hexCharToInt(value.charAt(position + 2)) << 4) + hexCharToInt(value.charAt(position + 3)));
-                    page[offset] = byteValue;
-                    offset++;
-                    position += 4;
-                }
-
-                break;
-            }
-        }
+        readByteData((int) (pageIndex * DebugViewData.PAGE_SIZE), page, length);
 
         return page;
     }
@@ -91,18 +65,86 @@ public class PythonByteArrayPageProvider implements DebugViewData.PageProvider {
 
     @Override
     public long getDocumentSize() {
-        switch (mode) {
-            case DESCRIPTION_STRING:
-                return (value.length() - prefix.length() - 4) / 4;
-            case DIRECT_STRING:
-                return value.length();
-        }
-
-        return 0;
+        return length;
     }
 
-    private enum Mode {
-        DESCRIPTION_STRING,
-        DIRECT_STRING
+    private long computeLength(String value) {
+        int skipEnd = 1;
+        long length = 0;
+        int position = 0;
+        if (value.startsWith(BYTEARRAY_PREFIX)) {
+            position += BYTEARRAY_PREFIX.length();
+            skipEnd = 2;
+        }
+
+        if (value.charAt(position) != 'b') {
+            return 0;
+        }
+        position++;
+        if (value.charAt(position) != '\'') {
+            return 0;
+        }
+        position++;
+
+        while (position < value.length() - skipEnd) {
+            if (value.charAt(position) == '\\') {
+                if (value.charAt(position + 1) == 'x') {
+                    position += 4;
+                } else {
+                    return 0;
+                }
+            } else {
+                position++;
+            }
+
+            length++;
+        }
+
+        return length;
+    }
+
+    private void readByteData(long bytePosition, byte[] targetArray, int length) {
+        int skipEnd = 1;
+        int position = 0;
+        if (value.startsWith(BYTEARRAY_PREFIX)) {
+            position += BYTEARRAY_PREFIX.length();
+            skipEnd = 2;
+        }
+
+        if (value.charAt(position) != 'b') {
+            return;
+        }
+        position++;
+        if (value.charAt(position) != '\'') {
+            return;
+        }
+        position++;
+
+        int offset = 0;
+        while (length > 0 && position < value.length() - skipEnd) {
+            if (value.charAt(position) == '\\') {
+                if (value.charAt(position + 1) == 'x') {
+                    if (bytePosition == 0) {
+                        byte byteValue = (byte) ((hexCharToInt(value.charAt(position + 2)) << 4) + hexCharToInt(value.charAt(position + 3)));
+                        targetArray[offset] = byteValue;
+                    }
+                    position += 4;
+                } else {
+                    return;
+                }
+            } else {
+                byte byteValue = (byte) value.charAt(position);
+                targetArray[offset] = byteValue;
+
+                position++;
+            }
+
+            if (bytePosition > 0) {
+                bytePosition--;
+            } else {
+                length--;
+                offset++;
+            }
+        }
     }
 }

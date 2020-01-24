@@ -10,7 +10,7 @@
 <p>Use "View as Binary" action in context menu in Variables window.</p>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.1.png" alt="bined-intellij-plugin-preview"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.2.png" alt="bined-intellij-plugin-preview" width="382" height="65"/></p>
 
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
@@ -32,9 +32,12 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
 
     <change-notes><![CDATA[
 <ul><li>Minor GUI improvements</li>
+<li>Support for multiple decoders in debugging view</li>
+<li>Display the number of bytes selected</li>
 <li>Fixed opening via dialog crashes IntelliJ (mac)</li>
 <li>Fixed "HIDE_DEFAULT_EDITOR is supported only for DumbAware providers" error message</li>
-<li>Support for multiple decoders in debugging view</li>
+<li>Fixed NullPointerException when trying to hex-view bytearray in Debug mode</li>
+<li>Fixed Editor stops responding when I use Find</li>
 </ul>
     ]]>
     </change-notes>
@@ -45,7 +48,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
-    <depends optional="true">com.intellij.modules.python</depends>
+    <depends optional="true" config-file="">com.intellij.modules.python</depends>
 
     <project-components>
     </project-components>
@@ -59,6 +62,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     </application-components>
 
     <extensions defaultExtensionNs="com.intellij">
+        <!-- <virtualFileSystem implementationClass="org.exbin.bined.intellij.BinEdFileSystem" key="bined" physical="false"/> -->
         <!--<fileTypeFactory implementation="org.exbin.bined.intellij.BinEdFileTypeFactory"/>-->
         <fileEditorProvider implementation="org.exbin.bined.intellij.BinEdFileEditorProvider"/>
     </extensions>

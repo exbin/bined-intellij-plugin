@@ -5,6 +5,7 @@
 - Fixed opening via dialog crashes IntelliJ (mac) (issue #22)
 - Fixed "HIDE_DEFAULT_EDITOR is supported only for DumbAware providers" error message (issue #24)
 - Fixed NullPointerException when trying to hex-view bytearray in Debug mode (issue #27)
+- Fixed Editor stops responding when I use Find (issue #19)
 
 0.2.1 (2019-08-22)
 - Minor GUI improvements

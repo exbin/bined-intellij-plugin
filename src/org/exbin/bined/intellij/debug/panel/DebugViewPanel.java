@@ -113,6 +113,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
     }
 
     public void setData(BinaryData data) {
-        componentPanel.getCodeArea().setContentData(data);
+        componentPanel.setContentData(data);
     }
 }

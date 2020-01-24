@@ -864,9 +864,10 @@ public class BinarySearchPanel extends javax.swing.JPanel {
 
     public void performFind() {
         binarySearchPanelApi.performFind(searchParameters);
-        findComboBoxEditorComponent.setRunningUpdate(true);
-        ((SearchHistoryModel) findComboBox.getModel()).addSearchCondition(searchParameters.getCondition());
-        findComboBoxEditorComponent.setRunningUpdate(false);
+        // TODO add to history
+//        findComboBoxEditorComponent.setRunningUpdate(true);
+//        ((SearchHistoryModel) findComboBox.getModel()).addSearchCondition(searchParameters.getCondition());
+//        findComboBoxEditorComponent.setRunningUpdate(false);
     }
 
     public void performReplace() {
