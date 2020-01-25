@@ -99,10 +99,6 @@ public class BinEdFile implements BinEdComponentFileApi {
         });
     }
 
-    public static PropertiesComponent getPreferences() {
-        return PropertiesComponent.getInstance();
-    }
-
     public boolean isModified() {
         return componentPanel.isModified();
     }
@@ -378,5 +374,9 @@ public class BinEdFile implements BinEdComponentFileApi {
         } else {
             codeArea.setContentData(new PagedData());
         }
+    }
+
+    public JComponent getPreferredFocusedComponent() {
+        return componentPanel.getCodeArea();
     }
 }

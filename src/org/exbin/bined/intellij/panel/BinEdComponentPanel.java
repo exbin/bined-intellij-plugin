@@ -884,6 +884,9 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
         toolbarPanel.setUndoHandler(undoHandler);
         CodeAreaOperationCommandHandler commandHandler = new CodeAreaOperationCommandHandler(codeArea, undoHandler);
         codeArea.setCommandHandler(commandHandler);
+        if (valuesPanel != null) {
+            valuesPanel.setCodeArea(codeArea, undoHandler);
+        }
         // TODO set ENTER KEY mode in apply options
 
         undoHandler.addUndoUpdateListener(new BinaryDataUndoUpdateListener() {

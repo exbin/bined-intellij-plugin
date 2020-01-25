@@ -58,6 +58,7 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     private final AnAction octalCodeTypeAction;
     private final AnAction decimalCodeTypeAction;
     private final AnAction hexadecimalCodeTypeAction;
+    private boolean modified = false;
 
     public BinEdToolbarPanel(BinaryEditorPreferences preferences, ExtCodeArea codeArea, AnAction optionsAction) {
         this.preferences = preferences;
@@ -121,13 +122,6 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
             public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
                 return new AnAction[]{binaryCodeTypeAction, octalCodeTypeAction, decimalCodeTypeAction, hexadecimalCodeTypeAction};
             }
-
-            @Override
-            public void update(@NotNull AnActionEvent e) {
-                if (e.getInputEvent() != null) {
-                    super.update(e);
-                }
-            }
         };
         cycleCodeTypesSplitAction = new CodeTypeSplitAction(cycleActionGroup);
 
@@ -150,8 +144,8 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
     public void setUndoHandler(BinaryDataUndoHandler undoHandler) {
         this.undoHandler = undoHandler;
 
-        toolbar.getPresentation(undoEditButton).setVisible(true);
-        toolbar.getPresentation(redoEditButton).setVisible(true);
+        setActionVisible(undoEditButton, true);
+        setActionVisible(redoEditButton, true);
     }
 
     private void updateCycleButtonState() {
@@ -188,28 +182,34 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
 
     public void applyFromCodeArea() {
         updateCycleButtonState();
-        setActionSelection(showUnprintablesToggleButton, codeArea.isShowUnprintables());
+        updateUnprintables();
     }
 
     public void loadFromPreferences() {
         codeArea.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
         updateCycleButtonState();
-        setActionSelection(showUnprintablesToggleButton, preferences.getCodeAreaPreferences().isShowUnprintables());
+        updateUnprintables();
     }
 
     public void updateUndoState() {
-        toolbar.getPresentation(undoEditButton).setEnabled(undoHandler.canUndo());
-        toolbar.getPresentation(redoEditButton).setEnabled(undoHandler.canRedo());
+        toolbar.getPresentation(undoEditButton).setEnabled(undoHandler != null && undoHandler.canUndo());
+        toolbar.getPresentation(redoEditButton).setEnabled(undoHandler != null && undoHandler.canRedo());
+    }
+
+    public void updateUnprintables() {
+        boolean showUnprintables = codeArea.isShowUnprintables();
+        setActionSelection(showUnprintablesToggleButton, showUnprintables);
     }
 
     public void updateModified(boolean modified) {
-        toolbar.getPresentation(saveFileButton).setEnabled(saveAction != null && modified);
+        this.modified = modified;
+        toolbar.getPresentation(saveFileButton).setEnabled(modified);
         updateUndoState();
     }
 
     public void setSaveAction(ActionListener saveAction) {
         this.saveAction = saveAction;
-        toolbar.getPresentation(saveFileButton).setVisible(true);
+        setActionVisible(saveFileButton, true);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -225,10 +225,17 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 if (saveAction != null) saveAction.actionPerformed(new ActionEvent(BinEdToolbarPanel.this, 0, ""));
             }
+
+            @Override
+            public void update(@NotNull AnActionEvent e) {
+                super.update(e);
+                Presentation presentation = e.getPresentation();
+                presentation.setVisible(saveAction != null);
+                presentation.setEnabled(modified);
+            }
         };
-        actionGroup.add(saveFileButton);
-        toolbar.getPresentation(saveFileButton).setEnabled(false);
-        toolbar.getPresentation(saveFileButton).setVisible(false);
+        actionGroup.addAction(saveFileButton);
+        setActionVisible(saveFileButton, false);
         actionGroup.addSeparator();
 
         undoEditButton = new AnAction(
@@ -240,10 +247,17 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 undoEditButtonActionPerformed();
             }
+
+            @Override
+            public void update(@NotNull AnActionEvent e) {
+                super.update(e);
+                Presentation presentation = e.getPresentation();
+                presentation.setVisible(undoHandler != null);
+                presentation.setEnabled(undoHandler != null && undoHandler.canUndo());
+            }
         };
-        actionGroup.add(undoEditButton);
-        toolbar.getPresentation(undoEditButton).setEnabled(false);
-        toolbar.getPresentation(undoEditButton).setVisible(false);
+        actionGroup.addAction(undoEditButton);
+        setActionVisible(undoEditButton, false);
 
         redoEditButton = new AnAction(
                 "Redo last undid operation",
@@ -254,15 +268,22 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 redoEditButtonActionPerformed();
             }
+
+            @Override
+            public void update(@NotNull AnActionEvent e) {
+                super.update(e);
+                Presentation presentation = e.getPresentation();
+                presentation.setVisible(undoHandler != null);
+                presentation.setEnabled(undoHandler != null && undoHandler.canRedo());
+            }
         };
-        actionGroup.add(redoEditButton);
-        toolbar.getPresentation(redoEditButton).setEnabled(false);
-        toolbar.getPresentation(redoEditButton).setVisible(false);
+        actionGroup.addAction(redoEditButton);
+        setActionVisible(redoEditButton, false);
 
         showUnprintablesToggleButton = new ToggleAction(
                 resourceBundle.getString("showUnprintablesToggleButton.toolTipText"),
                 null,
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow_disabled.png"))
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png"))
         ) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
@@ -272,16 +293,12 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
             @Override
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean selected) {
                 codeArea.setShowUnprintables(selected);
-                toolbar.getPresentation(showUnprintablesToggleButton).setIcon(
-                        selected ?
-                                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png"))
-                                : new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow_disabled.png"))
-                );
+                updateUnprintables();
             }
         };
-        actionGroup.add(showUnprintablesToggleButton);
+        actionGroup.addAction(showUnprintablesToggleButton);
 
-        actionGroup.add(cycleCodeTypesSplitAction);
+        actionGroup.addAction(cycleCodeTypesSplitAction);
         updateCycleButtonState();
 
         actionGroup.addSeparator();
@@ -295,7 +312,7 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
                 optionsAction.actionPerformed(anActionEvent);
             }
         };
-        actionGroup.add(settingsAction);
+        actionGroup.addAction(settingsAction);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -323,6 +340,10 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void setActionVisible(AnAction action, boolean enabled) {
+        toolbar.getPresentation(action).setVisible(enabled);
     }
 
     private void setActionSelection(AnAction action, boolean selected) {

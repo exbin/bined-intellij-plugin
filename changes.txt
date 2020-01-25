@@ -1,4 +1,4 @@
-0.2.2
+0.2.2 (2020-01-25)
 - Minor GUI improvements
 - Support for multiple decoders in debugging view
 - Display the number of bytes selected (issue #26)
@@ -6,6 +6,7 @@
 - Fixed "HIDE_DEFAULT_EDITOR is supported only for DumbAware providers" error message (issue #24)
 - Fixed NullPointerException when trying to hex-view bytearray in Debug mode (issue #27)
 - Fixed Editor stops responding when I use Find (issue #19)
+- Fixed Cursor position is lost if you switch tabs (issue #25)
 
 0.2.1 (2019-08-22)
 - Minor GUI improvements

@@ -124,7 +124,7 @@ public class BinEdFileEditor implements FileEditor {
     @Nullable
     @Override
     public JComponent getPreferredFocusedComponent() {
-        return virtualFile.getEditorPanel();
+        return virtualFile.getPreferredFocusedComponent();
     }
 
     @Nonnull

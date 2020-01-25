@@ -30,7 +30,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.ui.scale.JBUIScale;
 import com.intellij.util.ui.JBInsets;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -40,6 +39,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.intellij.openapi.actionSystem.ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE;
 
@@ -47,7 +48,7 @@ import static com.intellij.openapi.actionSystem.ActionToolbar.DEFAULT_MINIMUM_BU
  * Split button action derived from {com.intellij.openapi.actionSystem.SplitButtonAction}.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.2 2020/01/23
+ * @version 0.2.2 2020/01/25
  */
 public class CodeTypeSplitAction extends AnAction implements CustomComponentAction {
 
@@ -116,7 +117,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
         @Override
         public Dimension getPreferredSize() {
             Dimension size = super.getPreferredSize();
-            size.width += ARROW_DOWN.getIconWidth() + JBUIScale.scale(7);
+            size.width += ARROW_DOWN.getIconWidth() + scale(7);
             return size;
         }
 
@@ -137,7 +138,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
             JBInsets.removeFrom(baseRect, getInsets());
 
             if (getPopState() == PUSHED && mousePressType != CodeTypeSplitAction.SplitButton.MousePressType.None && selectedActionEnabled() || isToggleActionPushed()) {
-                int arrowWidth = ARROW_DOWN.getIconWidth() + JBUIScale.scale(7);
+                int arrowWidth = ARROW_DOWN.getIconWidth() + scale(7);
 
                 Shape clip = g.getClip();
                 Area buttonClip = new Area(clip);
@@ -154,14 +155,14 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
                 g.setClip(clip);
             }
 
-            int x = baseRect.x + baseRect.width - JBUIScale.scale(3) - ARROW_DOWN.getIconWidth();
-            int y = baseRect.y + (baseRect.height - ARROW_DOWN.getIconHeight()) / 2 + JBUIScale.scale(1);
+            int x = baseRect.x + baseRect.width - scale(3) - ARROW_DOWN.getIconWidth();
+            int y = baseRect.y + (baseRect.height - ARROW_DOWN.getIconHeight()) / 2 + scale(1);
             look.paintIconAt(g, ARROW_DOWN, x, y);
 
-            x -= JBUIScale.scale(4);
+            x -= scale(4);
             if (getPopState() == POPPED || getPopState() == PUSHED) {
                 g.setColor(JBUI.CurrentTheme.ActionButton.hoverSeparatorColor());
-                g.fillRect(x, baseRect.y, JBUIScale.scale(1), baseRect.height);
+                g.fillRect(x, baseRect.y, scale(1), baseRect.height);
             }
 
             Icon actionIcon = getIcon();
@@ -191,7 +192,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
         protected void onMousePressed(@NotNull MouseEvent e) {
             Rectangle baseRect = new Rectangle(getSize());
             JBInsets.removeFrom(baseRect, getInsets());
-            int arrowWidth = ARROW_DOWN.getIconWidth() + JBUIScale.scale(7);
+            int arrowWidth = ARROW_DOWN.getIconWidth() + scale(7);
 
             Rectangle execButtonRect = new Rectangle(baseRect.x, baseRect.y, baseRect.width - arrowWidth, baseRect.height);
             Rectangle arrowButtonRect = new Rectangle(execButtonRect.x + execButtonRect.width, baseRect.y, arrowWidth, baseRect.height);
@@ -291,5 +292,17 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
 //            }
             repaint();
         }
+    }
+
+    /**
+     * Best effort attempt to detect scale...
+     */
+    public static int scale(int i) {
+        try {
+            return JBUI.scale(i);
+        } catch (Exception ex) {
+            Logger.getLogger(CodeTypeSplitAction.class.getName()).log(Level.SEVERE, "Unable to use JBUI class", ex);
+        }
+        return i;
     }
 }

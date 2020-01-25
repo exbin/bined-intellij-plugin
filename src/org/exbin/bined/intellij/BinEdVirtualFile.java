@@ -180,4 +180,8 @@ public class BinEdVirtualFile extends VirtualFile {
     public void setClosed(boolean closed) {
         this.closed = closed;
     }
+
+    public JComponent getPreferredFocusedComponent() {
+        return editorFile.getPreferredFocusedComponent();
+    }
 }
