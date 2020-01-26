@@ -1,0 +1,9 @@
+<idea-plugin>
+    <project-components>
+        <component>
+            <implementation-class>com.jetbrains.php.debug.xdebug.debugger.XdebugValue</implementation-class>
+            <implementation-class>com.jetbrains.php.debug.common.PhpDebugProcess</implementation-class>
+            <implementation-class>com.intellij.xdebugger.XDebugSession</implementation-class>
+        </component>
+    </project-components>
+</idea-plugin>

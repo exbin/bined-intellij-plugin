@@ -151,13 +151,13 @@ public class BinEdFile implements BinEdComponentFileApi {
 
     public void openDocument(File file, boolean editable) throws IOException {
         ExtCodeArea codeArea = componentPanel.getCodeArea();
-        BinaryData oldData = codeArea.getContentData();
-
         FileHandlingMode fileHandlingMode = componentPanel.getFileHandlingMode();
+
+        BinaryData oldData = codeArea.getContentData();
         if (fileHandlingMode == FileHandlingMode.DELTA) {
             FileDataSource fileSource = segmentsRepository.openFileSource(file, editable ? FileDataSource.EditationMode.READ_WRITE : FileDataSource.EditationMode.READ_ONLY);
             DeltaDocument document = segmentsRepository.createDocument(fileSource);
-            codeArea.setContentData(document);
+            componentPanel.setContentData(document);
             if (oldData != null) {
                 oldData.dispose();
             }
@@ -294,7 +294,6 @@ public class BinEdFile implements BinEdComponentFileApi {
                     componentPanel.setContentData(document);
                 }
                 componentPanel.getUndoHandler().clear();
-                codeArea.notifyDataChanged();
                 componentPanel.setFileHandlingMode(newHandlingMode);
             }
         }
@@ -306,7 +305,7 @@ public class BinEdFile implements BinEdComponentFileApi {
         } else {
             ExtCodeArea codeArea = componentPanel.getCodeArea();
             BinaryData data = codeArea.getContentData();
-            codeArea.setContentData(new ByteArrayData());
+            componentPanel.setContentData(new ByteArrayData());
             if (data instanceof DeltaDocument) {
                 data.dispose();
             } else {
@@ -323,7 +322,7 @@ public class BinEdFile implements BinEdComponentFileApi {
     public void closeData() {
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         BinaryData data = codeArea.getContentData();
-        codeArea.setContentData(new ByteArrayData());
+        componentPanel.setContentData(new ByteArrayData());
         if (data instanceof DeltaDocument) {
             FileDataSource fileSource = Objects.requireNonNull(((DeltaDocument) data).getFileSource());
             data.dispose();
@@ -370,9 +369,9 @@ public class BinEdFile implements BinEdComponentFileApi {
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         FileHandlingMode fileHandlingMode = componentPanel.getFileHandlingMode();
         if (fileHandlingMode == FileHandlingMode.DELTA) {
-            codeArea.setContentData(segmentsRepository.createDocument());
+            componentPanel.setContentData(segmentsRepository.createDocument());
         } else {
-            codeArea.setContentData(new PagedData());
+            componentPanel.setContentData(new PagedData());
         }
     }
 

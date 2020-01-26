@@ -1,3 +1,5 @@
+0.2.3
+
 0.2.2 (2020-01-25)
 - Minor GUI improvements
 - Support for multiple decoders in debugging view

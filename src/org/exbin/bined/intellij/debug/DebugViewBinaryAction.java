@@ -34,9 +34,9 @@ import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
+import com.jetbrains.php.debug.xdebug.debugger.XdebugValue;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
-import com.jetbrains.python.debugger.PyFrameAccessor;
-import com.jetbrains.python.debugger.PyFullValueEvaluator;
 import com.sun.jdi.*;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
@@ -242,6 +242,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
 
                 String valueCanonicalName = container.getClass().getCanonicalName();
                 if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {
+                    PhpType dataType = ((XdebugValue) container).getType();
 //                    try {
 //                        data = new DebugViewDataSource(new PhpByteArrayPageProvider(value.get(), dataType));
 //                    } catch (ExecutionException | InterruptedException e) {

@@ -98,7 +98,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
         }
     }
 
-
     // Variables declaration - do not modify
     private javax.swing.JComboBox<String> providerComboBox;
     // End of variables declaration
