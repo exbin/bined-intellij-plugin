@@ -15,14 +15,14 @@ Screenshot
 Features
 --------
 
- - Visualize data as numerical (hexadecimal) codes and text representation
- - Codes can be also binary, octal or decimal
- - Support for Unicode, UTF-8 and other charsets
- - Insert and overwrite edit modes
- - Searching for text / hexadecimal code with found matches highlighting
- - Support for undo/redo
- - Support for files with size up to exabytes
- - Show debug variables as binary data
+  * Visualize data as numerical (hexadecimal) codes and text representation
+  * Codes can be also binary, octal or decimal
+  * Support for Unicode, UTF-8 and other charsets
+  * Insert and overwrite edit modes
+  * Searching for text / hexadecimal code with found matches highlighting
+  * Support for undo/redo
+  * Support for files with size up to exabytes
+  * Show debug variables as binary data
 
 Compiling
 ---------
@@ -31,7 +31,7 @@ Java Development Kit (JDK) version 8 or later is required to build this project 
 
 IntelliJ Idea platform is necessary to build this plugin. See. http://jetbrains.org  
 
-Assign SDK using 2019.1 IntelliJ platform / use "Plugin" run configuration to execute.
+Assign SDK using 2019.2 IntelliJ platform / use "Plugin" run configuration to execute.
 
 License
 -------
