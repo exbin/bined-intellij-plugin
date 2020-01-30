@@ -34,7 +34,7 @@ import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
-import com.jetbrains.php.debug.xdebug.debugger.XdebugValue;
+import com.jetbrains.php.debug.common.PhpNavigatableValue;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
 import com.sun.jdi.*;
@@ -42,8 +42,10 @@ import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.bined.intellij.debug.jdi.*;
 import org.exbin.bined.intellij.debug.panel.DebugViewPanel;
+import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.framework.bined.panel.ValuesPanel;
+import org.exbin.framework.gui.utils.BareBonesBrowserLaunch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +56,10 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Show debugger value in hexadecimal editor action.
@@ -234,7 +239,8 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                                 }
                                 BinaryData data = new DebugViewData(new PythonByteArrayPageProvider(fullValue));
                                 debugViewPanel.addProvider(new DefaultDebugViewDataProvider("Python bytearray value", data));
-                            } catch (ExecutionException | InterruptedException e) {
+                            } catch (Exception e) {
+                                Logger.getLogger(DebugViewBinaryAction.class.getName()).log(Level.SEVERE, null, e);
                             }
                         }
                     }
@@ -242,12 +248,20 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
 
                 String valueCanonicalName = container.getClass().getCanonicalName();
                 if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {
-                    PhpType dataType = ((XdebugValue) container).getType();
-//                    try {
-//                        data = new DebugViewDataSource(new PhpByteArrayPageProvider(value.get(), dataType));
-//                    } catch (ExecutionException | InterruptedException e) {
-//                        data = null;
-//                    }
+                    try {
+                        PhpType dataType = ((PhpNavigatableValue) container).getType();
+
+                        switch (dataType.toString()) {
+                            case "array": {
+                                Map<String, String> value = ((PhpNavigatableValue) container).getLoadedChildren();
+                                BinaryData data = new DebugViewData(new PhpByteArrayPageProvider(value));
+                                debugViewPanel.addProvider(new DefaultDebugViewDataProvider("PHP bytearray value", data));
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {
+                        Logger.getLogger(DebugViewBinaryAction.class.getName()).log(Level.SEVERE, null, e);
+                    }
                 }
 
 //                else if (phpValueClassAvailable && container instanceof XdebugValue) {

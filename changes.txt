@@ -1,4 +1,5 @@
 0.2.3
+- Added debugger array support for PHP
 
 0.2.2 (2020-01-25)
 - Minor GUI improvements

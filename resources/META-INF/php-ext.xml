@@ -1,9 +1,22 @@
 <idea-plugin>
-    <project-components>
+    <!-- <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.jetbrains.php.debug.xdebug.debugger.XdebugValue" />
+        <applicationService serviceInterface="com.jetbrains.php.debug.common.PhpValue" />
+        <applicationService serviceInterface="com.jetbrains.php.debug.common.PhpNavigatableValue" />
+        <applicationService serviceInterface="com.jetbrains.php.debug.common.PhpDebugProcess" />
+    </extensions> -->
+
+    <!--    <extensions defaultExtensionNs="com.jetbrains.php">
+        <annotator language="kotlin" implementationClass="com.jetbrains.php.debug.xdebug.debugger.XdebugValue"/>
+    </extensions> -->
+
+    <!--<project-components>
         <component>
             <implementation-class>com.jetbrains.php.debug.xdebug.debugger.XdebugValue</implementation-class>
-            <implementation-class>com.jetbrains.php.debug.common.PhpDebugProcess</implementation-class>
-            <implementation-class>com.intellij.xdebugger.XDebugSession</implementation-class>
+
+            <interface-class>com.jetbrains.php.debug.common.PhpValue</interface-class>
+            <interface-class>com.jetbrains.php.debug.common.PhpNavigatableValue</interface-class>
+            <interface-class>com.jetbrains.php.debug.common.PhpDebugProcess</interface-class>
         </component>
-    </project-components>
+    </project-components> -->
 </idea-plugin>

@@ -49,18 +49,19 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.xdebugger</depends>
     <depends optional="true" config-file="java-ext.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="python-ext.xml">com.intellij.modules.python</depends>
+    <depends optional="true" config-file="php-ext.xml">com.jetbrains.php</depends>
     <depends optional="true" config-file="go-ext.xml">com.intellij.modules.go</depends>
-    <!-- <depends optional="true" config-file="php-ext.xml">com.jetbrains.php</depends> -->
 
     <project-components>
     </project-components>
 
     <application-components>
-        <component>
+        <!--<component>
             <implementation-class>org.exbin.bined.intellij.BinEdFileSystem</implementation-class>
-        </component>
+        </component> -->
         <!-- <component><implementation-class>org.exbin.bined.intellij.BinEdFileEditorProvider</implementation-class></component> -->
         <!--        <component>
             <implementation-class>org.exbin.bined.intellij.Configuration</implementation-class>

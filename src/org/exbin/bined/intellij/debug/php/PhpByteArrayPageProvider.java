@@ -19,20 +19,33 @@ import org.exbin.bined.intellij.debug.DebugViewData;
 import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 /**
  * PHP bytearray data source for debugger view.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.7 2018/08/18
+ * @version 0.2.3 2020/01/30
  */
 public class PhpByteArrayPageProvider implements DebugViewData.PageProvider {
 
-    private final String value;
-    private final String prefix;
+    private final Map<String, String> value;
+    private int size = 0;
 
-    public PhpByteArrayPageProvider(@NotNull String value, String prefix) {
+    public PhpByteArrayPageProvider(@NotNull Map<String, String> value) {
         this.value = value;
-        this.prefix = prefix;
+
+        int pos = 0;
+        do {
+            String child = value.get(String.valueOf(pos));
+            try {
+                Byte.parseByte(child);
+            } catch (NumberFormatException ex) {
+                break;
+            }
+            pos++;
+            size++;
+        } while (true);
     }
 
     @Override
@@ -49,24 +62,20 @@ public class PhpByteArrayPageProvider implements DebugViewData.PageProvider {
         }
         byte[] page = new byte[length];
 
-        int position = (int) (prefix.length() + 3 + (pageIndex * DebugViewData.PAGE_SIZE * 4));
+        int position = (int) pageIndex * DebugViewData.PAGE_SIZE;
         int offset = 0;
         while (offset < length) {
-            byte byteValue = (byte) ((hexCharToInt(value.charAt(position + 2)) << 4) + hexCharToInt(value.charAt(position + 3)));
+            byte byteValue = Byte.parseByte(value.get(String.valueOf(position)));
             page[offset] = byteValue;
             offset++;
-            position += 4;
+            position++;
         }
 
         return page;
     }
 
-    private int hexCharToInt(char hexChar) {
-        return hexChar <= '9' ? hexChar - '0' : 10 + (hexChar - 'a');
-    }
-
     @Override
     public long getDocumentSize() {
-        return (value.length() - prefix.length() - 4) / 4;
+        return size;
     }
 }
