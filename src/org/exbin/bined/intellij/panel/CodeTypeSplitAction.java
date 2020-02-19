@@ -219,6 +219,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
                 }
                 AnAction action = actions[selectedIndex];
                 myPresentation.setIcon(action.getTemplatePresentation().getIcon());
+                myPresentation.setText(action.getTemplatePresentation().getText());
                 ActionUtil.performActionDumbAware(action, newEvent);
             }
         }
@@ -228,6 +229,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
             AnAction[] actions = myActionGroup.getChildren(null);
             AnAction action = actions[selectedIndex];
             myPresentation.setIcon(action.getTemplatePresentation().getIcon());
+            myPresentation.setText(action.getTemplatePresentation().getText());
         }
 
         @Override

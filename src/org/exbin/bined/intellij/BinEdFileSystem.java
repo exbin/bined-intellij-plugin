@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceDescriptor;
 import com.intellij.openapi.vcs.vfs.VcsFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileListener;
@@ -39,7 +40,12 @@ public class BinEdFileSystem extends VirtualFileSystem {
     private List<VirtualFileListener> fileListeners = new ArrayList<>();
 
     public static BinEdFileSystem getInstance() {
-        return ApplicationManager.getApplication().getComponent(BinEdFileSystem.class);
+        BinEdFileSystem fileSystem = ApplicationManager.getApplication().getComponent(BinEdFileSystem.class);
+        if (fileSystem == null) {
+            fileSystem = new BinEdFileSystem();
+            ApplicationManager.getApplication().initializeComponent(fileSystem, new ServiceDescriptor());
+        }
+        return fileSystem;
     }
 
     @NotNull
