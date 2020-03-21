@@ -158,6 +158,7 @@ public class EncodingsHandler {
 
     public void rebuildEncodings() {
         for (int i = toolsEncodingMenu.getItemCount() - 3; i >= 0; i--) {
+            encodingButtonGroup.remove(toolsEncodingMenu.getItem(i));
             toolsEncodingMenu.remove(i);
         }
 
@@ -170,11 +171,14 @@ public class EncodingsHandler {
             int selectedEncodingIndex = encodings.indexOf(textEncodingService.getSelectedEncoding());
             for (int index = 0; index < encodings.size(); index++) {
                 String encoding = encodings.get(index);
-                JRadioButtonMenuItem item = new JRadioButtonMenuItem(encoding, index == selectedEncodingIndex);
+                JRadioButtonMenuItem item = new JRadioButtonMenuItem(encoding);
                 item.addActionListener(encodingActionListener);
                 item.setToolTipText(ENCODING_TOOLTIP_PREFIX + encoding);
                 toolsEncodingMenu.add(item, index);
                 encodingButtonGroup.add(item);
+                if (index == selectedEncodingIndex) {
+                    item.setSelected(true);
+                }
             }
         }
     }

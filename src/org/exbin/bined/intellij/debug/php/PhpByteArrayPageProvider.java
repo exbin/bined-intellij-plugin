@@ -39,7 +39,7 @@ public class PhpByteArrayPageProvider implements DebugViewData.PageProvider {
         do {
             String child = value.get(String.valueOf(pos));
             try {
-                Byte.parseByte(child);
+                Integer.parseInt(child);
             } catch (NumberFormatException ex) {
                 break;
             }
@@ -65,7 +65,8 @@ public class PhpByteArrayPageProvider implements DebugViewData.PageProvider {
         int position = (int) pageIndex * DebugViewData.PAGE_SIZE;
         int offset = 0;
         while (offset < length) {
-            byte byteValue = Byte.parseByte(value.get(String.valueOf(position)));
+            int intValue = Integer.parseInt(value.get(String.valueOf(position)));
+            byte byteValue = intValue > -128 && intValue < 256 ? (byte) intValue : 0;
             page[offset] = byteValue;
             offset++;
             position++;

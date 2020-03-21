@@ -1,7 +1,9 @@
 <idea-plugin>
+    <!--
     <project-components>
         <component>
             <implementation-class>com.jetbrains.python.debugger.PyDebugValue</implementation-class>
         </component>
     </project-components>
+    -->
 </idea-plugin>
