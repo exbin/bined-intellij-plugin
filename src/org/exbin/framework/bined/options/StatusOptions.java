@@ -50,5 +50,5 @@ public interface StatusOptions {
     void setHexadecimalSpaceGroupSize(int hexadecimalSpaceGroupSize);
 
     void setOctalSpaceGroupSize(int octalSpaceGroupSize);
-    
+
 }

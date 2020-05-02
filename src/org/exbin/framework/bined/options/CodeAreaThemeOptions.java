@@ -38,5 +38,5 @@ public interface CodeAreaThemeOptions {
     void setSelectedProfile(int profileIndex);
 
     void setThemeProfile(int index, ExtendedCodeAreaThemeProfile themeProfile);
-   
+
 }

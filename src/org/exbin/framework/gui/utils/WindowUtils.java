@@ -19,7 +19,7 @@ package org.exbin.framework.gui.utils;
 import com.intellij.openapi.Disposable;
 import org.exbin.bined.intellij.DialogUtils;
 import org.exbin.framework.gui.utils.handler.OkCancelService;
-import org.exbin.framework.gui.utils.panel.WindowHeaderPanel;
+import org.exbin.framework.gui.utils.gui.WindowHeaderPanel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,7 +29,6 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.util.ResourceBundle;

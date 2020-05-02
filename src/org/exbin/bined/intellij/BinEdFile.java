@@ -15,7 +15,6 @@
  */
 package org.exbin.bined.intellij;
 
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
@@ -30,8 +29,8 @@ import org.exbin.auxiliary.paged_data.delta.DeltaDocument;
 import org.exbin.auxiliary.paged_data.delta.FileDataSource;
 import org.exbin.auxiliary.paged_data.delta.SegmentsRepository;
 import org.exbin.bined.EditationMode;
-import org.exbin.bined.intellij.panel.BinEdComponentFileApi;
-import org.exbin.bined.intellij.panel.BinEdComponentPanel;
+import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
+import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.FileHandlingMode;

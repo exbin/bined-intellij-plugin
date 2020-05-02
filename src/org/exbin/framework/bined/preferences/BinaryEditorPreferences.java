@@ -15,7 +15,8 @@
  */
 package org.exbin.framework.bined.preferences;
 
-import org.exbin.bined.CodeAreaViewMode;
+import org.exbin.bined.RowWrappingMode;
+import org.exbin.bined.basic.CodeAreaViewMode;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
@@ -128,7 +129,7 @@ public class BinaryEditorPreferences {
     private void importLegacyPreferences() {
         LegacyPreferences legacyPreferences = new LegacyPreferences(preferences);
         codeAreaPreferences.setCodeType(legacyPreferences.getCodeType());
-        codeAreaPreferences.setRowWrappingMode(legacyPreferences.isLineWrapping() ? RowWrappingCapable.RowWrappingMode.WRAPPING : RowWrappingCapable.RowWrappingMode.NO_WRAPPING);
+        codeAreaPreferences.setRowWrappingMode(legacyPreferences.isLineWrapping() ? RowWrappingMode.WRAPPING : RowWrappingMode.NO_WRAPPING);
         codeAreaPreferences.setShowUnprintables(legacyPreferences.isShowNonprintables());
         codeAreaPreferences.setCodeCharactersCase(legacyPreferences.getCodeCharactersCase());
         codeAreaPreferences.setPositionCodeType(legacyPreferences.getPositionCodeType());
@@ -176,7 +177,7 @@ public class BinaryEditorPreferences {
     }
 
     private void convertPreferences_0_2_0() {
-        String codeType = preferences.get(CodeAreaPreferences.PREFERENCES_VIEW_MODE);
+        String codeType = preferences.get(CodeAreaPreferences.PREFERENCES_VIEW_MODE, "DUAL");
         if ("HEXADECIMAL".equals(codeType)) {
             codeAreaPreferences.setViewMode(CodeAreaViewMode.CODE_MATRIX);
         } else if ("PREVIEW".equals(codeType)) {

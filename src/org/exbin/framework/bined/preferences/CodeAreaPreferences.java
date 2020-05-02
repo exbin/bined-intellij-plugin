@@ -21,11 +21,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.bined.CodeAreaViewMode;
+import org.exbin.bined.basic.CodeAreaViewMode;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.PositionCodeType;
-import org.exbin.bined.capability.RowWrappingCapable;
+import org.exbin.bined.RowWrappingMode;
 import org.exbin.framework.bined.options.CodeAreaOptions;
 
 /**
@@ -158,10 +158,10 @@ public class CodeAreaPreferences implements CodeAreaOptions {
 
     @Nonnull
     @Override
-    public RowWrappingCapable.RowWrappingMode getRowWrappingMode() {
-        RowWrappingCapable.RowWrappingMode defaultMode = RowWrappingCapable.RowWrappingMode.NO_WRAPPING;
+    public RowWrappingMode getRowWrappingMode() {
+        RowWrappingMode defaultMode = RowWrappingMode.NO_WRAPPING;
         try {
-            return RowWrappingCapable.RowWrappingMode.valueOf(preferences.get(PREFERENCES_ROW_WRAPPING_MODE, defaultMode.name()));
+            return RowWrappingMode.valueOf(preferences.get(PREFERENCES_ROW_WRAPPING_MODE, defaultMode.name()));
         } catch (Exception ex) {
             Logger.getLogger(CodeAreaPreferences.class.getName()).log(Level.SEVERE, null, ex);
             return defaultMode;
@@ -169,7 +169,7 @@ public class CodeAreaPreferences implements CodeAreaOptions {
     }
 
     @Override
-    public void setRowWrappingMode(RowWrappingCapable.RowWrappingMode rowWrappingMode) {
+    public void setRowWrappingMode(RowWrappingMode rowWrappingMode) {
         preferences.put(PREFERENCES_ROW_WRAPPING_MODE, rowWrappingMode.name());
     }
 

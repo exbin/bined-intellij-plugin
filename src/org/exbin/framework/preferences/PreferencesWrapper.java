@@ -18,9 +18,11 @@ package org.exbin.framework.preferences;
 import com.intellij.ide.util.PropertiesComponent;
 import org.exbin.framework.api.Preferences;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Wrapper for preferences.
@@ -44,19 +46,16 @@ public class PreferencesWrapper implements Preferences {
         return preferences.isValueSet(prefix + key);
     }
 
-    @Nullable
+    @Nonnull
     @Override
-    public String get(String key) {
-        return exists(key) ? preferences.getValue(prefix + key) : null;
+    public Optional<String> get(String key) {
+        return exists(key) ? Optional.ofNullable(preferences.getValue(prefix + key)) : Optional.empty();
     }
 
-    @Nullable
+    @Nonnull
     @Override
-    public String get(String key, @Nullable String def) {
-        if (def == null)
-            return get(key);
-
-        return preferences.getValue(prefix + key, def);
+    public String get(String key, String def) {
+        return preferences.getValue(prefix + key, Objects.requireNonNull(def));
     }
 
     @Override

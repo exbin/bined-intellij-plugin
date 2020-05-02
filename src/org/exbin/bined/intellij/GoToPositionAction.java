@@ -17,12 +17,12 @@ package org.exbin.bined.intellij;
 
 import org.exbin.bined.basic.PositionScrollVisibility;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.panel.GoToBinaryPanel;
+import org.exbin.framework.bined.gui.GoToBinaryPanel;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
-import org.exbin.framework.gui.utils.panel.DefaultControlPanel;
+import org.exbin.framework.gui.utils.gui.DefaultControlPanel;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;

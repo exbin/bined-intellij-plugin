@@ -21,7 +21,7 @@ import org.exbin.framework.api.Preferences;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.PositionCodeType;
-import org.exbin.framework.bined.panel.GoToBinaryPositionMode;
+import org.exbin.framework.bined.gui.GoToBinaryPositionMode;
 
 /**
  * Binary editor preferences.

@@ -84,7 +84,7 @@ public class CodeAreaColorOptionsImpl implements OptionsData, CodeAreaColorOptio
         }
         profileRecords.remove(index);
     }
-    
+
     public void fullyLoad() {
         for (int i = 0; i < profileRecords.size(); i++) {
             ProfileRecord record = profileRecords.get(i);
@@ -94,7 +94,7 @@ public class CodeAreaColorOptionsImpl implements OptionsData, CodeAreaColorOptio
             }
         }
     }
-    
+
     @Override
     public int getSelectedProfile() {
         return selectedProfile;

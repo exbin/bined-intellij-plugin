@@ -17,11 +17,11 @@ package org.exbin.framework.bined.options;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.bined.CodeAreaViewMode;
+import org.exbin.bined.basic.CodeAreaViewMode;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.PositionCodeType;
-import org.exbin.bined.capability.RowWrappingCapable;
+import org.exbin.bined.RowWrappingMode;
 
 /**
  * Code area options.
@@ -48,7 +48,7 @@ public interface CodeAreaOptions {
     PositionCodeType getPositionCodeType();
 
     @Nonnull
-    RowWrappingCapable.RowWrappingMode getRowWrappingMode();
+    RowWrappingMode getRowWrappingMode();
 
     @Nonnull
     CodeAreaViewMode getViewMode();
@@ -71,7 +71,7 @@ public interface CodeAreaOptions {
 
     void setPositionCodeType(PositionCodeType positionCodeType);
 
-    void setRowWrappingMode(RowWrappingCapable.RowWrappingMode rowWrappingMode);
+    void setRowWrappingMode(RowWrappingMode rowWrappingMode);
 
     void setShowUnprintables(boolean showUnprintables);
 

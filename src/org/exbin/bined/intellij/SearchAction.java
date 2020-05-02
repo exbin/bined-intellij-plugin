@@ -17,8 +17,8 @@ package org.exbin.bined.intellij;
 
 import org.exbin.bined.DefaultCodeAreaCaretPosition;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightCodeAreaPainter;
-import org.exbin.bined.intellij.panel.BinarySearchPanel;
-import org.exbin.bined.intellij.panel.BinarySearchPanelApi;
+import org.exbin.bined.intellij.gui.BinarySearchPanel;
+import org.exbin.bined.intellij.gui.BinarySearchPanelApi;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.ReplaceParameters;
 import org.exbin.framework.bined.SearchCondition;

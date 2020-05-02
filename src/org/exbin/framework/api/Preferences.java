@@ -15,6 +15,7 @@
  */
 package org.exbin.framework.api;
 
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -22,7 +23,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 /**
  * Preferences interface.
  *
- * @version 0.2.0 2019/06/09
+ * @version 0.2.0 2020/03/02
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -32,8 +33,8 @@ public interface Preferences {
 
     boolean exists(String key);
 
-    @Nullable
-    String get(String key);
+    @Nonnull
+    Optional<String> get(String key);
 
     @Nonnull
     String get(String key, String def);

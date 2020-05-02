@@ -18,6 +18,7 @@ package org.exbin.framework.editor.text.preferences;
 import org.exbin.framework.api.Preferences;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
@@ -67,15 +68,15 @@ public class TextEncodingPreferences implements TextEncodingOptions {
     @Override
     public List<String> getEncodings() {
         List<String> encodings = new ArrayList<>();
-        String value;
+        Optional<String> value;
         int i = 0;
         do {
             value = preferences.get(PREFERENCES_TEXT_ENCODING_PREFIX + Integer.toString(i));
-            if (value != null) {
-                encodings.add(value);
+            if (value.isPresent()) {
+                encodings.add(value.get());
                 i++;
             }
-        } while (value != null);
+        } while (value.isPresent());
 
         return encodings;
     }

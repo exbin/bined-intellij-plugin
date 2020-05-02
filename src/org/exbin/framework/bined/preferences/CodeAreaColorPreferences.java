@@ -19,6 +19,7 @@ import org.exbin.framework.api.Preferences;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -113,30 +114,30 @@ public class CodeAreaColorPreferences implements CodeAreaColorOptions {
         ExtendedCodeAreaColorProfile colorProfile = new ExtendedCodeAreaColorProfile();
         String colorProfilePrefix = PREFERENCES_COLOR_VALUE_PREFIX + String.valueOf(profileIndex) + ".";
 
-        colorProfile.setColor(CodeAreaBasicColors.TEXT_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_TEXT_COLOR, null)));
-        colorProfile.setColor(CodeAreaBasicColors.TEXT_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_TEXT_BACKGROUND, null)));
-        colorProfile.setColor(CodeAreaBasicColors.SELECTION_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_SELECTION_COLOR, null)));
-        colorProfile.setColor(CodeAreaBasicColors.SELECTION_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_SELECTION_BACKGROUND, null)));
-        colorProfile.setColor(CodeAreaBasicColors.SELECTION_MIRROR_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_SELECTION_MIRROR_COLOR, null)));
-        colorProfile.setColor(CodeAreaBasicColors.SELECTION_MIRROR_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_SELECTION_MIRROR_BACKGROUND, null)));
-        colorProfile.setColor(CodeAreaBasicColors.ALTERNATE_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_ALTERNATE_COLOR, null)));
-        colorProfile.setColor(CodeAreaBasicColors.ALTERNATE_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_ALTERNATE_BACKGROUND, null)));
-        colorProfile.setColor(CodeAreaBasicColors.CURSOR_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_CURSOR_COLOR, null)));
-        colorProfile.setColor(CodeAreaBasicColors.CURSOR_NEGATIVE_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_CURSOR_NEGATIVE_COLOR, null)));
+        colorProfile.setColor(CodeAreaBasicColors.TEXT_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_TEXT_COLOR)));
+        colorProfile.setColor(CodeAreaBasicColors.TEXT_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_TEXT_BACKGROUND)));
+        colorProfile.setColor(CodeAreaBasicColors.SELECTION_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_SELECTION_COLOR)));
+        colorProfile.setColor(CodeAreaBasicColors.SELECTION_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_SELECTION_BACKGROUND)));
+        colorProfile.setColor(CodeAreaBasicColors.SELECTION_MIRROR_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_SELECTION_MIRROR_COLOR)));
+        colorProfile.setColor(CodeAreaBasicColors.SELECTION_MIRROR_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_SELECTION_MIRROR_BACKGROUND)));
+        colorProfile.setColor(CodeAreaBasicColors.ALTERNATE_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_ALTERNATE_COLOR)));
+        colorProfile.setColor(CodeAreaBasicColors.ALTERNATE_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_ALTERNATE_BACKGROUND)));
+        colorProfile.setColor(CodeAreaBasicColors.CURSOR_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_CURSOR_COLOR)));
+        colorProfile.setColor(CodeAreaBasicColors.CURSOR_NEGATIVE_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_CURSOR_NEGATIVE_COLOR)));
 
-        colorProfile.setColor(BasicCodeAreaDecorationColorType.LINE, textAsColor(preferences.get(colorProfilePrefix + COLOR_LINE, null)));
-        colorProfile.setColor(CodeAreaColorizationColorType.CONTROL_CODES_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_CONTROL_CODES_COLOR, null)));
-        colorProfile.setColor(CodeAreaColorizationColorType.CONTROL_CODES_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_CONTROL_CODES_BACKGROUND, null)));
-        colorProfile.setColor(CodeAreaColorizationColorType.UPPER_CODES_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_UPPER_CODES_COLOR, null)));
-        colorProfile.setColor(CodeAreaColorizationColorType.UPPER_CODES_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_UPPER_CODES_BACKGROUND, null)));
+        colorProfile.setColor(BasicCodeAreaDecorationColorType.LINE, textAsColor(preferences.get(colorProfilePrefix + COLOR_LINE)));
+        colorProfile.setColor(CodeAreaColorizationColorType.CONTROL_CODES_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_CONTROL_CODES_COLOR)));
+        colorProfile.setColor(CodeAreaColorizationColorType.CONTROL_CODES_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_CONTROL_CODES_BACKGROUND)));
+        colorProfile.setColor(CodeAreaColorizationColorType.UPPER_CODES_COLOR, textAsColor(preferences.get(colorProfilePrefix + COLOR_UPPER_CODES_COLOR)));
+        colorProfile.setColor(CodeAreaColorizationColorType.UPPER_CODES_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + COLOR_UPPER_CODES_BACKGROUND)));
 
-        colorProfile.setColor(CodeAreaMatchColorType.MATCH_COLOR, textAsColor(preferences.get(colorProfilePrefix + MATCH_COLOR, null)));
-        colorProfile.setColor(CodeAreaMatchColorType.MATCH_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + MATCH_BACKGROUND, null)));
-        colorProfile.setColor(CodeAreaMatchColorType.ACTIVE_MATCH_COLOR, textAsColor(preferences.get(colorProfilePrefix + ACTIVE_MATCH_COLOR, null)));
-        colorProfile.setColor(CodeAreaMatchColorType.ACTIVE_MATCH_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + ACTIVE_MATCH_BACKGROUND, null)));
+        colorProfile.setColor(CodeAreaMatchColorType.MATCH_COLOR, textAsColor(preferences.get(colorProfilePrefix + MATCH_COLOR)));
+        colorProfile.setColor(CodeAreaMatchColorType.MATCH_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + MATCH_BACKGROUND)));
+        colorProfile.setColor(CodeAreaMatchColorType.ACTIVE_MATCH_COLOR, textAsColor(preferences.get(colorProfilePrefix + ACTIVE_MATCH_COLOR)));
+        colorProfile.setColor(CodeAreaMatchColorType.ACTIVE_MATCH_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + ACTIVE_MATCH_BACKGROUND)));
 
-        colorProfile.setColor(CodeAreaUnprintablesColorType.UNPRINTABLES_COLOR, textAsColor(preferences.get(colorProfilePrefix + UNPRINTABLES_COLOR, null)));
-        colorProfile.setColor(CodeAreaUnprintablesColorType.UNPRINTABLES_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + UNPRINTABLES_BACKGROUND, null)));
+        colorProfile.setColor(CodeAreaUnprintablesColorType.UNPRINTABLES_COLOR, textAsColor(preferences.get(colorProfilePrefix + UNPRINTABLES_COLOR)));
+        colorProfile.setColor(CodeAreaUnprintablesColorType.UNPRINTABLES_BACKGROUND, textAsColor(preferences.get(colorProfilePrefix + UNPRINTABLES_BACKGROUND)));
 
         return colorProfile;
     }
@@ -223,13 +224,13 @@ public class CodeAreaColorPreferences implements CodeAreaColorOptions {
      * Converts text to color.
      *
      * @param colorStr e.g. "#FFFFFF"
-     * @return
+     * @return color or null
      */
     @Nullable
-    private static Color textAsColor(@Nullable String colorStr) {
-        if (colorStr == null) {
+    private static Color textAsColor(Optional<String> colorStr) {
+        if (!colorStr.isPresent()) {
             return null;
         }
-        return Color.decode(colorStr);
+        return Color.decode(colorStr.get());
     }
 }

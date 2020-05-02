@@ -38,5 +38,5 @@ public interface CodeAreaColorOptions {
     void setColorsProfile(int index, ExtendedCodeAreaColorProfile colorProfile);
 
     void setSelectedProfile(int profileIndex);
-    
+
 }

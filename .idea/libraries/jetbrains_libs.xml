@@ -4,6 +4,7 @@
       <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-intellij-2019.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-pycharm-2019.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-phpstorm-2019.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-clion-2019.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
