@@ -117,7 +117,8 @@ public interface BinaryStatusApi {
 
         READ_ONLY("R", "read_only"),
         RAM_MEMORY("M", "ram"),
-        DELTA_MODE("\u0394", "delta");
+        DELTA_MODE("\u0394", "delta"),
+        NATIVE("N", "native");
 
         private final String displayChar;
         private final String value;

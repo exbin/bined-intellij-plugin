@@ -162,7 +162,7 @@ public class BinEdVirtualFile extends VirtualFile {
 
         BinEdVirtualFile that = (BinEdVirtualFile) o;
         String path = getPath();
-        return path != null ? path.equals(that.getPath()) : that.getPath() == null;
+        return path.equals(that.getPath());
     }
 
     @Override

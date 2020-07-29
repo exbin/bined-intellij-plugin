@@ -26,39 +26,32 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * File editor provider for binary files.
+ * Native file editor provider for binary files.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.3 2020/07/29
  */
-public class BinEdFileEditorProvider implements FileEditorProvider, DumbAware {
+public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAware {
 
-    public static final String BINED_EDITOR_TYPE_ID = "org.exbin.bined";
+    public static final String NATIVE_BINED_EDITOR_TYPE_ID = "org.exbin.bined.native";
 
     @Override
     public void disposeEditor(@NotNull FileEditor editor) {
-        if (editor instanceof BinEdFileEditor) {
+        if (editor instanceof BinEdNativeFileEditor) {
             editor.dispose();
         }
     }
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        return file instanceof BinEdVirtualFile;
+        return file.getFileType() == BinaryFileType.INSTANCE;
     }
 
     @NotNull
     @Override
     public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        BinEdVirtualFile binEdVirtualFile;
-        if (virtualFile instanceof BinEdVirtualFile) {
-            binEdVirtualFile = (BinEdVirtualFile) virtualFile;
-        } else {
-            binEdVirtualFile = new BinEdVirtualFile(virtualFile);
-        }
-
-        BinEdFileEditor fileEditor = new BinEdFileEditor(project, binEdVirtualFile);
-        fileEditor.setDisplayName(binEdVirtualFile.getDisplayName());
+        BinEdNativeFileEditor fileEditor = new BinEdNativeFileEditor(project, virtualFile);
+        fileEditor.setDisplayName(virtualFile.getPresentableName());
 
         return fileEditor;
     }
@@ -66,7 +59,7 @@ public class BinEdFileEditorProvider implements FileEditorProvider, DumbAware {
     @NotNull
     @Override
     public String getEditorTypeId() {
-        return BINED_EDITOR_TYPE_ID;
+        return NATIVE_BINED_EDITOR_TYPE_ID;
     }
 
     @NotNull

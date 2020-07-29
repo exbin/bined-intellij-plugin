@@ -406,6 +406,8 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
             memoryMode = BinaryStatusApi.MemoryMode.READ_ONLY;
         } else if (fileHandlingMode == FileHandlingMode.DELTA) {
             memoryMode = BinaryStatusApi.MemoryMode.DELTA_MODE;
+        } else if (fileHandlingMode == FileHandlingMode.NATIVE) {
+            memoryMode = BinaryStatusApi.MemoryMode.NATIVE;
         }
 
         if (binaryStatus != null) {

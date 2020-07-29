@@ -29,5 +29,9 @@ public enum FileHandlingMode {
     /**
      * File is handled using delta changes.
      */
-    DELTA;
+    DELTA,
+    /**
+     * IntelliJ native file wrapper.
+     */
+    NATIVE;
 }

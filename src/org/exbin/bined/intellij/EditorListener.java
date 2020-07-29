@@ -23,7 +23,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import javax.swing.*;
 
 /**
- * Editor listener for hexadecimal editor.
+ * Editor listener for binary editor.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.0 2016/12/08

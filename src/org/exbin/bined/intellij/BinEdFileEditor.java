@@ -19,6 +19,7 @@ import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -40,7 +41,7 @@ import java.util.List;
  * @version 0.2.2 2020/01/17
  */
 @ParametersAreNonnullByDefault
-public class BinEdFileEditor implements FileEditor {
+public class BinEdFileEditor implements FileEditor, DumbAware {
 
     private final Project project;
 
@@ -65,10 +66,10 @@ public class BinEdFileEditor implements FileEditor {
                     BinEdFile editorPanel = ((BinEdVirtualFile) virtualFile).getEditorFile();
                     if (!editorPanel.releaseFile()) {
                         // TODO Intercept close event instead of editor recreation
-                        OpenFileDescriptor descriptor = new OpenFileDescriptor(project, virtualFile, 0);
                         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-                        List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
                         fileEditorManager.setSelectedEditor(virtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
+//                      OpenFileDescriptor descriptor = new OpenFileDescriptor(project, virtualFile, 0);
+//                          List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
 //                        for (FileEditor fileEditor : editors) {
 //                            if (fileEditor instanceof BinEdFileEditor) {
 //                                // ((BinEdFileEditor) fileEditor).editorPanel.reopenFile(virtualFile);
