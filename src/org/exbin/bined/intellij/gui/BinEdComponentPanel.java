@@ -335,7 +335,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
         if (fileApi == null)
             return true;
 
-        while (isModified()) {
+        while (isModified() && fileApi.isSaveSupported()) {
             Object[] options = {
                     "Save",
                     "Discard",

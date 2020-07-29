@@ -44,7 +44,7 @@ public class BinEdFileEditorProvider implements FileEditorProvider, DumbAware {
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        return file instanceof BinEdVirtualFile;
+        return file instanceof BinEdVirtualFile || file.getPath().startsWith(BinEdVirtualFile.PATH_PREFIX);
     }
 
     @NotNull

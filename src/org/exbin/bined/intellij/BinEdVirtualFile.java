@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +36,7 @@ import java.io.OutputStream;
  */
 public class BinEdVirtualFile extends VirtualFile {
 
-    private static final String PATH_PREFIX = "bined://";
+    public static final String PATH_PREFIX = "bined://";
 
     private final VirtualFile parentFile;
     private String displayName;
@@ -43,7 +44,11 @@ public class BinEdVirtualFile extends VirtualFile {
     private boolean closed = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
-        this.parentFile = parentFile;
+        if (parentFile.getPath().startsWith(PATH_PREFIX)) {
+            this.parentFile = LocalFileSystem.getInstance().findFileByPath(parentFile.getPath().substring(PATH_PREFIX.length()));
+        } else {
+            this.parentFile = parentFile;
+        }
         String path = parentFile.getPath();
         int lastIndexOf = path.lastIndexOf('/');
         if (lastIndexOf >= 0) {

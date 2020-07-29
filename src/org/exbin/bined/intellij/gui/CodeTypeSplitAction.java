@@ -157,7 +157,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
 
             int x = baseRect.x + baseRect.width - scale(3) - ARROW_DOWN.getIconWidth();
             int y = baseRect.y + (baseRect.height - ARROW_DOWN.getIconHeight()) / 2 + scale(1);
-            look.paintIconAt(g, ARROW_DOWN, x, y);
+            ARROW_DOWN.paintIcon(null, g, x, y);
 
             x -= scale(4);
             if (getPopState() == POPPED || getPopState() == PUSHED) {
@@ -176,7 +176,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
 
             x = baseRect.x + (x - actionIcon.getIconWidth()) / 2;
             y = baseRect.y + (baseRect.height - actionIcon.getIconHeight()) / 2;
-            look.paintIconAt(g, actionIcon, x, y);
+            actionIcon.paintIcon(null, g, x, y);
         }
 
         private boolean isToggleActionPushed() {

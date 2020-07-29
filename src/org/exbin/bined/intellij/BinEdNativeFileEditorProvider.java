@@ -44,7 +44,7 @@ public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAw
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        return file.getFileType() == BinaryFileType.INSTANCE;
+        return file.getFileType() == BinaryFileType.INSTANCE && !(file instanceof BinEdVirtualFile);
     }
 
     @NotNull

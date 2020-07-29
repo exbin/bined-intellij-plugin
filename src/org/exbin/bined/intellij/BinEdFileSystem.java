@@ -15,9 +15,6 @@
  */
 package org.exbin.bined.intellij;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ServiceDescriptor;
-import com.intellij.openapi.vcs.vfs.VcsFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileSystem;
@@ -32,11 +29,12 @@ import java.util.List;
  * File system for binary editor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.1.0 2016/12/11
+ * @version 0.2.3 2020/12/11
  */
 public class BinEdFileSystem extends VirtualFileSystem {
 
     private static final String PROTOCOL = "bined";
+    private static final String ERROR_INVALID_OPERATION = "Invalid operation";
     private static final BinEdFileSystem INSTANCE = new BinEdFileSystem();
     private List<VirtualFileListener> fileListeners = new ArrayList<>();
 
@@ -79,35 +77,35 @@ public class BinEdFileSystem extends VirtualFileSystem {
 
     @Override
     protected void deleteFile(Object o, @NotNull VirtualFile virtualFile) throws IOException {
-        throw new RuntimeException(VcsFileSystem.COULD_NOT_IMPLEMENT_MESSAGE);
+        throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
     @Override
     protected void moveFile(Object o, @NotNull VirtualFile virtualFile, @NotNull VirtualFile virtualFile1) throws IOException {
-        throw new RuntimeException(VcsFileSystem.COULD_NOT_IMPLEMENT_MESSAGE);
+        throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
     @Override
     protected void renameFile(Object o, @NotNull VirtualFile virtualFile, @NotNull String s) throws IOException {
-        throw new RuntimeException(VcsFileSystem.COULD_NOT_IMPLEMENT_MESSAGE);
+        throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
     @NotNull
     @Override
     protected VirtualFile createChildFile(Object o, @NotNull VirtualFile virtualFile, @NotNull String s) throws IOException {
-        throw new RuntimeException(VcsFileSystem.COULD_NOT_IMPLEMENT_MESSAGE);
+        throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
     @NotNull
     @Override
     protected VirtualFile createChildDirectory(Object o, @NotNull VirtualFile virtualFile, @NotNull String s) throws IOException {
-        throw new RuntimeException(VcsFileSystem.COULD_NOT_IMPLEMENT_MESSAGE);
+        throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
     @NotNull
     @Override
     protected VirtualFile copyFile(Object o, @NotNull VirtualFile virtualFile, @NotNull VirtualFile virtualFile1, @NotNull String s) throws IOException {
-        throw new RuntimeException(VcsFileSystem.COULD_NOT_IMPLEMENT_MESSAGE);
+        throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
     @Override

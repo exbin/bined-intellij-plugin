@@ -15,27 +15,30 @@
  */
 package org.exbin.bined.intellij;
 
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.newvfs.BulkFileListener;
+import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.util.LocalTimeCounter;
-import org.exbin.auxiliary.paged_data.BinaryData;
+import com.intellij.util.messages.MessageBusConnection;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
-import org.exbin.bined.operation.BinaryDataCommand;
-import org.exbin.bined.operation.BinaryDataOperationException;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 /**
  * File editor wrapper using BinEd editor component.
@@ -54,12 +57,13 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
     private boolean opened = false;
     private VirtualFile virtualFile;
     private BinEdFileEditorState fileEditorState = new BinEdFileEditorState();
+    private MessageBusConnection updateConnection = null;
 
     public BinEdNativeFile(VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
         componentPanel = new BinEdComponentPanel();
         ExtCodeArea codeArea = componentPanel.getCodeArea();
-        CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandlerWrapper(codeArea);
+        CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
         componentPanel.setFileApi(this);
         componentPanel.setFileHandlingMode(FileHandlingMode.NATIVE);
         componentPanel.setUndoHandler(undoHandler);
@@ -117,33 +121,39 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
         updateModified();
 //        updateCurrentMemoryMode();
         componentPanel.getUndoHandler().clear();
+
+        Project project = ProjectManager.getInstance().getDefaultProject();
+        updateConnection = project.getMessageBus().connect();
+        updateConnection.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
+            @Override
+            public void after(@NotNull List<? extends VFileEvent> events) {
+                for (VFileEvent event : events) {
+                    if (virtualFile.equals(event.getFile())) {
+                        SwingUtilities.invokeLater(codeArea::notifyDataChanged);
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     @Override
     public void saveDocument() {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(new Runnable() {
-            @Override
-            public void run() {
-                saveFile();
-            }
-        });
-        updateModified();
-    }
-
-    public void saveFile() {
+        // Ignore
     }
 
     @Override
     public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
-        throw new IllegalArgumentException("Switching file handling is not allowed");
+        // Ignore
     }
 
     @Override
     public void closeData() {
-        ExtCodeArea codeArea = componentPanel.getCodeArea();
-        BinaryData data = codeArea.getContentData();
         componentPanel.setContentData(null);
+        Project project = ProjectManager.getInstance().getDefaultProject();
+        if (updateConnection != null) {
+            updateConnection.disconnect();
+        }
     }
 
     private void updateModified() {
@@ -163,28 +173,10 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 
     @Override
     public boolean isSaveSupported() {
-        return true;
+        return false;
     }
 
     public JComponent getPreferredFocusedComponent() {
         return componentPanel.getCodeArea();
-    }
-
-    private static class CodeAreaUndoHandlerWrapper extends CodeAreaUndoHandler {
-        public CodeAreaUndoHandlerWrapper(ExtCodeArea codeArea) {
-            super(codeArea);
-        }
-
-        @Override
-        public void execute(BinaryDataCommand command) throws BinaryDataOperationException {
-            Application application = ApplicationManager.getApplication();
-            application.runWriteAction(() -> {
-                try {
-                    super.execute(command);
-                } catch (BinaryDataOperationException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
     }
 }
