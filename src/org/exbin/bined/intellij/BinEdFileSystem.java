@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * File system for hexadecimal editor.
+ * File system for binary editor.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.0 2016/12/11
@@ -37,15 +37,12 @@ import java.util.List;
 public class BinEdFileSystem extends VirtualFileSystem {
 
     private static final String PROTOCOL = "bined";
+    private static final BinEdFileSystem INSTANCE = new BinEdFileSystem();
     private List<VirtualFileListener> fileListeners = new ArrayList<>();
 
+    @NotNull
     public static BinEdFileSystem getInstance() {
-        BinEdFileSystem fileSystem = ApplicationManager.getApplication().getComponent(BinEdFileSystem.class);
-        if (fileSystem == null) {
-            fileSystem = new BinEdFileSystem();
-            ApplicationManager.getApplication().initializeComponent(fileSystem, new ServiceDescriptor());
-        }
-        return fileSystem;
+        return INSTANCE;
     }
 
     @NotNull

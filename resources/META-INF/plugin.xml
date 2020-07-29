@@ -64,15 +64,15 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
         <!--<component>
             <implementation-class>org.exbin.bined.intellij.BinEdFileSystem</implementation-class>
         </component> -->
-        <!-- <component><implementation-class>org.exbin.bined.intellij.BinEdFileEditorProvider</implementation-class></component> -->
+        <component><implementation-class>org.exbin.bined.intellij.BinEdFileEditorProvider</implementation-class></component>
         <!--        <component>
             <implementation-class>org.exbin.bined.intellij.Configuration</implementation-class>
         </component> -->
     </application-components>
 
     <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Binary File" implementationClass="org.exbin.bined.intellij.BinaryFileType" fieldName="INSTANCE" language="" extensions=""/>
         <virtualFileSystem implementationClass="org.exbin.bined.intellij.BinEdFileSystem" key="bined" physical="false"/>
-        <!--<fileTypeFactory implementation="org.exbin.bined.intellij.BinEdFileTypeFactory"/>-->
         <fileEditorProvider implementation="org.exbin.bined.intellij.BinEdFileEditorProvider"/>
     </extensions>
 

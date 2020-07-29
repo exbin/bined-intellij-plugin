@@ -15,7 +15,6 @@
  */
 package org.exbin.bined.intellij;
 
-import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
 import com.intellij.openapi.fileEditor.FileEditorProvider;
@@ -45,7 +44,7 @@ public class BinEdFileEditorProvider implements FileEditorProvider, DumbAware {
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        return file instanceof BinEdVirtualFile || GenericBinaryFileType.DEFAULT_EXTENSION.equals(file.getExtension());
+        return file instanceof BinEdVirtualFile || file.getFileType() == BinaryFileType.INSTANCE;
     }
 
     @NotNull

@@ -16,6 +16,8 @@
  */
 package org.exbin.framework.gui.utils;
 
+import org.intellij.lang.annotations.MagicConstant;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -24,6 +26,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -101,8 +104,30 @@ public class ActionUtils {
         }
     }
 
+    /**
+     * Returns platform specific down mask filter.
+     *
+     * @return down mask for meta keys
+     */
+    @SuppressWarnings("deprecation")
+    @MagicConstant(flagsFromClass = java.awt.event.InputEvent.class)
     public static int getMetaMask() {
-        return java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        try {
+            switch (java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) {
+                case java.awt.Event.CTRL_MASK:
+                    return KeyEvent.CTRL_DOWN_MASK;
+                case java.awt.Event.META_MASK:
+                    return KeyEvent.META_DOWN_MASK;
+                case java.awt.Event.SHIFT_MASK:
+                    return KeyEvent.SHIFT_DOWN_MASK;
+                case java.awt.Event.ALT_MASK:
+                    return KeyEvent.ALT_DOWN_MASK;
+                default:
+                    return KeyEvent.CTRL_DOWN_MASK;
+            }
+        } catch (java.awt.HeadlessException ex) {
+            return KeyEvent.CTRL_DOWN_MASK;
+        }
     }
 
     /**
@@ -170,7 +195,7 @@ public class ActionUtils {
         int modifiers = 0;
         AWTEvent currentEvent = EventQueue.getCurrentEvent();
         if (currentEvent instanceof InputEvent) {
-            modifiers = ((InputEvent) currentEvent).getModifiers();
+            modifiers = ((InputEvent) currentEvent).getModifiersEx();
         } else if (currentEvent instanceof ActionEvent) {
             modifiers = ((ActionEvent) currentEvent).getModifiers();
         }

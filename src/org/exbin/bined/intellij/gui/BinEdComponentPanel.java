@@ -18,6 +18,7 @@ package org.exbin.bined.intellij.gui;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.util.PlatformIcons;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.*;
 import org.exbin.bined.basic.BasicCodeAreaZone;
@@ -189,11 +190,12 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
                 int clickedX = x;
                 int clickedY = y;
                 if (invoker instanceof JViewport) {
-                    clickedX += ((JViewport) invoker).getParent().getX();
-                    clickedY += ((JViewport) invoker).getParent().getY();
+                    clickedX += invoker.getParent().getX();
+                    clickedY += invoker.getParent().getY();
                 }
-                JPopupMenu popupMenu = createContextMenu(clickedX, clickedY);
-                popupMenu.show(invoker, x, y);
+                removeAll();
+                createContextMenu(this, clickedX, clickedY);
+                super.show(invoker, x, y);
             }
         });
 
@@ -207,7 +209,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
         codeArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
-                if (keyEvent.getModifiers() == ActionUtils.getMetaMask()) {
+                if (keyEvent.getModifiersEx() == ActionUtils.getMetaMask()) {
                     int keyCode = keyEvent.getKeyCode();
                     switch (keyCode) {
                         case KeyEvent.VK_S: {
@@ -451,64 +453,68 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
     // End of variables declaration
 
     @Nonnull
-    private JPopupMenu createContextMenu(int x, int y) {
-        final JPopupMenu result = new JPopupMenu();
-
+    private void createContextMenu(final JPopupMenu menu, int x, int y) {
         BasicCodeAreaZone positionZone = codeArea.getPositionZone(x, y);
 
         switch (positionZone) {
             case TOP_LEFT_CORNER:
             case HEADER: {
-                result.add(createShowHeaderMenuItem());
-                result.add(createPositionCodeTypeMenuItem());
+                menu.add(createShowHeaderMenuItem());
+                menu.add(createPositionCodeTypeMenuItem());
                 break;
             }
             case ROW_POSITIONS: {
-                result.add(createShowRowPositionMenuItem());
-                result.add(createPositionCodeTypeMenuItem());
-                result.add(new JSeparator());
-                result.add(createGoToMenuItem());
+                menu.add(createShowRowPositionMenuItem());
+                menu.add(createPositionCodeTypeMenuItem());
+                menu.add(new JSeparator());
+                menu.add(createGoToMenuItem());
 
                 break;
             }
             default: {
                 final JMenuItem cutMenuItem = new JMenuItem("Cut");
-                cutMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-cut.png")));
+                ImageIcon cutMenuItemIcon = new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-cut.png"));
+                cutMenuItem.setIcon(cutMenuItemIcon);
+                cutMenuItem.setDisabledIcon(new ImageIcon(GrayFilter.createDisabledImage(cutMenuItemIcon.getImage())));
                 cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionUtils.getMetaMask()));
                 cutMenuItem.setEnabled(codeArea.hasSelection() && codeArea.isEditable());
                 cutMenuItem.addActionListener((ActionEvent e) -> {
                     codeArea.cut();
-                    result.setVisible(false);
+                    menu.setVisible(false);
                 });
-                result.add(cutMenuItem);
+                menu.add(cutMenuItem);
 
                 final JMenuItem copyMenuItem = new JMenuItem("Copy");
-                copyMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-copy.png")));
+                ImageIcon copyMenuItemIcon = new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-copy.png"));
+                copyMenuItem.setIcon(copyMenuItemIcon);
+                copyMenuItem.setDisabledIcon(new ImageIcon(GrayFilter.createDisabledImage(copyMenuItemIcon.getImage())));
                 copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionUtils.getMetaMask()));
                 copyMenuItem.setEnabled(codeArea.hasSelection());
                 copyMenuItem.addActionListener((ActionEvent e) -> {
                     codeArea.copy();
-                    result.setVisible(false);
+                    menu.setVisible(false);
                 });
-                result.add(copyMenuItem);
+                menu.add(copyMenuItem);
 
                 final JMenuItem copyAsCodeMenuItem = new JMenuItem("Copy as Code");
                 copyAsCodeMenuItem.setEnabled(codeArea.hasSelection());
                 copyAsCodeMenuItem.addActionListener((ActionEvent e) -> {
                     codeArea.copyAsCode();
-                    result.setVisible(false);
+                    menu.setVisible(false);
                 });
-                result.add(copyAsCodeMenuItem);
+                menu.add(copyAsCodeMenuItem);
 
                 final JMenuItem pasteMenuItem = new JMenuItem("Paste");
-                pasteMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-paste.png")));
+                ImageIcon pasteMenuItemIcon = new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-paste.png"));
+                pasteMenuItem.setIcon(pasteMenuItemIcon);
+                pasteMenuItem.setDisabledIcon(new ImageIcon(GrayFilter.createDisabledImage(pasteMenuItemIcon.getImage())));
                 pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionUtils.getMetaMask()));
                 pasteMenuItem.setEnabled(codeArea.canPaste() && codeArea.isEditable());
                 pasteMenuItem.addActionListener((ActionEvent e) -> {
                     codeArea.paste();
-                    result.setVisible(false);
+                    menu.setVisible(false);
                 });
-                result.add(pasteMenuItem);
+                menu.add(pasteMenuItem);
 
                 final JMenuItem pasteFromCodeMenuItem = new JMenuItem("Paste from Code");
                 pasteFromCodeMenuItem.setEnabled(codeArea.canPaste() && codeArea.isEditable());
@@ -518,33 +524,35 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
                     } catch (IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(codeArea, ex.getMessage(), "Unable to Paste Code", JOptionPane.ERROR_MESSAGE);
                     }
-                    result.setVisible(false);
+                    menu.setVisible(false);
                 });
-                result.add(pasteFromCodeMenuItem);
+                menu.add(pasteFromCodeMenuItem);
 
                 final JMenuItem deleteMenuItem = new JMenuItem("Delete");
-                deleteMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-delete.png")));
+                ImageIcon deleteMenuItemIcon = new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-delete.png"));
+                deleteMenuItem.setIcon(deleteMenuItemIcon);
+                deleteMenuItem.setDisabledIcon(new ImageIcon(GrayFilter.createDisabledImage(deleteMenuItemIcon.getImage())));
                 deleteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
                 deleteMenuItem.setEnabled(codeArea.hasSelection() && codeArea.isEditable());
                 deleteMenuItem.addActionListener((ActionEvent e) -> {
                     codeArea.delete();
-                    result.setVisible(false);
+                    menu.setVisible(false);
                 });
-                result.add(deleteMenuItem);
-                result.addSeparator();
+                menu.add(deleteMenuItem);
+                menu.addSeparator();
 
                 final JMenuItem selectAllMenuItem = new JMenuItem("Select All");
                 selectAllMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/menu/resources/icons/tango-icon-theme/16x16/actions/edit-select-all.png")));
                 selectAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionUtils.getMetaMask()));
                 selectAllMenuItem.addActionListener((ActionEvent e) -> {
                     codeArea.selectAll();
-                    result.setVisible(false);
+                    menu.setVisible(false);
                 });
-                result.add(selectAllMenuItem);
-                result.addSeparator();
+                menu.add(selectAllMenuItem);
+                menu.addSeparator();
 
                 JMenuItem goToMenuItem = createGoToMenuItem();
-                result.add(goToMenuItem);
+                menu.add(goToMenuItem);
 
                 final JMenuItem findMenuItem = new JMenuItem("Find...");
                 findMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/tango-icon-theme/16x16/actions/edit-find.png")));
@@ -553,7 +561,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
                     searchAction.actionPerformed(e);
                     searchAction.switchReplaceMode(BinarySearchPanel.SearchOperation.FIND);
                 });
-                result.add(findMenuItem);
+                menu.add(findMenuItem);
 
                 final JMenuItem replaceMenuItem = new JMenuItem("Replace...");
                 replaceMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/tango-icon-theme/16x16/actions/edit-find-replace.png")));
@@ -563,11 +571,11 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
                     searchAction.actionPerformed(e);
                     searchAction.switchReplaceMode(BinarySearchPanel.SearchOperation.REPLACE);
                 });
-                result.add(replaceMenuItem);
+                menu.add(replaceMenuItem);
             }
         }
 
-        result.addSeparator();
+        menu.addSeparator();
 
         switch (positionZone) {
             case TOP_LEFT_CORNER:
@@ -579,14 +587,14 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
                 JMenu showMenu = new JMenu("Show");
                 showMenu.add(createShowHeaderMenuItem());
                 showMenu.add(createShowRowPositionMenuItem());
-                result.add(showMenu);
+                menu.add(showMenu);
             }
         }
 
         final JMenuItem optionsMenuItem = new JMenuItem("Options...");
         optionsMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/options/resources/icons/Preferences16.gif")));
         optionsMenuItem.addActionListener(createOptionsAction());
-        result.add(optionsMenuItem);
+        menu.add(optionsMenuItem);
 
         switch (positionZone) {
             case TOP_LEFT_CORNER:
@@ -595,7 +603,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
                 break;
             }
             default: {
-                result.addSeparator();
+                menu.addSeparator();
                 final JMenuItem aboutMenuItem = new JMenuItem("About...");
                 aboutMenuItem.addActionListener((ActionEvent e) -> {
                     AboutPanel aboutPanel = new AboutPanel();
@@ -609,11 +617,9 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
                     //            dialog.setSize(650, 460);
                     dialog.showCentered((Component) e.getSource());
                 });
-                result.add(aboutMenuItem);
+                menu.add(aboutMenuItem);
             }
         }
-
-        return result;
     }
 
     @Nonnull

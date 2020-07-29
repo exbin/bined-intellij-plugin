@@ -22,30 +22,34 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNullableByDefault;
 import javax.swing.*;
 
 /**
- * File type for generic binary file.
+ * File type for binary files.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.1 2019/08/22
+ * @version 0.2.3 2020/07/29
  */
-public class GenericBinaryFileType implements FileType {
+@ParametersAreNullableByDefault
+public class BinaryFileType implements FileType {
 
     public static final String DEFAULT_EXTENSION = "bin";
+    public static final BinaryFileType INSTANCE = new BinaryFileType();
 
-    public static final GenericBinaryFileType INSTANCE = new GenericBinaryFileType();
+    private BinaryFileType() {
+    }
 
     @NotNull
     @Override
     public String getName() {
-        return "BINARY_FILE";
+        return "Binary File";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Generic binary file";
+        return "Binary File (opened by BinEd Plugin)";
     }
 
     @NotNull
@@ -62,7 +66,7 @@ public class GenericBinaryFileType implements FileType {
 
     @Override
     public boolean isBinary() {
-        return false;
+        return true;
     }
 
     @Override
@@ -73,6 +77,6 @@ public class GenericBinaryFileType implements FileType {
     @Nullable
     @Override
     public String getCharset(@NotNull VirtualFile file, @NotNull byte[] content) {
-        return CharsetToolkit.UTF8;
+        return CharsetToolkit.US_ASCII_CHARSET.name();
     }
 }

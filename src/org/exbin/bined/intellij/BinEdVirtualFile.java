@@ -21,6 +21,7 @@ import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +53,7 @@ public class BinEdVirtualFile extends VirtualFile {
         }
     }
 
+    @Nonnull
     public BinEdFile getEditorFile() {
         if (editorFile == null) {
             editorFile = new BinEdFile();
@@ -60,6 +62,7 @@ public class BinEdVirtualFile extends VirtualFile {
         return editorFile;
     }
 
+    @Nonnull
     public JPanel getEditorPanel() {
         return getEditorFile().getPanel();
     }
@@ -153,7 +156,7 @@ public class BinEdVirtualFile extends VirtualFile {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -164,8 +167,7 @@ public class BinEdVirtualFile extends VirtualFile {
 
     @Override
     public int hashCode() {
-        String path = getPath();
-        return path != null ? path.hashCode() : 0;
+        return getPath().hashCode();
     }
 
     public boolean isMoved() {

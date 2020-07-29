@@ -106,6 +106,7 @@ public class BinEdFile implements BinEdComponentFileApi {
         return componentPanel.releaseFile();
     }
 
+    @Nonnull
     public JPanel getPanel() {
         return componentPanel;
     }
