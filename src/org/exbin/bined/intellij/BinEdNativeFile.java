@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.util.LocalTimeCounter;
 import com.intellij.util.messages.MessageBusConnection;
+import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.EditationMode;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
@@ -44,7 +45,7 @@ import java.util.List;
  * File editor wrapper using BinEd editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.3 2020/07/29
+ * @version 0.2.3 2020/07/30
  */
 public class BinEdNativeFile implements BinEdComponentFileApi {
 
@@ -129,8 +130,13 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
             public void after(@NotNull List<? extends VFileEvent> events) {
                 for (VFileEvent event : events) {
                     if (virtualFile.equals(event.getFile())) {
-                        SwingUtilities.invokeLater(codeArea::notifyDataChanged);
-                        break;
+                        BinEdFileDataWrapper contentData = (BinEdFileDataWrapper) codeArea.getContentData();
+                        if (!contentData.isWriteInProgress()) {
+                            contentData.resetCache();
+                            SwingUtilities.invokeLater(codeArea::notifyDataChanged);
+                            componentPanel.getUndoHandler().clear();
+                            break;
+                        }
                     }
                 }
             }
@@ -149,6 +155,10 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 
     @Override
     public void closeData() {
+        BinaryData contentData = componentPanel.getCodeArea().getContentData();
+        if (contentData instanceof BinEdFileDataWrapper) {
+            ((BinEdFileDataWrapper) contentData).close();
+        }
         componentPanel.setContentData(null);
         Project project = ProjectManager.getInstance().getDefaultProject();
         if (updateConnection != null) {

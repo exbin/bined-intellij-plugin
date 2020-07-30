@@ -34,7 +34,6 @@ import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
-import com.jetbrains.cidr.execution.debugger.evaluation.CidrPhysicalValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrValue;
 import com.jetbrains.php.debug.common.PhpNavigatableValue;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
@@ -42,9 +41,8 @@ import com.jetbrains.python.debugger.PyDebugValue;
 import com.sun.jdi.*;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
-import org.exbin.bined.intellij.debug.c.CCharArrayPageProvider;
-import org.exbin.bined.intellij.debug.jdi.*;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
+import org.exbin.bined.intellij.debug.jdi.*;
 import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.framework.bined.gui.ValuesPanel;
@@ -259,19 +257,19 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                     }
                 }
 
-                if (cValueClassAvailable && container instanceof CidrValue) {
-                    String dataType = ((CidrValue) container).getEvaluationExpression(true);
-                    switch (dataType) {
-                        case "byteArray": {
-                            BinaryData data = new DebugViewData(new CCharArrayPageProvider(myDataNode, (CidrPhysicalValue) container));
-                            debugViewPanel.addProvider(new DefaultDebugViewDataProvider("C bytearray value", data));
-                            break;
-                        }
-                        default: {
-
-                        }
-                    }
-                }
+//                if (cValueClassAvailable && container instanceof CidrValue) {
+//                    String dataType = ((CidrValue) container).getEvaluationExpression(true);
+//                    switch (dataType) {
+//                        case "byteArray": {
+//                            BinaryData data = new DebugViewData(new CCharArrayPageProvider(myDataNode, (CidrPhysicalValue) container));
+//                            debugViewPanel.addProvider(new DefaultDebugViewDataProvider("C bytearray value", data));
+//                            break;
+//                        }
+//                        default: {
+//
+//                        }
+//                    }
+//                }
 
                 String valueCanonicalName = container.getClass().getCanonicalName();
                 if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {

@@ -1,13 +1,12 @@
 package org.exbin.bined.intellij.debug.c;
 
-import com.intellij.openapi.util.Key;
 import com.intellij.xdebugger.frame.XValuePlace;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.jetbrains.cidr.execution.debugger.backend.LLValue;
 import com.jetbrains.cidr.execution.debugger.backend.LLValueData;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrElementValue;
+import com.jetbrains.cidr.execution.debugger.evaluation.CidrLocalValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrPhysicalValue;
-import com.jetbrains.cidr.execution.debugger.evaluation.CidrValue;
 import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.DebugViewData;
 
@@ -15,6 +14,8 @@ import java.util.List;
 
 /**
  * C character array data source for debugger view.
+ *
+ * TODO
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.3 2020/03/23
@@ -25,10 +26,24 @@ public class CCharArrayPageProvider implements DebugViewData.PageProvider {
 
     public CCharArrayPageProvider(XValueNodeImpl myDataNode, CidrPhysicalValue cidrValue) {
         LLValue value = cidrValue.getPresentationVar();
+//        ValueRenderer preparedRenderer = cidrValue.getPreparedRenderer();
+//        preparedRenderer.getChildEvaluationExpression()
+//
+//        EvaluationContext evaluationContext = cidrValue.createEvaluationContext();
+//
+//        NSCollectionValueRenderer renderer = new NSCollectionValueRenderer(cidrValue, NSCollectionValueRenderer.Kind.ARRAY);
+//        renderer.computeMayHaveChildren(evaluationContext);
+
+        ((CidrLocalValue) cidrValue).computeValueChildren(myDataNode);
         CidrElementValue cidrElementValue = new CidrElementValue(value, "", cidrValue, 0, false);
         cidrElementValue.computePresentation(myDataNode, XValuePlace.TREE);
-        LLValueData preparedVarData = cidrElementValue.getPreparedVarData();
+        LLValue var = cidrElementValue.getVar();
+        cidrElementValue.computeChildren(myDataNode);
+//        myDataNode.getChildCount()
+//        KeyFMap userMap = var.getUserData(GDBDriver.LLVALUE_DATA);
+//        LLValueData preparedVarData = cidrElementValue.getPreparedVarData();
 
+//        cidrElementValue.getContainer().getPresentationVarData(cidrValue.getProcess().getDebuggerContext()); // cidrElementValue.createEvaluationContext()
 //        cidrValue.computePresentation();
 //        Object userData = cidrValue.getUserData(new Key<>("GDBDriver.LLVALUE_DATA"));
         this.arrayRef = null;
@@ -63,6 +78,6 @@ public class CCharArrayPageProvider implements DebugViewData.PageProvider {
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length();
+        return arrayRef == null ? 0 : arrayRef.length();
     }
 }

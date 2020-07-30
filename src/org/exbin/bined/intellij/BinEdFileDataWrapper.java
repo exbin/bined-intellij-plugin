@@ -15,33 +15,44 @@
  */
 package org.exbin.bined.intellij;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.io.FileTooBigException;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 import org.exbin.auxiliary.paged_data.PagedData;
-import org.exbin.bined.operation.BinaryDataOperationException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.ParametersAreNullableByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * File data wrapper.
+ * File data wrapper for IntelliJ Virtual File with caching.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.3 2020/07/29
+ * @version 0.2.3 2020/07/30
  */
 @ParametersAreNonnullByDefault
 public class BinEdFileDataWrapper implements EditableBinaryData {
 
     private static final int BUFFER_SIZE = 4096;
+    public static final int PAGE_SIZE = 4096;
+
     private final VirtualFile file;
+
+    private InputStream cacheInputStream = null;
+    private long cachePosition = 0;
+    private final DataPage[] cachePages = new DataPage[]{new DataPage(), new DataPage()};
+    private int nextCachePage = 0;
+
+    private volatile boolean writeInProgress = false;
 
     public BinEdFileDataWrapper(VirtualFile virtualFile) {
         this.file = virtualFile;
@@ -58,20 +69,18 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public byte getByte(long position) {
-        try {
-            InputStream inputStream = file.getInputStream();
-            StreamUtils.skipInputStreamData(inputStream, position);
-            int read = inputStream.read();
-            if (read < 0) {
-                throw new IllegalStateException("Broken virtual file");
-            }
-            inputStream.close();
+    public synchronized byte getByte(long position) {
+        long pageIndex = position / PAGE_SIZE;
+        int pageOffset = (int) (position % PAGE_SIZE);
 
-            return (byte) read;
-        } catch (IOException e) {
-            throw new IllegalStateException("Broken virtual file", e);
+        if (cachePages[0].pageIndex == pageIndex) {
+            return cachePages[0].page[pageOffset];
         }
+        if (cachePages[1].pageIndex == pageIndex) {
+            return cachePages[1].page[pageOffset];
+        }
+        int usedPage = loadPage(pageIndex);
+        return cachePages[usedPage].page[pageOffset];
     }
 
     @Nonnull
@@ -86,41 +95,59 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
 
     @Nonnull
     @Override
-    public BinaryData copy(long startFrom, long length) {
-        try {
-            PagedData data = new PagedData();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = data.getDataOutputStream();
-            StreamUtils.skipInputStreamData(inputStream, startFrom);
-            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, length);
-            outputStream.close();
-            inputStream.close();
+    public synchronized BinaryData copy(long startFrom, long length) {
+        long pageIndex = startFrom / PAGE_SIZE;
+        int pageOffset = (int) (startFrom % PAGE_SIZE);
 
-            return data;
-        } catch (IOException e) {
-            throw new IllegalStateException("Broken virtual file", e);
+        PagedData data = new PagedData();
+        long dataPosition = 0;
+        while (length > 0) {
+            int pageLength = length > PAGE_SIZE - pageOffset ? PAGE_SIZE - pageOffset : (int) length;
+            copyTo(data, dataPosition, pageIndex, pageOffset, pageLength);
+            pageIndex++;
+            pageOffset = 0;
+            dataPosition += pageLength;
+            length -= pageLength;
+        }
+
+        return data;
+    }
+
+    private void copyTo(PagedData data, long dataPosition, long pageIndex, int pageOffset, int pageLength) {
+        if (cachePages[0].pageIndex == pageIndex) {
+            data.insert(dataPosition, cachePages[0].page, pageOffset, pageLength);
+        } else if (cachePages[1].pageIndex == pageIndex) {
+            data.insert(dataPosition, cachePages[1].page, pageOffset, pageLength);
+        } else {
+            int usedPage = loadPage(pageIndex);
+            data.insert(dataPosition, cachePages[usedPage].page, pageOffset, pageLength);
         }
     }
 
     @Override
-    public void copyToArray(long startFrom, byte[] target, int offset, int length) {
-        try {
-            InputStream inputStream = file.getInputStream();
-            StreamUtils.skipInputStreamData(inputStream, startFrom);
-            int done = 0;
-            int remains = length;
-            while (remains > 0) {
-                int copied = inputStream.read(target, offset + done, remains);
-                if (copied < 0) {
-                    throw new IllegalStateException("Broken virtual file");
-                }
-                remains -= copied;
-                done += copied;
-            }
+    public synchronized void copyToArray(long startFrom, byte[] target, int offset, int length) {
+        long pageIndex = startFrom / PAGE_SIZE;
+        int pageOffset = (int) (startFrom % PAGE_SIZE);
 
-            inputStream.close();
-        } catch (IOException e) {
-            throw new IllegalStateException("Broken virtual file", e);
+        int dataPosition = offset;
+        while (length > 0) {
+            int pageLength = Math.min(length, PAGE_SIZE - pageOffset);
+            copyTo(target, dataPosition, pageIndex, pageOffset, pageLength);
+            pageIndex++;
+            pageOffset = 0;
+            dataPosition += pageLength;
+            length -= pageLength;
+        }
+    }
+
+    private void copyTo(byte[] data, int dataPosition, long pageIndex, int pageOffset, int pageLength) {
+        if (cachePages[0].pageIndex == pageIndex) {
+            System.arraycopy(cachePages[0].page, pageOffset, data, dataPosition, pageLength);
+        } else if (cachePages[1].pageIndex == pageIndex) {
+            System.arraycopy(cachePages[1].page, pageOffset, data, dataPosition, pageLength);
+        } else {
+            int usedPage = loadPage(pageIndex);
+            System.arraycopy(cachePages[usedPage].page, pageOffset, data, dataPosition, pageLength);
         }
     }
 
@@ -161,25 +188,20 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public void setByte(long position, byte value) {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> {
-            try {
-                long fileLength = file.getLength();
-                InputStream inputStream = file.getInputStream();
-                OutputStream outputStream = file.getOutputStream(null);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, position);
-                outputStream.write(value);
-                if (fileLength > position + 1) {
-                    StreamUtils.skipInputStreamData(inputStream, 1);
-                    StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - position - 1);
-                }
-
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
+    public synchronized void setByte(long position, byte value) {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, position);
+            outputStream.write(value);
+            if (fileLength > position + 1) {
+                StreamUtils.skipInputStreamData(inputStream, 1);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - position - 1);
             }
+
+            inputStream.close();
+            outputStream.close();
         });
     }
 
@@ -189,28 +211,23 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public void insert(long startFrom, long length) {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> {
-            try {
-                long fileLength = file.getLength();
-                InputStream inputStream = file.getInputStream();
-                OutputStream outputStream = file.getOutputStream(null);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
-                long remains = length;
-                while (remains > 0) {
-                    outputStream.write(0b0);
-                    remains--;
-                }
-                if (fileLength > startFrom) {
-                    StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
-                }
-
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
+    public synchronized void insert(long startFrom, long length) {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
+            long remains = length;
+            while (remains > 0) {
+                outputStream.write(0b0);
+                remains--;
             }
+            if (fileLength > startFrom) {
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
+            }
+
+            inputStream.close();
+            outputStream.close();
         });
     }
 
@@ -220,99 +237,79 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public void insert(long startFrom, byte[] insertedData, int insertedDataOffset, int insertedDataLength) {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> {
-            try {
-                long fileLength = file.getLength();
-                InputStream inputStream = file.getInputStream();
-                OutputStream outputStream = file.getOutputStream(null);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
-                outputStream.write(insertedData, insertedDataOffset, insertedDataLength);
-                if (fileLength > startFrom) {
-                    StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
-                }
-
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
+    public synchronized void insert(long startFrom, byte[] insertedData, int insertedDataOffset, int insertedDataLength) {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
+            outputStream.write(insertedData, insertedDataOffset, insertedDataLength);
+            if (fileLength > startFrom) {
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
             }
+
+            inputStream.close();
+            outputStream.close();
         });
     }
 
     @Override
-    public void insert(long startFrom, BinaryData insertedData) {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> {
-            try {
-                long fileLength = file.getLength();
-                InputStream inputStream = file.getInputStream();
-                OutputStream outputStream = file.getOutputStream(null);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
-                insertedData.saveToStream(outputStream);
-                if (fileLength > startFrom) {
-                    StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
-                }
-
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
+    public synchronized void insert(long startFrom, BinaryData insertedData) {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
+            insertedData.saveToStream(outputStream);
+            if (fileLength > startFrom) {
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
             }
+
+            inputStream.close();
+            outputStream.close();
         });
     }
 
     @Override
-    public void insert(long startFrom, BinaryData insertedData, final long insertedDataOffset, final long insertedDataLength) {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> {
-            try {
-                long fileLength = file.getLength();
-                InputStream inputStream = file.getInputStream();
-                OutputStream outputStream = file.getOutputStream(null);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
-                long length = insertedDataLength;
-                long offset = insertedDataOffset;
-                byte[] cache = new byte[length < BUFFER_SIZE ? (int) length : BUFFER_SIZE];
-                while (length > 0) {
-                    int toCopy = length > BUFFER_SIZE ? BUFFER_SIZE : (int) length;
-                    insertedData.copyToArray(offset, cache, 0, toCopy);
-                    outputStream.write(cache, 0, toCopy);
-                    length -= toCopy;
-                    offset += toCopy;
-                }
-                if (fileLength > startFrom) {
-                    StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
-                }
-
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
+    public synchronized void insert(long startFrom, BinaryData insertedData, final long insertedDataOffset, final long insertedDataLength) {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
+            long length = insertedDataLength;
+            long offset = insertedDataOffset;
+            byte[] cache = new byte[length < BUFFER_SIZE ? (int) length : BUFFER_SIZE];
+            while (length > 0) {
+                int toCopy = length > BUFFER_SIZE ? BUFFER_SIZE : (int) length;
+                insertedData.copyToArray(offset, cache, 0, toCopy);
+                outputStream.write(cache, 0, toCopy);
+                length -= toCopy;
+                offset += toCopy;
             }
+            if (fileLength > startFrom) {
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
+            }
+
+            inputStream.close();
+            outputStream.close();
         });
     }
 
     @Override
-    public long insert(long startFrom, InputStream insertStream, long maximumDataSize) throws IOException {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> {
-            try {
-                long fileLength = file.getLength();
-                InputStream inputStream = file.getInputStream();
-                OutputStream outputStream = file.getOutputStream(null);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(insertStream, outputStream, maximumDataSize);
-                if (fileLength > startFrom) {
-                    StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
-                }
-
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
+    public synchronized long insert(long startFrom, InputStream insertStream, long maximumDataSize) throws IOException {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(insertStream, outputStream, maximumDataSize);
+            if (fileLength > startFrom) {
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom);
             }
+
+            inputStream.close();
+            outputStream.close();
         });
 
         return maximumDataSize;
@@ -324,34 +321,29 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public void replace(long targetPosition, BinaryData replacingData, long startFrom, long replacingLength) {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> {
-            try {
-                long fileLength = file.getLength();
-                InputStream inputStream = file.getInputStream();
-                OutputStream outputStream = file.getOutputStream(null);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
-                long length = replacingLength;
-                long offset = startFrom;
-                byte[] cache = new byte[length < BUFFER_SIZE ? (int) length : BUFFER_SIZE];
-                while (length > 0) {
-                    int toCopy = length > BUFFER_SIZE ? BUFFER_SIZE : (int) length;
-                    replacingData.copyToArray(offset, cache, 0, toCopy);
-                    outputStream.write(cache, 0, toCopy);
-                    length -= toCopy;
-                    offset += toCopy;
-                }
-                if (fileLength > startFrom + replacingLength) {
-                    StreamUtils.skipInputStreamData(inputStream, replacingLength);
-                    StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom - replacingLength);
-                }
-
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
+    public synchronized void replace(long targetPosition, BinaryData replacingData, long startFrom, long replacingLength) {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
+            long length = replacingLength;
+            long offset = startFrom;
+            byte[] cache = new byte[length < BUFFER_SIZE ? (int) length : BUFFER_SIZE];
+            while (length > 0) {
+                int toCopy = length > BUFFER_SIZE ? BUFFER_SIZE : (int) length;
+                replacingData.copyToArray(offset, cache, 0, toCopy);
+                outputStream.write(cache, 0, toCopy);
+                length -= toCopy;
+                offset += toCopy;
             }
+            if (fileLength > startFrom + replacingLength) {
+                StreamUtils.skipInputStreamData(inputStream, replacingLength);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom - replacingLength);
+            }
+
+            inputStream.close();
+            outputStream.close();
         });
     }
 
@@ -361,25 +353,20 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public void replace(long targetPosition, byte[] replacingData, int replacingDataOffset, int length) {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> {
-            try {
-                long fileLength = file.getLength();
-                InputStream inputStream = file.getInputStream();
-                OutputStream outputStream = file.getOutputStream(null);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, targetPosition);
-                outputStream.write(replacingData, replacingDataOffset, length);
-                if (fileLength > targetPosition + length) {
-                    StreamUtils.skipInputStreamData(inputStream, length);
-                    StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - targetPosition - length);
-                }
-
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
+    public synchronized void replace(long targetPosition, byte[] replacingData, int replacingDataOffset, int length) {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, targetPosition);
+            outputStream.write(replacingData, replacingDataOffset, length);
+            if (fileLength > targetPosition + length) {
+                StreamUtils.skipInputStreamData(inputStream, length);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - targetPosition - length);
             }
+
+            inputStream.close();
+            outputStream.close();
         });
     }
 
@@ -389,43 +376,118 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public void fillData(long startFrom, long length, byte fill) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public synchronized void fillData(long startFrom, long length, byte fill) {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
+            for (int i = 0; i < length; i++) {
+                outputStream.write(fill);
+            }
+            if (fileLength > startFrom + length) {
+                StreamUtils.skipInputStreamData(inputStream, length);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom - length);
+            }
+
+            inputStream.close();
+            outputStream.close();
+        });
     }
 
     @Override
-    public void remove(long startFrom, long length) {
+    public synchronized void remove(long startFrom, long length) {
+        writeAction(() -> {
+            long fileLength = file.getLength();
+            InputStream inputStream = file.getInputStream();
+            OutputStream outputStream = file.getOutputStream(null);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
+            if (fileLength > startFrom + length) {
+                StreamUtils.skipInputStreamData(inputStream, length);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom - length);
+            }
+
+            inputStream.close();
+            outputStream.close();
+        });
+    }
+
+    @Override
+    public synchronized void clear() {
+        writeAction(() -> {
+            OutputStream outputStream = file.getOutputStream(null);
+            outputStream.close();
+        });
+    }
+
+    public boolean isWriteInProgress() {
+        return writeInProgress;
+    }
+
+    private void writeAction(WriteRunnable action) {
         Application application = ApplicationManager.getApplication();
         application.runWriteAction(() -> {
+            writeInProgress = true;
             try {
-                long fileLength = file.getLength();
-                InputStream inputStream = file.getInputStream();
-                OutputStream outputStream = file.getOutputStream(null);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
-                if (fileLength > startFrom + length) {
-                    StreamUtils.skipInputStreamData(inputStream, length);
-                    StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom - length);
+                action.run();
+            } catch (IOException ex) {
+                if (ex instanceof FileTooBigException) {
+//                    JBPopupFactory factory = JBPopupFactory.getInstance();
+//                    BalloonBuilder builder = factory.createHtmlTextBalloonBuilder(ex.getMessage(), MessageType.INFO, null);
+//                    Balloon balloon = builder.createBalloon();
+//                    Project project = ProjectManager.getInstance().getDefaultProject();
+//                    balloon.show(RelativePoint.getCenterOf(WindowManager.getInstance().getStatusBar(project).getComponent()), Balloon.Position.above);
+
+                    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Notifications.Bus.notify(new Notification("org.exbin.deltahex.intellij", "Write Failed", "File too big: " + ex.getMessage(), NotificationType.ERROR));
+                        }
+                    });
+                } else {
+                    throw new IllegalStateException("Broken virtual file", ex);
                 }
-
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
             }
+            resetCache();
+            writeInProgress = false;
         });
     }
 
-    @Override
-    public void clear() {
-        Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> {
+    public void resetCache() {
+        if (cacheInputStream != null) {
             try {
-                OutputStream outputStream = file.getOutputStream(null);
-                outputStream.close();
+                cacheInputStream.close();
             } catch (IOException e) {
-                throw new IllegalStateException("Broken virtual file", e);
+                e.printStackTrace();
             }
-        });
+            cacheInputStream = null;
+        }
+
+        cachePages[0].pageIndex = -1;
+        cachePages[1].pageIndex = -1;
+    }
+
+    public synchronized void close() {
+        resetCache();
+    }
+
+    @Nonnull
+    private InputStream getInputStream(long position) throws IOException {
+        if (cacheInputStream != null && cachePosition <= position) {
+            if (cachePosition < position) {
+                StreamUtils.skipInputStreamData(cacheInputStream, position - cachePosition);
+                cachePosition = position;
+            }
+        } else {
+            if (cacheInputStream != null) {
+                cacheInputStream.close();
+            }
+            cacheInputStream = file.getInputStream();
+            StreamUtils.skipInputStreamData(cacheInputStream, position);
+            cachePosition = position;
+        }
+
+        return cacheInputStream;
     }
 
     @Override
@@ -437,5 +499,42 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     @Override
     public OutputStream getDataOutputStream() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    private int loadPage(long pageIndex) {
+        int usedPage = nextCachePage;
+        long position = pageIndex * PAGE_SIZE;
+        long dataSize = getDataSize();
+        try {
+            InputStream inputStream = getInputStream(position);
+
+            int done = 0;
+            int remains = position + PAGE_SIZE > dataSize ? (int) (dataSize - position) : PAGE_SIZE;
+            while (remains > 0) {
+                int copied = inputStream.read(cachePages[usedPage].page, done, remains);
+                if (copied < 0) {
+                    throw new IllegalStateException("Broken virtual file");
+                }
+                cachePosition += copied;
+                remains -= copied;
+                done += copied;
+            }
+
+            cachePages[usedPage].pageIndex = pageIndex;
+            nextCachePage = 1 - nextCachePage;
+        } catch (IOException e) {
+            throw new IllegalStateException("Broken virtual file", e);
+        }
+
+        return usedPage;
+    }
+
+    private static class DataPage {
+        long pageIndex = -1;
+        byte[] page = new byte[PAGE_SIZE];
+    }
+
+    public interface WriteRunnable {
+        void run() throws IOException;
     }
 }

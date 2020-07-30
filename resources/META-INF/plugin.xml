@@ -6,9 +6,9 @@
 
     <description><![CDATA[
 <p>Binary/hexadecimal editor plugin based on BinEd library.</p>
-<p>Use "Open as Binary" action in main "File" menu or in project files context menu.</p>
-<p>Use "View as Binary" action in context menu in variables/debug window.</p>
-<p>Associate file extension with Binary File file type in Options/Editor/File Types</p>
+<ul><li>Use "Open as Binary" action in main "File" menu or in project files context menu.</li>
+<li>Use "View as Binary" action in context menu in variables/debug window.</li>
+<li>Associate file extension with Binary File file type in Options/Editor/File Types</li></ul>
 
 <h1>Preview</h1>
 <p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.3.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
@@ -32,7 +32,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Added debugger array support for PHP, C</li>
+<ul><li>Fixed debugger array support for PHP</li>
 <li>Added binary file type</li>
 </ul>
     ]]>
