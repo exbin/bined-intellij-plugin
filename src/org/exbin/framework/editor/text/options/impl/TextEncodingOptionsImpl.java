@@ -22,17 +22,18 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
 import org.exbin.framework.gui.options.api.OptionsData;
+import org.exbin.xbup.core.util.StringUtils;
 
 /**
  * Text encoding options.
  *
- * @version 0.2.1 2019/07/19
+ * @version 0.2.1 2020/08/17
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class TextEncodingOptionsImpl implements TextEncodingOptions, OptionsData {
 
-    private String selectedEncoding = TextEncodingPreferences.ENCODING_UTF8;
+    private String selectedEncoding = StringUtils.ENCODING_UTF8;
     private List<String> encodings = new ArrayList<>();
 
     @Nonnull

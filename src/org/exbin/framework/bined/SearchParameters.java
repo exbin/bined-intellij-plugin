@@ -15,12 +15,16 @@
  */
 package org.exbin.framework.bined;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * Parameters for action to search for occurences of text or data.
  *
  * @version 0.1.0 2016/07/21
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class SearchParameters {
 
     private SearchCondition condition = new SearchCondition();
@@ -33,6 +37,7 @@ public class SearchParameters {
     public SearchParameters() {
     }
 
+    @Nonnull
     public SearchCondition getCondition() {
         return condition;
     }
@@ -90,11 +95,11 @@ public class SearchParameters {
         searchDirection = searchParameters.getSearchDirection();
     }
 
-    public static enum SearchMode {
+    public enum SearchMode {
         TEXT, BINARY
     }
 
-    public static enum SearchDirection {
+    public enum SearchDirection {
         FORWARD, BACKWARD
     }
 }

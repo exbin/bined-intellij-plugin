@@ -42,7 +42,7 @@ public class DefaultControlPanel extends javax.swing.JPanel implements DefaultCo
     public DefaultControlPanel(java.util.ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
         initComponents();
-        
+
         okCancelListener = new OkCancelListener() {
             @Override
             public void okEvent() {

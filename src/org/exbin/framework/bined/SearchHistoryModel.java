@@ -17,6 +17,7 @@ package org.exbin.framework.bined;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -27,6 +28,7 @@ import javax.swing.event.ListDataListener;
  * @version 0.1.0 2016/07/19
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class SearchHistoryModel implements ComboBoxModel<SearchCondition> {
 
     public static final int HISTORY_LIMIT = 10;

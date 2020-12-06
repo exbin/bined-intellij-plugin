@@ -70,7 +70,7 @@
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/editor/text/options/panel/resources/TextFontOptionsPanel.properties" key="defaultFontCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/editor/text/options/gui/resources/TextFontOptionsPanel.properties" key="defaultFontCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
         <Property name="name" type="java.lang.String" value="defaultFontCheckBox" noResource="true"/>
       </Properties>
@@ -81,7 +81,7 @@
     <Component class="javax.swing.JButton" name="fillDefaultFontButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/editor/text/options/panel/resources/TextFontOptionsPanel.properties" key="fillDefaultFontButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/editor/text/options/gui/resources/TextFontOptionsPanel.properties" key="fillDefaultFontButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="fillDefaultFontButton" noResource="true"/>
@@ -93,7 +93,7 @@
     <Component class="javax.swing.JButton" name="changeFontButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/editor/text/options/panel/resources/TextFontOptionsPanel.properties" key="changeFontButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/editor/text/options/gui/resources/TextFontOptionsPanel.properties" key="changeFontButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="changeFontButton" noResource="true"/>
@@ -109,7 +109,7 @@
         </Property>
         <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/editor/text/options/panel/resources/TextFontOptionsPanel.properties" key="fontPreviewLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/editor/text/options/gui/resources/TextFontOptionsPanel.properties" key="fontPreviewLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
@@ -124,7 +124,7 @@
     <Component class="javax.swing.JButton" name="fillCurrentFontButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/editor/text/options/panel/resources/TextFontOptionsPanel.properties" key="fillCurrentFontButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/editor/text/options/gui/resources/TextFontOptionsPanel.properties" key="fillCurrentFontButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="fillCurrentFontButton" noResource="true"/>

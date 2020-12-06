@@ -128,7 +128,7 @@ public class SearchCondition {
         }
     }
 
-    public static enum SearchMode {
+    public enum SearchMode {
         TEXT, BINARY
     }
 }

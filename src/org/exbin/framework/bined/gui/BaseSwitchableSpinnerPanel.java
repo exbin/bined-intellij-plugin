@@ -1,18 +1,17 @@
 /*
  * Copyright (C) ExBin Project
  *
- * This application or library is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This application or library is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along this application.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.exbin.framework.bined.gui;
 
@@ -29,6 +28,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -47,9 +47,10 @@ import org.exbin.framework.gui.utils.WindowUtils;
 /**
  * Spinner supporting multiple bases.
  *
- * @version 0.2.1 2019/07/30
+ * @version 0.2.1 2020/12/06
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
 
     private boolean adjusting;
@@ -96,6 +97,7 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         spinner = new javax.swing.JSpinner();
 
         octalMenuItem.setText("OCT");
+        octalMenuItem.setToolTipText("Octal");
         octalMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 octalMenuItemActionPerformed(evt);
@@ -104,6 +106,7 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         baseSwitchPopupMenu.add(octalMenuItem);
 
         decimalMenuItem.setText("DEC");
+        decimalMenuItem.setToolTipText("Decimal");
         decimalMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 decimalMenuItemActionPerformed(evt);
@@ -112,6 +115,7 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         baseSwitchPopupMenu.add(decimalMenuItem);
 
         hexadecimalMenuItem.setText("HEX");
+        hexadecimalMenuItem.setToolTipText("Hexadecimal");
         hexadecimalMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hexadecimalMenuItemActionPerformed(evt);
@@ -122,6 +126,7 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(400, 300));
 
         baseSwitchButton.setText("DEC");
+        baseSwitchButton.setToolTipText("Decimal");
         baseSwitchButton.setComponentPopupMenu(baseSwitchPopupMenu);
         baseSwitchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -200,7 +205,9 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
     private void switchNumBase(PositionCodeType codeType) {
         adjusting = true;
         long value = getValue();
+        int position = codeType.ordinal();
         baseSwitchButton.setText(codeType.name().substring(0, 3));
+        baseSwitchButton.setToolTipText(((JMenuItem) baseSwitchPopupMenu.getComponent(position)).getToolTipText());
         spinnerEditor.setPositionCodeType(codeType);
         setValue(value);
         adjusting = false;
@@ -234,7 +241,7 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
     public void setMaximum(long maximum) {
         ((SpinnerNumberModel) spinner.getModel()).setMaximum(maximum);
     }
-    
+
     public void revalidateSpinner() {
         spinner.revalidate();
     }

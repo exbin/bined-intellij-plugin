@@ -113,7 +113,7 @@ public interface BinaryStatusApi {
     }
 
     @ParametersAreNonnullByDefault
-    public static enum MemoryMode {
+    public enum MemoryMode {
 
         READ_ONLY("R", "read_only"),
         RAM_MEMORY("M", "ram"),

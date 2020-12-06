@@ -11,6 +11,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="octalMenuItem">
           <Properties>
             <Property name="text" type="java.lang.String" value="OCT"/>
+            <Property name="toolTipText" type="java.lang.String" value="Octal"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="octalMenuItemActionPerformed"/>
@@ -19,6 +20,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="decimalMenuItem">
           <Properties>
             <Property name="text" type="java.lang.String" value="DEC"/>
+            <Property name="toolTipText" type="java.lang.String" value="Decimal"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="decimalMenuItemActionPerformed"/>
@@ -27,6 +29,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="hexadecimalMenuItem">
           <Properties>
             <Property name="text" type="java.lang.String" value="HEX"/>
+            <Property name="toolTipText" type="java.lang.String" value="Hexadecimal"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hexadecimalMenuItemActionPerformed"/>
@@ -73,6 +76,7 @@
     <Component class="javax.swing.JButton" name="baseSwitchButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="DEC"/>
+        <Property name="toolTipText" type="java.lang.String" value="Decimal"/>
         <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="baseSwitchPopupMenu"/>
         </Property>

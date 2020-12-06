@@ -25,6 +25,7 @@ import org.exbin.framework.api.Preferences;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
 import org.exbin.framework.editor.text.preferences.TextFontPreferences;
+import org.exbin.xbup.core.util.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -166,8 +167,8 @@ public class BinaryEditorPreferences {
         encodingPreferences.setEncodings(new ArrayList<>(legacyPreferences.getEncodings()));
         Collection<String> legacyEncodings = legacyPreferences.getEncodings();
         List<String> encodings = new ArrayList<>(legacyEncodings);
-        if (!encodings.isEmpty() && !encodings.contains(TextEncodingPreferences.ENCODING_UTF8)) {
-            encodings.add(TextEncodingPreferences.ENCODING_UTF8);
+        if (!encodings.isEmpty() && !encodings.contains(StringUtils.ENCODING_UTF8)) {
+            encodings.add(StringUtils.ENCODING_UTF8);
         }
         encodingPreferences.setEncodings(encodings);
         fontPreferences.setUseDefaultFont(legacyPreferences.isUseDefaultFont());

@@ -15,12 +15,15 @@
  */
 package org.exbin.framework.bined;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * Parameters for action to replace for occurences of text or data.
  *
  * @version 0.2.0 2016/12/21
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class ReplaceParameters {
 
     private SearchCondition condition = new SearchCondition();
@@ -58,7 +61,7 @@ public class ReplaceParameters {
         this.replaceAll = replaceAll;
     }
 
-    public static enum ReplaceMode {
+    public enum ReplaceMode {
         TEXT, BINARY
     }
 }
