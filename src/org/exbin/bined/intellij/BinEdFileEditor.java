@@ -209,6 +209,9 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
         return virtualFile;
     }
 
+    @Override
+    public VirtualFile getFile() { return virtualFile; }
+
     public Project getProject() {
         return project;
     }
