@@ -19,6 +19,7 @@ import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
+import com.intellij.openapi.vfs.VirtualFileWithId;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,9 +33,9 @@ import java.io.OutputStream;
  * Virtual file for binary editor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.1 2019/08/23
+ * @version 0.2.4 2021/04/11
  */
-public class BinEdVirtualFile extends VirtualFile {
+public class BinEdVirtualFile extends VirtualFile implements VirtualFileWithId {
 
     public static final String PATH_PREFIX = "bined://";
 
@@ -190,5 +191,15 @@ public class BinEdVirtualFile extends VirtualFile {
 
     public JComponent getPreferredFocusedComponent() {
         return editorFile.getPreferredFocusedComponent();
+    }
+
+    /**
+     * Seems like some versions of IDE taps into this for some reason.
+     *
+     * @return invalid ID
+     */
+    @Override
+    public int getId() {
+        return 0;
     }
 }

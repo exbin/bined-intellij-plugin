@@ -32,13 +32,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.List;
 
 /**
  * File editor using BinEd editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.2 2020/01/17
+ * @version 0.2.4 2021/04/10
  */
 @ParametersAreNonnullByDefault
 public class BinEdFileEditor implements FileEditor, DumbAware {
@@ -205,6 +204,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
         this.displayName = displayName;
     }
 
+    @Nonnull
     public BinEdVirtualFile getVirtualFile() {
         return virtualFile;
     }

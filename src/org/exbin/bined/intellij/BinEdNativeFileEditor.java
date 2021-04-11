@@ -148,6 +148,9 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
         return nativeFile;
     }
 
+    @Override
+    public VirtualFile getFile() { return nativeFile.getVirtualFile(); }
+
     public Project getProject() {
         return project;
     }

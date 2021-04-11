@@ -15,15 +15,19 @@
  */
 package org.exbin.bined.intellij;
 
+import com.intellij.ide.highlighter.ArchiveFileType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
+import com.intellij.openapi.fileTypes.DirectoryFileType;
+import com.intellij.openapi.fileTypes.UnknownFileType;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +37,7 @@ import java.util.List;
  * Open file in binary editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.1 2019/08/22
+ * @version 0.2.4 2021/04/10
  */
 public class OpenAsBinaryAction extends AnAction implements DumbAware {
 
@@ -44,7 +48,8 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
     @Override
     public void update(@NotNull AnActionEvent event) {
         super.update(event);
-        event.getPresentation().setEnabledAndVisible(true);
+        VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
+        event.getPresentation().setEnabledAndVisible(virtualFile != null && virtualFile.isValid() && !(virtualFile.getFileType() instanceof DirectoryFileType || virtualFile.getFileType() instanceof UnknownFileType));
     }
 
     @Override
@@ -55,7 +60,17 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
         }
 
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
-        if (virtualFile != null && virtualFile.isValid() && !virtualFile.isDirectory()) {
+        boolean isValid = virtualFile != null && virtualFile.isValid();
+        if (isValid && virtualFile.isDirectory()) {
+            isValid = false;
+            if (virtualFile.getFileType() instanceof ArchiveFileType) {
+                if (virtualFile.getFileSystem() instanceof JarFileSystem) {
+                    virtualFile = ((JarFileSystem) virtualFile.getFileSystem()).getVirtualFileForJar(virtualFile);
+                    isValid = virtualFile != null;
+                }
+            }
+        }
+        if (isValid) {
             BinEdVirtualFile binEdVirtualFile = new BinEdVirtualFile(virtualFile);
             OpenFileDescriptor descriptor = new OpenFileDescriptor(project, binEdVirtualFile, 0);
             FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
