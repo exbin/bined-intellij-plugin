@@ -350,7 +350,7 @@ public class BinEdToolbarPanel extends javax.swing.JPanel {
         toolbar.getPresentation(action).putClientProperty("selected", selected);
     }
 
-    private static Icon load(String path) {
-        return IconLoader.getIcon(path);
+    private Icon load(String path) {
+        return IconLoader.getIcon(path, getClass());
     }
 }

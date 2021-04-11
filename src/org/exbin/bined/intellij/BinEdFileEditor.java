@@ -23,6 +23,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 
@@ -32,12 +33,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * File editor using BinEd editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.4 2021/04/10
+ * @version 0.2.4 2021/04/11
  */
 @ParametersAreNonnullByDefault
 public class BinEdFileEditor implements FileEditor, DumbAware {
@@ -48,6 +52,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
     private String displayName;
     private BinEdVirtualFile virtualFile;
     private BinEdFileEditorState fileEditorState = new BinEdFileEditorState();
+    private static VirtualFile NULL_VIRTUAL_FILE = new NullVirtualFile();
 
     public BinEdFileEditor(Project project, final BinEdVirtualFile virtualFile) {
         this.project = project;
@@ -135,12 +140,12 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
 
     @Nonnull
     @Override
-    public FileEditorState getState(@Nonnull FileEditorStateLevel level) {
+    public FileEditorState getState(FileEditorStateLevel level) {
         return fileEditorState;
     }
 
     @Override
-    public void setState(@Nonnull FileEditorState state) {
+    public void setState(FileEditorState state) {
     }
 
     @Override
@@ -164,12 +169,12 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
     }
 
     @Override
-    public void addPropertyChangeListener(@Nonnull PropertyChangeListener listener) {
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     @Override
-    public void removePropertyChangeListener(@Nonnull PropertyChangeListener listener) {
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
@@ -192,12 +197,12 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
 
     @Nullable
     @Override
-    public <T> T getUserData(@Nonnull Key<T> key) {
+    public <T> T getUserData(Key<T> key) {
         return null;
     }
 
     @Override
-    public <T> void putUserData(@Nonnull Key<T> key, @Nullable T value) {
+    public <T> void putUserData(Key<T> key, @Nullable T value) {
     }
 
     public void setDisplayName(String displayName) {
@@ -209,10 +214,93 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
         return virtualFile;
     }
 
+    @Nonnull
     @Override
-    public VirtualFile getFile() { return virtualFile; }
+    public VirtualFile getFile() {
+        return NULL_VIRTUAL_FILE;
+    }
 
+    @Nonnull
     public Project getProject() {
         return project;
+    }
+
+    @ParametersAreNonnullByDefault
+    private static class NullVirtualFile extends VirtualFile {
+        @Nonnull
+        @Override
+        public String getName() {
+            return "NULL";
+        }
+
+        @Nonnull
+        @Override
+        public VirtualFileSystem getFileSystem() {
+            return new BinEdFileSystem();
+        }
+
+        @Nonnull
+        @Override
+        public String getPath() {
+            return "";
+        }
+
+        @Override
+        public boolean isWritable() {
+            return false;
+        }
+
+        @Override
+        public boolean isDirectory() {
+            return false;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Nullable
+        @Override
+        public VirtualFile getParent() {
+            return null;
+        }
+
+        @Nonnull
+        @Override
+        public VirtualFile[] getChildren() {
+            return new VirtualFile[0];
+        }
+
+        @Nonnull
+        @Override
+        public OutputStream getOutputStream(Object requestor, long newModificationStamp, long newTimeStamp) throws IOException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Nonnull
+        @Override
+        public byte[] contentsToByteArray() throws IOException {
+            return new byte[0];
+        }
+
+        @Override
+        public long getTimeStamp() {
+            return 0;
+        }
+
+        @Override
+        public long getLength() {
+            return 0;
+        }
+
+        @Override
+        public void refresh(boolean asynchronous, boolean recursive, @Nullable Runnable postRunnable) {
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            throw new UnsupportedOperationException();
+        }
     }
 }

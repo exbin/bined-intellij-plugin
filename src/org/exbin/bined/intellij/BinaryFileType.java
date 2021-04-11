@@ -77,6 +77,6 @@ public class BinaryFileType implements FileType {
     @Nullable
     @Override
     public String getCharset(@NotNull VirtualFile file, @NotNull byte[] content) {
-        return CharsetToolkit.US_ASCII_CHARSET.name();
+        return "US-ASCII";
     }
 }

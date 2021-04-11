@@ -36,7 +36,7 @@ import java.beans.PropertyChangeSupport;
  * Native file editor using BinEd editor component.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.2 2020/07/29
+ * @version 0.2.4 2021/04/11
  */
 @ParametersAreNonnullByDefault
 public class BinEdNativeFileEditor implements FileEditor, DumbAware {
@@ -75,12 +75,12 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
 
     @Nonnull
     @Override
-    public FileEditorState getState(@Nonnull FileEditorStateLevel level) {
+    public FileEditorState getState(FileEditorStateLevel level) {
         return fileEditorState;
     }
 
     @Override
-    public void setState(@Nonnull FileEditorState state) {
+    public void setState(FileEditorState state) {
     }
 
     @Override
@@ -104,12 +104,12 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
     }
 
     @Override
-    public void addPropertyChangeListener(@Nonnull PropertyChangeListener listener) {
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     @Override
-    public void removePropertyChangeListener(@Nonnull PropertyChangeListener listener) {
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
@@ -132,25 +132,30 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
 
     @Nullable
     @Override
-    public <T> T getUserData(@Nonnull Key<T> key) {
+    public <T> T getUserData(Key<T> key) {
         return null;
     }
 
     @Override
-    public <T> void putUserData(@Nonnull Key<T> key, @Nullable T value) {
+    public <T> void putUserData(Key<T> key, @Nullable T value) {
     }
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
+    @Nonnull
     public BinEdNativeFile getNativeFile() {
         return nativeFile;
     }
 
+    @Nonnull
     @Override
-    public VirtualFile getFile() { return nativeFile.getVirtualFile(); }
+    public VirtualFile getFile() {
+        return nativeFile.getVirtualFile();
+    }
 
+    @Nonnull
     public Project getProject() {
         return project;
     }

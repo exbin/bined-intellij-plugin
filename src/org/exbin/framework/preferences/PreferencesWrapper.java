@@ -27,7 +27,7 @@ import java.util.Optional;
 /**
  * Wrapper for preferences.
  *
- * @version 0.2.1 2019/08/08
+ * @version 0.2.4 2021/04/11
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -88,8 +88,14 @@ public class PreferencesWrapper implements Preferences {
     }
 
     @Override
-    public long getLong(String key, long def) {
-        return preferences.getOrInitLong(prefix + key, def);
+    public long getLong(String key, long defaultValue) {
+        try {
+            String value = preferences.getValue(prefix + key);
+            return value == null ? defaultValue : Long.parseLong(value);
+        }
+        catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 
     @Override

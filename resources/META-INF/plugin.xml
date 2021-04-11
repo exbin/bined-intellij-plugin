@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://bined.exbin.org/intellij-plugin">
     <id>org.exbin.deltahex.intellij</id>
     <name>BinEd - Binary/Hexadecimal Editor</name>
-    <version>0.2.4.snapshot</version>
+    <version>0.2.4</version>
     <vendor email="exbinproject@gmail.com" url="https://exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
@@ -11,7 +11,7 @@
 <li>Associate file extension with Binary File file type in Options/Editor/File Types</li></ul>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.3.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.4.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
 
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
@@ -32,7 +32,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Added String field in values panel</li>
+<ul><li>Added string field in values panel</li>
 <li>Fixed Can't close any tabs once a binary file is opened</li>
 </ul>
     ]]>
@@ -51,7 +51,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     <depends optional="true" config-file="go-ext.xml">com.intellij.modules.go</depends>
     <depends optional="true" config-file="ruby-ext.xml">com.intellij.modules.ruby</depends>
     <depends optional="true" config-file="c-ext.xml">com.intellij.modules.clion</depends>
-    <depends optional="true" config-file="database-ext.xml">com.intellij.modules.database</depends>
+<!--    <depends optional="true" config-file="database-ext.xml">com.intellij.modules.database</depends> -->
 
     <project-components>
     </project-components>
