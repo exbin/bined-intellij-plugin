@@ -1,3 +1,6 @@
+0.2.5
+- 
+
 0.2.4 (2021-04-11)
 - Added string field in values panel (issue #8)
 - Fixed 2021.1: Can't close any tabs once a binary file is opened (issue #35)

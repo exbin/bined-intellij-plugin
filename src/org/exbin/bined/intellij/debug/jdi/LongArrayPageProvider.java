@@ -19,6 +19,7 @@ import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.DebugViewData;
 import org.exbin.framework.bined.gui.ValuesPanel;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
  */
+@ParametersAreNonnullByDefault
 public class LongArrayPageProvider implements DebugViewData.PageProvider {
 
     private final ArrayReference arrayRef;

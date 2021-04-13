@@ -18,6 +18,7 @@ package org.exbin.bined.intellij.debug.jdi;
 import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.DebugViewData;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.2 2020/01/18
  */
+@ParametersAreNonnullByDefault
 public class BooleanArrayPageProvider implements DebugViewData.PageProvider {
 
     private final ArrayReference arrayRef;

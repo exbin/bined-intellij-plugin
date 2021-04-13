@@ -20,6 +20,7 @@ import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,6 +31,7 @@ import java.io.OutputStream;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.0 2019/03/15
  */
+@ParametersAreNonnullByDefault
 public class DebugViewData implements BinaryData {
 
     public static final int PAGE_SIZE = 2048;
@@ -186,6 +188,7 @@ public class DebugViewData implements BinaryData {
         throw new UnsupportedOperationException("Save to stream is not supported");
     }
 
+    @Nonnull
     @Override
     public InputStream getDataInputStream() {
         throw new UnsupportedOperationException("Data input stream is not supported");
@@ -201,7 +204,7 @@ public class DebugViewData implements BinaryData {
         long getDocumentSize();
     }
 
-    private class CachePage {
+    private static class CachePage {
         long index = 0;
         byte[] data = null;
     }

@@ -18,6 +18,7 @@ package org.exbin.bined.intellij.debug.jdi;
 import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.DebugViewData;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.1.6 2018/03/03
  */
+@ParametersAreNonnullByDefault
 public class FloatArrayPageProvider implements DebugViewData.PageProvider {
 
     private final byte[] valuesCache = new byte[4];

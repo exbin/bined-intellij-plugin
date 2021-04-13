@@ -42,8 +42,8 @@ public class DefaultDebugViewDataProvider implements DebugViewDataProvider {
         return name;
     }
 
-    @Override
     @Nonnull
+    @Override
     public BinaryData getData() {
         return data;
     }

@@ -19,6 +19,7 @@ import org.exbin.bined.intellij.debug.DebugViewData;
 import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 
 /**
@@ -27,12 +28,13 @@ import java.util.Map;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.3 2020/01/30
  */
+@ParametersAreNonnullByDefault
 public class PhpByteArrayPageProvider implements DebugViewData.PageProvider {
 
     private final Map<String, String> value;
     private int size = 0;
 
-    public PhpByteArrayPageProvider(@NotNull Map<String, String> value) {
+    public PhpByteArrayPageProvider(Map<String, String> value) {
         this.value = value;
 
         int pos = 0;

@@ -25,12 +25,15 @@ import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.FileHandlingMode;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * Panel to show debug view.
  *
  * @version 0.2.2 2020/01/16
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class DebugViewPanel extends javax.swing.JPanel {
 
     private final List<DebugViewDataProvider> providers = new ArrayList<>();

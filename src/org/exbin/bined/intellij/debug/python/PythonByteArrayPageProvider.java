@@ -19,6 +19,8 @@ import org.exbin.bined.intellij.debug.DebugViewData;
 import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * Python bytes/bytearray data source for debugger view.
  * <p>
@@ -27,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.2 2020/01/24
  */
+@ParametersAreNonnullByDefault
 public class PythonByteArrayPageProvider implements DebugViewData.PageProvider {
 
     private static final String BYTEARRAY_PREFIX = "bytearray(";
@@ -34,7 +37,7 @@ public class PythonByteArrayPageProvider implements DebugViewData.PageProvider {
     private final String value;
     private final long length;
 
-    public PythonByteArrayPageProvider(@NotNull String value) {
+    public PythonByteArrayPageProvider(String value) {
         this.value = value;
 
         length = computeLength(value);

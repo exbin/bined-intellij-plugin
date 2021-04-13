@@ -46,10 +46,10 @@ import org.exbin.bined.intellij.debug.jdi.*;
 import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.framework.bined.gui.ValuesPanel;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigInteger;
@@ -66,6 +66,7 @@ import java.util.logging.Logger;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.2 2020/01/17
  */
+@ParametersAreNonnullByDefault
 public class DebugViewBinaryAction extends XFetchValueActionBase implements DumbAware {
 
     private static boolean classesDetected = false;
@@ -104,9 +105,9 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
     protected void handle(Project project, String value, XDebuggerTree tree) {
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    protected ValueCollector createCollector(@NotNull AnActionEvent e) {
+    protected ValueCollector createCollector(AnActionEvent e) {
         XValueNodeImpl node = getDataNode(e);
         return new ValueCollector(XDebuggerTree.getTree(e.getDataContext())) {
             DataDialog dialog = null;
@@ -129,14 +130,14 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
     }
 
     @Override
-    public void update(@NotNull AnActionEvent event) {
+    public void update(AnActionEvent event) {
         super.update(event);
         if (getDataNode(event) != null) {
             event.getPresentation().setText("View as Binary");
         }
     }
 
-    private static XValueNodeImpl getDataNode(@NotNull AnActionEvent event) {
+    private static XValueNodeImpl getDataNode(AnActionEvent event) {
         if (!classesDetected) detectClasses();
 
         List<XValueNodeImpl> selectedNodes = XDebuggerTreeActionBase.getSelectedNodes(event.getDataContext());
@@ -178,6 +179,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                 || CommonClassNames.JAVA_LANG_CHARACTER.equals(type);
     }
 
+    @ParametersAreNonnullByDefault
     private static class DataDialog extends DialogWrapper {
 
         private final Project project;
@@ -204,8 +206,8 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
             init();
         }
 
-        @NotNull
-        private void identifyData(@Nonnull DebugViewPanel debugViewPanel, @Nullable String initialValue) {
+        @Nonnull
+        private void identifyData(DebugViewPanel debugViewPanel, @Nullable String initialValue) {
             if (!classesDetected) detectClasses();
 
             if (myDataNode != null) {
@@ -304,13 +306,13 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
             }
 
             debugViewPanel.addProvider(new DebugViewDataProvider() {
-                @NotNull
+                @Nonnull
                 @Override
                 public String getName() {
                     return "toString()";
                 }
 
-                @NotNull
+                @Nonnull
                 @Override
                 public BinaryData getData() {
                     if (initialValue != null) {
@@ -322,6 +324,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
             });
         }
 
+        @Nullable
         private BinaryData processArrayData(ValueDescriptorImpl descriptor) {
             final ArrayReference arrayRef = (ArrayReference) descriptor.getValue();
             final ArrayType arrayType = (ArrayType) descriptor.getType();
@@ -366,6 +369,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
             return null;
         }
 
+        @Nullable
         private BinaryData processSimpleValue(ValueDescriptorImpl descriptor) {
             String typeString = descriptor.getDeclaredType();
             if (typeString == null) {
@@ -459,6 +463,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
             return null;
         }
 
+        @Nonnull
         private Value getPrimitiveValue(ValueDescriptorImpl descriptor) {
             if (descriptor.isPrimitive())
                 return descriptor.getValue();
@@ -482,8 +487,8 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
             super.doOKAction();
         }
 
+        @Nonnull
         @Override
-        @NotNull
         protected Action[] createActions() {
             return myDataNode != null ? new Action[]{getOKAction(), getCancelAction()} : new Action[]{getCancelAction()};
         }
@@ -508,7 +513,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
     }
 
     private static class PyValueFuture extends AbstractFuture<String> {
-        public PyValueFuture(@NotNull XValueNodeImpl dataNode) {
+        public PyValueFuture(@Nonnull XValueNodeImpl dataNode) {
             super();
 
             XFullValueEvaluator fullValueEvaluator = dataNode.getFullValueEvaluator();
@@ -530,17 +535,17 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                 }
 
                 @Override
-                public void evaluated(@NotNull String s) {
+                public void evaluated(@Nonnull String s) {
                     set(s);
                 }
 
                 @Override
-                public void evaluated(@NotNull String s, @Nullable Font font) {
+                public void evaluated(@Nonnull String s, @Nullable Font font) {
                     set(s);
                 }
 
                 @Override
-                public void errorOccurred(@NotNull String s) {
+                public void errorOccurred(@Nonnull String s) {
                     set(null);
                 }
             });
