@@ -1,5 +1,5 @@
 0.2.5
-- 
+- New app icon
 
 0.2.4 (2021-04-11)
 - Added string field in values panel (issue #8)
