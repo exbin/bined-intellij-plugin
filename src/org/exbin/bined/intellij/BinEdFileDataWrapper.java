@@ -22,10 +22,9 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.io.FileTooBigException;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.ByteArrayData;
-import org.exbin.auxiliary.paged_data.EditableBinaryData;
-import org.exbin.auxiliary.paged_data.PagedData;
+import com.intellij.openapi.vfs.newvfs.persistent.PersistentFS;
+import com.intellij.openapi.vfs.newvfs.persistent.PersistentFSImpl;
+import org.exbin.auxiliary.paged_data.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -322,6 +321,10 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
 
     @Override
     public synchronized void replace(long targetPosition, BinaryData replacingData, long startFrom, long replacingLength) {
+        if (targetPosition + replacingLength > getDataSize()) {
+            throw new OutOfBoundsException("Data can be replaced only inside or at the end");
+        }
+
         writeAction(() -> {
             long fileLength = file.getLength();
             InputStream inputStream = file.getInputStream();
@@ -354,6 +357,10 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
 
     @Override
     public synchronized void replace(long targetPosition, byte[] replacingData, int replacingDataOffset, int length) {
+        if (targetPosition + length > getDataSize()) {
+            throw new OutOfBoundsException("Data can be replaced only inside or at the end");
+        }
+
         writeAction(() -> {
             long fileLength = file.getLength();
             InputStream inputStream = file.getInputStream();
