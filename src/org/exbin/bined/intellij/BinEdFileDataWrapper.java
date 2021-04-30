@@ -326,7 +326,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             long fileLength = file.getLength();
             InputStream inputStream = file.getInputStream();
             OutputStream outputStream = file.getOutputStream(null);
-            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
+            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, targetPosition);
             long length = replacingLength;
             long offset = startFrom;
             byte[] cache = new byte[length < BUFFER_SIZE ? (int) length : BUFFER_SIZE];
@@ -339,7 +339,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             }
             if (fileLength > startFrom + replacingLength) {
                 StreamUtils.skipInputStreamData(inputStream, replacingLength);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom - replacingLength);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - targetPosition - replacingLength);
             }
 
             inputStream.close();
