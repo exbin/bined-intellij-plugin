@@ -22,8 +22,6 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.io.FileTooBigException;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.newvfs.persistent.PersistentFS;
-import com.intellij.openapi.vfs.newvfs.persistent.PersistentFSImpl;
 import org.exbin.auxiliary.paged_data.*;
 
 import javax.annotation.Nonnull;
@@ -174,6 +172,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
 
     @Override
     public void dispose() {
+        resetCache();
     }
 
     @Override

@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
@@ -34,7 +35,7 @@ import java.io.OutputStream;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.4 2021/04/11
  */
-public class BinEdVirtualFile extends VirtualFile {
+public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     public static final String PATH_PREFIX = "bined://";
 
@@ -189,6 +190,6 @@ public class BinEdVirtualFile extends VirtualFile {
     }
 
     public JComponent getPreferredFocusedComponent() {
-        return editorFile.getPreferredFocusedComponent();
+        return getEditorFile().getPreferredFocusedComponent();
     }
 }

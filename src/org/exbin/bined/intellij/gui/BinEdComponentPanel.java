@@ -18,6 +18,12 @@ package org.exbin.bined.intellij.gui;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
+import com.intellij.ui.Graphics2DDelegate;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.ui.JBSwingUtilities;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.*;
 import org.exbin.bined.basic.BasicCodeAreaZone;
@@ -70,9 +76,9 @@ import java.nio.charset.Charset;
  * Binary editor component panel.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.2 2020/01/16
+ * @version 0.2.5 2021/08/16
  */
-public class BinEdComponentPanel extends javax.swing.JPanel {
+public class BinEdComponentPanel extends JBPanel implements DumbAware {
 
     private static final FileHandlingMode DEFAULT_FILE_HANDLING_MODE = FileHandlingMode.DELTA;
 
@@ -96,7 +102,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
     private final SearchAction searchAction;
     private EncodingsHandler encodingsHandler;
     private ValuesPanel valuesPanel = null;
-    private JScrollPane valuesPanelScrollPane = null;
+    private JBScrollPane valuesPanelScrollPane = null;
     private boolean valuesPanelVisible = false;
 
     private FileHandlingMode fileHandlingMode = DEFAULT_FILE_HANDLING_MODE;
@@ -108,7 +114,12 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
 
         preferences = new BinaryEditorPreferences(new PreferencesWrapper(getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
 
-        codeArea = new ExtCodeArea();
+        codeArea = new ExtCodeArea() {
+            @Override
+            protected Graphics getComponentGraphics(Graphics g) {
+                return g instanceof Graphics2DDelegate ? g : JBSwingUtilities.runGlobalCGTransform(this, IdeBackgroundUtil.withEditorBackground(g, this));
+            }
+        };
         codeArea.setPainter(new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea));
         defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
         codeArea.setCodeFont(defaultFont);
@@ -182,6 +193,20 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
 
         this.add(statusPanel, BorderLayout.SOUTH);
         codeAreaPanel.add(codeArea, BorderLayout.CENTER);
+//        JPanel panel = new JPanel();
+//        panel.setMinimumSize(new Dimension(4000,4000));
+//        panel.setPreferredSize(new Dimension(4000,4000));
+//        JBScrollPane scrollPane = new JBScrollPane() {
+//            @Override
+//            protected void paintComponent(Graphics g) {
+//                Graphics delegateGraphics = g.create();
+//                //Graphics2D delegateGraphics = IdeBackgroundUtil.withEditorBackground(g, codeArea);
+//                super.paintComponent(delegateGraphics);
+//                delegateGraphics.dispose();
+//            }
+//        };
+//        scrollPane.setViewportView(panel);
+//        codeAreaPanel.add(scrollPane, BorderLayout.CENTER);
 
         codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
@@ -237,17 +262,17 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
         codeArea.addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
             binaryStatus.setCursorPosition(caretPosition);
         });
-        codeArea.addSelectionChangedListener(selectionRange -> {
-            binaryStatus.setSelectionRange(selectionRange);
+        codeArea.addSelectionChangedListener(() -> {
+            binaryStatus.setSelectionRange(codeArea.getSelection());
         });
 
-        codeArea.addEditationModeChangedListener(binaryStatus::setEditationMode);
-        binaryStatus.setEditationMode(codeArea.getEditationMode(), codeArea.getActiveOperation());
+        codeArea.addEditModeChangedListener(binaryStatus::setEditMode);
+        binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
 
         binaryStatus.setControlHandler(new BinaryStatusApi.StatusControlHandler() {
             @Override
-            public void changeEditationOperation(EditationOperation editationOperation) {
-                codeArea.setEditationOperation(editationOperation);
+            public void changeEditOperation(EditOperation editOperation) {
+                codeArea.setEditOperation(editOperation);
             }
 
             @Override
@@ -401,7 +426,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
 
     private void updateCurrentMemoryMode() {
         BinaryStatusApi.MemoryMode memoryMode = BinaryStatusApi.MemoryMode.RAM_MEMORY;
-        if (codeArea.getEditationMode() == EditationMode.READ_ONLY) {
+        if (codeArea.getEditMode() == EditMode.READ_ONLY) {
             memoryMode = BinaryStatusApi.MemoryMode.READ_ONLY;
         } else if (fileHandlingMode == FileHandlingMode.DELTA) {
             memoryMode = BinaryStatusApi.MemoryMode.DELTA_MODE;
@@ -455,7 +480,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
 
     @Nonnull
     private void createContextMenu(final JPopupMenu menu, int x, int y) {
-        BasicCodeAreaZone positionZone = codeArea.getPositionZone(x, y);
+        BasicCodeAreaZone positionZone = codeArea.getPainter().getPositionZone(x, y);
 
         switch (positionZone) {
             case TOP_LEFT_CORNER:
@@ -799,7 +824,7 @@ public class BinEdComponentPanel extends javax.swing.JPanel {
             if (valuesPanel == null) {
                 valuesPanel = new ValuesPanel();
                 valuesPanel.setCodeArea(codeArea, undoHandler);
-                valuesPanelScrollPane = new JScrollPane(valuesPanel);
+                valuesPanelScrollPane = new JBScrollPane(valuesPanel);
                 valuesPanelScrollPane.setBorder(null);
             }
             this.add(valuesPanelScrollPane, BorderLayout.EAST);

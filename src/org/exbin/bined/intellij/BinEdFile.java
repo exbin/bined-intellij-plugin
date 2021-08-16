@@ -20,6 +20,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.util.LocalTimeCounter;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
@@ -28,7 +29,7 @@ import org.exbin.auxiliary.paged_data.PagedData;
 import org.exbin.auxiliary.paged_data.delta.DeltaDocument;
 import org.exbin.auxiliary.paged_data.delta.FileDataSource;
 import org.exbin.auxiliary.paged_data.delta.SegmentsRepository;
-import org.exbin.bined.EditationMode;
+import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
@@ -48,7 +49,7 @@ import java.util.Objects;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.2 2020/01/24
  */
-public class BinEdFile implements BinEdComponentFileApi {
+public class BinEdFile implements BinEdComponentFileApi, DumbAware {
 
     public static final String ACTION_CLIPBOARD_CUT = "cut-to-clipboard";
     public static final String ACTION_CLIPBOARD_COPY = "copy-to-clipboard";
@@ -155,7 +156,7 @@ public class BinEdFile implements BinEdComponentFileApi {
 
         BinaryData oldData = codeArea.getContentData();
         if (fileHandlingMode == FileHandlingMode.DELTA) {
-            FileDataSource fileSource = segmentsRepository.openFileSource(file, editable ? FileDataSource.EditationMode.READ_WRITE : FileDataSource.EditationMode.READ_ONLY);
+            FileDataSource fileSource = segmentsRepository.openFileSource(file, editable ? FileDataSource.EditMode.READ_WRITE : FileDataSource.EditMode.READ_ONLY);
             DeltaDocument document = segmentsRepository.createDocument(fileSource);
             componentPanel.setContentData(document);
             if (oldData != null) {
@@ -174,7 +175,7 @@ public class BinEdFile implements BinEdComponentFileApi {
                 componentPanel.setContentData(data);
             }
         }
-        codeArea.setEditationMode(editable ? EditationMode.EXPANDING : EditationMode.READ_ONLY);
+        codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
     }
 
     public void openDocument(InputStream stream, boolean editable) throws IOException {
@@ -182,7 +183,7 @@ public class BinEdFile implements BinEdComponentFileApi {
         setNewData();
         EditableBinaryData data = Objects.requireNonNull((EditableBinaryData) codeArea.getContentData());
         data.loadFromStream(stream);
-        codeArea.setEditationMode(editable ? EditationMode.EXPANDING : EditationMode.READ_ONLY);
+        codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
         componentPanel.setContentData(data);
     }
 
@@ -190,7 +191,7 @@ public class BinEdFile implements BinEdComponentFileApi {
 //        this.virtualFile = virtualFile;
 //        BinaryData data = codeArea.getContentData();
 //        boolean editable = virtualFile.isWritable();
-//        codeArea.setEditationMode(editable ? EditationMode.EXPANDING : EditationMode.READ_ONLY);
+//        codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 //
 //        switchFileHandlingMode(data instanceof DeltaDocument ? FileHandlingMode.DELTA : FileHandlingMode.MEMORY);
 //        if (data instanceof DeltaDocument) {

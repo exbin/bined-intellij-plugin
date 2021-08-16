@@ -16,26 +16,25 @@
 package org.exbin.framework.bined.service;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.ReplaceParameters;
 import org.exbin.framework.bined.SearchParameters;
 
 /**
  * Binary search service.
  *
- * @version 0.2.1 2019/07/16
+ * @version 0.2.1 2021/02/21
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public interface BinarySearchService {
 
-    void performFind(SearchParameters dialogSearchParameters, ExtCodeArea codeArea, SearchStatusListener searchStatusListener);
+    void performFind(SearchParameters dialogSearchParameters, SearchStatusListener searchStatusListener);
 
-    void setMatchPosition(int matchPosition, ExtCodeArea codeArea);
+    void setMatchPosition(int matchPosition);
 
-    void performReplace(SearchParameters searchParameters, ReplaceParameters replaceParameters, ExtCodeArea codeArea);
+    void performReplace(SearchParameters searchParameters, ReplaceParameters replaceParameters);
 
-    void clearMatches(ExtCodeArea codeArea);
+    void clearMatches();
 
     @ParametersAreNonnullByDefault
     public interface SearchStatusListener {

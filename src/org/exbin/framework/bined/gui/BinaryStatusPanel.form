@@ -272,13 +272,13 @@
               <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
               <Component id="memoryModeLabel" min="-2" pref="16" max="-2" attributes="0"/>
               <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-              <Component id="editationModeLabel" min="-2" pref="35" max="-2" attributes="0"/>
+              <Component id="editModeLabel" min="-2" pref="35" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="editationModeLabel" max="32767" attributes="0"/>
+          <Component id="editModeLabel" max="32767" attributes="0"/>
           <Component id="documentSizeLabel" alignment="0" max="32767" attributes="0"/>
           <Component id="memoryModeLabel" alignment="0" max="32767" attributes="0"/>
           <Component id="cursorPositionLabel" alignment="0" max="32767" attributes="0"/>
@@ -352,22 +352,22 @@
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JLabel() {&#xa;    @Override&#xa;    public JToolTip createToolTip() {&#xa;        updateCursorPositionToolTip();&#xa;        return super.createToolTip();&#xa;    }&#xa;}&#xa;"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JLabel" name="editationModeLabel">
+    <Component class="javax.swing.JLabel" name="editModeLabel">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="text" type="java.lang.String" value="OVR"/>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/bined/gui/resources/BinaryStatusPanel.properties" key="editationModeLabel.toolTipText" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/bined/gui/resources/BinaryStatusPanel.properties" key="editModeLabel.toolTipText" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
             <EtchetBorder/>
           </Border>
         </Property>
-        <Property name="name" type="java.lang.String" value="editationModeLabel" noResource="true"/>
+        <Property name="name" type="java.lang.String" value="editModeLabel" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="editationModeLabelMouseClicked"/>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="editModeLabelMouseClicked"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="encodingLabel">

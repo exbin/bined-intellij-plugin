@@ -15,6 +15,7 @@
  */
 package org.exbin.framework.bined.gui;
 
+import com.intellij.ui.components.JBPanel;
 import org.exbin.framework.bined.StatusDocumentSizeFormat;
 import org.exbin.framework.bined.StatusCursorPositionFormat;
 import java.awt.Toolkit;
@@ -26,8 +27,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JToolTip;
 import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.CodeAreaUtils;
-import org.exbin.bined.EditationMode;
-import org.exbin.bined.EditationOperation;
+import org.exbin.bined.EditMode;
+import org.exbin.bined.EditOperation;
 import org.exbin.bined.PositionCodeType;
 import org.exbin.bined.SelectionRange;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
@@ -45,12 +46,12 @@ import org.exbin.framework.bined.preferences.StatusPreferences;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatusApi, TextEncodingStatusApi {
+public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextEncodingStatusApi {
 
-    public static final String INSERT_EDITATION_MODE_LABEL = "INS";
-    public static final String OVERWRITE_EDITATION_MODE_LABEL = "OVR";
-    public static final String READONLY_EDITATION_MODE_LABEL = "RO";
-    public static final String INPLACE_EDITATION_MODE_LABEL = "INP";
+    public static final String INSERT_EDIT_MODE_LABEL = "INS";
+    public static final String OVERWRITE_EDIT_MODE_LABEL = "OVR";
+    public static final String READONLY_EDIT_MODE_LABEL = "RO";
+    public static final String INPLACE_EDIT_MODE_LABEL = "INP";
 
     public static final String OCTAL_CODE_TYPE_LABEL = "OCT";
     public static final String DECIMAL_CODE_TYPE_LABEL = "DEC";
@@ -67,7 +68,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     private int decimalSpaceGroupSize = StatusOptionsImpl.DEFAULT_DECIMAL_SPACE_GROUP_SIZE;
     private int hexadecimalSpaceGroupSize = StatusOptionsImpl.DEFAULT_HEXADECIMAL_SPACE_GROUP_SIZE;
 
-    private EditationOperation editationOperation;
+    private EditOperation editOperation;
     private CodeAreaCaretPosition caretPosition;
     private SelectionRange selectionRange;
     private long documentSize;
@@ -173,8 +174,8 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
         memoryModeButtonGroup = new javax.swing.ButtonGroup();
         documentSizeModeButtonGroup = new javax.swing.ButtonGroup();
         cursorPositionModeButtonGroup = new javax.swing.ButtonGroup();
-        memoryModeLabel = new javax.swing.JLabel();
-        documentSizeLabel = new javax.swing.JLabel() {
+        memoryModeLabel = new com.intellij.ui.components.JBLabel();
+        documentSizeLabel = new com.intellij.ui.components.JBLabel() {
             @Override
             public JToolTip createToolTip() {
                 updateDocumentSizeToolTip();
@@ -182,7 +183,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
             }
         }
         ;
-        cursorPositionLabel = new javax.swing.JLabel() {
+        cursorPositionLabel = new com.intellij.ui.components.JBLabel() {
             @Override
             public JToolTip createToolTip() {
                 updateCursorPositionToolTip();
@@ -190,8 +191,8 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
             }
         }
         ;
-        editationModeLabel = new javax.swing.JLabel();
-        encodingLabel = new javax.swing.JLabel();
+        editModeLabel = new com.intellij.ui.components.JBLabel();
+        encodingLabel = new com.intellij.ui.components.JBLabel();
 
         positionPopupMenu.setName("positionPopupMenu"); // NOI18N
 
@@ -372,14 +373,14 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
             }
         });
 
-        editationModeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        editationModeLabel.setText("OVR");
-        editationModeLabel.setToolTipText(resourceBundle.getString("editationModeLabel.toolTipText")); // NOI18N
-        editationModeLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        editationModeLabel.setName("editationModeLabel"); // NOI18N
-        editationModeLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+        editModeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        editModeLabel.setText("OVR");
+        editModeLabel.setToolTipText(resourceBundle.getString("editModeLabel.toolTipText")); // NOI18N
+        editModeLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        editModeLabel.setName("editModeLabel"); // NOI18N
+        editModeLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                editationModeLabelMouseClicked(evt);
+                editModeLabelMouseClicked(evt);
             }
         });
 
@@ -414,11 +415,11 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
                 .addGap(0, 0, 0)
                 .addComponent(memoryModeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(editationModeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(editModeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(editationModeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(editModeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(documentSizeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(memoryModeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(cursorPositionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -426,15 +427,15 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void editationModeLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_editationModeLabelMouseClicked
+    private void editModeLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_editModeLabelMouseClicked
         if (statusControlHandler != null && evt.getButton() == MouseEvent.BUTTON1) {
-            if (editationOperation == EditationOperation.INSERT) {
-                statusControlHandler.changeEditationOperation(EditationOperation.OVERWRITE);
-            } else if (editationOperation == EditationOperation.OVERWRITE) {
-                statusControlHandler.changeEditationOperation(EditationOperation.INSERT);
+            if (editOperation == EditOperation.INSERT) {
+                statusControlHandler.changeEditOperation(EditOperation.OVERWRITE);
+            } else if (editOperation == EditOperation.OVERWRITE) {
+                statusControlHandler.changeEditOperation(EditOperation.INSERT);
             }
         }
-    }//GEN-LAST:event_editationModeLabelMouseClicked
+    }//GEN-LAST:event_editModeLabelMouseClicked
 
     private void cursorPositionLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cursorPositionLabelMouseClicked
         if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() > 1) {
@@ -554,7 +555,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu cursorPositionCodeTypeMenu;
-    private javax.swing.JLabel cursorPositionLabel;
+    private com.intellij.ui.components.JBLabel cursorPositionLabel;
     private javax.swing.ButtonGroup cursorPositionModeButtonGroup;
     private javax.swing.JCheckBoxMenuItem cursorPositionShowOffsetCheckBoxMenuItem;
     private javax.swing.JRadioButtonMenuItem decimalCursorPositionModeRadioButtonMenuItem;
@@ -562,18 +563,18 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     private javax.swing.JRadioButtonMenuItem deltaMemoryModeRadioButtonMenuItem;
     private javax.swing.JMenu documentSizeCodeTypeMenu;
     private javax.swing.JMenuItem documentSizeCopyMenuItem;
-    private javax.swing.JLabel documentSizeLabel;
+    private com.intellij.ui.components.JBLabel documentSizeLabel;
     private javax.swing.ButtonGroup documentSizeModeButtonGroup;
     private javax.swing.JPopupMenu documentSizePopupMenu;
     private javax.swing.JCheckBoxMenuItem documentSizeShowRelativeCheckBoxMenuItem;
-    private javax.swing.JLabel editationModeLabel;
-    private javax.swing.JLabel encodingLabel;
+    private com.intellij.ui.components.JBLabel editModeLabel;
+    private com.intellij.ui.components.JBLabel encodingLabel;
     private javax.swing.JRadioButtonMenuItem hexadecimalCursorPositionModeRadioButtonMenuItem;
     private javax.swing.JRadioButtonMenuItem hexadecimalDocumentSizeModeRadioButtonMenuItem;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.ButtonGroup memoryModeButtonGroup;
-    private javax.swing.JLabel memoryModeLabel;
+    private com.intellij.ui.components.JBLabel memoryModeLabel;
     private javax.swing.JPopupMenu memoryModePopupMenu;
     private javax.swing.JRadioButtonMenuItem octalCursorPositionModeRadioButtonMenuItem;
     private javax.swing.JRadioButtonMenuItem octalDocumentSizeModeRadioButtonMenuItem;
@@ -619,35 +620,35 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     }
 
     @Override
-    public void setEditationMode(EditationMode editationMode, EditationOperation editationOperation) {
-        this.editationOperation = editationOperation;
-        switch (editationMode) {
+    public void setEditMode(EditMode editMode, EditOperation editOperation) {
+        this.editOperation = editOperation;
+        switch (editMode) {
             case READ_ONLY: {
-                editationModeLabel.setText(READONLY_EDITATION_MODE_LABEL);
+                editModeLabel.setText(READONLY_EDIT_MODE_LABEL);
                 break;
             }
             case EXPANDING:
             case CAPPED: {
-                switch (editationOperation) {
+                switch (editOperation) {
                     case INSERT: {
-                        editationModeLabel.setText(INSERT_EDITATION_MODE_LABEL);
+                        editModeLabel.setText(INSERT_EDIT_MODE_LABEL);
                         break;
                     }
                     case OVERWRITE: {
-                        editationModeLabel.setText(OVERWRITE_EDITATION_MODE_LABEL);
+                        editModeLabel.setText(OVERWRITE_EDIT_MODE_LABEL);
                         break;
                     }
                     default:
-                        throw new IllegalStateException("Unexpected editation operation " + editationOperation.name());
+                        throw new IllegalStateException("Unexpected edit operation " + editOperation.name());
                 }
                 break;
             }
             case INPLACE: {
-                editationModeLabel.setText(INPLACE_EDITATION_MODE_LABEL);
+                editModeLabel.setText(INPLACE_EDIT_MODE_LABEL);
                 break;
             }
             default:
-                throw new IllegalStateException("Unexpected editation mode " + editationMode.name());
+                throw new IllegalStateException("Unexpected edit mode " + editMode.name());
         }
     }
 

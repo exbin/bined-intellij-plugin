@@ -25,9 +25,8 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
-import org.exbin.bined.EditationMode;
+import org.exbin.bined.EditMode;
 import org.exbin.bined.SelectionRange;
-import org.exbin.bined.capability.EditationModeCapable;
 import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.RowWrappingMode;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightCodeAreaPainter;
@@ -37,6 +36,7 @@ import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
+import org.exbin.bined.capability.EditModeCapable;
 
 /**
  * Color profile panel.
@@ -74,7 +74,7 @@ public class ColorProfilePanel extends javax.swing.JPanel {
     }
 
     private void initPreviewCodeArea() {
-        ((EditationModeCapable) codeArea).setEditationMode(EditationMode.READ_ONLY);
+        ((EditModeCapable) codeArea).setEditMode(EditMode.READ_ONLY);
         ExtendedHighlightNonAsciiCodeAreaPainter painter = new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea);
         codeArea.setPainter(painter);
         List<ExtendedHighlightCodeAreaPainter.SearchMatch> exampleMatches = new ArrayList<>();

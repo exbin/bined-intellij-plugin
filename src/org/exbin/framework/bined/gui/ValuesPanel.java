@@ -31,7 +31,6 @@ import javax.swing.SwingUtilities;
 import org.exbin.bined.CaretMovedListener;
 import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.DataChangedListener;
-import org.exbin.bined.capability.EditationModeCapable;
 import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.BinaryDataOperationException;
 import org.exbin.bined.operation.swing.command.BinaryCompoundCommand;
@@ -45,15 +44,16 @@ import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.bined.capability.EditModeCapable;
 
 /**
  * Values side panel.
  *
- * @version 0.2.1 2020/12/05
+ * @version 0.2.5 2021/08/15
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class ValuesPanel extends javax.swing.JPanel {
+public class ValuesPanel extends com.intellij.ui.components.JBPanel {
 
     public static final int UBYTE_MAX_VALUE = 255;
     public static final int SWORD_MIN_VALUE = -32768;
@@ -92,36 +92,36 @@ public class ValuesPanel extends javax.swing.JPanel {
 
         endianButtonGroup = new javax.swing.ButtonGroup();
         integerSignButtonGroup = new javax.swing.ButtonGroup();
-        binaryLabel = new javax.swing.JLabel();
-        binaryCheckBox0 = new javax.swing.JCheckBox();
-        binaryCheckBox1 = new javax.swing.JCheckBox();
-        binaryCheckBox2 = new javax.swing.JCheckBox();
-        binaryCheckBox3 = new javax.swing.JCheckBox();
-        binaryCheckBox4 = new javax.swing.JCheckBox();
-        binaryCheckBox5 = new javax.swing.JCheckBox();
-        binaryCheckBox6 = new javax.swing.JCheckBox();
-        binaryCheckBox7 = new javax.swing.JCheckBox();
-        byteLabel = new javax.swing.JLabel();
-        byteTextField = new javax.swing.JTextField();
-        wordLabel = new javax.swing.JLabel();
-        wordTextField = new javax.swing.JTextField();
-        intLabel = new javax.swing.JLabel();
-        intTextField = new javax.swing.JTextField();
-        longLabel = new javax.swing.JLabel();
-        longTextField = new javax.swing.JTextField();
-        floatLabel = new javax.swing.JLabel();
-        floatTextField = new javax.swing.JTextField();
-        doubleLabel = new javax.swing.JLabel();
-        doubleTextField = new javax.swing.JTextField();
-        characterLabel = new javax.swing.JLabel();
-        characterTextField = new javax.swing.JTextField();
-        stringLabel = new javax.swing.JLabel();
-        stringTextField = new javax.swing.JTextField();
+        binaryLabel = new com.intellij.ui.components.JBLabel();
+        binaryCheckBox0 = new com.intellij.ui.components.JBCheckBox();
+        binaryCheckBox1 = new com.intellij.ui.components.JBCheckBox();
+        binaryCheckBox2 = new com.intellij.ui.components.JBCheckBox();
+        binaryCheckBox3 = new com.intellij.ui.components.JBCheckBox();
+        binaryCheckBox4 = new com.intellij.ui.components.JBCheckBox();
+        binaryCheckBox5 = new com.intellij.ui.components.JBCheckBox();
+        binaryCheckBox6 = new com.intellij.ui.components.JBCheckBox();
+        binaryCheckBox7 = new com.intellij.ui.components.JBCheckBox();
+        byteLabel = new com.intellij.ui.components.JBLabel();
+        byteTextField = new com.intellij.ui.components.JBTextField();
+        wordLabel = new com.intellij.ui.components.JBLabel();
+        wordTextField = new com.intellij.ui.components.JBTextField();
+        intLabel = new com.intellij.ui.components.JBLabel();
+        intTextField = new com.intellij.ui.components.JBTextField();
+        longLabel = new com.intellij.ui.components.JBLabel();
+        longTextField = new com.intellij.ui.components.JBTextField();
+        floatLabel = new com.intellij.ui.components.JBLabel();
+        floatTextField = new com.intellij.ui.components.JBTextField();
+        doubleLabel = new com.intellij.ui.components.JBLabel();
+        doubleTextField = new com.intellij.ui.components.JBTextField();
+        characterLabel = new com.intellij.ui.components.JBLabel();
+        characterTextField = new com.intellij.ui.components.JBTextField();
+        stringLabel = new com.intellij.ui.components.JBLabel();
+        stringTextField = new com.intellij.ui.components.JBTextField();
         jSeparator1 = new javax.swing.JSeparator();
-        bigEndianRadioButton = new javax.swing.JRadioButton();
-        littleEndianRadioButton = new javax.swing.JRadioButton();
-        signedRadioButton = new javax.swing.JRadioButton();
-        unsignedRadioButton = new javax.swing.JRadioButton();
+        bigEndianRadioButton = new com.intellij.ui.components.JBRadioButton();
+        littleEndianRadioButton = new com.intellij.ui.components.JBRadioButton();
+        signedRadioButton = new com.intellij.ui.components.JBRadioButton();
+        unsignedRadioButton = new com.intellij.ui.components.JBRadioButton();
 
         setMaximumSize(new java.awt.Dimension(246, 447));
         setMinimumSize(new java.awt.Dimension(246, 447));
@@ -702,38 +702,38 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JRadioButton bigEndianRadioButton;
-    private javax.swing.JCheckBox binaryCheckBox0;
-    private javax.swing.JCheckBox binaryCheckBox1;
-    private javax.swing.JCheckBox binaryCheckBox2;
-    private javax.swing.JCheckBox binaryCheckBox3;
-    private javax.swing.JCheckBox binaryCheckBox4;
-    private javax.swing.JCheckBox binaryCheckBox5;
-    private javax.swing.JCheckBox binaryCheckBox6;
-    private javax.swing.JCheckBox binaryCheckBox7;
-    private javax.swing.JLabel binaryLabel;
-    private javax.swing.JLabel byteLabel;
-    private javax.swing.JTextField byteTextField;
-    private javax.swing.JLabel characterLabel;
-    private javax.swing.JTextField characterTextField;
-    private javax.swing.JLabel doubleLabel;
-    private javax.swing.JTextField doubleTextField;
+    private com.intellij.ui.components.JBRadioButton bigEndianRadioButton;
+    private com.intellij.ui.components.JBCheckBox binaryCheckBox0;
+    private com.intellij.ui.components.JBCheckBox binaryCheckBox1;
+    private com.intellij.ui.components.JBCheckBox binaryCheckBox2;
+    private com.intellij.ui.components.JBCheckBox binaryCheckBox3;
+    private com.intellij.ui.components.JBCheckBox binaryCheckBox4;
+    private com.intellij.ui.components.JBCheckBox binaryCheckBox5;
+    private com.intellij.ui.components.JBCheckBox binaryCheckBox6;
+    private com.intellij.ui.components.JBCheckBox binaryCheckBox7;
+    private com.intellij.ui.components.JBLabel binaryLabel;
+    private com.intellij.ui.components.JBLabel byteLabel;
+    private com.intellij.ui.components.JBTextField byteTextField;
+    private com.intellij.ui.components.JBLabel characterLabel;
+    private com.intellij.ui.components.JBTextField characterTextField;
+    private com.intellij.ui.components.JBLabel doubleLabel;
+    private com.intellij.ui.components.JBTextField doubleTextField;
     private javax.swing.ButtonGroup endianButtonGroup;
-    private javax.swing.JLabel floatLabel;
-    private javax.swing.JTextField floatTextField;
-    private javax.swing.JLabel intLabel;
-    private javax.swing.JTextField intTextField;
+    private com.intellij.ui.components.JBLabel floatLabel;
+    private com.intellij.ui.components.JBTextField floatTextField;
+    private com.intellij.ui.components.JBLabel intLabel;
+    private com.intellij.ui.components.JBTextField intTextField;
     private javax.swing.ButtonGroup integerSignButtonGroup;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JRadioButton littleEndianRadioButton;
-    private javax.swing.JLabel longLabel;
-    private javax.swing.JTextField longTextField;
-    private javax.swing.JRadioButton signedRadioButton;
-    private javax.swing.JLabel stringLabel;
-    private javax.swing.JTextField stringTextField;
-    private javax.swing.JRadioButton unsignedRadioButton;
-    private javax.swing.JLabel wordLabel;
-    private javax.swing.JTextField wordTextField;
+    private com.intellij.ui.components.JBRadioButton littleEndianRadioButton;
+    private com.intellij.ui.components.JBLabel longLabel;
+    private com.intellij.ui.components.JBTextField longTextField;
+    private com.intellij.ui.components.JBRadioButton signedRadioButton;
+    private com.intellij.ui.components.JBLabel stringLabel;
+    private com.intellij.ui.components.JBTextField stringTextField;
+    private com.intellij.ui.components.JBRadioButton unsignedRadioButton;
+    private com.intellij.ui.components.JBLabel wordLabel;
+    private com.intellij.ui.components.JBTextField wordTextField;
     // End of variables declaration//GEN-END:variables
 
     public void setCodeArea(ExtCodeArea codeArea, @Nullable BinaryDataUndoHandler undoHandler) {
@@ -743,7 +743,7 @@ public class ValuesPanel extends javax.swing.JPanel {
 
     public void enableUpdate() {
         dataChangedListener = () -> {
-            updateEditationMode();
+            updateEditMode();
             updateValues();
         };
         codeArea.addDataChangedListener(dataChangedListener);
@@ -765,7 +765,7 @@ public class ValuesPanel extends javax.swing.JPanel {
         if (undoHandler != null) {
             undoHandler.addUndoUpdateListener(undoUpdateListener);
         }
-        updateEditationMode();
+        updateEditMode();
         updateValues();
     }
 
@@ -777,7 +777,7 @@ public class ValuesPanel extends javax.swing.JPanel {
         }
     }
 
-    public void updateEditationMode() {
+    public void updateEditMode() {
         boolean editable = isEditable();
         binaryCheckBox0.setEnabled(editable);
         binaryCheckBox1.setEnabled(editable);
@@ -857,7 +857,7 @@ public class ValuesPanel extends javax.swing.JPanel {
     }
 
     private boolean isEditable() {
-        return ((EditationModeCapable) codeArea).isEditable();
+        return ((EditModeCapable) codeArea).isEditable();
     }
 
     private ByteOrder getByteOrder() {

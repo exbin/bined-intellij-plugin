@@ -20,14 +20,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaCaretPosition;
-import org.exbin.bined.EditationMode;
-import org.exbin.bined.EditationOperation;
+import org.exbin.bined.EditMode;
+import org.exbin.bined.EditOperation;
 import org.exbin.bined.SelectionRange;
 
 /**
  * Binary editor status interface.
  *
- * @version 0.2.1 2020/01/24
+ * @version 0.2.1 2021/08/13
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -41,19 +41,19 @@ public interface BinaryStatusApi {
     void setCursorPosition(CodeAreaCaretPosition cursorPosition);
 
     /**
-     * Reports cursor position.
+     * Sets current selection.
      *
      * @param selectionRange current selection
      */
     void setSelectionRange(SelectionRange selectionRange);
 
     /**
-     * Reports currently active editation mode.
+     * Reports currently active edit mode.
      *
-     * @param mode editation mode
-     * @param operation editation operation
+     * @param mode edit mode
+     * @param operation edit operation
      */
-    void setEditationMode(EditationMode mode, EditationOperation operation);
+    void setEditMode(EditMode mode, EditOperation operation);
 
     /**
      * Sets control handler for status operations.
@@ -81,11 +81,11 @@ public interface BinaryStatusApi {
     public static interface StatusControlHandler {
 
         /**
-         * Requests change of editation mode from given mode.
+         * Requests change of edit operation from given operation.
          *
-         * @param operation editation operation
+         * @param operation edit operation
          */
-        void changeEditationOperation(EditationOperation operation);
+        void changeEditOperation(EditOperation operation);
 
         /**
          * Requests change of cursor position using go-to dialog.

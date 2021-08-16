@@ -18,6 +18,7 @@ package org.exbin.bined.intellij.gui;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
@@ -39,7 +40,7 @@ import java.awt.event.ActionListener;
  * @version 0.2.2 2020/01/23
  */
 @ParametersAreNonnullByDefault
-public class BinEdToolbarPanel extends javax.swing.JPanel {
+public class BinEdToolbarPanel extends JBPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinEdToolbarPanel.class);
 

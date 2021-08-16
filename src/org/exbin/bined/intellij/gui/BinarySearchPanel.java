@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij.gui;
 
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.RowWrappingMode;
 import org.exbin.bined.ScrollBarVisibility;
 import org.exbin.bined.capability.RowWrappingCapable;
@@ -54,7 +55,7 @@ import java.util.List;
  * @version 0.2.1 2019/07/21
  * @author ExBin Project (http://exbin.org)
  */
-public class BinarySearchPanel extends javax.swing.JPanel {
+public class BinarySearchPanel extends JBPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinarySearchPanel.class);
 

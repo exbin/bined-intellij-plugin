@@ -27,7 +27,7 @@ import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.util.LocalTimeCounter;
 import com.intellij.util.messages.MessageBusConnection;
 import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.bined.EditationMode;
+import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
@@ -115,7 +115,7 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         codeArea.setContentData(new BinEdFileDataWrapper(virtualFile));
-        codeArea.setEditationMode(editable ? EditationMode.EXPANDING : EditationMode.READ_ONLY);
+        codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
         opened = true;
 //        documentOriginalSize = codeArea.getDataSize();

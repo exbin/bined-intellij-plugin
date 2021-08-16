@@ -23,7 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.bined.EditationMode;
+import org.exbin.bined.EditMode;
 import org.exbin.bined.SelectionRange;
 import org.exbin.bined.RowWrappingMode;
 import org.exbin.bined.swing.extended.ExtCodeArea;
@@ -62,7 +62,7 @@ public class LayoutProfilePanel extends javax.swing.JPanel {
     }
 
     private void initPreviewCodeArea() {
-        codeArea.setEditationMode(EditationMode.READ_ONLY);
+        codeArea.setEditMode(EditMode.READ_ONLY);
         ByteArrayEditableData exampleData = new ByteArrayEditableData();
         try {
             exampleData.loadFromStream(getClass().getResourceAsStream("/org/exbin/framework/bined/resources/preview/lorem.txt"));
