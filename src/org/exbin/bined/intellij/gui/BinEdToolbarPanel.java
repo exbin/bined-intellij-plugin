@@ -37,7 +37,7 @@ import java.awt.event.ActionListener;
  * Binary editor toolbar panel.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.2 2020/01/23
+ * @version 0.2.5 2021/08/17
  */
 @ParametersAreNonnullByDefault
 public class BinEdToolbarPanel extends JBPanel {
@@ -68,7 +68,7 @@ public class BinEdToolbarPanel extends JBPanel {
 
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
-        toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actionGroup, true);
+        toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, actionGroup, true);
         add(toolbar, BorderLayout.CENTER);
 
         binaryCodeTypeAction = new AnAction(

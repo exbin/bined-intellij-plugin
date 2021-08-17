@@ -115,9 +115,24 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         preferences = new BinaryEditorPreferences(new PreferencesWrapper(getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
 
         codeArea = new ExtCodeArea() {
+
+            private Graphics2DDelegate graphicsCache = null;
+
             @Override
             protected Graphics getComponentGraphics(Graphics g) {
-                return g instanceof Graphics2DDelegate ? g : JBSwingUtilities.runGlobalCGTransform(this, IdeBackgroundUtil.withEditorBackground(g, this));
+                if (g instanceof Graphics2DDelegate) {
+                    return g;
+                }
+
+                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                    return graphicsCache;
+                }
+
+                if (graphicsCache != null) {
+                    graphicsCache.dispose();
+                }
+                graphicsCache = (Graphics2DDelegate) JBSwingUtilities.runGlobalCGTransform(this, IdeBackgroundUtil.withEditorBackground(g, this));
+                return graphicsCache;
             }
         };
         codeArea.setPainter(new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea));
@@ -193,20 +208,6 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
 
         this.add(statusPanel, BorderLayout.SOUTH);
         codeAreaPanel.add(codeArea, BorderLayout.CENTER);
-//        JPanel panel = new JPanel();
-//        panel.setMinimumSize(new Dimension(4000,4000));
-//        panel.setPreferredSize(new Dimension(4000,4000));
-//        JBScrollPane scrollPane = new JBScrollPane() {
-//            @Override
-//            protected void paintComponent(Graphics g) {
-//                Graphics delegateGraphics = g.create();
-//                //Graphics2D delegateGraphics = IdeBackgroundUtil.withEditorBackground(g, codeArea);
-//                super.paintComponent(delegateGraphics);
-//                delegateGraphics.dispose();
-//            }
-//        };
-//        scrollPane.setViewportView(panel);
-//        codeAreaPanel.add(scrollPane, BorderLayout.CENTER);
 
         codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override

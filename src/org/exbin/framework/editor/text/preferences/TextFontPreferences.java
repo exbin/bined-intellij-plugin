@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.api.Preferences;
 import org.exbin.framework.editor.text.options.TextFontOptions;
@@ -102,7 +103,7 @@ public class TextFontPreferences implements TextFontOptions {
         return attribs;
     }
 
-    public void setFont(Font font) {
+    public void setFont(@Nullable Font font) {
         if (font != null) {
             Map<TextAttribute, ?> attribs = font.getAttributes();
             setFontAttributes((Map<TextAttribute, Object>) attribs);
