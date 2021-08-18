@@ -131,7 +131,9 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 if (graphicsCache != null) {
                     graphicsCache.dispose();
                 }
-                graphicsCache = (Graphics2DDelegate) JBSwingUtilities.runGlobalCGTransform(this, IdeBackgroundUtil.withEditorBackground(g, this));
+
+                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
                 return graphicsCache;
             }
         };

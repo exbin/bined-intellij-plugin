@@ -43,6 +43,7 @@ import java.awt.event.ActionListener;
 public class BinEdToolbarPanel extends JBPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinEdToolbarPanel.class);
+    private static final String TOOLBAR_PLACE = "BinEdPluginMainToolbar";
 
     private final BinaryEditorPreferences preferences;
     private final ExtCodeArea codeArea;
@@ -68,7 +69,7 @@ public class BinEdToolbarPanel extends JBPanel {
 
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
-        toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, actionGroup, true);
+        toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE, actionGroup, true);
         add(toolbar, BorderLayout.CENTER);
 
         binaryCodeTypeAction = new AnAction(
