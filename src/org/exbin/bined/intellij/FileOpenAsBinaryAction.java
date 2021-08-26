@@ -29,13 +29,14 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.exbin.framework.gui.utils.ActionUtils;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.List;
 
 /**
  * Open file in binary editor action.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.1 2019/08/22
+ * @version 0.2.1 2021/08/26
  */
 public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
 
@@ -58,7 +59,10 @@ public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
 
         FileChooserDescriptor chooserDescriptor = new FileChooserDescriptor(true, false, true, false, false, false);
         VirtualFile virtualFile = FileChooser.chooseFile(chooserDescriptor, project, null);
-        if (virtualFile != null && virtualFile.isValid() && !virtualFile.isDirectory()) {
+        if (virtualFile == null)
+            return;
+
+        if (virtualFile.isValid()) {
             BinEdVirtualFile binEdVirtualFile = new BinEdVirtualFile(virtualFile);
             OpenFileDescriptor descriptor = new OpenFileDescriptor(project, binEdVirtualFile, 0);
             FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
@@ -73,6 +77,8 @@ public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
                     fileEditor.dispose();
                 }
             }
+        } else {
+            JOptionPane.showMessageDialog(null,  "File reported as invalid", "Unable to open file", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

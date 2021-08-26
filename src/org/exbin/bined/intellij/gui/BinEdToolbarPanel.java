@@ -70,6 +70,7 @@ public class BinEdToolbarPanel extends JBPanel {
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
         toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE, actionGroup, true);
+        toolbar.setTargetComponent(codeArea);
         add(toolbar, BorderLayout.CENTER);
 
         binaryCodeTypeAction = new AnAction(
