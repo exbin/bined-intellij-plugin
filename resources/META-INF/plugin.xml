@@ -35,6 +35,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
 <ul><li>New app icon</li>
 <li>Fixed issues with binary file type (issue #36)</li>
 <li>Fixed issue with transparency (issue #38)</li>
+<li>Fixed issue with opening zip files</li>
 </ul>
     ]]>
     </change-notes>

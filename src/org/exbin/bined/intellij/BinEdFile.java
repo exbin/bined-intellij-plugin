@@ -35,6 +35,7 @@ import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.options.gui.LayoutProfilePanel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,6 +43,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * File editor wrapper using BinEd editor component.
@@ -129,7 +132,7 @@ public class BinEdFile implements BinEdComponentFileApi, DumbAware {
                 try {
                     openDocument(file, editable);
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    Logger.getLogger(BinEdFile.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
                 try (InputStream stream = virtualFile.getInputStream()) {
@@ -138,7 +141,7 @@ public class BinEdFile implements BinEdComponentFileApi, DumbAware {
                         openDocument(stream, editable);
                     }
                 } catch (IOException ex) {
-                    // Exceptions.printStackTrace(ex);
+                    Logger.getLogger(BinEdFile.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -237,7 +240,7 @@ public class BinEdFile implements BinEdComponentFileApi, DumbAware {
                         try {
                             segmentsRepository.saveDocument((DeltaDocument) data);
                         } catch (IOException ex) {
-                            ex.printStackTrace();
+                            Logger.getLogger(BinEdFile.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     } else {
                         try (OutputStream stream = virtualFile.getOutputStream(this)) {
@@ -247,8 +250,8 @@ public class BinEdFile implements BinEdComponentFileApi, DumbAware {
                             }
 
                             stream.flush();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } catch (IOException ex) {
+                            Logger.getLogger(BinEdFile.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 }

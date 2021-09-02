@@ -29,8 +29,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -66,7 +68,10 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
             if (virtualFile.getFileType() instanceof ArchiveFileType) {
                 if (virtualFile.getFileSystem() instanceof JarFileSystem) {
                     virtualFile = ((JarFileSystem) virtualFile.getFileSystem()).getVirtualFileForJar(virtualFile);
-                    isValid = virtualFile != null;
+                    isValid = virtualFile != null && virtualFile.isValid();
+                } else {
+                    virtualFile = ((ArchiveFileSystem) virtualFile.getFileSystem()).getLocalByEntry(virtualFile);
+                    isValid = virtualFile != null && virtualFile.isValid();
                 }
             }
         }
@@ -85,6 +90,8 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
                     fileEditor.dispose();
                 }
             }
+        } else {
+            JOptionPane.showMessageDialog(null,  "File reported as invalid", "Unable to open file", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

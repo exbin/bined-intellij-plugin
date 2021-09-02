@@ -2,6 +2,7 @@
 - New app icon
 - Fixed issues with binary file type (issue #36)
 - Fixed issue with transparency (issue #38)
+- Fixed issue with opening zip files
 
 0.2.4 (2021-04-11)
 - Added string field in values panel (issue #8)

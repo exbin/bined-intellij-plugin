@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij;
 
+import com.intellij.ide.highlighter.ArchiveFileType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileChooser.FileChooser;
@@ -25,7 +26,9 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
 import org.exbin.framework.gui.utils.ActionUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,10 +62,20 @@ public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
 
         FileChooserDescriptor chooserDescriptor = new FileChooserDescriptor(true, false, true, false, false, false);
         VirtualFile virtualFile = FileChooser.chooseFile(chooserDescriptor, project, null);
-        if (virtualFile == null)
-            return;
-
-        if (virtualFile.isValid()) {
+        boolean isValid = virtualFile != null && virtualFile.isValid();
+        if (isValid && virtualFile.isDirectory()) {
+            isValid = false;
+            if (virtualFile.getFileType() instanceof ArchiveFileType) {
+                if (virtualFile.getFileSystem() instanceof JarFileSystem) {
+                    virtualFile = ((JarFileSystem) virtualFile.getFileSystem()).getVirtualFileForJar(virtualFile);
+                    isValid = virtualFile != null && virtualFile.isValid();
+                } else {
+                    virtualFile = ((ArchiveFileSystem) virtualFile.getFileSystem()).getLocalByEntry(virtualFile);
+                    isValid = virtualFile != null && virtualFile.isValid();
+                }
+            }
+        }
+        if (isValid) {
             BinEdVirtualFile binEdVirtualFile = new BinEdVirtualFile(virtualFile);
             OpenFileDescriptor descriptor = new OpenFileDescriptor(project, binEdVirtualFile, 0);
             FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
