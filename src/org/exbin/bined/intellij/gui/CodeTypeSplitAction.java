@@ -273,27 +273,6 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
                 myDisposable = null;
             }
         }
-
-        @Override
-        public void afterActionPerformed(@NotNull AnAction action, @NotNull DataContext
-                dataContext, @NotNull AnActionEvent event) {
-//            if (selectedAction != action && myAction != action) {
-//                selectedAction = action;
-//                copyPresentation(selectedAction.getTemplatePresentation());
-//
-//                if(selectedAction instanceof Toggleable) {
-//                    myPresentation.putClientProperty(Toggleable.SELECTED_PROPERTY, event.getPresentation().getClientProperty(Toggleable.SELECTED_PROPERTY));
-//                }
-//            }
-//            else if (myPresentation != event.getPresentation()) {
-//                copyPresentation(event.getPresentation());
-//            }
-//            else if (!myPresentation.isEnabled()) {
-//                actionEnabled = false;
-//                myPresentation.setEnabled(true);
-//            }
-            repaint();
-        }
     }
 
     /**

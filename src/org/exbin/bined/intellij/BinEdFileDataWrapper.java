@@ -39,6 +39,7 @@ import java.io.OutputStream;
 @ParametersAreNonnullByDefault
 public class BinEdFileDataWrapper implements EditableBinaryData {
 
+	public static final String BROKEN_VIRTUAL_FILE = "Broken virtual file";
     private static final int BUFFER_SIZE = 4096;
     public static final int PAGE_SIZE = 4096;
 
@@ -86,7 +87,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
         try {
             return new ByteArrayData(file.contentsToByteArray());
         } catch (IOException e) {
-            throw new IllegalStateException("Broken virtual file", e);
+            throw new IllegalStateException(BROKEN_VIRTUAL_FILE, e);
         }
     }
 
@@ -156,7 +157,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             outputStream.close();
             inputStream.close();
         } catch (IOException e) {
-            throw new IllegalStateException("Broken virtual file", e);
+            throw new IllegalStateException(BROKEN_VIRTUAL_FILE, e);
         }
     }
 
@@ -166,7 +167,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
         try {
             return file.getInputStream();
         } catch (IOException e) {
-            throw new IllegalStateException("Broken virtual file", e);
+            throw new IllegalStateException(BROKEN_VIRTUAL_FILE, e);
         }
     }
 
@@ -451,7 +452,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
                         }
                     });
                 } else {
-                    throw new IllegalStateException("Broken virtual file", ex);
+                    throw new IllegalStateException(BROKEN_VIRTUAL_FILE, ex);
                 }
             }
             resetCache();
@@ -519,7 +520,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             while (remains > 0) {
                 int copied = inputStream.read(cachePages[usedPage].page, done, remains);
                 if (copied < 0) {
-                    throw new IllegalStateException("Broken virtual file");
+                    throw new IllegalStateException(BROKEN_VIRTUAL_FILE);
                 }
                 cachePosition += copied;
                 remains -= copied;
@@ -529,7 +530,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             cachePages[usedPage].pageIndex = pageIndex;
             nextCachePage = 1 - nextCachePage;
         } catch (IOException e) {
-            throw new IllegalStateException("Broken virtual file", e);
+            throw new IllegalStateException(BROKEN_VIRTUAL_FILE, e);
         }
 
         return usedPage;

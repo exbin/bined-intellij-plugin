@@ -34,13 +34,19 @@ import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
+import com.jetbrains.cidr.execution.debugger.evaluation.CidrPhysicalValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrValue;
 import com.jetbrains.php.debug.common.PhpNavigatableValue;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
+import com.jetbrains.rider.debugger.DotNetNamedValue;
+import com.jetbrains.rider.debugger.DotNetValue;
+import com.jetbrains.rider.model.debuggerWorker.ObjectPropertiesProxy;
+import com.jetbrains.rider.model.debuggerWorker.ObjectProxy;
 import com.sun.jdi.*;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
+import org.exbin.bined.intellij.debug.c.CCharArrayPageProvider;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.debug.jdi.*;
 import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
@@ -73,11 +79,13 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
     private static boolean javaValueClassAvailable = false;
     private static boolean pythonValueClassAvailable = false;
     private static boolean cValueClassAvailable = false;
+    private static boolean dotNetValueClassAvailable = false;
 
     private static final String JAVA_VALUE_CLASS = "com.intellij.debugger.engine.JavaValue";
     private static final String PYTHON_VALUE_CLASS = "com.jetbrains.python.debugger.PyDebugValue";
     private static final String PHP_VALUE_CLASS = "com.jetbrains.php.debug.xdebug.debugger.XdebugValue";
     private static final String C_VALUE_CLASS = "com.jetbrains.cidr.execution.debugger.evaluation.CidrValue";
+    private static final String DOTNET_VALUE_CLASS = "com.jetbrains.rider.debugger.DotNetNamedValue";
 
     private static void detectClasses() {
         classesDetected = true;
@@ -97,6 +105,12 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
         try {
             Class.forName(C_VALUE_CLASS);
             cValueClassAvailable = true;
+        } catch (ClassNotFoundException ignore) {
+        }
+
+        try {
+            Class.forName(DOTNET_VALUE_CLASS);
+            dotNetValueClassAvailable = true;
         } catch (ClassNotFoundException ignore) {
         }
     }
@@ -152,6 +166,10 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
             }
 
             if (pythonValueClassAvailable && container instanceof PyDebugValue) {
+                return node;
+            }
+
+            if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
                 return node;
             }
 
@@ -228,6 +246,19 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                     }
                 }
 
+                if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
+                    DotNetNamedValue namedValue = (DotNetNamedValue) container;
+                    ObjectProxy objectProxy = namedValue.getObjectProxy();
+                    DotNetValue value = new DotNetValue(namedValue.getFrame(), objectProxy, namedValue.getLifetime(), namedValue.getSessionId());
+//                    value.
+                    ObjectPropertiesProxy properties = objectProxy.getProperties();
+                    if (properties.isArray()) {
+                        switch (properties.getType()) {
+
+                        }
+                    }
+                }
+
                 if (pythonValueClassAvailable && container instanceof PyDebugValue) {
                     String dataType = ((PyDebugValue) container).getType();
                     switch (dataType) {
@@ -259,19 +290,19 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                     }
                 }
 
-//                if (cValueClassAvailable && container instanceof CidrValue) {
-//                    String dataType = ((CidrValue) container).getEvaluationExpression(true);
-//                    switch (dataType) {
-//                        case "byteArray": {
-//                            BinaryData data = new DebugViewData(new CCharArrayPageProvider(myDataNode, (CidrPhysicalValue) container));
-//                            debugViewPanel.addProvider(new DefaultDebugViewDataProvider("C bytearray value", data));
-//                            break;
-//                        }
-//                        default: {
-//
-//                        }
-//                    }
-//                }
+                if (cValueClassAvailable && container instanceof CidrValue) {
+                    String dataType = ((CidrValue) container).getEvaluationExpression(true);
+                    switch (dataType) {
+                        case "byteArray": {
+                            BinaryData data = new DebugViewData(new CCharArrayPageProvider(myDataNode, (CidrPhysicalValue) container));
+                            debugViewPanel.addProvider(new DefaultDebugViewDataProvider("C bytearray value", data));
+                            break;
+                        }
+                        default: {
+
+                        }
+                    }
+                }
 
                 String valueCanonicalName = container.getClass().getCanonicalName();
                 if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {

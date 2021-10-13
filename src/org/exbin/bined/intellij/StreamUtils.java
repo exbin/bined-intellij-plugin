@@ -23,7 +23,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 /**
  * Utilities for stream data manipulations.
  *
- * @version 0.2.1 2017/05/15
+ * @version 0.2.5 2021/10/11
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -45,14 +45,17 @@ public final class StreamUtils {
         byte[] buffer = new byte[BUFFER_SIZE];
         int bufferUsed = 0;
 
-        while (source.available() > 0) {
-            int bytesRed = source.read(buffer, bufferUsed, BUFFER_SIZE - bufferUsed);
-            bufferUsed += bytesRed;
-            if (bufferUsed == BUFFER_SIZE) {
-                target.write(buffer, 0, BUFFER_SIZE);
-                bufferUsed = 0;
+        int bytesRead;
+        do {
+            bytesRead = source.read(buffer, bufferUsed, BUFFER_SIZE - bufferUsed);
+            if (bytesRead > 0) {
+                bufferUsed += bytesRead;
+                if (bufferUsed == BUFFER_SIZE) {
+                    target.write(buffer, 0, BUFFER_SIZE);
+                    bufferUsed = 0;
+                }
             }
-        }
+        } while (bytesRead > 0);
 
         if (bufferUsed > 0) {
             target.write(buffer, 0, bufferUsed);
@@ -61,50 +64,47 @@ public final class StreamUtils {
 
     /**
      * Copies all data from input stream to output stream using 1k buffer with
-     * size limitation.
+     * maximum size limitation.
      *
      * @param source input stream
      * @param target output stream
-     * @param size data size limitation
-     * @throws IOException if read or write fails
+     * @param maxAllowedSize data size limitation
+     * @throws IOException if read or write fails or source contains more data
+     * then limitation
      */
-    public static void copyInputStreamToOutputStream(InputStream source, OutputStream target, long size) throws IOException {
-        long remain = size;
-        int bufferSize = size < BUFFER_SIZE ? (int) size : BUFFER_SIZE;
-        byte[] buffer = new byte[bufferSize];
+    public static void copyInputStreamToOutputStream(InputStream source, OutputStream target, long maxAllowedSize) throws IOException {
+        long remain = maxAllowedSize;
+        byte[] buffer = new byte[BUFFER_SIZE];
         int bufferUsed = 0;
 
-        while (source.available() > 0) {
-            if (remain == 0) {
-                throw new IOException("More data than limited to " + size + " available.");
+        int bytesRead;
+        do {
+            bytesRead = source.read(buffer, bufferUsed, BUFFER_SIZE - bufferUsed);
+            if (bytesRead > 0) {
+                if (bytesRead > remain) {
+                    throw new IOException("More data than limited to " + maxAllowedSize + " available.");
+                }
+                remain -= bytesRead;
+                bufferUsed += bytesRead;
+                if (bufferUsed == BUFFER_SIZE) {
+                    target.write(buffer, 0, BUFFER_SIZE);
+                    bufferUsed = 0;
+                }
             }
-
-            int bytesRed = source.read(buffer, bufferUsed, bufferSize - bufferUsed);
-            bufferUsed += bytesRed;
-            if (bufferUsed == bufferSize) {
-                target.write(buffer, 0, bufferSize);
-                remain -= bufferSize;
-                bufferUsed = 0;
-            }
-        }
+        } while (bytesRead > 0);
 
         if (bufferUsed > 0) {
             target.write(buffer, 0, bufferUsed);
-            remain -= bufferUsed;
-        }
-
-        if (remain > 0) {
-            throw new IOException("Unexpected data processed - " + size + " expected, " + (size - remain) + " processed.");
         }
     }
 
     /**
      * Copies data of given size from input stream to output stream using 1k
-     * buffer with size limitation.
+     * buffer.
      *
      * @param source input stream
      * @param target output stream
-     * @param size data size limitation
+     * @param size data size
      * @throws IOException if read or write fails
      */
     public static void copyFixedSizeInputStreamToOutputStream(InputStream source, OutputStream target, long size) throws IOException {
@@ -113,17 +113,19 @@ public final class StreamUtils {
         byte[] buffer = new byte[bufferSize];
         int bufferUsed = 0;
 
-        while ((source.available() > 0) && (bufferUsed != remain)) {
-
-            int length = (bufferSize > remain ? (int) remain : bufferSize) - bufferUsed;
-            int bytesRed = source.read(buffer, bufferUsed, length);
-            bufferUsed += bytesRed;
-            if (bufferUsed == bufferSize) {
-                target.write(buffer, 0, bufferSize);
-                remain -= bufferSize;
-                bufferUsed = 0;
+        int bytesRead;
+        do {
+            bytesRead = source.read(buffer, bufferUsed, bufferSize - bufferUsed);
+            if (bytesRead > 0) {
+                bufferUsed += bytesRead;
+                if (bufferUsed == bufferSize) {
+                    remain -= bufferSize;
+                    target.write(buffer, 0, bufferSize);
+                    bufferUsed = 0;
+                    bufferSize = size < BUFFER_SIZE ? (int) size : BUFFER_SIZE;
+                }
             }
-        }
+        } while (bytesRead > 0);
 
         if (bufferUsed > 0) {
             target.write(buffer, 0, bufferUsed);
@@ -132,20 +134,6 @@ public final class StreamUtils {
 
         if (remain > 0) {
             throw new IOException("Unexpected data processed - " + size + " expected, " + (size - remain) + " processed.");
-        }
-    }
-
-    /**
-     * Skips all remaining data from input stream.
-     *
-     * @param source input stream
-     * @throws IOException if read fails
-     */
-    public static void skipInputStreamData(InputStream source) throws IOException {
-        while (source.available() > 0) {
-            if (source.skip(BUFFER_SIZE) == -1) {
-                break;
-            }
         }
     }
 
@@ -159,11 +147,25 @@ public final class StreamUtils {
     public static void skipInputStreamData(InputStream source, long skipBytes) throws IOException {
         while (skipBytes > 0) {
             long skipped = source.skip(skipBytes > BUFFER_SIZE ? BUFFER_SIZE : skipBytes);
-            if (skipped == -1) {
-                throw new IOException("Unable to skip data");
+            if (skipped <= 0) {
+                break;
             } else {
                 skipBytes -= skipped;
             }
+        }
+
+        // Skip was not successful - read data instead
+        if (skipBytes > 0) {
+            int toRead = skipBytes < BUFFER_SIZE ? (int) skipBytes : BUFFER_SIZE;
+            byte[] buffer = new byte[toRead];
+            do {
+                int bytesRead = source.read(buffer, 0, toRead);
+                if (bytesRead <= 0) {
+                    throw new IOException("Unable to skip data");
+                }
+                skipBytes -= bytesRead;
+                toRead = skipBytes < BUFFER_SIZE ? (int) skipBytes : BUFFER_SIZE;
+            } while (skipBytes > 0);
         }
     }
 
@@ -179,15 +181,18 @@ public final class StreamUtils {
         byte[] buffer = new byte[BUFFER_SIZE];
         int bufferUsed = 0;
 
-        while (source.available() > 0) {
-            int bytesRed = source.read(buffer, bufferUsed, BUFFER_SIZE - bufferUsed);
-            bufferUsed += bytesRed;
-            if (bufferUsed == BUFFER_SIZE) {
-                target.write(buffer, 0, BUFFER_SIZE);
-                secondTarget.write(buffer, 0, BUFFER_SIZE);
-                bufferUsed = 0;
+        int bytesRead;
+        do {
+            bytesRead = source.read(buffer, bufferUsed, BUFFER_SIZE - bufferUsed);
+            if (bytesRead > 0) {
+                bufferUsed += bytesRead;
+                if (bufferUsed == BUFFER_SIZE) {
+                    target.write(buffer, 0, BUFFER_SIZE);
+                    secondTarget.write(buffer, 0, BUFFER_SIZE);
+                    bufferUsed = 0;
+                }
             }
-        }
+        } while (bytesRead > 0);
 
         if (bufferUsed > 0) {
             target.write(buffer, 0, bufferUsed);
@@ -196,7 +201,8 @@ public final class StreamUtils {
     }
 
     /**
-     * Compares two streams for matching data.
+     * Compares two streams for matching data from current position till the
+     * end.
      *
      * @param stream one stream
      * @param compStream other stream
@@ -204,23 +210,24 @@ public final class StreamUtils {
      * @throws IOException if read or write fails
      */
     public static boolean compareStreams(InputStream stream, InputStream compStream) throws IOException {
-        byte[] dataBlob = new byte[1];
-        byte[] compDataBlob = new byte[1];
-        while (stream.available() > 0) {
-            int nextByte = stream.read(dataBlob, 0, 1);
+        byte[] dataBlob = new byte[2];
+
+        int nextByte;
+        do {
+            nextByte = stream.read(dataBlob, 0, 1);
+            int compNextByte = compStream.read(dataBlob, 1, 1);
             if (nextByte < 0) {
-                return false;
+                return compNextByte < 0;
             }
-            int compNextByte = compStream.read(compDataBlob, 0, 1);
             if (compNextByte < 0) {
                 return false;
             }
 
-            if (dataBlob[0] != compDataBlob[0]) {
+            if (dataBlob[0] != dataBlob[1]) {
                 return false;
             }
-        }
+        } while (nextByte > 0);
 
-        return compStream.available() == 0;
+        return true;
     }
 }
