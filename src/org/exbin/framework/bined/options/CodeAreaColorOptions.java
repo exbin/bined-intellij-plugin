@@ -20,7 +20,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 
 /**
- * Code area theme options.
+ * Code area color options.
  *
  * @version 0.2.1 2019/07/20
  * @author ExBin Project (http://exbin.org)

@@ -57,15 +57,15 @@ public class CodeAreaLayoutPreferences implements CodeAreaLayoutOptions {
 
     @Nonnull
     public List<String> getLayoutProfilesList() {
-        List<String> layoutList = new ArrayList<>();
-        int layoutsCount = preferences.getInt(PREFERENCES_LAYOUT_PROFILES_COUNT, 0);
+        List<String> profilesList = new ArrayList<>();
+        int profilesCount = preferences.getInt(PREFERENCES_LAYOUT_PROFILES_COUNT, 0);
 
-        for (int i = 0; i < layoutsCount; i++) {
-            String layoutName = preferences.get(PREFERENCES_LAYOUT_PROFILE_NAME_PREFIX + String.valueOf(i), "");
-            layoutList.add(layoutName);
+        for (int i = 0; i < profilesCount; i++) {
+            String profileName = preferences.get(PREFERENCES_LAYOUT_PROFILE_NAME_PREFIX + String.valueOf(i), "");
+            profilesList.add(profileName);
         }
 
-        return layoutList;
+        return profilesList;
     }
 
     public void setLayoutProfilesList(List<String> layoutNames) {

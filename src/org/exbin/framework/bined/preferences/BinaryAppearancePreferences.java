@@ -19,9 +19,9 @@ import org.exbin.framework.api.Preferences;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Appearance preferences.
+ * Binary appearance preferences.
  *
- * @version 0.2.0 2019/06/09
+ * @version 0.2.2 2021/10/17
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -29,7 +29,7 @@ public class BinaryAppearancePreferences {
 
     public static final String PREFERENCES_TEXT_WORD_WRAPPING = "textAppearance.wordWrap";
     public static final String PREFERENCES_SHOW_VALUES_PANEL = "showValuesPanel";
-    public static final String PREFERENCES_MULTITAB_MODE = "experimentalMultiTabMode";
+    public static final String PREFERENCES_MULTIFILE_MODE = "multiFileMode";
 
     private final Preferences preferences;
 
@@ -45,8 +45,8 @@ public class BinaryAppearancePreferences {
         return preferences.getBoolean(PREFERENCES_SHOW_VALUES_PANEL, true);
     }
 
-    public boolean isMultiTabMode() {
-        return preferences.getBoolean(PREFERENCES_MULTITAB_MODE, false);
+    public boolean isMultiFileMode() {
+        return preferences.getBoolean(PREFERENCES_MULTIFILE_MODE, true);
     }
 
     public void setLineWrapping(boolean wrapping) {
@@ -57,7 +57,7 @@ public class BinaryAppearancePreferences {
         preferences.putBoolean(PREFERENCES_SHOW_VALUES_PANEL, show);
     }
 
-    public void setMultiTabMode(boolean mode) {
-        preferences.putBoolean(PREFERENCES_MULTITAB_MODE, mode);
+    public void setMultiFileMode(boolean mode) {
+        preferences.putBoolean(PREFERENCES_MULTIFILE_MODE, mode);
     }
 }

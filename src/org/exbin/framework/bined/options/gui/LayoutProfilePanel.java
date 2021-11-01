@@ -16,26 +16,19 @@
 package org.exbin.framework.bined.options.gui;
 
 import java.awt.BorderLayout;
-import java.io.IOException;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.bined.EditMode;
-import org.exbin.bined.SelectionRange;
-import org.exbin.bined.RowWrappingMode;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 
 /**
  * Layout profile panel.
  *
- * @version 0.2.0 2019/03/16
+ * @version 0.2.1 2021/09/20
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -43,7 +36,7 @@ public class LayoutProfilePanel extends javax.swing.JPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(LayoutProfilePanel.class);
 
-    private ExtCodeArea codeArea;
+    private final PreviewPanel previewPanel = new PreviewPanel();
 
     public LayoutProfilePanel() {
         initComponents();
@@ -51,9 +44,7 @@ public class LayoutProfilePanel extends javax.swing.JPanel {
     }
 
     private void init() {
-        codeArea = new ExtCodeArea();
-        initPreviewCodeArea();
-        previewPanel.add(codeArea, BorderLayout.CENTER);
+        add(previewPanel, BorderLayout.CENTER);
     }
 
     @Nonnull
@@ -61,29 +52,16 @@ public class LayoutProfilePanel extends javax.swing.JPanel {
         return resourceBundle;
     }
 
-    private void initPreviewCodeArea() {
-        codeArea.setEditMode(EditMode.READ_ONLY);
-        ByteArrayEditableData exampleData = new ByteArrayEditableData();
-        try {
-            exampleData.loadFromStream(getClass().getResourceAsStream("/org/exbin/framework/bined/resources/preview/lorem.txt"));
-        } catch (IOException ex) {
-            Logger.getLogger(LayoutProfilePanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        codeArea.setContentData(exampleData);
-        codeArea.setRowWrapping(RowWrappingMode.WRAPPING);
-        codeArea.setEnabled(false);
-        codeArea.setSelection(new SelectionRange(200, 300));
-    }
-
     @Nonnull
     public DefaultExtendedCodeAreaLayoutProfile getLayoutProfile() {
+        ExtCodeArea codeArea = previewPanel.getCodeArea();
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = (DefaultExtendedCodeAreaLayoutProfile) codeArea.getLayoutProfile();
         return Objects.requireNonNull(layoutProfile).createCopy();
     }
 
     public void setLayoutProfile(DefaultExtendedCodeAreaLayoutProfile layoutProfile) {
         DefaultExtendedCodeAreaLayoutProfile newLayoutProfile = layoutProfile.createCopy();
-        codeArea.setLayoutProfile(newLayoutProfile);
+        updateLayoutProfile(newLayoutProfile);
         showHeaderCheckBox.setSelected(newLayoutProfile.isShowHeader());
         headerTopSpaceSpinner.setValue(newLayoutProfile.getTopHeaderSpace());
         headerBottomSpaceSpinner.setValue(newLayoutProfile.getBottomHeaderSpace());
@@ -124,8 +102,6 @@ public class LayoutProfilePanel extends javax.swing.JPanel {
         headerTopSpaceSpinner = new javax.swing.JSpinner();
         headerBottomSpaceLabel = new javax.swing.JLabel();
         headerBottomSpaceSpinner = new javax.swing.JSpinner();
-        previewPanel = new javax.swing.JPanel();
-        previewLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -324,71 +300,66 @@ public class LayoutProfilePanel extends javax.swing.JPanel {
         preferencesScrollPane.setViewportView(preferencesPanel);
 
         add(preferencesScrollPane, java.awt.BorderLayout.WEST);
-
-        previewPanel.setLayout(new java.awt.BorderLayout());
-
-        previewLabel.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.darkShadow"));
-        previewLabel.setText(resourceBundle.getString("previewLabel.text")); // NOI18N
-        previewLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        previewLabel.setOpaque(true);
-        previewPanel.add(previewLabel, java.awt.BorderLayout.NORTH);
-
-        add(previewPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void showRowPositionCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_showRowPositionCheckBoxItemStateChanged
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = getLayoutProfile();
         layoutProfile.setShowRowPosition(showRowPositionCheckBox.isSelected());
-        codeArea.setLayoutProfile(layoutProfile);
+        updateLayoutProfile(layoutProfile);
     }//GEN-LAST:event_showRowPositionCheckBoxItemStateChanged
 
     private void rowPositionLeftSpaceSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_rowPositionLeftSpaceSpinnerStateChanged
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = getLayoutProfile();
         layoutProfile.setLeftRowPositionSpace((Integer) rowPositionLeftSpaceSpinner.getValue());
-        codeArea.setLayoutProfile(layoutProfile);
+        updateLayoutProfile(layoutProfile);
     }//GEN-LAST:event_rowPositionLeftSpaceSpinnerStateChanged
 
     private void rowPositionRightSpaceSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_rowPositionRightSpaceSpinnerStateChanged
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = getLayoutProfile();
         layoutProfile.setRightRowPositionSpace((Integer) rowPositionRightSpaceSpinner.getValue());
-        codeArea.setLayoutProfile(layoutProfile);
+        updateLayoutProfile(layoutProfile);
     }//GEN-LAST:event_rowPositionRightSpaceSpinnerStateChanged
 
     private void halfSpaceGroupSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_halfSpaceGroupSizeSpinnerStateChanged
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = getLayoutProfile();
         layoutProfile.setHalfSpaceGroupSize((Integer) halfSpaceGroupSizeSpinner.getValue());
-        codeArea.setLayoutProfile(layoutProfile);
+        updateLayoutProfile(layoutProfile);
     }//GEN-LAST:event_halfSpaceGroupSizeSpinnerStateChanged
 
     private void spaceGroupSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spaceGroupSizeSpinnerStateChanged
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = getLayoutProfile();
         layoutProfile.setSpaceGroupSize((Integer) spaceGroupSizeSpinner.getValue());
-        codeArea.setLayoutProfile(layoutProfile);
+        updateLayoutProfile(layoutProfile);
     }//GEN-LAST:event_spaceGroupSizeSpinnerStateChanged
 
     private void doubleSpaceGroupSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_doubleSpaceGroupSizeSpinnerStateChanged
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = getLayoutProfile();
         layoutProfile.setDoubleSpaceGroupSize((Integer) doubleSpaceGroupSizeSpinner.getValue());
-        codeArea.setLayoutProfile(layoutProfile);
+        updateLayoutProfile(layoutProfile);
     }//GEN-LAST:event_doubleSpaceGroupSizeSpinnerStateChanged
 
     private void headerBottomSpaceSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_headerBottomSpaceSpinnerStateChanged
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = getLayoutProfile();
         layoutProfile.setBottomHeaderSpace((Integer) headerBottomSpaceSpinner.getValue());
-        codeArea.setLayoutProfile(layoutProfile);
+        updateLayoutProfile(layoutProfile);
     }//GEN-LAST:event_headerBottomSpaceSpinnerStateChanged
 
     private void headerTopSpaceSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_headerTopSpaceSpinnerStateChanged
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = getLayoutProfile();
         layoutProfile.setTopHeaderSpace((Integer) headerTopSpaceSpinner.getValue());
-        codeArea.setLayoutProfile(layoutProfile);
+        updateLayoutProfile(layoutProfile);
     }//GEN-LAST:event_headerTopSpaceSpinnerStateChanged
 
     private void showHeaderCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_showHeaderCheckBoxItemStateChanged
         DefaultExtendedCodeAreaLayoutProfile layoutProfile = getLayoutProfile();
         layoutProfile.setShowHeader(showHeaderCheckBox.isSelected());
-        codeArea.setLayoutProfile(layoutProfile);
+        updateLayoutProfile(layoutProfile);
     }//GEN-LAST:event_showHeaderCheckBoxItemStateChanged
+
+    private void updateLayoutProfile(DefaultExtendedCodeAreaLayoutProfile layoutProfile) {
+        ExtCodeArea codeArea = previewPanel.getCodeArea();
+        codeArea.setLayoutProfile(layoutProfile);
+    }
 
     /**
      * Test method for this panel.
@@ -411,8 +382,6 @@ public class LayoutProfilePanel extends javax.swing.JPanel {
     private javax.swing.JSpinner headerTopSpaceSpinner;
     private javax.swing.JPanel preferencesPanel;
     private javax.swing.JScrollPane preferencesScrollPane;
-    private javax.swing.JLabel previewLabel;
-    private javax.swing.JPanel previewPanel;
     private javax.swing.JLabel rowPositionLeftSpaceLabel;
     private javax.swing.JSpinner rowPositionLeftSpaceSpinner;
     private javax.swing.JPanel rowPositionPanel;

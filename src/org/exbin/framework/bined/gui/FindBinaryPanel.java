@@ -582,7 +582,9 @@ public class FindBinaryPanel extends javax.swing.JPanel {
     }
 
     public void detachMenu() {
-        codeAreaPopupMenuHandler.dropPopupMenu(POPUP_MENU_POSTFIX);
+        if (codeAreaPopupMenuHandler != null) {
+            codeAreaPopupMenuHandler.dropPopupMenu(POPUP_MENU_POSTFIX);
+        }
     }
 
     private void updateReplaceEnablement() {

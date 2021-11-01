@@ -78,15 +78,15 @@ public class CodeAreaColorPreferences implements CodeAreaColorOptions {
 
     @Nonnull
     public List<String> getColorProfilesList() {
-        List<String> themesList = new ArrayList<>();
-        int themesCount = preferences.getInt(PREFERENCES_COLOR_PROFILES_COUNT, 0);
+        List<String> profilesList = new ArrayList<>();
+        int profilesCount = preferences.getInt(PREFERENCES_COLOR_PROFILES_COUNT, 0);
 
-        for (int i = 0; i < themesCount; i++) {
-            String themeName = preferences.get(PREFERENCES_COLOR_PROFILE_NAME_PREFIX + String.valueOf(i), "");
-            themesList.add(themeName);
+        for (int i = 0; i < profilesCount; i++) {
+            String profileName = preferences.get(PREFERENCES_COLOR_PROFILE_NAME_PREFIX + String.valueOf(i), "");
+            profilesList.add(profileName);
         }
 
-        return themesList;
+        return profilesList;
     }
 
     public void setColorProfilesList(List<String> colorProfilesNames) {

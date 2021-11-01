@@ -23,7 +23,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="showValuesPanelCheckBox" alignment="0" max="32767" attributes="0"/>
-                  <Component id="multiTabModeCheckBox" alignment="0" max="32767" attributes="0"/>
+                  <Component id="multiFileModeCheckBox" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -35,20 +35,20 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="showValuesPanelCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="multiTabModeCheckBox" min="-2" max="-2" attributes="0"/>
+              <Component id="multiFileModeCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JCheckBox" name="multiTabModeCheckBox">
+    <Component class="javax.swing.JCheckBox" name="multiFileModeCheckBox">
       <Properties>
+        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/bined/options/gui/resources/BinaryAppearanceOptionsPanel.properties" key="multiTabModeCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/bined/options/gui/resources/BinaryAppearanceOptionsPanel.properties" key="multiFileModeCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
-        <Property name="enabled" type="boolean" value="false"/>
-        <Property name="name" type="java.lang.String" value="multiTabModeCheckBox" noResource="true"/>
+        <Property name="name" type="java.lang.String" value="multiFileModeCheckBox" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="showValuesPanelCheckBox">

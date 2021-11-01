@@ -1,5 +1,8 @@
 0.2.5
 - New app icon
+- Added templates for profiles
+- Added insert data dialog
+- Added files compare dialog
 - Fixed issues with binary file type (issue #36)
 - Fixed issue with transparency (issue #38)
 - Fixed issue with opening zip files

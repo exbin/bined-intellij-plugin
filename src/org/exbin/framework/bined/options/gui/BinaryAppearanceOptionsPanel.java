@@ -26,7 +26,7 @@ import org.exbin.framework.gui.options.api.OptionsModifiedListener;
 /**
  * Binary viewer/editor appearance options panel.
  *
- * @version 0.2.1 2019/08/16
+ * @version 0.2.1 2021/10/17
  * @author ExBin Project (http://exbin.org)
  */
 public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements OptionsCapable<BinaryAppearanceOptionsImpl> {
@@ -47,13 +47,13 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
     @Override
     public void loadFromOptions(BinaryAppearanceOptionsImpl options) {
         showValuesPanelCheckBox.setSelected(options.isShowValuesPanel());
-        multiTabModeCheckBox.setSelected(options.isMultiTabMode());
+        multiFileModeCheckBox.setSelected(options.isMultiFileMode());
     }
 
     @Override
     public void saveToOptions(BinaryAppearanceOptionsImpl options) {
         options.setShowValuesPanel(showValuesPanelCheckBox.isSelected());
-        options.setMultiTabMode(multiTabModeCheckBox.isSelected());
+        options.setMultiFileMode(multiFileModeCheckBox.isSelected());
     }
 
     /**
@@ -65,14 +65,14 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        multiTabModeCheckBox = new javax.swing.JCheckBox();
+        multiFileModeCheckBox = new javax.swing.JCheckBox();
         showValuesPanelCheckBox = new javax.swing.JCheckBox();
 
         setName("Form"); // NOI18N
 
-        multiTabModeCheckBox.setText(resourceBundle.getString("multiTabModeCheckBox.text")); // NOI18N
-        multiTabModeCheckBox.setEnabled(false);
-        multiTabModeCheckBox.setName("multiTabModeCheckBox"); // NOI18N
+        multiFileModeCheckBox.setSelected(true);
+        multiFileModeCheckBox.setText(resourceBundle.getString("multiFileModeCheckBox.text")); // NOI18N
+        multiFileModeCheckBox.setName("multiFileModeCheckBox"); // NOI18N
 
         showValuesPanelCheckBox.setSelected(true);
         showValuesPanelCheckBox.setText(resourceBundle.getString("showValuesPanelCheckBox.text")); // NOI18N
@@ -86,7 +86,7 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(showValuesPanelCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(multiTabModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(multiFileModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -95,7 +95,7 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
                 .addContainerGap()
                 .addComponent(showValuesPanelCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(multiTabModeCheckBox)
+                .addComponent(multiFileModeCheckBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -110,7 +110,7 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox multiTabModeCheckBox;
+    private javax.swing.JCheckBox multiFileModeCheckBox;
     private javax.swing.JCheckBox showValuesPanelCheckBox;
     // End of variables declaration//GEN-END:variables
 

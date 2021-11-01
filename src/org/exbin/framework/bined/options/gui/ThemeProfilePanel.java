@@ -16,30 +16,21 @@
 package org.exbin.framework.bined.options.gui;
 
 import java.awt.BorderLayout;
-import java.io.IOException;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.bined.EditMode;
-import org.exbin.bined.SelectionRange;
-import org.exbin.bined.RowWrappingMode;
-import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
-import org.exbin.bined.capability.EditModeCapable;
 
 /**
  * Theme profile panel.
  *
- * @version 0.2.0 2019/08/05
+ * @version 0.2.1 2021/09/20
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -47,7 +38,7 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ThemeProfilePanel.class);
 
-    private ExtCodeArea codeArea;
+    private final PreviewPanel previewPanel = new PreviewPanel();
 
     public ThemeProfilePanel() {
         initComponents();
@@ -55,9 +46,7 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
     }
 
     private void init() {
-        codeArea = new ExtCodeArea();
-        initPreviewCodeArea();
-        previewPanel.add(codeArea, BorderLayout.CENTER);
+        add(previewPanel, BorderLayout.CENTER);
     }
 
     @Nonnull
@@ -65,28 +54,15 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
         return resourceBundle;
     }
 
-    private void initPreviewCodeArea() {
-        ((EditModeCapable) codeArea).setEditMode(EditMode.READ_ONLY);
-        ByteArrayEditableData exampleData = new ByteArrayEditableData();
-        try {
-            exampleData.loadFromStream(getClass().getResourceAsStream("/org/exbin/framework/bined/resources/preview/lorem.txt"));
-        } catch (IOException ex) {
-            Logger.getLogger(ThemeProfilePanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        codeArea.setContentData(exampleData);
-        ((RowWrappingCapable) codeArea).setRowWrapping(RowWrappingMode.WRAPPING);
-        codeArea.setEnabled(false);
-        codeArea.setSelection(new SelectionRange(200, 300));
-    }
-
     @Nonnull
     public ExtendedCodeAreaThemeProfile getThemeProfile() {
+        ExtCodeArea codeArea = previewPanel.getCodeArea();
         ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
         return Objects.requireNonNull(themeProfile).createCopy();
     }
 
     public void setThemeProfile(ExtendedCodeAreaThemeProfile themeProfile) {
-        codeArea.setThemeProfile(themeProfile);
+        updateThemeProfile(themeProfile);
         backgroundModeComboBox.setSelectedIndex(themeProfile.getBackgroundPaintMode().ordinal());
         paintRowPosBackgroundCheckBox.setSelected(themeProfile.isPaintRowPosBackground());
         decoratorHeaderLineCheckBox.setSelected(themeProfile.hasDecoration(ExtendedCodeAreaDecorations.HEADER_LINE));
@@ -117,8 +93,6 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
         decoratorHeaderLineCheckBox = new javax.swing.JCheckBox();
         verticalLineByteGroupSizeSpinner = new javax.swing.JSpinner();
         verticalLineByteGroupSizeLabel = new javax.swing.JLabel();
-        previewPanel = new javax.swing.JPanel();
-        previewLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -242,80 +216,75 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
         preferencesScrollPane.setViewportView(preferencesPanel);
 
         add(preferencesScrollPane, java.awt.BorderLayout.WEST);
-
-        previewPanel.setLayout(new java.awt.BorderLayout());
-
-        previewLabel.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.darkShadow"));
-        previewLabel.setText(resourceBundle.getString("previewLabel.text")); // NOI18N
-        previewLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        previewLabel.setOpaque(true);
-        previewPanel.add(previewLabel, java.awt.BorderLayout.NORTH);
-
-        add(previewPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void backgroundModeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundModeComboBoxActionPerformed
         ExtendedBackgroundPaintMode backgroundPaintMode = ExtendedBackgroundPaintMode.values()[backgroundModeComboBox.getSelectedIndex()];
-        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        ExtendedCodeAreaThemeProfile themeProfile = getThemeProfile();
         if (themeProfile != null) {
             themeProfile.setBackgroundPaintMode(backgroundPaintMode);
         }
-        codeArea.setThemeProfile(themeProfile);
+        updateThemeProfile(themeProfile);
     }//GEN-LAST:event_backgroundModeComboBoxActionPerformed
 
     private void paintRowPosBackgroundCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_paintRowPosBackgroundCheckBoxItemStateChanged
         boolean selected = paintRowPosBackgroundCheckBox.isSelected();
-        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        ExtendedCodeAreaThemeProfile themeProfile = getThemeProfile();
         if (themeProfile != null) {
             themeProfile.setPaintRowPosBackground(selected);
         }
-        codeArea.setThemeProfile(themeProfile);
+        updateThemeProfile(themeProfile);
     }//GEN-LAST:event_paintRowPosBackgroundCheckBoxItemStateChanged
 
     private void decoratorRowPosLineCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_decoratorRowPosLineCheckBoxItemStateChanged
         boolean selected = decoratorRowPosLineCheckBox.isSelected();
-        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        ExtendedCodeAreaThemeProfile themeProfile = getThemeProfile();
         if (themeProfile != null) {
             themeProfile.setDecoration(ExtendedCodeAreaDecorations.ROW_POSITION_LINE, selected);
         }
-        codeArea.setThemeProfile(themeProfile);
+        updateThemeProfile(themeProfile);
     }//GEN-LAST:event_decoratorRowPosLineCheckBoxItemStateChanged
 
     private void decoratorSplitLineCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_decoratorSplitLineCheckBoxItemStateChanged
         boolean selected = decoratorSplitLineCheckBox.isSelected();
-        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        ExtendedCodeAreaThemeProfile themeProfile = getThemeProfile();
         if (themeProfile != null) {
             themeProfile.setDecoration(ExtendedCodeAreaDecorations.SPLIT_LINE, selected);
         }
-        codeArea.setThemeProfile(themeProfile);
+        updateThemeProfile(themeProfile);
     }//GEN-LAST:event_decoratorSplitLineCheckBoxItemStateChanged
 
     private void decoratorBoxCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_decoratorBoxCheckBoxItemStateChanged
         boolean selected = decoratorBoxCheckBox.isSelected();
-        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        ExtendedCodeAreaThemeProfile themeProfile = getThemeProfile();
         if (themeProfile != null) {
             themeProfile.setDecoration(ExtendedCodeAreaDecorations.BOX_LINES, selected);
         }
-        codeArea.setThemeProfile(themeProfile);
+        updateThemeProfile(themeProfile);
     }//GEN-LAST:event_decoratorBoxCheckBoxItemStateChanged
 
     private void decoratorHeaderLineCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_decoratorHeaderLineCheckBoxItemStateChanged
         boolean selected = decoratorHeaderLineCheckBox.isSelected();
-        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        ExtendedCodeAreaThemeProfile themeProfile = getThemeProfile();
         if (themeProfile != null) {
             themeProfile.setDecoration(ExtendedCodeAreaDecorations.HEADER_LINE, selected);
         }
-        codeArea.setThemeProfile(themeProfile);
+        updateThemeProfile(themeProfile);
     }//GEN-LAST:event_decoratorHeaderLineCheckBoxItemStateChanged
 
     private void verticalLineByteGroupSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_verticalLineByteGroupSizeSpinnerStateChanged
         int byteGroupSize = (Integer) verticalLineByteGroupSizeSpinner.getValue();
-        ExtendedCodeAreaThemeProfile themeProfile = codeArea.getThemeProfile();
+        ExtendedCodeAreaThemeProfile themeProfile = getThemeProfile();
         if (themeProfile != null) {
             themeProfile.setVerticalLineByteGroupSize(byteGroupSize);
         }
-        codeArea.setThemeProfile(themeProfile);
+        updateThemeProfile(themeProfile);
     }//GEN-LAST:event_verticalLineByteGroupSizeSpinnerStateChanged
+
+    private void updateThemeProfile(ExtendedCodeAreaThemeProfile themeProfile) {
+        ExtCodeArea codeArea = previewPanel.getCodeArea();
+        codeArea.setThemeProfile(themeProfile);
+    }
 
     /**
      * Test method for this panel.
@@ -337,8 +306,6 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox paintRowPosBackgroundCheckBox;
     private javax.swing.JPanel preferencesPanel;
     private javax.swing.JScrollPane preferencesScrollPane;
-    private javax.swing.JLabel previewLabel;
-    private javax.swing.JPanel previewPanel;
     private javax.swing.JLabel verticalLineByteGroupSizeLabel;
     private javax.swing.JSpinner verticalLineByteGroupSizeSpinner;
     // End of variables declaration//GEN-END:variables

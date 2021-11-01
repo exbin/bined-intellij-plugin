@@ -58,15 +58,15 @@ public class CodeAreaThemePreferences implements CodeAreaThemeOptions {
 
     @Nonnull
     public List<String> getThemeProfilesList() {
-        List<String> themesList = new ArrayList<>();
-        int themesCount = preferences.getInt(PREFERENCES_THEMES_COUNT, 0);
+        List<String> profilesList = new ArrayList<>();
+        int profilesCount = preferences.getInt(PREFERENCES_THEMES_COUNT, 0);
 
-        for (int i = 0; i < themesCount; i++) {
-            String themeName = preferences.get(PREFERENCES_THEME_NAME_PREFIX + String.valueOf(i), "");
-            themesList.add(themeName);
+        for (int i = 0; i < profilesCount; i++) {
+            String profileName = preferences.get(PREFERENCES_THEME_NAME_PREFIX + String.valueOf(i), "");
+            profilesList.add(profileName);
         }
 
-        return themesList;
+        return profilesList;
     }
 
     public void setThemeProfilesList(List<String> themesNames) {

@@ -31,7 +31,7 @@ public class BinaryAppearanceOptionsImpl implements OptionsData, BinaryAppearanc
 
     private boolean lineWrapping;
     private boolean showValuesPanel;
-    private boolean multiTabMode;
+    private boolean multiFileMode;
 
     @Override
     public boolean isLineWrapping() {
@@ -54,24 +54,24 @@ public class BinaryAppearanceOptionsImpl implements OptionsData, BinaryAppearanc
     }
 
     @Override
-    public boolean isMultiTabMode() {
-        return multiTabMode;
+    public boolean isMultiFileMode() {
+        return multiFileMode;
     }
 
     @Override
-    public void setMultiTabMode(boolean multiTabMode) {
-        this.multiTabMode = multiTabMode;
+    public void setMultiFileMode(boolean multiFileMode) {
+        this.multiFileMode = multiFileMode;
     }
 
     public void loadFromPreferences(BinaryAppearancePreferences preferences) {
         lineWrapping = preferences.isLineWrapping();
         showValuesPanel = preferences.isShowValuesPanel();
-        multiTabMode = preferences.isMultiTabMode();
+        multiFileMode = preferences.isMultiFileMode();
     }
 
     public void saveToPreferences(BinaryAppearancePreferences preferences) {
         preferences.setLineWrapping(lineWrapping);
         preferences.setShowValuesPanel(showValuesPanel);
-        preferences.setMultiTabMode(multiTabMode);
+        preferences.setMultiFileMode(multiFileMode);
     }
 }

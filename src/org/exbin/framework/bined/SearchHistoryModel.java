@@ -17,6 +17,7 @@ package org.exbin.framework.bined;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataEvent;
@@ -45,8 +46,9 @@ public class SearchHistoryModel implements ComboBoxModel<SearchCondition> {
         this.selectedItem = (SearchCondition) selectedItem;
     }
 
+    @Nullable
     @Override
-    public Object getSelectedItem() {
+    public SearchCondition getSelectedItem() {
         return selectedItem;
     }
 
@@ -55,6 +57,7 @@ public class SearchHistoryModel implements ComboBoxModel<SearchCondition> {
         return searchHistory.size();
     }
 
+    @Nullable
     @Override
     public SearchCondition getElementAt(int index) {
         return searchHistory.get(index);

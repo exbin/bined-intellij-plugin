@@ -17,40 +17,26 @@ package org.exbin.framework.bined.options.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
-import org.exbin.bined.EditMode;
-import org.exbin.bined.SelectionRange;
-import org.exbin.bined.capability.RowWrappingCapable;
-import org.exbin.bined.RowWrappingMode;
-import org.exbin.bined.highlight.swing.extended.ExtendedHighlightCodeAreaPainter;
-import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
-import org.exbin.bined.capability.EditModeCapable;
 
 /**
  * Color profile panel.
  *
- * @version 0.2.0 2019/03/12
+ * @version 0.2.1 2021/09/21
  * @author ExBin Project (http://exbin.org)
  */
 public class ColorProfilePanel extends javax.swing.JPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ColorProfilePanel.class);
 
+    private final PreviewPanel previewPanel = new PreviewPanel(PreviewPanel.PreviewType.WITH_SEARCH);
     private final ColorProfileTableModel colorTableModel = new ColorProfileTableModel();
-
-    private ExtCodeArea codeArea;
 
     public ColorProfilePanel() {
         initComponents();
@@ -58,13 +44,11 @@ public class ColorProfilePanel extends javax.swing.JPanel {
     }
 
     private void init() {
-        codeArea = new ExtCodeArea();
-        initPreviewCodeArea();
-        previewPanel.add(codeArea, BorderLayout.CENTER);
-
         colorsTable.setDefaultRenderer(Color.class, new ColorCellTableRenderer());
         colorsTable.setDefaultEditor(Color.class, new ColorCellTableEditor());
 
+        add(previewPanel, BorderLayout.CENTER);
+        ExtCodeArea codeArea = previewPanel.getCodeArea();
         colorTableModel.setColorProfile((ExtendedCodeAreaColorProfile) codeArea.getColorsProfile());
     }
 
@@ -73,38 +57,16 @@ public class ColorProfilePanel extends javax.swing.JPanel {
         return resourceBundle;
     }
 
-    private void initPreviewCodeArea() {
-        ((EditModeCapable) codeArea).setEditMode(EditMode.READ_ONLY);
-        ExtendedHighlightNonAsciiCodeAreaPainter painter = new ExtendedHighlightNonAsciiCodeAreaPainter(codeArea);
-        codeArea.setPainter(painter);
-        List<ExtendedHighlightCodeAreaPainter.SearchMatch> exampleMatches = new ArrayList<>();
-        // Set manual search matches for "ligula"
-        exampleMatches.add(new ExtendedHighlightCodeAreaPainter.SearchMatch(145, 6));
-        exampleMatches.add(new ExtendedHighlightCodeAreaPainter.SearchMatch(480, 6));
-        exampleMatches.add(new ExtendedHighlightCodeAreaPainter.SearchMatch(1983, 6));
-        painter.setMatches(exampleMatches);
-        painter.setCurrentMatchIndex(1);
-        ByteArrayEditableData exampleData = new ByteArrayEditableData();
-        try {
-            exampleData.loadFromStream(getClass().getResourceAsStream("/org/exbin/framework/bined/resources/preview/lorem.txt"));
-        } catch (IOException ex) {
-            Logger.getLogger(ColorProfilePanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        codeArea.setContentData(exampleData);
-        ((RowWrappingCapable) codeArea).setRowWrapping(RowWrappingMode.WRAPPING);
-        codeArea.setEnabled(false);
-        codeArea.setShowUnprintables(true);
-        codeArea.setSelection(new SelectionRange(200, 300));
-    }
-
     public void setColorProfile(@Nonnull ExtendedCodeAreaColorProfile colorProfile) {
         ExtendedCodeAreaColorProfile newColorProfile = colorProfile.createCopy();
+        ExtCodeArea codeArea = previewPanel.getCodeArea();
         codeArea.setColorsProfile(newColorProfile);
         colorTableModel.setColorProfile(newColorProfile);
     }
 
     @Nonnull
     public ExtendedCodeAreaColorProfile getColorProfile() {
+        ExtCodeArea codeArea = previewPanel.getCodeArea();
         ExtendedCodeAreaColorProfile profile = (ExtendedCodeAreaColorProfile) codeArea.getColorsProfile();
         return Objects.requireNonNull(profile).createCopy();
     }
@@ -121,8 +83,6 @@ public class ColorProfilePanel extends javax.swing.JPanel {
         preferencesPanel = new javax.swing.JPanel();
         colorsScrollPane = new javax.swing.JScrollPane();
         colorsTable = new javax.swing.JTable();
-        previewPanel = new javax.swing.JPanel();
-        previewLabel = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -134,16 +94,6 @@ public class ColorProfilePanel extends javax.swing.JPanel {
         preferencesPanel.add(colorsScrollPane, java.awt.BorderLayout.CENTER);
 
         add(preferencesPanel, java.awt.BorderLayout.WEST);
-
-        previewPanel.setLayout(new java.awt.BorderLayout());
-
-        previewLabel.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.darkShadow"));
-        previewLabel.setText(resourceBundle.getString("previewLabel.text")); // NOI18N
-        previewLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        previewLabel.setOpaque(true);
-        previewPanel.add(previewLabel, java.awt.BorderLayout.NORTH);
-
-        add(previewPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     /**
@@ -159,7 +109,5 @@ public class ColorProfilePanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane colorsScrollPane;
     private javax.swing.JTable colorsTable;
     private javax.swing.JPanel preferencesPanel;
-    private javax.swing.JLabel previewLabel;
-    private javax.swing.JPanel previewPanel;
     // End of variables declaration//GEN-END:variables
 }

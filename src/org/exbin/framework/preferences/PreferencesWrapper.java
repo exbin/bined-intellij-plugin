@@ -15,136 +15,147 @@
  */
 package org.exbin.framework.preferences;
 
-import com.intellij.ide.util.PropertiesComponent;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.exbin.framework.api.Preferences;
-
+import java.util.prefs.BackingStoreException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Wrapper for preferences.
  *
- * @version 0.2.4 2021/04/11
+ * @version 0.2.0 2019/06/09
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class PreferencesWrapper implements Preferences {
 
-    private final PropertiesComponent preferences;
-    private final String prefix;
+    private final java.util.prefs.Preferences preferences;
 
-    public PreferencesWrapper(PropertiesComponent preferences, String prefix) {
-        this.preferences = Objects.requireNonNull(preferences);
-        this.prefix = Objects.requireNonNull(prefix);
+    public PreferencesWrapper(java.util.prefs.Preferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override
     public boolean exists(String key) {
-        return preferences.isValueSet(prefix + key);
+        return preferences.get(key, null) != null;
     }
 
     @Nonnull
     @Override
     public Optional<String> get(String key) {
-        return exists(key) ? Optional.ofNullable(preferences.getValue(prefix + key)) : Optional.empty();
+        return Optional.ofNullable(preferences.get(key, null));
     }
 
     @Nonnull
     @Override
     public String get(String key, String def) {
-        return preferences.getValue(prefix + key, Objects.requireNonNull(def));
+        return preferences.get(key, def);
+    }
+
+    @Override
+    public void remove(String key) {
+        preferences.remove(key);
+    }
+
+    @Override
+    public void putInt(String key, int value) {
+        preferences.putInt(key, value);
+    }
+
+    @Override
+    public int getInt(String key, int def) {
+        return preferences.getInt(key, def);
+    }
+
+    @Override
+    public void putLong(String key, long value) {
+        preferences.putLong(key, value);
+    }
+
+    @Override
+    public long getLong(String key, long def) {
+        return preferences.getLong(key, def);
+    }
+
+    @Override
+    public void putBoolean(String key, boolean value) {
+        preferences.putBoolean(key, value);
+    }
+
+    @Override
+    public boolean getBoolean(String key, boolean def) {
+        return preferences.getBoolean(key, def);
+    }
+
+    @Override
+    public void putFloat(String key, float value) {
+        preferences.putFloat(key, value);
+    }
+
+    @Override
+    public float getFloat(String key, float def) {
+        return preferences.getFloat(key, def);
+    }
+
+    @Override
+    public void putDouble(String key, double value) {
+        preferences.putDouble(key, value);
+    }
+
+    @Override
+    public double getDouble(String key, double def) {
+        return preferences.getDouble(key, def);
+    }
+
+    @Override
+    public void putByteArray(String key, byte[] value) {
+        preferences.putByteArray(key, value);
+    }
+
+    @Override
+    public byte[] getByteArray(String key, byte[] def) {
+        return preferences.getByteArray(key, def);
     }
 
     @Override
     public void put(String key, @Nullable String value) {
         if (value == null) {
-            preferences.unsetValue(prefix + key);
+            preferences.remove(key);
         } else {
-            preferences.setValue(prefix + key, value);
+            preferences.put(key, value);
         }
     }
 
-    @Override
-    public void remove(String key) {
-        preferences.unsetValue(prefix + key);
-    }
-
-    @Override
-    public void putInt(String key, int value) {
-        preferences.setValue(prefix + key, value, value + 1);
-    }
-
-    @Override
-    public int getInt(String key, int def) {
-        return preferences.getInt(prefix + key, def);
-    }
-
-    @Override
-    public void putLong(String key, long value) {
-        preferences.setValue(prefix + key, (int) value, value + 1);
-    }
-
-    @Override
-    public long getLong(String key, long defaultValue) {
-        try {
-            String value = preferences.getValue(prefix + key);
-            return value == null ? defaultValue : Long.parseLong(value);
-        }
-        catch (NumberFormatException e) {
-            return defaultValue;
-        }
-    }
-
-    @Override
-    public void putBoolean(String key, boolean value) {
-        preferences.setValue(prefix + key, value, !value);
-    }
-
-    @Override
-    public boolean getBoolean(String key, boolean def) {
-        return preferences.getBoolean(prefix + key, def);
-    }
-
-    @Override
-    public void putFloat(String key, float value) {
-        preferences.setValue(prefix + key, value, value + 1);
-    }
-
-    @Override
-    public float getFloat(String key, float def) {
-        return preferences.getFloat(prefix + key, def);
-    }
-
-    @Override
-    public void putDouble(String key, double value) {
-        preferences.setValue(prefix + key, (float) value, (float) (value + 1));
-    }
-
-    @Override
-    public double getDouble(String key, double def) {
-        return preferences.getFloat(prefix + key, (float) def);
-    }
-
-    @Override
-    public void putByteArray(String key, byte[] value) {
-        throw new UnsupportedOperationException("Not supported yet.");
-        //preferences.setValue(prefix + key, value);
-    }
-
-    @Override
-    public byte[] getByteArray(String key, byte[] def) {
-        throw new UnsupportedOperationException("Not supported yet.");
-        // return preferences.getValue(prefix + key, def);
-    }
-
+    /**
+     * Makes any changes permanent (stores cached changes to permanent storage).
+     */
     @Override
     public void flush() {
+        try {
+            preferences.flush();
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(PreferencesWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
+    /**
+     * Forces reloading of cache from permanent storage.
+     */
     @Override
     public void sync() {
+        try {
+            preferences.sync();
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(PreferencesWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Nonnull
+    public java.util.prefs.Preferences getInnerPreferences() {
+        return preferences;
     }
 }

@@ -78,6 +78,7 @@ public class SearchParameters {
         this.multipleMatches = multipleMatches;
     }
 
+    @Nonnull
     public SearchDirection getSearchDirection() {
         return searchDirection;
     }

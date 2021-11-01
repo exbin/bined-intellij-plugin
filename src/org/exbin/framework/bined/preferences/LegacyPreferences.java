@@ -30,7 +30,6 @@ import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.PositionCodeType;
 import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
-import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
 import org.exbin.framework.editor.text.preferences.TextFontPreferences;
 import org.exbin.xbup.core.util.StringUtils;
 

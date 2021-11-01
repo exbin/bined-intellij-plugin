@@ -19,6 +19,7 @@ import org.exbin.framework.bined.SearchCondition;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.util.ResourceBundle;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -32,9 +33,10 @@ import org.exbin.auxiliary.paged_data.EditableBinaryData;
 /**
  * Multiline search condition editor panel.
  *
- * @version 0.2.1 2019/06/17
+ * @version 0.2.1 2021/10/30
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class BinaryMultilinePanel extends javax.swing.JPanel {
 
     private static final String POPUP_MENU_POSTFIX = ".binaryMultilineDialog";
@@ -106,19 +108,7 @@ public class BinaryMultilinePanel extends javax.swing.JPanel {
             codeArea.setContentData(condition.getBinaryData());
             add(codeArea, BorderLayout.CENTER);
             if (codeAreaPopupMenuHandler != null) {
-                codeArea.setComponentPopupMenu(new JPopupMenu() {
-                    @Override
-                    public void show(Component invoker, int x, int y) {
-                        int clickedX = x;
-                        int clickedY = y;
-                        if (invoker instanceof JViewport) {
-                            clickedX += ((JViewport) invoker).getParent().getX();
-                            clickedY += ((JViewport) invoker).getParent().getY();
-                        }
-                        JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, POPUP_MENU_POSTFIX, clickedX, clickedY);
-                        popupMenu.show(invoker, x, y);
-                    }
-                });
+                attachPopupMenu();
             }
         }
         revalidate();
@@ -126,6 +116,26 @@ public class BinaryMultilinePanel extends javax.swing.JPanel {
 
     public void setCodeAreaPopupMenuHandler(CodeAreaPopupMenuHandler codeAreaPopupMenuHandler) {
         this.codeAreaPopupMenuHandler = codeAreaPopupMenuHandler;
+        if (codeArea != null) {
+            attachPopupMenu();
+        }
+    }
+
+    private void attachPopupMenu() {
+        codeArea.setComponentPopupMenu(new JPopupMenu() {
+            @Override
+            public void show(Component invoker, int x, int y) {
+                int clickedX = x;
+                int clickedY = y;
+                if (invoker instanceof JViewport) {
+                    clickedX += ((JViewport) invoker).getParent().getX();
+                    clickedY += ((JViewport) invoker).getParent().getY();
+                }
+                JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, POPUP_MENU_POSTFIX, clickedX, clickedY);
+                popupMenu.show(invoker, x, y);
+                codeAreaPopupMenuHandler.dropPopupMenu(POPUP_MENU_POSTFIX);
+            }
+        });
     }
 
     public void detachMenu() {

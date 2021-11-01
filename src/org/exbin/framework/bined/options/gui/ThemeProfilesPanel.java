@@ -17,6 +17,7 @@ package org.exbin.framework.bined.options.gui;
 
 import java.awt.Component;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,6 +49,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private AddProfileOperation addProfileOperation = null;
     private EditProfileOperation editProfileOperation = null;
     private CopyProfileOperation copyProfileOperation = null;
+    private TemplateProfileOperation templateProfileOperation = null;
 
     public ThemeProfilesPanel() {
         initComponents();
@@ -72,6 +74,10 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         this.copyProfileOperation = copyProfileOperation;
     }
 
+    public void setTemplateProfileOperation(TemplateProfileOperation templateProfileOperation) {
+        this.templateProfileOperation = templateProfileOperation;
+    }
+
     private void updateStates() {
         int[] selectedIndices = profilesList.getSelectedIndices();
         boolean hasSelection = selectedIndices.length > 0;
@@ -85,6 +91,9 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         if (hasSelection) {
             upButton.setEnabled(profilesList.getMaxSelectionIndex() >= selectedIndices.length);
             downButton.setEnabled(profilesList.getMinSelectionIndex() + selectedIndices.length < getProfilesListModel().getSize());
+            if (selectedIndices.length == 1) {
+                previewPanel.getCodeArea().setThemeProfile(getProfilesListModel().getElementAt(selectedIndices[0]).getThemeProfile());
+            }
         } else {
             upButton.setEnabled(false);
             downButton.setEnabled(false);
@@ -125,16 +134,48 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         profilesListScrollPane = new javax.swing.JScrollPane();
         profilesList = new javax.swing.JList<>();
         profilesControlPanel = new javax.swing.JPanel();
+        addButton = new javax.swing.JButton();
+        fromTemplateButton = new javax.swing.JButton();
+        editButton = new javax.swing.JButton();
+        copyButton = new javax.swing.JButton();
         upButton = new javax.swing.JButton();
         downButton = new javax.swing.JButton();
-        addButton = new javax.swing.JButton();
-        removeButton = new javax.swing.JButton();
         selectAllButton = new javax.swing.JButton();
-        editButton = new javax.swing.JButton();
+        removeButton = new javax.swing.JButton();
         hideButton = new javax.swing.JButton();
-        copyButton = new javax.swing.JButton();
+        previewPanel = new org.exbin.framework.bined.options.gui.PreviewPanel();
 
         profilesListScrollPane.setViewportView(profilesList);
+
+        addButton.setText(resourceBundle.getString("addButton.text")); // NOI18N
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
+
+        fromTemplateButton.setText(resourceBundle.getString("fromTemplateButton.text")); // NOI18N
+        fromTemplateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fromTemplateButtonActionPerformed(evt);
+            }
+        });
+
+        editButton.setText(resourceBundle.getString("editButton.text")); // NOI18N
+        editButton.setEnabled(false);
+        editButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editButtonActionPerformed(evt);
+            }
+        });
+
+        copyButton.setText(resourceBundle.getString("copyButton.text")); // NOI18N
+        copyButton.setEnabled(false);
+        copyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyButtonActionPerformed(evt);
+            }
+        });
 
         upButton.setText(resourceBundle.getString("upButton.text")); // NOI18N
         upButton.setEnabled(false);
@@ -152,10 +193,11 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
             }
         });
 
-        addButton.setText(resourceBundle.getString("addButton.text")); // NOI18N
-        addButton.addActionListener(new java.awt.event.ActionListener() {
+        selectAllButton.setText(resourceBundle.getString("selectAllButton.text")); // NOI18N
+        selectAllButton.setEnabled(false);
+        selectAllButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addButtonActionPerformed(evt);
+                selectAllButtonActionPerformed(evt);
             }
         });
 
@@ -167,35 +209,11 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
             }
         });
 
-        selectAllButton.setText(resourceBundle.getString("selectAllButton.text")); // NOI18N
-        selectAllButton.setEnabled(false);
-        selectAllButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                selectAllButtonActionPerformed(evt);
-            }
-        });
-
-        editButton.setText(resourceBundle.getString("editButton.text")); // NOI18N
-        editButton.setEnabled(false);
-        editButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editButtonActionPerformed(evt);
-            }
-        });
-
         hideButton.setText(resourceBundle.getString("hideButton.text")); // NOI18N
         hideButton.setEnabled(false);
         hideButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hideButtonActionPerformed(evt);
-            }
-        });
-
-        copyButton.setText(resourceBundle.getString("copyButton.text")); // NOI18N
-        copyButton.setEnabled(false);
-        copyButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                copyButtonActionPerformed(evt);
             }
         });
 
@@ -206,14 +224,15 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
             .addGroup(profilesControlPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(profilesControlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 140, Short.MAX_VALUE)
+                    .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
                     .addComponent(editButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(copyButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(selectAllButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 140, Short.MAX_VALUE)
+                    .addComponent(selectAllButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
                     .addComponent(downButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(upButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(hideButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(removeButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(removeButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(fromTemplateButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE))
                 .addContainerGap())
         );
         profilesControlPanelLayout.setVerticalGroup(
@@ -221,6 +240,8 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
             .addGroup(profilesControlPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(addButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(fromTemplateButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(editButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -235,7 +256,7 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
                 .addComponent(removeButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(hideButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(199, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -244,16 +265,20 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(profilesListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(profilesListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 666, Short.MAX_VALUE)
+                    .addComponent(previewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(profilesControlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(profilesControlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(profilesListScrollPane)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(profilesListScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(previewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -369,6 +394,24 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         }
     }//GEN-LAST:event_copyButtonActionPerformed
 
+    private void fromTemplateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fromTemplateButtonActionPerformed
+        ProfilesListModel model = getProfilesListModel();
+        int selectedIndex = profilesList.getSelectedIndex();
+
+        if (templateProfileOperation != null) {
+            ThemeProfilesPanel.ThemeProfile newProfileRecord = templateProfileOperation.run(this);
+            if (newProfileRecord != null) {
+                if (selectedIndex >= 0) {
+                    profilesList.clearSelection();
+                    model.add(selectedIndex, newProfileRecord);
+                } else {
+                    model.add(newProfileRecord);
+                }
+                wasModified();
+            }
+        }
+    }//GEN-LAST:event_fromTemplateButtonActionPerformed
+
     public boolean isModified() {
         return modified;
     }
@@ -424,7 +467,9 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
     private javax.swing.JButton copyButton;
     private javax.swing.JButton downButton;
     private javax.swing.JButton editButton;
+    private javax.swing.JButton fromTemplateButton;
     private javax.swing.JButton hideButton;
+    private org.exbin.framework.bined.options.gui.PreviewPanel previewPanel;
     private javax.swing.JPanel profilesControlPanel;
     private javax.swing.JList<ThemeProfile> profilesList;
     private javax.swing.JScrollPane profilesListScrollPane;
@@ -511,9 +556,13 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
         }
 
         public void removeIndices(int[] indices) {
+            if (indices.length == 0) {
+                return;
+            }
+            Arrays.sort(indices);
             for (int i = indices.length - 1; i >= 0; i--) {
                 profiles.remove(indices[i]);
-                fireIntervalRemoved(this, 0, indices[i]);
+                fireIntervalRemoved(this, indices[i], indices[i]);
             }
         }
 
@@ -568,20 +617,27 @@ public class ThemeProfilesPanel extends javax.swing.JPanel implements ProfileLis
     public static interface AddProfileOperation {
 
         @Nullable
-        ThemeProfilesPanel.ThemeProfile run(JComponent parentComponent, String profileName);
+        ThemeProfile run(JComponent parentComponent, String profileName);
     }
 
     @ParametersAreNonnullByDefault
     public static interface EditProfileOperation {
 
         @Nullable
-        ThemeProfilesPanel.ThemeProfile run(JComponent parentComponent, ThemeProfilesPanel.ThemeProfile profileRecord);
+        ThemeProfile run(JComponent parentComponent, ThemeProfile profileRecord);
     }
 
     @ParametersAreNonnullByDefault
     public static interface CopyProfileOperation {
 
         @Nullable
-        ThemeProfilesPanel.ThemeProfile run(JComponent parentComponent, ThemeProfilesPanel.ThemeProfile profileRecord);
+        ThemeProfile run(JComponent parentComponent, ThemeProfile profileRecord);
+    }
+
+    @ParametersAreNonnullByDefault
+    public static interface TemplateProfileOperation {
+
+        @Nullable
+        ThemeProfile run(JComponent parentComponent);
     }
 }

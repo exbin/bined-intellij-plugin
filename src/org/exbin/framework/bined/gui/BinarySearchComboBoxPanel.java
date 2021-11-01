@@ -212,6 +212,7 @@ public class BinarySearchComboBoxPanel extends JPanel {
                 }
                 JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, ".search" + postfix, clickedX, clickedY);
                 popupMenu.show(invoker, x, y);
+                codeAreaPopupMenuHandler.dropPopupMenu(".search" + postfix);
             }
         });
     }

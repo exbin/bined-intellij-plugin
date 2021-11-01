@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE map SYSTEM "http://java.sun.com/dtd/preferences.dtd">
+<map MAP_XML_VERSION="1.0">
+  <entry key="layoutProfileName.0" value="Default"/>
+  <entry key="layoutProfileName.1" value="Compact"/>
+  <entry key="layoutProfileName.2" value="Group by 2"/>
+  <entry key="layoutProfileName.3" value="Group by 4"/>
+  <entry key="layoutProfileName.4" value="Mixed 2-4"/>
+  <entry key="layoutProfilesCount" value="5"/>
+  <entry key="layouts.0.bottomHeaderSpace" value="0"/>
+  <entry key="layouts.0.doubleSpaceGroupSize" value="0"/>
+  <entry key="layouts.0.halfSpaceGroupSize" value="0"/>
+  <entry key="layouts.0.leftRowPositionSpace" value="0"/>
+  <entry key="layouts.0.rightRowPositionSpace" value="0"/>
+  <entry key="layouts.0.showHeader" value="true"/>
+  <entry key="layouts.0.showRowPosition" value="true"/>
+  <entry key="layouts.0.spaceGroupSize" value="1"/>
+  <entry key="layouts.0.topHeaderSpace" value="0"/>
+  <entry key="layouts.1.bottomHeaderSpace" value="0"/>
+  <entry key="layouts.1.doubleSpaceGroupSize" value="0"/>
+  <entry key="layouts.1.halfSpaceGroupSize" value="1"/>
+  <entry key="layouts.1.leftRowPositionSpace" value="0"/>
+  <entry key="layouts.1.rightRowPositionSpace" value="0"/>
+  <entry key="layouts.1.showHeader" value="true"/>
+  <entry key="layouts.1.showRowPosition" value="true"/>
+  <entry key="layouts.1.spaceGroupSize" value="0"/>
+  <entry key="layouts.1.topHeaderSpace" value="0"/>
+  <entry key="layouts.2.bottomHeaderSpace" value="0"/>
+  <entry key="layouts.2.doubleSpaceGroupSize" value="0"/>
+  <entry key="layouts.2.halfSpaceGroupSize" value="1"/>
+  <entry key="layouts.2.leftRowPositionSpace" value="0"/>
+  <entry key="layouts.2.rightRowPositionSpace" value="0"/>
+  <entry key="layouts.2.showHeader" value="true"/>
+  <entry key="layouts.2.showRowPosition" value="true"/>
+  <entry key="layouts.2.spaceGroupSize" value="2"/>
+  <entry key="layouts.2.topHeaderSpace" value="0"/>
+  <entry key="layouts.3.bottomHeaderSpace" value="0"/>
+  <entry key="layouts.3.doubleSpaceGroupSize" value="0"/>
+  <entry key="layouts.3.halfSpaceGroupSize" value="1"/>
+  <entry key="layouts.3.leftRowPositionSpace" value="0"/>
+  <entry key="layouts.3.rightRowPositionSpace" value="0"/>
+  <entry key="layouts.3.showHeader" value="true"/>
+  <entry key="layouts.3.showRowPosition" value="true"/>
+  <entry key="layouts.3.spaceGroupSize" value="4"/>
+  <entry key="layouts.3.topHeaderSpace" value="0"/>
+  <entry key="layouts.4.bottomHeaderSpace" value="0"/>
+  <entry key="layouts.4.doubleSpaceGroupSize" value="4"/>
+  <entry key="layouts.4.halfSpaceGroupSize" value="1"/>
+  <entry key="layouts.4.leftRowPositionSpace" value="0"/>
+  <entry key="layouts.4.rightRowPositionSpace" value="0"/>
+  <entry key="layouts.4.showHeader" value="true"/>
+  <entry key="layouts.4.showRowPosition" value="true"/>
+  <entry key="layouts.4.spaceGroupSize" value="2"/>
+  <entry key="layouts.4.topHeaderSpace" value="0"/>
+</map>

@@ -23,17 +23,21 @@ import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
 import com.intellij.ui.Graphics2DDelegate;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.ui.JBSwingUtilities;
 import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.bined.*;
+import org.exbin.bined.CodeAreaCaretPosition;
+import org.exbin.bined.EditMode;
+import org.exbin.bined.EditOperation;
+import org.exbin.bined.PositionCodeType;
 import org.exbin.bined.basic.BasicCodeAreaZone;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
-import org.exbin.bined.intellij.GoToPositionAction;
+import org.exbin.bined.intellij.action.GoToPositionAction;
+import org.exbin.bined.intellij.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.SearchAction;
+import org.exbin.bined.intellij.action.InsertDataAction;
 import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
@@ -60,10 +64,10 @@ import org.exbin.framework.gui.utils.WindowUtils;
 import org.exbin.framework.gui.utils.handler.OptionsControlHandler;
 import org.exbin.framework.gui.utils.gui.CloseControlPanel;
 import org.exbin.framework.gui.utils.gui.OptionsControlPanel;
-import org.exbin.framework.preferences.PreferencesWrapper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -97,6 +101,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
     private CharsetChangeListener charsetChangeListener = null;
     private ModifiedStateListener modifiedChangeListener = null;
     private final GoToPositionAction goToRowAction;
+    private final InsertDataAction insertDataAction;
     private final AbstractAction showHeaderAction;
     private final AbstractAction showRowNumbersAction;
     private final SearchAction searchAction;
@@ -112,7 +117,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
     public BinEdComponentPanel() {
         initComponents();
 
-        preferences = new BinaryEditorPreferences(new PreferencesWrapper(getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
+        preferences = new BinaryEditorPreferences(new IntelliJPreferencesWrapper(getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
 
         codeArea = new ExtCodeArea() {
 
@@ -154,6 +159,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         statusPanel = new BinaryStatusPanel();
 
         goToRowAction = new GoToPositionAction(codeArea);
+        insertDataAction = new InsertDataAction(codeArea, undoHandler);
         showHeaderAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -387,21 +393,6 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         return true;
     }
 
-    public void setContentData(BinaryData data) {
-        codeArea.setContentData(data);
-
-        documentOriginalSize = codeArea.getDataSize();
-        updateCurrentDocumentSize();
-        updateCurrentMemoryMode();
-
-        // Autodetect encoding using IDE mechanism
-//        final Charset charset = Charset.forName(FileEncodingQuery.getEncoding(dataObject.getPrimaryFile()).name());
-//        if (charsetChangeListener != null) {
-//            charsetChangeListener.charsetChanged();
-//        }
-//        codeArea.setCharset(charset);
-    }
-
     private void saveDocument() {
         fileApi.saveDocument();
 
@@ -580,6 +571,9 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 menu.add(selectAllMenuItem);
                 menu.addSeparator();
 
+                JMenuItem insertDataMenuItem = createInsertDataMenuItem();
+                menu.add(insertDataMenuItem);
+
                 JMenuItem goToMenuItem = createGoToMenuItem();
                 menu.add(goToMenuItem);
 
@@ -706,6 +700,14 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionUtils.getMetaMask()));
         goToMenuItem.addActionListener(goToRowAction);
         return goToMenuItem;
+    }
+
+    @Nonnull
+    private JMenuItem createInsertDataMenuItem() {
+        final JMenuItem insertDataActionItem = new JMenuItem("Insert Data...");
+        insertDataActionItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionUtils.getMetaMask()));
+        insertDataActionItem.addActionListener(insertDataAction);
+        return insertDataActionItem;
     }
 
     @Nonnull
@@ -939,6 +941,26 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 notifyModified();
             }
         });
+    }
+
+    @Nullable
+    public BinaryData getContentData() {
+        return codeArea.getContentData();
+    }
+
+    public void setContentData(BinaryData data) {
+        codeArea.setContentData(data);
+
+        documentOriginalSize = codeArea.getDataSize();
+        updateCurrentDocumentSize();
+        updateCurrentMemoryMode();
+
+        // Autodetect encoding using IDE mechanism
+//        final Charset charset = Charset.forName(FileEncodingQuery.getEncoding(dataObject.getPrimaryFile()).name());
+//        if (charsetChangeListener != null) {
+//            charsetChangeListener.charsetChanged();
+//        }
+//        codeArea.setCharset(charset);
     }
 
     public static PropertiesComponent getPreferences() {

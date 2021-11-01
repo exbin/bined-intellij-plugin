@@ -21,14 +21,13 @@ import org.exbin.framework.api.Preferences;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.EnterKeyHandlingMode;
-import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.options.EditorOptions;
 
 /**
  * Hexadecimal editor preferences.
  *
- * @version 0.2.1 2019/07/17
+ * @version 0.2.1 2021/10/30
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -36,7 +35,6 @@ public class EditorPreferences implements EditorOptions {
 
     public static final String PREFERENCES_FILE_HANDLING_MODE = "fileHandlingMode";
     public static final String PREFERENCES_SHOW_VALUES_PANEL = "valuesPanel";
-    public static final String PREFERENCES_MEMORY_MODE = "memoryMode";
     public static final String PREFERENCES_ENTER_KEY_HANDLING_MODE = "enterKeyHandlingMode";
 
     private final Preferences preferences;
@@ -70,15 +68,6 @@ public class EditorPreferences implements EditorOptions {
     @Override
     public void setShowValuesPanel(boolean showValuesPanel) {
         preferences.putBoolean(PREFERENCES_SHOW_VALUES_PANEL, showValuesPanel);
-    }
-
-    @Nonnull
-    public String getMemoryMode() {
-        return preferences.get(PREFERENCES_MEMORY_MODE, BinaryStatusApi.MemoryMode.DELTA_MODE.getPreferencesValue());
-    }
-
-    public void setMemoryMode(String memoryMode) {
-        preferences.put(PREFERENCES_MEMORY_MODE, memoryMode);
     }
 
     @Nonnull

@@ -6,6 +6,8 @@
       <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-phpstorm-2019.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-clion-2019.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jetbrains/debugvalue-rider-2019.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jetbrains/database-openapi.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jetbrains/database-impl.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

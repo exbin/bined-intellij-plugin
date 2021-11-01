@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
+import org.exbin.framework.bined.BinEdFileHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -67,7 +68,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
             public void fileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile virtualFile) {
                 if (virtualFile instanceof BinEdVirtualFile && !((BinEdVirtualFile) virtualFile).isMoved() && !((BinEdVirtualFile) virtualFile).isClosed()) {
                     ((BinEdVirtualFile) virtualFile).setClosed(true);
-                    BinEdFile editorPanel = ((BinEdVirtualFile) virtualFile).getEditorFile();
+                    BinEdFileHandler editorPanel = ((BinEdVirtualFile) virtualFile).getEditorFile();
                     if (!editorPanel.releaseFile()) {
                         // TODO Intercept close event instead of editor recreation
                         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);

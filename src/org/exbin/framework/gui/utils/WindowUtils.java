@@ -173,6 +173,11 @@ public class WindowUtils {
         return dialog;
     }
 
+    @Nonnull
+    public static DialogWrapper createDialog(Window parentWindow, Dialog.ModalityType modalityType, JPanel panel) {
+        return WindowUtils.createDialog(panel, parentWindow, "", modalityType);
+    }
+
     public static void invokeDialog(final JComponent component) {
         JDialog dialog = createDialog(component);
         invokeWindow(dialog);

@@ -95,7 +95,7 @@
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                    <TitledBorder title="&lt;rowPositionPanel.border.title&gt;">
+                    <TitledBorder title="Row Positions">
                       <ResourceString PropertyName="titleX" bundle="org/exbin/framework/bined/options/gui/resources/LayoutProfilePanel.properties" key="rowPositionPanel.border.title" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
@@ -235,7 +235,7 @@
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                    <TitledBorder title="&lt;headerPanel.border.title&gt;">
+                    <TitledBorder title="Header">
                       <ResourceString PropertyName="titleX" bundle="org/exbin/framework/bined/options/gui/resources/LayoutProfilePanel.properties" key="headerPanel.border.title" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
                     </TitledBorder>
                   </Border>
@@ -330,38 +330,6 @@
             </Container>
           </SubComponents>
         </Container>
-      </SubComponents>
-    </Container>
-    <Container class="javax.swing.JPanel" name="previewPanel">
-      <Constraints>
-        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-          <BorderConstraints direction="Center"/>
-        </Constraint>
-      </Constraints>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
-      <SubComponents>
-        <Component class="javax.swing.JLabel" name="previewLabel">
-          <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="2c" green="2a" id="Button.darkShadow" palette="3" red="27" type="palette"/>
-            </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/exbin/framework/bined/options/gui/resources/LayoutProfilePanel.properties" key="previewLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
-            </Property>
-            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-              <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                <EmptyBorder bottom="5" left="5" right="5" top="5"/>
-              </Border>
-            </Property>
-            <Property name="opaque" type="boolean" value="true"/>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-              <BorderConstraints direction="North"/>
-            </Constraint>
-          </Constraints>
-        </Component>
       </SubComponents>
     </Container>
   </SubComponents>

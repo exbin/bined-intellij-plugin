@@ -77,9 +77,6 @@
           </Events>
         </MenuItem>
         <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
-          <Properties>
-            <Property name="name" type="java.lang.String" value="jSeparator2" noResource="true"/>
-          </Properties>
         </Component>
         <MenuItem class="javax.swing.JMenuItem" name="positionCopyMenuItem">
           <Properties>
@@ -141,8 +138,9 @@
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="documentSizeModeButtonGroup"/>
                 </Property>
+                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/exbin/framework/bined/gui/resources/BinaryStatusPanel.properties" key="decDocumentSizeModeRadioButtonMenuItem1.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/exbin/framework/bined/gui/resources/BinaryStatusPanel.properties" key="decDocumentSizeModeRadioButtonMenuItem.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="name" type="java.lang.String" value="decimalDocumentSizeModeRadioButtonMenuItem" noResource="true"/>
               </Properties>
@@ -156,7 +154,7 @@
                   <ComponentRef name="documentSizeModeButtonGroup"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="org/exbin/framework/bined/gui/resources/BinaryStatusPanel.properties" key="hexDocumentSizeModeRadioButtonMenuItem1.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="org/exbin/framework/bined/gui/resources/BinaryStatusPanel.properties" key="hexadecimalDocumentSizeModeRadioButtonMenuItem.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="name" type="java.lang.String" value="hexadecimalDocumentSizeModeRadioButtonMenuItem" noResource="true"/>
               </Properties>
@@ -179,9 +177,6 @@
           </Events>
         </MenuItem>
         <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
-          <Properties>
-            <Property name="name" type="java.lang.String" value="jSeparator1" noResource="true"/>
-          </Properties>
         </Component>
         <MenuItem class="javax.swing.JMenuItem" name="documentSizeCopyMenuItem">
           <Properties>
@@ -304,7 +299,6 @@
         <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="memoryModePopupMenu"/>
         </Property>
-        <Property name="name" type="java.lang.String" value="memoryModeLabel" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="documentSizeLabel">
@@ -322,7 +316,6 @@
         <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="documentSizePopupMenu"/>
         </Property>
-        <Property name="name" type="java.lang.String" value="documentSizeLabel" noResource="true"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JLabel() {&#xa;    @Override&#xa;    public JToolTip createToolTip() {&#xa;        updateDocumentSizeToolTip();&#xa;        return super.createToolTip();&#xa;    }&#xa;}&#xa;"/>
@@ -343,7 +336,6 @@
         <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="positionPopupMenu"/>
         </Property>
-        <Property name="name" type="java.lang.String" value="cursorPositionLabel" noResource="true"/>
       </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="cursorPositionLabelMouseClicked"/>
@@ -364,7 +356,6 @@
             <EtchetBorder/>
           </Border>
         </Property>
-        <Property name="name" type="java.lang.String" value="editModeLabel" noResource="true"/>
       </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="editModeLabelMouseClicked"/>
@@ -384,7 +375,6 @@
             <EtchetBorder/>
           </Border>
         </Property>
-        <Property name="name" type="java.lang.String" value="encodingLabel" noResource="true"/>
       </Properties>
       <Events>
         <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="encodingLabelMousePressed"/>

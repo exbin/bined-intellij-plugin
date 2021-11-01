@@ -22,6 +22,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.bined.CodeAreaUtils;
 
 /**
  * Parameters for action to search for occurences of text or data.
@@ -89,7 +90,7 @@ public class SearchCondition {
                 return binaryData == null || binaryData.isEmpty();
             }
             default:
-                throw new IllegalStateException("Unexpected search mode " + searchMode.name());
+                throw CodeAreaUtils.getInvalidTypeException(searchMode);
         }
     }
 

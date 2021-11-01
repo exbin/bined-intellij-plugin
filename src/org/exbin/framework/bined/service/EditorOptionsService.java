@@ -22,7 +22,7 @@ import org.exbin.framework.bined.FileHandlingMode;
 /**
  * Editor options service interface.
  *
- * @version 0.2.1 2019/07/20
+ * @version 0.2.1 2021/10/31
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -32,5 +32,5 @@ public interface EditorOptionsService {
 
     void setShowValuesPanel(boolean isShowValuesPanel);
 
-    void setEditorHandlingMode(EnterKeyHandlingMode enterKeyHandlingMode);
+    void setEnterKeyHandlingMode(EnterKeyHandlingMode enterKeyHandlingMode);
 }

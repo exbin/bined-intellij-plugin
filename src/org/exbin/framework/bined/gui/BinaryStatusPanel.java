@@ -57,6 +57,8 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
     public static final String DECIMAL_CODE_TYPE_LABEL = "DEC";
     public static final String HEXADECIMAL_CODE_TYPE_LABEL = "HEX";
 
+    private static final String BR_TAG = "<br>";
+
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinaryStatusPanel.class);
 
     private StatusPreferences statusParameters;
@@ -110,7 +112,7 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
                 break;
             }
             default:
-                throw new IllegalStateException("Unexpected code type " + cursorPositionFormat.getCodeType());
+                throw CodeAreaUtils.getInvalidTypeException(cursorPositionFormat.getCodeType());
         }
         cursorPositionShowOffsetCheckBoxMenuItem.setSelected(cursorPositionFormat.isShowOffset());
 
@@ -128,7 +130,7 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
                 break;
             }
             default:
-                throw new IllegalStateException("Unexpected code type " + documentSizeFormat.getCodeType());
+                throw CodeAreaUtils.getInvalidTypeException(documentSizeFormat.getCodeType());
         }
         documentSizeShowRelativeCheckBoxMenuItem.setSelected(documentSizeFormat.isShowRelative());
     }
@@ -279,6 +281,7 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
         documentSizeCodeTypeMenu.add(octalDocumentSizeModeRadioButtonMenuItem);
 
         documentSizeModeButtonGroup.add(decimalDocumentSizeModeRadioButtonMenuItem);
+        decimalDocumentSizeModeRadioButtonMenuItem.setSelected(true);
         decimalDocumentSizeModeRadioButtonMenuItem.setText(resourceBundle.getString("decDocumentSizeModeRadioButtonMenuItem1.text")); // NOI18N
         decimalDocumentSizeModeRadioButtonMenuItem.setName("decimalDocumentSizeModeRadioButtonMenuItem"); // NOI18N
         decimalDocumentSizeModeRadioButtonMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -639,7 +642,7 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
                         break;
                     }
                     default:
-                        throw new IllegalStateException("Unexpected edit operation " + editOperation.name());
+                        throw CodeAreaUtils.getInvalidTypeException(editOperation);
                 }
                 break;
             }
@@ -648,7 +651,7 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
                 break;
             }
             default:
-                throw new IllegalStateException("Unexpected edit mode " + editMode.name());
+                throw CodeAreaUtils.getInvalidTypeException(editMode);
         }
     }
 
@@ -663,10 +666,10 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
         boolean enabled = memoryMode != MemoryMode.READ_ONLY;
         deltaMemoryModeRadioButtonMenuItem.setEnabled(enabled);
         ramMemoryModeRadioButtonMenuItem.setEnabled(enabled);
-        if (memoryMode == MemoryMode.RAM_MEMORY) {
-            ramMemoryModeRadioButtonMenuItem.setSelected(true);
-        } else {
+        if (memoryMode == MemoryMode.DELTA_MODE) {
             deltaMemoryModeRadioButtonMenuItem.setSelected(true);
+        } else {
+            ramMemoryModeRadioButtonMenuItem.setSelected(true);
         }
     }
 
@@ -701,20 +704,20 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
             if (selectionRange != null && !selectionRange.isEmpty()) {
                 long first = selectionRange.getFirst();
                 long last = selectionRange.getLast();
-                builder.append(resourceBundle.getString("selectionFromLabel.toolTipText")).append("<br>");
-                builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.OCTAL)).append("<br>");
-                builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.DECIMAL)).append("<br>");
-                builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.HEXADECIMAL)).append("<br>");
-                builder.append("<br>");
-                builder.append(resourceBundle.getString("selectionToLabel.toolTipText")).append("<br>");
-                builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(last, PositionCodeType.OCTAL)).append("<br>");
-                builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(last, PositionCodeType.DECIMAL)).append("<br>");
-                builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.HEXADECIMAL)).append("<br>");
+                builder.append(resourceBundle.getString("selectionFromLabel.toolTipText")).append(BR_TAG);
+                builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.OCTAL)).append(BR_TAG);
+                builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.DECIMAL)).append(BR_TAG);
+                builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.HEXADECIMAL)).append(BR_TAG);
+                builder.append(BR_TAG);
+                builder.append(resourceBundle.getString("selectionToLabel.toolTipText")).append(BR_TAG);
+                builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(last, PositionCodeType.OCTAL)).append(BR_TAG);
+                builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(last, PositionCodeType.DECIMAL)).append(BR_TAG);
+                builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(first, PositionCodeType.HEXADECIMAL)).append(BR_TAG);
             } else {
                 long dataPosition = caretPosition.getDataPosition();
-                builder.append(resourceBundle.getString("cursorPositionLabel.toolTipText")).append("<br>");
-                builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(dataPosition, PositionCodeType.OCTAL)).append("<br>");
-                builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(dataPosition, PositionCodeType.DECIMAL)).append("<br>");
+                builder.append(resourceBundle.getString("cursorPositionLabel.toolTipText")).append(BR_TAG);
+                builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(dataPosition, PositionCodeType.OCTAL)).append(BR_TAG);
+                builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(dataPosition, PositionCodeType.DECIMAL)).append(BR_TAG);
                 builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(dataPosition, PositionCodeType.HEXADECIMAL));
                 builder.append("</html>");
             }
@@ -752,16 +755,16 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
         builder.append("<html>");
         if (selectionRange != null && !selectionRange.isEmpty()) {
             long length = selectionRange.getLength();
-            builder.append(resourceBundle.getString("selectionLengthLabel.toolTipText")).append("<br>");
-            builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.OCTAL)).append("<br>");
-            builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.DECIMAL)).append("<br>");
-            builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.HEXADECIMAL)).append("<br>");
-            builder.append("<br>");
+            builder.append(resourceBundle.getString("selectionLengthLabel.toolTipText")).append(BR_TAG);
+            builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.OCTAL)).append(BR_TAG);
+            builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.DECIMAL)).append(BR_TAG);
+            builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(length, PositionCodeType.HEXADECIMAL)).append(BR_TAG);
+            builder.append(BR_TAG);
         }
 
-        builder.append(resourceBundle.getString("documentSizeLabel.toolTipText")).append("<br>");
-        builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(documentSize, PositionCodeType.OCTAL)).append("<br>");
-        builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(documentSize, PositionCodeType.DECIMAL)).append("<br>");
+        builder.append(resourceBundle.getString("documentSizeLabel.toolTipText")).append(BR_TAG);
+        builder.append(OCTAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(documentSize, PositionCodeType.OCTAL)).append(BR_TAG);
+        builder.append(DECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(documentSize, PositionCodeType.DECIMAL)).append(BR_TAG);
         builder.append(HEXADECIMAL_CODE_TYPE_LABEL + ": ").append(numberToPosition(documentSize, PositionCodeType.HEXADECIMAL));
         builder.append("</html>");
         documentSizeLabel.setToolTipText(builder.toString());
@@ -788,7 +791,7 @@ public class BinaryStatusPanel extends JBPanel implements BinaryStatusApi, TextE
                 break;
             }
             default:
-                throw new IllegalStateException("Unexpected code type " + codeType.name());
+                throw CodeAreaUtils.getInvalidTypeException(codeType);
         }
 
         long remainder = value > 0 ? value : -value;

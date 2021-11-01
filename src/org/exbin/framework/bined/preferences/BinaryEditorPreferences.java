@@ -15,28 +15,26 @@
  */
 package org.exbin.framework.bined.preferences;
 
-import org.exbin.bined.RowWrappingMode;
+import org.exbin.framework.api.Preferences;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.CodeAreaViewMode;
-import org.exbin.bined.capability.RowWrappingCapable;
+import org.exbin.bined.RowWrappingMode;
 import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
-import org.exbin.framework.api.Preferences;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
 import org.exbin.framework.editor.text.preferences.TextFontPreferences;
 import org.exbin.xbup.core.util.StringUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 /**
  * Binary editor preferences.
  *
- * @version 0.2.1 2019/08/21
+ * @version 0.2.1 2019/07/21
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
