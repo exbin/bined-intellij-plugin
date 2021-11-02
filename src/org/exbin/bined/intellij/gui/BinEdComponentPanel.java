@@ -34,9 +34,10 @@ import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
+import org.exbin.bined.intellij.action.CompareFilesAction;
 import org.exbin.bined.intellij.action.GoToPositionAction;
 import org.exbin.bined.intellij.IntelliJPreferencesWrapper;
-import org.exbin.bined.intellij.SearchAction;
+import org.exbin.bined.intellij.action.SearchAction;
 import org.exbin.bined.intellij.action.InsertDataAction;
 import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
@@ -102,6 +103,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
     private ModifiedStateListener modifiedChangeListener = null;
     private final GoToPositionAction goToRowAction;
     private final InsertDataAction insertDataAction;
+    private final CompareFilesAction compareFilesAction;
     private final AbstractAction showHeaderAction;
     private final AbstractAction showRowNumbersAction;
     private final SearchAction searchAction;
@@ -159,7 +161,8 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         statusPanel = new BinaryStatusPanel();
 
         goToRowAction = new GoToPositionAction(codeArea);
-        insertDataAction = new InsertDataAction(codeArea, undoHandler);
+        insertDataAction = new InsertDataAction(codeArea);
+        compareFilesAction = new CompareFilesAction(codeArea);
         showHeaderAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -614,6 +617,9 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
             }
         }
 
+        JMenuItem compareFilesMenuItem = createCompareFilesMenuItem();
+        menu.add(compareFilesMenuItem);
+
         final JMenuItem optionsMenuItem = new JMenuItem("Options...");
         optionsMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/options/resources/icons/Preferences16.gif")));
         optionsMenuItem.addActionListener(createOptionsAction());
@@ -704,10 +710,17 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
 
     @Nonnull
     private JMenuItem createInsertDataMenuItem() {
-        final JMenuItem insertDataActionItem = new JMenuItem("Insert Data...");
-        insertDataActionItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionUtils.getMetaMask()));
-        insertDataActionItem.addActionListener(insertDataAction);
-        return insertDataActionItem;
+        final JMenuItem insertDataMenuItem = new JMenuItem("Insert Data...");
+        insertDataMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionUtils.getMetaMask()));
+        insertDataMenuItem.addActionListener(insertDataAction);
+        return insertDataMenuItem;
+    }
+
+    @Nonnull
+    private JMenuItem createCompareFilesMenuItem() {
+        final JMenuItem compareFilesMenuItem = new JMenuItem("Compare Files...");
+        compareFilesMenuItem.addActionListener(compareFilesAction);
+        return compareFilesMenuItem;
     }
 
     @Nonnull
@@ -925,6 +938,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         if (valuesPanel != null) {
             valuesPanel.setCodeArea(codeArea, undoHandler);
         }
+        insertDataAction.setUndoHandler(undoHandler);
         // TODO set ENTER KEY mode in apply options
 
         undoHandler.addUndoUpdateListener(new BinaryDataUndoUpdateListener() {
@@ -963,6 +977,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
 //        codeArea.setCharset(charset);
     }
 
+    @Nonnull
     public static PropertiesComponent getPreferences() {
         return PropertiesComponent.getInstance();
     }

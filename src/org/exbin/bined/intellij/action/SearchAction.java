@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij;
+package org.exbin.bined.intellij.action;
 
 import org.exbin.bined.DefaultCodeAreaCaretPosition;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightCodeAreaPainter;

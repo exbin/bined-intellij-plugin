@@ -50,18 +50,20 @@ import java.util.logging.Logger;
 /**
  * Insert data action.
  *
- * @version 0.2.1 2019/07/21
+ * @version 0.2.5 2021/11/02
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class InsertDataAction implements ActionListener {
 
-    private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(GoToBinaryPanel.class);
     private final ExtCodeArea codeArea;
-    private final BinaryDataUndoHandler undoHandler;
+    private BinaryDataUndoHandler undoHandler;
 
-    public InsertDataAction(ExtCodeArea codeArea, BinaryDataUndoHandler undoHandler) {
+    public InsertDataAction(ExtCodeArea codeArea) {
         this.codeArea = Objects.requireNonNull(codeArea);
+    }
+
+    public void setUndoHandler(BinaryDataUndoHandler undoHandler) {
         this.undoHandler = undoHandler;
     }
 
@@ -71,7 +73,7 @@ public class InsertDataAction implements ActionListener {
         final InsertDataPanel insertDataPanel = new InsertDataPanel();
         DefaultControlPanel controlPanel = new DefaultControlPanel(insertDataPanel.getResourceBundle());
         JPanel dialogPanel = WindowUtils.createDialogPanel(insertDataPanel, controlPanel);
-        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), "", Dialog.ModalityType.APPLICATION_MODAL);
+        final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), "Insert Data", Dialog.ModalityType.APPLICATION_MODAL);
         insertDataPanel.setControl(() -> {
             final BinaryMultilinePanel multilinePanel = new BinaryMultilinePanel();
             SearchCondition searchCondition = new SearchCondition();
@@ -82,8 +84,7 @@ public class InsertDataAction implements ActionListener {
             multilinePanel.setCondition(searchCondition);
             DefaultControlPanel controlPanel1 = new DefaultControlPanel();
             JPanel dialogPanel1 = WindowUtils.createDialogPanel(multilinePanel, controlPanel1);
-            final DialogWrapper multilineDialog = WindowUtils.createDialog(dialog.getWindow(), Dialog.ModalityType.APPLICATION_MODAL, dialogPanel1);
-            //WindowUtils.setDialogTitle(multilineDialog, multilinePanel.getResourceBundle());
+            final DialogWrapper multilineDialog = WindowUtils.createDialog(dialogPanel1, dialog.getWindow(), "Multiline Data", Dialog.ModalityType.APPLICATION_MODAL);
             controlPanel1.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
                 if (actionType == DefaultControlHandler.ControlActionType.OK) {
                     SearchCondition condition = multilinePanel.getCondition();
@@ -102,8 +103,7 @@ public class InsertDataAction implements ActionListener {
             multilineDialog.showCentered(dialog.getWindow());
 //                    multilinePanel.detachMenu();
         });
-        WindowUtils.addHeaderPanel(dialog.getWindow(), insertDataPanel.getClass(), insertDataPanel.getResourceBundle());
-        // frameModule.setDialogTitle(dialog, insertDataPanel.getResourceBundle());
+        //WindowUtils.addHeaderPanel(dialog.getWindow(), insertDataPanel.getClass(), insertDataPanel.getResourceBundle());
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
             if (actionType == DefaultControlHandler.ControlActionType.OK) {
                 insertDataPanel.acceptInput();

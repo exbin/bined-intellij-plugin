@@ -17,13 +17,8 @@ package org.exbin.framework.bined.gui;
 
 import java.awt.Component;
 import java.awt.event.ItemEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -34,9 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.PagedData;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.gui.utils.LanguageUtils;
 import org.exbin.framework.gui.utils.WindowUtils;
@@ -44,7 +37,7 @@ import org.exbin.framework.gui.utils.WindowUtils;
 /**
  * Compare files panel.
  *
- * @version 0.2.1 2021/10/31
+ * @version 0.2.1 2021/11/02
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
@@ -53,8 +46,8 @@ public class CompareFilesPanel extends javax.swing.JPanel {
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(CompareFilesPanel.class);
 
     private Control control;
-    private File leftCustomFile;
-    private File rightCustomFile;
+    private FileRecord leftCustomFile;
+    private FileRecord rightCustomFile;
 
     public CompareFilesPanel() {
         initComponents();
@@ -77,8 +70,7 @@ public class CompareFilesPanel extends javax.swing.JPanel {
                         switchToLeftCustomFile();
                     }
                 } else {
-                    BinEdFileHandler fileHandler = (BinEdFileHandler) control.getFileHandler(selectedIndex - 1);
-                    setLeftFile(fileHandler.getCodeArea().getContentData());
+                    setLeftFile(control.getFileData(selectedIndex - 1));
                 }
             }
         });
@@ -97,11 +89,18 @@ public class CompareFilesPanel extends javax.swing.JPanel {
                         switchToRightCustomFile();
                     }
                 } else {
-                    BinEdFileHandler fileHandler = (BinEdFileHandler) control.getFileHandler(selectedIndex - 1);
-                    setRightFile(fileHandler.getCodeArea().getContentData());
+                    setRightFile(control.getFileData(selectedIndex - 1));
                 }
             }
         });
+    }
+
+    public void setLeftIndex(int index) {
+        leftComboBox.setSelectedIndex(index);
+    }
+
+    public void setRightIndex(int index) {
+        rightComboBox.setSelectedIndex(index);
     }
 
     @Nonnull
@@ -139,7 +138,6 @@ public class CompareFilesPanel extends javax.swing.JPanel {
     }
 
     public void setCodeAreaPopupMenu(CodeAreaPopupMenuHandler codeAreaPopupMenuHandler) {
-
         codeAreaDiffPanel.getLeftCodeArea().setComponentPopupMenu(createPopupMenu(codeAreaPopupMenuHandler, "compareLeft"));
         codeAreaDiffPanel.getRightCodeArea().setComponentPopupMenu(createPopupMenu(codeAreaPopupMenuHandler, "compareRight"));
     }
@@ -267,12 +265,12 @@ public class CompareFilesPanel extends javax.swing.JPanel {
 
     private void rightOpenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rightOpenButtonActionPerformed
         if (control != null) {
-            File file = control.openFile();
+            FileRecord file = control.openFile();
             if (file != null) {
                 rightCustomFile = file;
                 rightComboBox.setSelectedIndex(0);
                 rightComboBox.removeItemAt(0);
-                rightComboBox.insertItemAt(file.getAbsolutePath(), 0);
+                rightComboBox.insertItemAt(file.getName(), 0);
                 switchToRightCustomFile();
             }
         }
@@ -280,35 +278,23 @@ public class CompareFilesPanel extends javax.swing.JPanel {
 
     private void leftOpenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_leftOpenButtonActionPerformed
         if (control != null) {
-            File file = control.openFile();
+            FileRecord file = control.openFile();
             if (file != null) {
                 leftCustomFile = file;
                 leftComboBox.setSelectedIndex(0);
                 leftComboBox.removeItemAt(0);
-                leftComboBox.insertItemAt(file.getAbsolutePath(), 0);
+                leftComboBox.insertItemAt(file.getName(), 0);
                 switchToLeftCustomFile();
             }
         }
     }//GEN-LAST:event_leftOpenButtonActionPerformed
 
     private void switchToLeftCustomFile() {
-        try (FileInputStream fileStream = new FileInputStream(leftCustomFile)) {
-            PagedData data = new PagedData();
-            data.loadFromStream(fileStream);
-            setLeftFile(data);
-        } catch (IOException ex) {
-            Logger.getLogger(CompareFilesPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        setLeftFile(leftCustomFile.getData());
     }
 
     private void switchToRightCustomFile() {
-        try (FileInputStream fileStream = new FileInputStream(rightCustomFile)) {
-            PagedData data = new PagedData();
-            data.loadFromStream(fileStream);
-            setRightFile(data);
-        } catch (IOException ex) {
-            Logger.getLogger(CompareFilesPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        setRightFile(rightCustomFile.getData());
     }
 
     /**
@@ -334,9 +320,29 @@ public class CompareFilesPanel extends javax.swing.JPanel {
     public interface Control {
 
         @Nullable
-        File openFile();
+        FileRecord openFile();
 
         @Nonnull
-        BinEdFileHandler getFileHandler(int index);
+        BinaryData getFileData(int index);
+    }
+
+    @ParametersAreNonnullByDefault
+    public static class FileRecord {
+
+        private final String name;
+        private final BinaryData data;
+
+        public FileRecord(String name, BinaryData data) {
+            this.name = name;
+            this.data = data;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public BinaryData getData() {
+            return data;
+        }
     }
 }
