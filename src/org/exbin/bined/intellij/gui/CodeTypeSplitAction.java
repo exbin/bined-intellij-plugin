@@ -18,7 +18,13 @@ package org.exbin.bined.intellij.gui;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPopupMenu;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.Toggleable;
 import com.intellij.openapi.actionSystem.ex.ActionButtonLook;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.actionSystem.ex.AnActionListener;
@@ -29,6 +35,7 @@ import com.intellij.openapi.actionSystem.impl.MenuItemPresentationFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ui.JBInsets;
 import com.intellij.util.ui.JBUI;
@@ -90,6 +97,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
         }
 
         private static final Icon ARROW_DOWN = AllIcons.General.ButtonDropTriangle;
+        private static final Key<Boolean> SELECTED_PROPERTY_KEY = Key.create(Toggleable.SELECTED_PROPERTY);
 
         private final ActionGroup myActionGroup;
         private int selectedIndex = 0;
@@ -185,7 +193,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
 
             AnAction[] actions = myActionGroup.getChildren(null);
             return actions[selectedIndex] instanceof Toggleable &&
-                    myPresentation.getClientProperty(Toggleable.SELECTED_PROPERTY) == Boolean.TRUE;
+                    myPresentation.getClientProperty(SELECTED_PROPERTY_KEY) == Boolean.TRUE;
         }
 
         @Override
@@ -220,7 +228,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
                 AnAction action = actions[selectedIndex];
                 myPresentation.setIcon(action.getTemplatePresentation().getIcon());
                 myPresentation.setText(action.getTemplatePresentation().getText());
-                ActionUtil.performActionDumbAware(action, newEvent);
+                ActionUtil.performActionDumbAwareWithCallbacks(action, newEvent, getDataContext());
             }
         }
 

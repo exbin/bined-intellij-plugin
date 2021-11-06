@@ -18,6 +18,7 @@ package org.exbin.bined.intellij.gui;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
@@ -44,6 +45,7 @@ public class BinEdToolbarPanel extends JBPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinEdToolbarPanel.class);
     private static final String TOOLBAR_PLACE = "BinEdPluginMainToolbar";
+    private static final Key<Boolean> SELECTED_PROPERTY_KEY = Key.create(Toggleable.SELECTED_PROPERTY);
 
     private final BinaryEditorPreferences preferences;
     private final ExtCodeArea codeArea;
@@ -350,7 +352,7 @@ public class BinEdToolbarPanel extends JBPanel {
     }
 
     private void setActionSelection(AnAction action, boolean selected) {
-        toolbar.getPresentation(action).putClientProperty("selected", selected);
+        toolbar.getPresentation(action).putClientProperty(SELECTED_PROPERTY_KEY, selected);
     }
 
     private Icon load(String path) {

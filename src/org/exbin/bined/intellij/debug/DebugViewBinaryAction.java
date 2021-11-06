@@ -39,10 +39,10 @@ import com.jetbrains.cidr.execution.debugger.evaluation.CidrValue;
 import com.jetbrains.php.debug.common.PhpNavigatableValue;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
-import com.jetbrains.rider.debugger.DotNetNamedValue;
-import com.jetbrains.rider.debugger.DotNetValue;
-import com.jetbrains.rider.model.debuggerWorker.ObjectPropertiesProxy;
-import com.jetbrains.rider.model.debuggerWorker.ObjectProxy;
+//import com.jetbrains.rider.debugger.DotNetNamedValue;
+//import com.jetbrains.rider.debugger.DotNetValue;
+//import com.jetbrains.rider.model.debuggerWorker.ObjectPropertiesProxy;
+//import com.jetbrains.rider.model.debuggerWorker.ObjectProxy;
 import com.sun.jdi.*;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
@@ -169,9 +169,9 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                 return node;
             }
 
-            if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
-                return node;
-            }
+//            if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
+//                return node;
+//            }
 
             if (cValueClassAvailable && container instanceof CidrValue) {
                 return node;
@@ -246,18 +246,18 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
                     }
                 }
 
-                if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
-                    DotNetNamedValue namedValue = (DotNetNamedValue) container;
-                    ObjectProxy objectProxy = namedValue.getObjectProxy();
-                    DotNetValue value = new DotNetValue(namedValue.getFrame(), objectProxy, namedValue.getLifetime(), namedValue.getSessionId());
-//                    value.
-                    ObjectPropertiesProxy properties = objectProxy.getProperties();
-                    if (properties.isArray()) {
-                        switch (properties.getType()) {
-
-                        }
-                    }
-                }
+//                if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
+//                    DotNetNamedValue namedValue = (DotNetNamedValue) container;
+//                    ObjectProxy objectProxy = namedValue.getObjectProxy();
+//                    DotNetValue value = new DotNetValue(namedValue.getFrame(), objectProxy, namedValue.getLifetime(), namedValue.getSessionId());
+////                    value.
+//                    ObjectPropertiesProxy properties = objectProxy.getProperties();
+//                    if (properties.isArray()) {
+//                        switch (properties.getType()) {
+//
+//                        }
+//                    }
+//                }
 
                 if (pythonValueClassAvailable && container instanceof PyDebugValue) {
                     String dataType = ((PyDebugValue) container).getType();

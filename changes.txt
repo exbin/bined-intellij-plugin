@@ -1,4 +1,4 @@
-0.2.5
+0.2.5 (2021-11-06)
 - New app icon
 - Added templates for profiles
 - Added insert data dialog
