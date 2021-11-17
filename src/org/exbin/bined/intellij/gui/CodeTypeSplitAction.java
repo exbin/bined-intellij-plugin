@@ -216,7 +216,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
             HelpTooltip.hide(this);
 
             if (mousePressType == CodeTypeSplitAction.SplitButton.MousePressType.Popup) {
-                showPopupMenu(event, myActionGroup);
+                showGroupInPopup(event, myActionGroup);
             } else if (selectedActionEnabled()) {
                 AnActionEvent newEvent = AnActionEvent.createFromInputEvent(event.getInputEvent(), myPlace, event.getPresentation(), getDataContext());
                 AnAction[] actions = myActionGroup.getChildren(null);
@@ -241,7 +241,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
         }
 
         @Override
-        protected void showPopupMenu(AnActionEvent event, ActionGroup actionGroup) {
+        protected void showGroupInPopup(AnActionEvent event, ActionGroup actionGroup) {
             ActionManagerImpl am = (ActionManagerImpl) ActionManager.getInstance();
             ActionPopupMenu popupMenu = am.createActionPopupMenu(event.getPlace(), actionGroup, new MenuItemPresentationFactory() {
                 @Override
