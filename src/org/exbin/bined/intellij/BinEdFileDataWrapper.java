@@ -34,7 +34,7 @@ import java.io.OutputStream;
  * File data wrapper for IntelliJ Virtual File with caching.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.3 2020/07/30
+ * @version 0.2.6 2021/12/28
  */
 @ParametersAreNonnullByDefault
 public class BinEdFileDataWrapper implements EditableBinaryData {
@@ -58,7 +58,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return file.getLength() > 0;
     }
 
     @Override
@@ -154,7 +154,6 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
         try {
             InputStream inputStream = file.getInputStream();
             StreamUtils.copyInputStreamToOutputStream(inputStream, outputStream);
-            outputStream.close();
             inputStream.close();
         } catch (IOException e) {
             throw new IllegalStateException(BROKEN_VIRTUAL_FILE, e);
@@ -192,11 +191,15 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             long fileLength = file.getLength();
             InputStream inputStream = file.getInputStream();
             OutputStream outputStream = file.getOutputStream(null);
-            StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, position);
-            outputStream.write(value);
+            if (position > 0) {
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, position);
+            }
             if (fileLength > position + 1) {
                 StreamUtils.skipInputStreamData(inputStream, 1);
+                outputStream.write(value);
                 StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - position - 1);
+            } else {
+                outputStream.write(value);
             }
 
             inputStream.close();
@@ -448,7 +451,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
                     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
                         @Override
                         public void run() {
-                            Notifications.Bus.notify(new Notification("org.exbin.deltahex.intellij", "Write Failed", "File too big: " + ex.getMessage(), NotificationType.ERROR));
+                            Notifications.Bus.notify(new Notification(BinEdIntelliJPlugin.PLUGIN_ID, "Write Failed", "File too big: " + ex.getMessage(), NotificationType.ERROR));
                         }
                     });
                 } else {

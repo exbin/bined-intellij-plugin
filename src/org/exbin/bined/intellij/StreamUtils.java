@@ -122,7 +122,10 @@ public final class StreamUtils {
                     remain -= bufferSize;
                     target.write(buffer, 0, bufferSize);
                     bufferUsed = 0;
-                    bufferSize = size < BUFFER_SIZE ? (int) size : BUFFER_SIZE;
+                    if (remain == 0) {
+                        break;
+                    }
+                    bufferSize = remain < BUFFER_SIZE ? (int) remain : BUFFER_SIZE;
                 }
             }
         } while (bytesRead > 0);

@@ -23,6 +23,7 @@ package org.exbin.bined.intellij;
  */
 public class BinEdIntelliJPlugin {
 
+    public static final String PLUGIN_ID = "org.exbin.deltahex.intellij";
     public static final String PLUGIN_PREFIX = "BinEdPlugin.";
 
     private BinEdIntelliJPlugin() {
