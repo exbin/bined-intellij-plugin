@@ -1,0 +1,15 @@
+<idea-plugin>
+    <actions>
+        <group>
+            <action id="Debugger.BinEdShowAsBinary" class="org.exbin.bined.intellij.debug.DebugViewBinaryAction"
+                    text="Show As Binary" icon="/images/icon-idea.png"/>
+
+            <add-to-group group-id="XDebugger.Watches.Tree.Popup" anchor="last"/>
+            <add-to-group group-id="XDebugger.Watches.Tree.Toolbar" anchor="after"
+                          relative-to-action="XDebugger.Actions"/>
+            <add-to-group group-id="XDebugger.Variables.Tree.Popup" anchor="last"/>
+            <add-to-group group-id="XDebugger.Evaluation.Dialog.Tree.Popup" anchor="last"/>
+            <add-to-group group-id="XDebugger.Inspect.Tree.Popup" anchor="last"/>
+        </group>
+    </actions>
+</idea-plugin>

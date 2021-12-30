@@ -199,6 +199,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         encodingsHandler.setParentComponent(this);
         encodingsHandler.init();
         encodingsHandler.setTextEncodingStatus(new TextEncodingStatusApi() {
+            @Nonnull
             @Override
             public String getEncoding() {
                 return encodingStatus.getEncoding();
@@ -317,6 +318,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         });
     }
 
+    @Nullable
     public BinEdComponentFileApi getFileApi() {
         return fileApi;
     }

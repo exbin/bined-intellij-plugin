@@ -21,6 +21,8 @@ import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNullableByDefault;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.3 2020/12/11
  */
+@ParametersAreNullableByDefault
 public class BinEdFileSystem extends VirtualFileSystem {
 
     private static final String PROTOCOL = "bined";
@@ -61,50 +64,50 @@ public class BinEdFileSystem extends VirtualFileSystem {
 
     @Nullable
     @Override
-    public VirtualFile refreshAndFindFileByPath(@NotNull String s) {
+    public VirtualFile refreshAndFindFileByPath(String s) {
         return null;
     }
 
     @Override
-    public void addVirtualFileListener(@NotNull VirtualFileListener virtualFileListener) {
+    public void addVirtualFileListener(VirtualFileListener virtualFileListener) {
         fileListeners.add(virtualFileListener);
     }
 
     @Override
-    public void removeVirtualFileListener(@NotNull VirtualFileListener virtualFileListener) {
+    public void removeVirtualFileListener(VirtualFileListener virtualFileListener) {
         fileListeners.remove(virtualFileListener);
     }
 
     @Override
-    protected void deleteFile(Object o, @NotNull VirtualFile virtualFile) throws IOException {
+    protected void deleteFile(Object o, VirtualFile virtualFile) throws IOException {
         throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
     @Override
-    protected void moveFile(Object o, @NotNull VirtualFile virtualFile, @NotNull VirtualFile virtualFile1) throws IOException {
+    protected void moveFile(Object o, VirtualFile virtualFile, VirtualFile virtualFile1) throws IOException {
         throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
     @Override
-    protected void renameFile(Object o, @NotNull VirtualFile virtualFile, @NotNull String s) throws IOException {
+    protected void renameFile(Object o, VirtualFile virtualFile, String s) throws IOException {
         throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    protected VirtualFile createChildFile(Object o, @NotNull VirtualFile virtualFile, @NotNull String s) throws IOException {
+    protected VirtualFile createChildFile(Object o, VirtualFile virtualFile, String s) throws IOException {
         throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    protected VirtualFile createChildDirectory(Object o, @NotNull VirtualFile virtualFile, @NotNull String s) throws IOException {
+    protected VirtualFile createChildDirectory(Object o, VirtualFile virtualFile, String s) throws IOException {
         throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    protected VirtualFile copyFile(Object o, @NotNull VirtualFile virtualFile, @NotNull VirtualFile virtualFile1, @NotNull String s) throws IOException {
+    protected VirtualFile copyFile(Object o, VirtualFile virtualFile, VirtualFile virtualFile1, String s) throws IOException {
         throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 

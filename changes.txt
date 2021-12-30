@@ -1,5 +1,6 @@
 0.2.6
 - Fixed native file mode (issue #39)
+- Added options page
 
 0.2.5 (2021-11-06)
 - New app icon
