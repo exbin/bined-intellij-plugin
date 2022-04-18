@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij;
 
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileSystem;
@@ -34,7 +35,7 @@ import java.util.List;
  * @version 0.2.3 2020/12/11
  */
 @ParametersAreNullableByDefault
-public class BinEdFileSystem extends VirtualFileSystem {
+public class BinEdFileSystem extends VirtualFileSystem implements DumbAware {
 
     private static final String PROTOCOL = "bined";
     private static final String ERROR_INVALID_OPERATION = "Invalid operation";

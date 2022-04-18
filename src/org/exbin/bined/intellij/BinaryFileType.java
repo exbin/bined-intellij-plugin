@@ -17,6 +17,7 @@ package org.exbin.bined.intellij;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +33,7 @@ import javax.swing.*;
  * @version 0.2.3 2020/07/29
  */
 @ParametersAreNullableByDefault
-public class BinaryFileType implements FileType {
+public class BinaryFileType implements FileType, DumbAware {
 
     public static final String DEFAULT_EXTENSION = "bin";
     public static final BinaryFileType INSTANCE = new BinaryFileType();

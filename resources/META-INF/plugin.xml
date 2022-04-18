@@ -78,6 +78,10 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
         <applicationConfigurable instance="org.exbin.bined.intellij.BinEdSettingsConfigurable" id="org.exbin.bined.intellij.BinEdSettingsConfigurable" parentId="tools"/>
     </extensions>
 
+    <extensionPoints>
+        <extensionPoint qualifiedName="org.exbin.bined.intellij.api.viewBinaryData" interface="org.exbin.bined.intellij.api.BinEdViewData" />
+    </extensionPoints>
+
     <actions>
         <action id="BinEdEditor.OpenAsBinaryAction" class="org.exbin.bined.intellij.OpenAsBinaryAction"
                 text="Open As Binary" description="Opens file in binary/hexadecimal viewer/editor"
