@@ -50,6 +50,7 @@ public class BinEdToolbarPanel extends JBPanel {
     private final BinaryEditorPreferences preferences;
     private final ExtCodeArea codeArea;
     private final AnAction optionsAction;
+    private final AnAction onlineHelpAction;
     private BinaryDataUndoHandler undoHandler;
 
     private final DefaultActionGroup actionGroup;
@@ -64,10 +65,11 @@ public class BinEdToolbarPanel extends JBPanel {
     private final AnAction hexadecimalCodeTypeAction;
     private boolean modified = false;
 
-    public BinEdToolbarPanel(BinaryEditorPreferences preferences, ExtCodeArea codeArea, AnAction optionsAction) {
+    public BinEdToolbarPanel(BinaryEditorPreferences preferences, ExtCodeArea codeArea, AnAction optionsAction, AnAction onlineHelpAction) {
         this.preferences = preferences;
         this.codeArea = codeArea;
         this.optionsAction = optionsAction;
+        this.onlineHelpAction = onlineHelpAction;
 
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
@@ -318,6 +320,18 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
         actionGroup.addAction(settingsAction);
+
+        AnAction onlineHelpToolbarAction = new AnAction(
+                "Online Help",
+                null,
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/help.png"))
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                onlineHelpAction.actionPerformed(anActionEvent);
+            }
+        };
+        actionGroup.addAction(onlineHelpToolbarAction);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
