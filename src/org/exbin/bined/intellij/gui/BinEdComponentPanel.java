@@ -70,6 +70,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -84,6 +85,7 @@ import java.nio.charset.Charset;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.5 2021/08/16
  */
+@ParametersAreNonnullByDefault
 public class BinEdComponentPanel extends JBPanel implements DumbAware {
 
     private static final FileHandlingMode DEFAULT_FILE_HANDLING_MODE = FileHandlingMode.DELTA;
@@ -678,11 +680,13 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
                 optionsPanel.setPreferences(preferences);
                 optionsPanel.setTextFontService(new TextFontService() {
+                    @Nonnull
                     @Override
                     public Font getCurrentFont() {
                         return codeArea.getCodeFont();
                     }
 
+                    @Nonnull
                     @Override
                     public Font getDefaultFont() {
                         return defaultFont;

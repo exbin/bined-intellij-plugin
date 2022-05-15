@@ -15,9 +15,14 @@
  */
 package org.exbin.bined.intellij.debug.jdi;
 
-import com.sun.jdi.*;
+import com.sun.jdi.ArrayReference;
+import com.sun.jdi.BooleanValue;
+import com.sun.jdi.Field;
+import com.sun.jdi.ObjectReference;
+import com.sun.jdi.Value;
 import org.exbin.bined.intellij.debug.DebugViewData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
@@ -36,6 +41,7 @@ public class BooleanArrayPageProvider implements DebugViewData.PageProvider {
         this.arrayRef = arrayRef;
     }
 
+    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         int startPos = (int) (pageIndex * DebugViewData.PAGE_SIZE * 8);

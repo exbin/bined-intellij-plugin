@@ -17,6 +17,7 @@ package org.exbin.bined.intellij;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.DumbAware;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
@@ -32,7 +33,7 @@ import javax.swing.*;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.6 2021/12/30
  */
-public class BinEdSettingsConfigurable implements Configurable {
+public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
     private BinEdOptionsPanelBorder optionsPanelWrapper;
 

@@ -111,7 +111,7 @@ public class DebugViewData implements BinaryData {
             } else {
                 byte[] data = pageProvider.getPage(pageIndex);
                 if (data == null) {
-                    throw new IndexOutOfBoundsException("Requested data out of bounds");
+                    throw createIndexOutOfBoundsException();
                 }
 
                 pages[nextPage].data = data;
@@ -121,7 +121,7 @@ public class DebugViewData implements BinaryData {
             }
 
             if (pageOffset >= page.data.length) {
-                throw new IndexOutOfBoundsException("Requested data out of bounds");
+                throw createIndexOutOfBoundsException();
             }
 
             int copyLength = length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) length;
@@ -129,7 +129,7 @@ public class DebugViewData implements BinaryData {
                 copyLength = page.data.length - pageOffset;
             }
             if (copyLength == 0) {
-                throw new IndexOutOfBoundsException("Requested data out of bounds");
+                throw createIndexOutOfBoundsException();
             }
 
             result.replace(offset, page.data, pageOffset, copyLength);
@@ -155,7 +155,7 @@ public class DebugViewData implements BinaryData {
             } else {
                 byte[] data = pageProvider.getPage(pageIndex);
                 if (data == null) {
-                    throw new IndexOutOfBoundsException("Requested data out of bounds");
+                    throw createIndexOutOfBoundsException();
                 }
 
                 pages[nextPage].data = data;
@@ -165,7 +165,7 @@ public class DebugViewData implements BinaryData {
             }
 
             if (pageOffset >= page.data.length) {
-                throw new IndexOutOfBoundsException("Requested data out of bounds");
+                throw createIndexOutOfBoundsException();
             }
 
             int copyLength = length;
@@ -173,7 +173,7 @@ public class DebugViewData implements BinaryData {
                 copyLength = page.data.length - pageOffset;
             }
             if (copyLength == 0) {
-                throw new IndexOutOfBoundsException("Requested data out of bounds");
+                throw createIndexOutOfBoundsException();
             }
 
             System.arraycopy(page.data, pageOffset, target, offset, copyLength);
@@ -196,11 +196,16 @@ public class DebugViewData implements BinaryData {
 
     @Override
     public void dispose() {
+    }
 
+    private static IndexOutOfBoundsException createIndexOutOfBoundsException() {
+        return new IndexOutOfBoundsException("Requested data out of bounds");
     }
 
     public interface PageProvider {
+        @Nonnull
         byte[] getPage(long pageIndex);
+
         long getDocumentSize();
     }
 

@@ -16,10 +16,12 @@
 package org.exbin.bined.intellij.utils;
 
 import com.intellij.openapi.ui.DialogWrapper;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.Action;
+import javax.swing.JComponent;
 
 /**
  * Dialog utilities.
@@ -27,16 +29,23 @@ import javax.swing.*;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.0 2018/11/10
  */
+@ParametersAreNonnullByDefault
 public class DialogUtils {
 
+    private DialogUtils() {
+    }
+
+    @Nonnull
     public static DialogWrapper createDialog(JComponent dialogPanel, String dialogTitle) {
         return new BinEdDialogWrapper(dialogPanel, dialogTitle);
     }
 
+    @Nonnull
     public static DialogWrapper createDialog(JComponent dialogPanel, String dialogTitle, JComponent focusedComponent) {
         return new BinEdDialogWrapper(dialogPanel, dialogTitle, focusedComponent);
     }
 
+    @ParametersAreNonnullByDefault
     public static class BinEdDialogWrapper extends DialogWrapper {
 
         private final JComponent dialogPanel;
@@ -66,7 +75,7 @@ public class DialogUtils {
             return dialogPanel;
         }
 
-        @NotNull
+        @Nonnull
         @Override
         protected Action[] createActions() {
             return new Action[0];

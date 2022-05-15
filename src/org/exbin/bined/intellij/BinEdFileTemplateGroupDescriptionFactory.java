@@ -19,6 +19,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
+import com.intellij.openapi.project.DumbAware;
 
 import javax.annotation.Nonnull;
 
@@ -28,7 +29,7 @@ import javax.annotation.Nonnull;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.6 2021/12/30
  */
-public class BinEdFileTemplateGroupDescriptionFactory implements FileTemplateGroupDescriptorFactory {
+public class BinEdFileTemplateGroupDescriptionFactory implements FileTemplateGroupDescriptorFactory, DumbAware {
 
     @Nonnull
     @Override

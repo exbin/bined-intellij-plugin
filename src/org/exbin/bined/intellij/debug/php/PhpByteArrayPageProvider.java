@@ -19,6 +19,7 @@ import org.exbin.bined.intellij.debug.DebugViewData;
 import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 
@@ -50,6 +51,7 @@ public class PhpByteArrayPageProvider implements DebugViewData.PageProvider {
         } while (true);
     }
 
+    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         long documentSize = getDocumentSize();

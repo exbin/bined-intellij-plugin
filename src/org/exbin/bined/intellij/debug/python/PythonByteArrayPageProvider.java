@@ -19,6 +19,7 @@ import org.exbin.bined.intellij.debug.DebugViewData;
 import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -43,6 +44,7 @@ public class PythonByteArrayPageProvider implements DebugViewData.PageProvider {
         length = computeLength(value);
     }
 
+    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         long documentSize = getDocumentSize();

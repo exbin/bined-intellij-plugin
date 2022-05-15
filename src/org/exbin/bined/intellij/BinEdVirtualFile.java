@@ -21,11 +21,12 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.exbin.framework.bined.BinEdFileHandler;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import javax.swing.*;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,6 +37,7 @@ import java.io.OutputStream;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.4 2021/04/11
  */
+@ParametersAreNonnullByDefault
 public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     public static final String PATH_PREFIX = "bined://";
@@ -74,7 +76,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return getEditorFile().getPanel();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getName() {
         return parentFile.getName();
@@ -84,13 +86,13 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return displayName;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public VirtualFileSystem getFileSystem() {
         return BinEdFileSystem.getInstance();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getPath() {
         return PATH_PREFIX + parentFile.getPath();
@@ -121,13 +123,13 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return parentFile.getChildren();
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public OutputStream getOutputStream(Object requestor, long newModificationStamp, long newTimeStamp) throws IOException {
-        return parentFile.getOutputStream(requestor, newModificationStamp, newTimeStamp);
+    public OutputStream getOutputStream(Object requester, long newModificationStamp, long newTimeStamp) throws IOException {
+        return parentFile.getOutputStream(requester, newModificationStamp, newTimeStamp);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public byte[] contentsToByteArray() throws IOException {
         return parentFile.contentsToByteArray();
@@ -148,6 +150,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         parentFile.refresh(asynchronous, recursive, postRunnable);
     }
 
+    @Nonnull
     @Override
     public InputStream getInputStream() throws IOException {
         return parentFile.getInputStream();

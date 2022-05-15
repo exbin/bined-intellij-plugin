@@ -16,18 +16,21 @@
 package org.exbin.bined.intellij.api;
 
 import com.intellij.openapi.extensions.PluginAware;
-import com.intellij.openapi.project.DumbAware;
+import org.exbin.auxiliary.paged_data.BinaryData;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * BinEd View Data Extension Point Interface.
+ * BinEd View Data Handler.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.6 2022/04/18
+ * @version 0.2.6 2022/05/15
  */
 @ParametersAreNonnullByDefault
-public interface BinEdViewData extends PluginAware, DumbAware {
+public interface BinEdViewHandler extends PluginAware {
 
-    void passHandler(BinEdViewHandler handler);
+    void showBinEdViewDialog(@Nullable BinaryData binaryData);
+
+    void showBinEdViewDialog(Object object);
 }

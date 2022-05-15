@@ -18,6 +18,7 @@ package org.exbin.bined.intellij.debug.jdi;
 import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.DebugViewData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
@@ -36,13 +37,11 @@ public class ByteArrayPageProvider implements DebugViewData.PageProvider {
         this.arrayRef = arrayRef;
     }
 
+    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         int startPos = (int) (pageIndex * DebugViewData.PAGE_SIZE);
-        int length = DebugViewData.PAGE_SIZE;
-        if (arrayRef.length() - startPos < DebugViewData.PAGE_SIZE) {
-            length = arrayRef.length() - startPos;
-        }
+        int length = Math.min(arrayRef.length() - startPos, DebugViewData.PAGE_SIZE);
         final List<Value> values = arrayRef.getValues(startPos, length);
         byte[] result = new byte[length];
         for (int i = 0; i < values.size(); i++) {

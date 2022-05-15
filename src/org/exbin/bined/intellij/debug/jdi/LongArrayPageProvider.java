@@ -19,6 +19,7 @@ import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.DebugViewData;
 import org.exbin.framework.bined.gui.ValuesPanel;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigInteger;
 import java.util.List;
@@ -38,14 +39,12 @@ public class LongArrayPageProvider implements DebugViewData.PageProvider {
         this.arrayRef = arrayRef;
     }
 
+    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         int pageSize = DebugViewData.PAGE_SIZE / 8;
         int startPos = (int) (pageIndex * pageSize);
-        int length = pageSize;
-        if (arrayRef.length() - startPos < pageSize) {
-            length = arrayRef.length() - startPos;
-        }
+        int length = Math.min(arrayRef.length() - startPos, pageSize);
         final List<Value> values = arrayRef.getValues(startPos, length);
         byte[] result = new byte[length * 8];
         for (int i = 0; i < values.size(); i++) {

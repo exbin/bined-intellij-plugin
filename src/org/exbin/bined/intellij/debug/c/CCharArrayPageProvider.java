@@ -25,6 +25,7 @@ import com.jetbrains.cidr.execution.debugger.evaluation.CidrPhysicalValue;
 import com.sun.jdi.*;
 import org.exbin.bined.intellij.debug.DebugViewData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
@@ -66,6 +67,7 @@ public class CCharArrayPageProvider implements DebugViewData.PageProvider {
         this.arrayRef = null;
     }
 
+    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         int startPos = (int) (pageIndex * DebugViewData.PAGE_SIZE);

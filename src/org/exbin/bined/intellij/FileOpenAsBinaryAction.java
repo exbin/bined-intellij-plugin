@@ -30,9 +30,9 @@ import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
 import org.exbin.framework.gui.utils.ActionUtils;
-import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JOptionPane;
 import java.util.List;
 
 /**
@@ -41,6 +41,7 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.1 2021/08/26
  */
+@ParametersAreNonnullByDefault
 public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
 
     public FileOpenAsBinaryAction() {
@@ -48,13 +49,13 @@ public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent event) {
+    public void update(AnActionEvent event) {
         super.update(event);
         event.getPresentation().setEnabledAndVisible(true);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent event) {
+    public void actionPerformed(AnActionEvent event) {
         Project project = event.getProject();
         if (project == null) {
             project = ProjectManager.getInstance().getDefaultProject();
@@ -91,7 +92,7 @@ public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(null,  "File reported as invalid", "Unable to open file", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "File reported as invalid", "Unable to open file", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
