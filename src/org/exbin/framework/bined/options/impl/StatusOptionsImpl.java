@@ -21,7 +21,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.bined.StatusCursorPositionFormat;
 import org.exbin.framework.bined.StatusDocumentSizeFormat;
 import org.exbin.framework.bined.preferences.StatusPreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
+import org.exbin.framework.options.api.OptionsData;
 
 /**
  * Status panel options.

@@ -15,9 +15,9 @@
  */
 package org.exbin.bined.intellij.debug.php;
 
-import org.exbin.bined.intellij.debug.DebugViewData;
+import org.exbin.bined.intellij.data.PageProvider;
+import org.exbin.bined.intellij.data.PageProviderBinaryData;
 import org.exbin.auxiliary.paged_data.OutOfBoundsException;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -30,7 +30,7 @@ import java.util.Map;
  * @version 0.2.3 2020/01/30
  */
 @ParametersAreNonnullByDefault
-public class PhpByteArrayPageProvider implements DebugViewData.PageProvider {
+public class PhpByteArrayPageProvider implements PageProvider {
 
     private final Map<String, String> value;
     private int size = 0;
@@ -55,18 +55,18 @@ public class PhpByteArrayPageProvider implements DebugViewData.PageProvider {
     @Override
     public byte[] getPage(long pageIndex) {
         long documentSize = getDocumentSize();
-        if (pageIndex > documentSize / DebugViewData.PAGE_SIZE )
+        if (pageIndex > documentSize / PageProviderBinaryData.PAGE_SIZE )
             throw new OutOfBoundsException();
 
         int length;
-        if (documentSize / DebugViewData.PAGE_SIZE == pageIndex) {
-            length = (int) (documentSize % DebugViewData.PAGE_SIZE);
+        if (documentSize / PageProviderBinaryData.PAGE_SIZE == pageIndex) {
+            length = (int) (documentSize % PageProviderBinaryData.PAGE_SIZE);
         } else {
-            length = DebugViewData.PAGE_SIZE;
+            length = PageProviderBinaryData.PAGE_SIZE;
         }
         byte[] page = new byte[length];
 
-        int position = (int) pageIndex * DebugViewData.PAGE_SIZE;
+        int position = (int) pageIndex * PageProviderBinaryData.PAGE_SIZE;
         int offset = 0;
         while (offset < length) {
             int intValue = Integer.parseInt(value.get(String.valueOf(position)));

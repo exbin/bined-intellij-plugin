@@ -22,8 +22,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.border.EtchedBorder;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Color cell panel for color profile panel.

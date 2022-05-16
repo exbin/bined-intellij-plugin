@@ -27,8 +27,8 @@ import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.PagedData;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.gui.CompareFilesPanel;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.utils.gui.CloseControlPanel;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.utils.gui.CloseControlPanel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -74,7 +74,7 @@ public class CompareFilesAction implements ActionListener {
 
         List<String> availableFiles = new ArrayList<>();
         availableFiles.add("Current File");
-        compareFilesPanel.setControl(new CompareFilesPanel.Control() {
+        compareFilesPanel.setController(new CompareFilesPanel.Controller() {
             @Nullable
             @Override
             public CompareFilesPanel.FileRecord openFile() {

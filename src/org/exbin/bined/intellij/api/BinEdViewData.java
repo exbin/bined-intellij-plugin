@@ -24,10 +24,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * BinEd View Data Extension Point Interface.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.6 2022/04/18
+ * @version 0.2.6 2022/05/16
  */
 @ParametersAreNonnullByDefault
 public interface BinEdViewData extends PluginAware, DumbAware {
 
+    /**
+     * Passes handler to available actions.
+     *
+     * @param handler handler
+     */
     void passHandler(BinEdViewHandler handler);
 }

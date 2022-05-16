@@ -29,8 +29,8 @@ import org.exbin.bined.SelectionRange;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightCodeAreaPainter;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Preview panel for code area.

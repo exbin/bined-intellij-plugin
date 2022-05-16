@@ -47,6 +47,7 @@ public class CompoundCodeAreaOperation extends CodeAreaOperation {
         super(codeArea, backPosition);
     }
 
+    @Nonnull
     @Override
     public CodeAreaOperationType getType() {
         return CodeAreaOperationType.MODIFY_DATA;

@@ -45,7 +45,7 @@ import java.util.List;
  * Post startup activity.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.1 2022/05/15
+ * @version 0.2.6 2022/05/15
  */
 @ParametersAreNonnullByDefault
 public final class BinEdPluginStartupActivity implements StartupActivity, DumbAware {
@@ -97,8 +97,6 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             }
         }, null);
         initExtensions();
-        byte[] testArray = new byte[] {5, 6};
-        viewHandler.showBinEdViewDialog(testArray);
     }
 
     private void initExtensions() {

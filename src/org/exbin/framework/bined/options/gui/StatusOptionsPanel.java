@@ -22,10 +22,10 @@ import org.exbin.bined.PositionCodeType;
 import org.exbin.framework.bined.options.impl.StatusOptionsImpl;
 import org.exbin.framework.bined.StatusCursorPositionFormat;
 import org.exbin.framework.bined.StatusDocumentSizeFormat;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.options.api.OptionsCapable;
-import org.exbin.framework.gui.options.api.OptionsModifiedListener;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.options.api.OptionsCapable;
+import org.exbin.framework.options.api.OptionsModifiedListener;
 
 /**
  * Editor status bar options panel.

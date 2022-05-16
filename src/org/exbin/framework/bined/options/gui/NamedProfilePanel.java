@@ -19,8 +19,8 @@ import java.awt.BorderLayout;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JPanel;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Wrapper panel for setting default profile.

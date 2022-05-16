@@ -18,7 +18,7 @@ package org.exbin.framework.bined.options.impl;
 import org.exbin.framework.bined.options.BinaryAppearanceOptions;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.bined.preferences.BinaryAppearancePreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
+import org.exbin.framework.options.api.OptionsData;
 
 /**
  * Binary component appearance options.
@@ -30,7 +30,7 @@ import org.exbin.framework.gui.options.api.OptionsData;
 public class BinaryAppearanceOptionsImpl implements OptionsData, BinaryAppearanceOptions {
 
     private boolean lineWrapping;
-    private boolean showValuesPanel;
+    private boolean showParsingPanel;
     private boolean multiFileMode;
 
     @Override
@@ -44,13 +44,13 @@ public class BinaryAppearanceOptionsImpl implements OptionsData, BinaryAppearanc
     }
 
     @Override
-    public boolean isShowValuesPanel() {
-        return showValuesPanel;
+    public boolean isShowParsingPanel() {
+        return showParsingPanel;
     }
 
     @Override
-    public void setShowValuesPanel(boolean showValuesPanel) {
-        this.showValuesPanel = showValuesPanel;
+    public void setShowParsingPanel(boolean showParsingPanel) {
+        this.showParsingPanel = showParsingPanel;
     }
 
     @Override
@@ -65,13 +65,13 @@ public class BinaryAppearanceOptionsImpl implements OptionsData, BinaryAppearanc
 
     public void loadFromPreferences(BinaryAppearancePreferences preferences) {
         lineWrapping = preferences.isLineWrapping();
-        showValuesPanel = preferences.isShowValuesPanel();
+        showParsingPanel = preferences.isShowParsingPanel();
         multiFileMode = preferences.isMultiFileMode();
     }
 
     public void saveToPreferences(BinaryAppearancePreferences preferences) {
         preferences.setLineWrapping(lineWrapping);
-        preferences.setShowValuesPanel(showValuesPanel);
+        preferences.setShowParsingPanel(showParsingPanel);
         preferences.setMultiFileMode(multiFileMode);
     }
 }

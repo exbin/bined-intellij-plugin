@@ -37,8 +37,8 @@ import javax.swing.event.ListSelectionListener;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.options.impl.CodeAreaThemeOptionsImpl;
 import org.exbin.framework.bined.preferences.CodeAreaThemePreferences;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.preferences.PreferencesWrapper;
 import org.exbin.framework.preferences.StreamPreferences;
 

@@ -18,12 +18,12 @@ package org.exbin.bined.intellij.debug.c;
 import com.intellij.xdebugger.frame.XValuePlace;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.jetbrains.cidr.execution.debugger.backend.LLValue;
-import com.jetbrains.cidr.execution.debugger.backend.LLValueData;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrElementValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrLocalValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrPhysicalValue;
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.debug.DebugViewData;
+import org.exbin.bined.intellij.data.PageProvider;
+import org.exbin.bined.intellij.data.PageProviderBinaryData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -38,7 +38,7 @@ import java.util.List;
  * @version 0.2.3 2020/03/23
  */
 @ParametersAreNonnullByDefault
-public class CCharArrayPageProvider implements DebugViewData.PageProvider {
+public class CCharArrayPageProvider implements PageProvider {
 
     private final ArrayReference arrayRef;
 
@@ -70,9 +70,9 @@ public class CCharArrayPageProvider implements DebugViewData.PageProvider {
     @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
-        int startPos = (int) (pageIndex * DebugViewData.PAGE_SIZE);
-        int length = DebugViewData.PAGE_SIZE;
-        if (arrayRef.length() - startPos < DebugViewData.PAGE_SIZE) {
+        int startPos = (int) (pageIndex * PageProviderBinaryData.PAGE_SIZE);
+        int length = PageProviderBinaryData.PAGE_SIZE;
+        if (arrayRef.length() - startPos < PageProviderBinaryData.PAGE_SIZE) {
             length = arrayRef.length() - startPos;
         }
         final List<Value> values = arrayRef.getValues(startPos, length);

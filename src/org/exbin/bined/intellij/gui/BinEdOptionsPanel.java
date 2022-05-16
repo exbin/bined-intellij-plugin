@@ -31,11 +31,11 @@ import org.exbin.framework.editor.text.options.gui.TextFontOptionsPanel;
 import org.exbin.framework.editor.text.gui.AddEncodingPanel;
 import org.exbin.framework.editor.text.gui.TextFontPanel;
 import org.exbin.framework.editor.text.service.TextFontService;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
-import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
-import org.exbin.framework.gui.utils.gui.DefaultControlPanel;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.utils.WindowUtils.DialogWrapper;
+import org.exbin.framework.utils.handler.DefaultControlHandler;
+import org.exbin.framework.utils.gui.DefaultControlPanel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

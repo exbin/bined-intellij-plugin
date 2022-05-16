@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
+import org.exbin.framework.options.api.OptionsData;
 import org.exbin.xbup.core.util.StringUtils;
 
 /**

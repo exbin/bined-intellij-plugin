@@ -22,13 +22,12 @@ import org.exbin.bined.basic.CodeAreaViewMode;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.PositionCodeType;
-import org.exbin.bined.capability.RowWrappingCapable;
 import org.exbin.bined.RowWrappingMode;
 import org.exbin.framework.bined.options.impl.CodeAreaOptionsImpl;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.options.api.OptionsCapable;
-import org.exbin.framework.gui.options.api.OptionsModifiedListener;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.options.api.OptionsCapable;
+import org.exbin.framework.options.api.OptionsModifiedListener;
 
 /**
  * Code area preference parameters panel.

@@ -41,9 +41,9 @@ public interface BinaryAppearanceService {
     void setWordWrapMode(boolean mode);
 
     /**
-     * Sets values panel visibility.
+     * Sets content parsing panel visibility.
      *
-     * @param showValuesPanel
+     * @param showParsingPanel show panel
      */
-    void setShowValuesPanel(boolean showValuesPanel);
+    void setShowParsingPanel(boolean showParsingPanel);
 }

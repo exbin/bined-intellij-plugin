@@ -26,8 +26,8 @@ import javax.swing.JTextArea;
 import javax.swing.JViewport;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 
 /**

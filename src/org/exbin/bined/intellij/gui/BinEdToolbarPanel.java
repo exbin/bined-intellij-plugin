@@ -24,7 +24,7 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
-import org.exbin.framework.gui.utils.LanguageUtils;
+import org.exbin.framework.utils.LanguageUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

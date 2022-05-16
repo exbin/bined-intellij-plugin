@@ -23,7 +23,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.preferences.CodeAreaThemePreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
+import org.exbin.framework.options.api.OptionsData;
 
 /**
  * Code area theme options.

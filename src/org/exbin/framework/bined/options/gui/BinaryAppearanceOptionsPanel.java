@@ -18,10 +18,10 @@ package org.exbin.framework.bined.options.gui;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
 import org.exbin.framework.bined.options.impl.BinaryAppearanceOptionsImpl;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.options.api.OptionsCapable;
-import org.exbin.framework.gui.options.api.OptionsModifiedListener;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.options.api.OptionsCapable;
+import org.exbin.framework.options.api.OptionsModifiedListener;
 
 /**
  * Binary viewer/editor appearance options panel.
@@ -46,13 +46,13 @@ public class BinaryAppearanceOptionsPanel extends javax.swing.JPanel implements 
 
     @Override
     public void loadFromOptions(BinaryAppearanceOptionsImpl options) {
-        showValuesPanelCheckBox.setSelected(options.isShowValuesPanel());
+        showValuesPanelCheckBox.setSelected(options.isShowParsingPanel());
         multiFileModeCheckBox.setSelected(options.isMultiFileMode());
     }
 
     @Override
     public void saveToOptions(BinaryAppearanceOptionsImpl options) {
-        options.setShowValuesPanel(showValuesPanelCheckBox.isSelected());
+        options.setShowParsingPanel(showValuesPanelCheckBox.isSelected());
         options.setMultiFileMode(multiFileModeCheckBox.isSelected());
     }
 

@@ -20,22 +20,19 @@ import org.exbin.auxiliary.paged_data.EditableBinaryData;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.operation.BinaryDataOperationException;
-import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.operation.swing.command.CodeAreaCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.SearchCondition;
 import org.exbin.framework.bined.gui.BinaryMultilinePanel;
-import org.exbin.framework.bined.gui.GoToBinaryPanel;
 import org.exbin.framework.bined.gui.InsertDataPanel;
 import org.exbin.framework.bined.operation.InsertDataOperation;
 import org.exbin.framework.bined.operation.ReplaceDataOperation;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.utils.WindowUtils.DialogWrapper;
-import org.exbin.framework.gui.utils.gui.DefaultControlPanel;
-import org.exbin.framework.gui.utils.handler.DefaultControlHandler;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.utils.WindowUtils.DialogWrapper;
+import org.exbin.framework.utils.gui.DefaultControlPanel;
+import org.exbin.framework.utils.handler.DefaultControlHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
@@ -43,7 +40,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,7 +70,7 @@ public class InsertDataAction implements ActionListener {
         DefaultControlPanel controlPanel = new DefaultControlPanel(insertDataPanel.getResourceBundle());
         JPanel dialogPanel = WindowUtils.createDialogPanel(insertDataPanel, controlPanel);
         final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), "Insert Data", Dialog.ModalityType.APPLICATION_MODAL);
-        insertDataPanel.setControl(() -> {
+        insertDataPanel.setController(() -> {
             final BinaryMultilinePanel multilinePanel = new BinaryMultilinePanel();
             SearchCondition searchCondition = new SearchCondition();
             EditableBinaryData conditionData = new ByteArrayEditableData();

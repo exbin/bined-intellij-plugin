@@ -30,11 +30,11 @@ public interface BinaryAppearanceOptions {
 
     boolean isMultiFileMode();
 
-    boolean isShowValuesPanel();
+    boolean isShowParsingPanel();
 
     void setLineWrapping(boolean lineWrapping);
 
     void setMultiFileMode(boolean multiTabMode);
 
-    void setShowValuesPanel(boolean showValuesPanel);
+    void setShowParsingPanel(boolean showParsingPanel);
 }

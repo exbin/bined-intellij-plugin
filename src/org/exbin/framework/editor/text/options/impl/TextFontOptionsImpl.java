@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.editor.text.options.TextFontOptions;
 import org.exbin.framework.editor.text.preferences.TextFontPreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
+import org.exbin.framework.options.api.OptionsData;
 
 /**
  * Text font options.

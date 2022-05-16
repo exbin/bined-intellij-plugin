@@ -20,8 +20,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.framework.bined.operation.InsertDataOperation.FillWithType;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Insert data panel.
@@ -34,7 +34,7 @@ public class InsertDataPanel extends javax.swing.JPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(InsertDataPanel.class);
 
-    private Control control;
+    private Controller controller;
 
     public InsertDataPanel() {
         initComponents();
@@ -45,8 +45,8 @@ public class InsertDataPanel extends javax.swing.JPanel {
         return resourceBundle;
     }
 
-    public void setControl(Control control) {
-        this.control = control;
+    public void setController(Controller controller) {
+        this.controller = controller;
     }
 
     /**
@@ -141,8 +141,8 @@ public class InsertDataPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void sampleDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sampleDataButtonActionPerformed
-        if (control != null) {
-            control.sampleDataAction();
+        if (controller != null) {
+            controller.sampleDataAction();
         }
     }//GEN-LAST:event_sampleDataButtonActionPerformed
 
@@ -219,7 +219,7 @@ public class InsertDataPanel extends javax.swing.JPanel {
     private javax.swing.JRadioButton spaceRadioButton;
     // End of variables declaration//GEN-END:variables
 
-    public interface Control {
+    public interface Controller {
 
         void sampleDataAction();
     }

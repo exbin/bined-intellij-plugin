@@ -21,7 +21,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.EnterKeyHandlingMode;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.preferences.EditorPreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
+import org.exbin.framework.options.api.OptionsData;
 
 /**
  * Binary editor preferences.

@@ -19,8 +19,8 @@ import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.CodeAreaUtils;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Go-to position panel for binary editor.
@@ -35,7 +35,7 @@ public class GoToBinaryPanel extends javax.swing.JPanel {
 
     private long cursorPosition;
     private long maxPosition;
-    private GoToBinaryPositionMode goToMode = GoToBinaryPositionMode.FROM_START;
+    private RelativePositionMode goToMode = RelativePositionMode.FROM_START;
 
     public GoToBinaryPanel() {
         initComponents();
@@ -173,19 +173,19 @@ public class GoToBinaryPanel extends javax.swing.JPanel {
 
     private void fromStartRadioButtonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_fromStartRadioButtonItemStateChanged
         if (fromStartRadioButton.isSelected()) {
-            switchGoToMode(GoToBinaryPositionMode.FROM_START);
+            switchGoToMode(RelativePositionMode.FROM_START);
         }
     }//GEN-LAST:event_fromStartRadioButtonItemStateChanged
 
     private void fromEndRadioButtonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_fromEndRadioButtonItemStateChanged
         if (fromEndRadioButton.isSelected()) {
-            switchGoToMode(GoToBinaryPositionMode.FROM_END);
+            switchGoToMode(RelativePositionMode.FROM_END);
         }
     }//GEN-LAST:event_fromEndRadioButtonItemStateChanged
 
     private void fromCursorRadioButtonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_fromCursorRadioButtonItemStateChanged
         if (fromCursorRadioButton.isSelected()) {
-            switchGoToMode(GoToBinaryPositionMode.FROM_CURSOR);
+            switchGoToMode(RelativePositionMode.FROM_CURSOR);
         }
     }//GEN-LAST:event_fromCursorRadioButtonItemStateChanged
 
@@ -269,7 +269,7 @@ public class GoToBinaryPanel extends javax.swing.JPanel {
         return resourceBundle;
     }
 
-    private void switchGoToMode(GoToBinaryPositionMode goToMode) {
+    private void switchGoToMode(RelativePositionMode goToMode) {
         if (this.goToMode == goToMode) {
             return;
         }

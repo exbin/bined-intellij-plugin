@@ -21,10 +21,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.EnterKeyHandlingMode;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.options.impl.EditorOptionsImpl;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.options.api.OptionsCapable;
-import org.exbin.framework.gui.options.api.OptionsModifiedListener;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.options.api.OptionsCapable;
+import org.exbin.framework.options.api.OptionsModifiedListener;
 
 /**
  * Editor preference parameters panel.

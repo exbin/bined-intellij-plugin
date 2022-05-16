@@ -21,7 +21,7 @@ import org.exbin.framework.api.Preferences;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.PositionCodeType;
-import org.exbin.framework.bined.gui.GoToBinaryPositionMode;
+import org.exbin.framework.bined.gui.RelativePositionMode;
 
 /**
  * Binary editor preferences.
@@ -42,17 +42,17 @@ public class GoToPositionPreferences {
     }
 
     @Nonnull
-    public GoToBinaryPositionMode getPositionMode() {
-        GoToBinaryPositionMode defaultMode = GoToBinaryPositionMode.FROM_START;
+    public RelativePositionMode getPositionMode() {
+        RelativePositionMode defaultMode = RelativePositionMode.FROM_START;
         try {
-            return GoToBinaryPositionMode.valueOf(preferences.get(PREFERENCES_GO_TO_BINARY_POSITION_MODE, defaultMode.name()));
+            return RelativePositionMode.valueOf(preferences.get(PREFERENCES_GO_TO_BINARY_POSITION_MODE, defaultMode.name()));
         } catch (Exception ex) {
             Logger.getLogger(GoToPositionPreferences.class.getName()).log(Level.SEVERE, null, ex);
             return defaultMode;
         }
     }
 
-    public void setPositionMode(GoToBinaryPositionMode positionMode) {
+    public void setPositionMode(RelativePositionMode positionMode) {
         preferences.put(PREFERENCES_GO_TO_BINARY_POSITION_MODE, positionMode.name());
     }
 

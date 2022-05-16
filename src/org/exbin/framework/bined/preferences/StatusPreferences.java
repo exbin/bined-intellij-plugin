@@ -95,11 +95,13 @@ public class StatusPreferences implements StatusOptions {
         preferences.putBoolean(PREFERENCES_DOCUMENT_SIZE_SHOW_RELATIVE, statusDocumentSizeShowRelative);
     }
 
+    @Nonnull
     @Override
     public StatusCursorPositionFormat getCursorPositionFormat() {
         return new StatusCursorPositionFormat(getCursorPositionCodeType(), isCursorShowOffset());
     }
 
+    @Nonnull
     @Override
     public StatusDocumentSizeFormat getDocumentSizeFormat() {
         return new StatusDocumentSizeFormat(getDocumentSizeCodeType(), isDocumentSizeShowRelative());

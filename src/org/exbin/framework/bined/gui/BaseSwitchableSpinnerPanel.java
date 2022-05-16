@@ -42,7 +42,7 @@ import javax.swing.text.JTextComponent;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.PositionCodeType;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Spinner supporting multiple bases.

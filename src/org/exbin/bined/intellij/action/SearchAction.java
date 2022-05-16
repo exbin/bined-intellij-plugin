@@ -24,7 +24,7 @@ import org.exbin.framework.bined.ReplaceParameters;
 import org.exbin.framework.bined.SearchCondition;
 import org.exbin.framework.bined.SearchParameters;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.gui.utils.ActionUtils;
+import org.exbin.framework.utils.ActionUtils;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 

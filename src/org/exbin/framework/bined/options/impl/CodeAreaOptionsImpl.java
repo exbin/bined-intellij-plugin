@@ -31,7 +31,7 @@ import org.exbin.bined.extended.capability.ShowUnprintablesCapable;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.preferences.CodeAreaPreferences;
-import org.exbin.framework.gui.options.api.OptionsData;
+import org.exbin.framework.options.api.OptionsData;
 
 /**
  * Code area options.

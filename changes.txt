@@ -2,6 +2,8 @@
 - Fixed native file mode (issue #39)
 - Added options page
 - Added link to online help/manual
+- Added edit selection action
+- Added API: view binary data
 
 0.2.5 (2021-11-06)
 - New app icon

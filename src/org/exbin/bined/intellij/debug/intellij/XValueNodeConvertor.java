@@ -45,18 +45,18 @@ import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
-import org.exbin.bined.intellij.debug.DebugViewData;
+import org.exbin.bined.intellij.data.PageProviderBinaryData;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.debug.DefaultDebugViewDataProvider;
 import org.exbin.bined.intellij.debug.c.CCharArrayPageProvider;
-import org.exbin.bined.intellij.debug.jdi.BooleanArrayPageProvider;
-import org.exbin.bined.intellij.debug.jdi.ByteArrayPageProvider;
-import org.exbin.bined.intellij.debug.jdi.CharArrayPageProvider;
-import org.exbin.bined.intellij.debug.jdi.DoubleArrayPageProvider;
-import org.exbin.bined.intellij.debug.jdi.FloatArrayPageProvider;
-import org.exbin.bined.intellij.debug.jdi.IntegerArrayPageProvider;
-import org.exbin.bined.intellij.debug.jdi.LongArrayPageProvider;
-import org.exbin.bined.intellij.debug.jdi.ShortArrayPageProvider;
+import org.exbin.bined.intellij.debug.jdi.JdiBooleanArrayPageProvider;
+import org.exbin.bined.intellij.debug.jdi.JdiByteArrayPageProvider;
+import org.exbin.bined.intellij.debug.jdi.JdiCharArrayPageProvider;
+import org.exbin.bined.intellij.debug.jdi.JdiDoubleArrayPageProvider;
+import org.exbin.bined.intellij.debug.jdi.JdiFloatArrayPageProvider;
+import org.exbin.bined.intellij.debug.jdi.JdiIntegerArrayPageProvider;
+import org.exbin.bined.intellij.debug.jdi.JdiLongArrayPageProvider;
+import org.exbin.bined.intellij.debug.jdi.JdiShortArrayPageProvider;
 import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.framework.bined.gui.ValuesPanel;
@@ -188,7 +188,7 @@ public class XValueNodeConvertor {
 //                            PyFullValueEvaluator fullValueEvaluator = new PyFullValueEvaluator(debugValue.getFrameAccessor(), debugValue.getEvaluationExpression());
 //                            fullValueNode.getRawValue()
                             }
-                            BinaryData data = new DebugViewData(new PythonByteArrayPageProvider(fullValue));
+                            BinaryData data = new PageProviderBinaryData(new PythonByteArrayPageProvider(fullValue));
                             providers.add(new DefaultDebugViewDataProvider("Python bytearray value", data));
                         } catch (Exception e) {
                             Logger.getLogger(XValueNodeConvertor.class.getName()).log(Level.SEVERE, null, e);
@@ -201,7 +201,7 @@ public class XValueNodeConvertor {
                 String dataType = ((CidrValue) container).getEvaluationExpression(true);
                 switch (dataType) {
                     case "byteArray": {
-                        BinaryData data = new DebugViewData(new CCharArrayPageProvider(myDataNode, (CidrPhysicalValue) container));
+                        BinaryData data = new PageProviderBinaryData(new CCharArrayPageProvider(myDataNode, (CidrPhysicalValue) container));
                         providers.add(new DefaultDebugViewDataProvider("C bytearray value", data));
                         break;
                     }
@@ -219,7 +219,7 @@ public class XValueNodeConvertor {
                     switch (dataType.toString()) {
                         case "array": {
                             Map<String, String> value = ((PhpNavigatableValue) container).getLoadedChildren();
-                            BinaryData data = new DebugViewData(new PhpByteArrayPageProvider(value));
+                            BinaryData data = new PageProviderBinaryData(new PhpByteArrayPageProvider(value));
                             providers.add(new DefaultDebugViewDataProvider("PHP bytearray value", data));
                             break;
                         }
@@ -307,35 +307,35 @@ public class XValueNodeConvertor {
             switch (componentType) {
                 case CommonClassNames.JAVA_LANG_BOOLEAN:
                 case "boolean": {
-                    return new DebugViewData(new BooleanArrayPageProvider(arrayRef));
+                    return new PageProviderBinaryData(new JdiBooleanArrayPageProvider(arrayRef));
                 }
                 case CommonClassNames.JAVA_LANG_BYTE:
                 case "byte": {
-                    return new DebugViewData(new ByteArrayPageProvider(arrayRef));
+                    return new PageProviderBinaryData(new JdiByteArrayPageProvider(arrayRef));
                 }
                 case CommonClassNames.JAVA_LANG_SHORT:
                 case "short": {
-                    return new DebugViewData(new ShortArrayPageProvider(arrayRef));
+                    return new PageProviderBinaryData(new JdiShortArrayPageProvider(arrayRef));
                 }
                 case CommonClassNames.JAVA_LANG_INTEGER:
                 case "int": {
-                    return new DebugViewData(new IntegerArrayPageProvider(arrayRef));
+                    return new PageProviderBinaryData(new JdiIntegerArrayPageProvider(arrayRef));
                 }
                 case CommonClassNames.JAVA_LANG_LONG:
                 case "long": {
-                    return new DebugViewData(new LongArrayPageProvider(arrayRef));
+                    return new PageProviderBinaryData(new JdiLongArrayPageProvider(arrayRef));
                 }
                 case CommonClassNames.JAVA_LANG_FLOAT:
                 case "float": {
-                    return new DebugViewData(new FloatArrayPageProvider(arrayRef));
+                    return new PageProviderBinaryData(new JdiFloatArrayPageProvider(arrayRef));
                 }
                 case CommonClassNames.JAVA_LANG_DOUBLE:
                 case "double": {
-                    return new DebugViewData(new DoubleArrayPageProvider(arrayRef));
+                    return new PageProviderBinaryData(new JdiDoubleArrayPageProvider(arrayRef));
                 }
                 case CommonClassNames.JAVA_LANG_CHARACTER:
                 case "char": {
-                    return new DebugViewData(new CharArrayPageProvider(arrayRef));
+                    return new PageProviderBinaryData(new JdiCharArrayPageProvider(arrayRef));
                 }
             }
         }

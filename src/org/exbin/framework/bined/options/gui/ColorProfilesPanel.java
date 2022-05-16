@@ -32,8 +32,8 @@ import javax.swing.event.ListSelectionEvent;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.framework.bined.options.gui.PreviewPanel.PreviewType;
 import org.exbin.framework.bined.options.impl.CodeAreaColorOptionsImpl;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Manage list of color profiles panel.

@@ -56,13 +56,6 @@ public interface BinaryStatusApi {
     void setEditMode(EditMode mode, EditOperation operation);
 
     /**
-     * Sets control handler for status operations.
-     *
-     * @param statusControlHandler status control handler
-     */
-    void setControlHandler(StatusControlHandler statusControlHandler);
-
-    /**
      * Sets current document size.
      *
      * @param documentSize document size
@@ -76,41 +69,6 @@ public interface BinaryStatusApi {
      * @param memoryMode memory mode
      */
     void setMemoryMode(MemoryMode memoryMode);
-
-    @ParametersAreNonnullByDefault
-    public static interface StatusControlHandler {
-
-        /**
-         * Requests change of edit operation from given operation.
-         *
-         * @param operation edit operation
-         */
-        void changeEditOperation(EditOperation operation);
-
-        /**
-         * Requests change of cursor position using go-to dialog.
-         */
-        void changeCursorPosition();
-
-        /**
-         * Switches to next encoding in defined list.
-         */
-        void cycleEncodings();
-
-        /**
-         * Handles encodings popup menu.
-         *
-         * @param mouseEvent mouse event
-         */
-        void encodingsPopupEncodingsMenu(MouseEvent mouseEvent);
-
-        /**
-         * Requests change of memory mode.
-         *
-         * @param memoryMode memory mode
-         */
-        void changeMemoryMode(MemoryMode memoryMode);
-    }
 
     @ParametersAreNonnullByDefault
     public enum MemoryMode {

@@ -22,7 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Item list with text input.

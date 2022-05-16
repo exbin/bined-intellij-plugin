@@ -31,8 +31,8 @@ import javax.swing.event.PopupMenuListener;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Compare files panel.
@@ -45,7 +45,7 @@ public class CompareFilesPanel extends javax.swing.JPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(CompareFilesPanel.class);
 
-    private Control control;
+    private Controller controller;
     private FileRecord leftCustomFile;
     private FileRecord rightCustomFile;
 
@@ -70,7 +70,7 @@ public class CompareFilesPanel extends javax.swing.JPanel {
                         switchToLeftCustomFile();
                     }
                 } else {
-                    setLeftFile(control.getFileData(selectedIndex - 1));
+                    setLeftFile(controller.getFileData(selectedIndex - 1));
                 }
             }
         });
@@ -89,7 +89,7 @@ public class CompareFilesPanel extends javax.swing.JPanel {
                         switchToRightCustomFile();
                     }
                 } else {
-                    setRightFile(control.getFileData(selectedIndex - 1));
+                    setRightFile(controller.getFileData(selectedIndex - 1));
                 }
             }
         });
@@ -108,8 +108,8 @@ public class CompareFilesPanel extends javax.swing.JPanel {
         return resourceBundle;
     }
 
-    public void setControl(Control control) {
-        this.control = control;
+    public void setController(Controller controller) {
+        this.controller = controller;
     }
 
     public void setAvailableFiles(List<String> availableFiles) {
@@ -264,8 +264,8 @@ public class CompareFilesPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void rightOpenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rightOpenButtonActionPerformed
-        if (control != null) {
-            FileRecord file = control.openFile();
+        if (controller != null) {
+            FileRecord file = controller.openFile();
             if (file != null) {
                 rightCustomFile = file;
                 rightComboBox.setSelectedIndex(0);
@@ -277,8 +277,8 @@ public class CompareFilesPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_rightOpenButtonActionPerformed
 
     private void leftOpenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_leftOpenButtonActionPerformed
-        if (control != null) {
-            FileRecord file = control.openFile();
+        if (controller != null) {
+            FileRecord file = controller.openFile();
             if (file != null) {
                 leftCustomFile = file;
                 leftComboBox.setSelectedIndex(0);
@@ -317,7 +317,7 @@ public class CompareFilesPanel extends javax.swing.JPanel {
     private javax.swing.JButton rightOpenButton;
     // End of variables declaration//GEN-END:variables
 
-    public interface Control {
+    public interface Controller {
 
         @Nullable
         FileRecord openFile();

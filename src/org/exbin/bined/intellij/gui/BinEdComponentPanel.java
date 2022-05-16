@@ -35,6 +35,7 @@ import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAre
 import org.exbin.bined.intellij.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.action.CompareFilesAction;
+import org.exbin.bined.intellij.action.EditSelectionAction;
 import org.exbin.bined.intellij.action.GoToPositionAction;
 import org.exbin.bined.intellij.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.action.SearchAction;
@@ -49,7 +50,12 @@ import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.FileHandlingMode;
-import org.exbin.framework.bined.options.*;
+import org.exbin.framework.bined.options.CodeAreaColorOptions;
+import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
+import org.exbin.framework.bined.options.CodeAreaOptions;
+import org.exbin.framework.bined.options.CodeAreaThemeOptions;
+import org.exbin.framework.bined.options.EditorOptions;
+import org.exbin.framework.bined.options.StatusOptions;
 import org.exbin.framework.bined.options.impl.CodeAreaOptionsImpl;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.gui.ValuesPanel;
@@ -59,20 +65,38 @@ import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.options.TextFontOptions;
 import org.exbin.framework.editor.text.service.TextFontService;
-import org.exbin.framework.gui.about.gui.AboutPanel;
-import org.exbin.framework.gui.utils.ActionUtils;
-import org.exbin.framework.gui.utils.BareBonesBrowserLaunch;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.utils.handler.OptionsControlHandler;
-import org.exbin.framework.gui.utils.gui.CloseControlPanel;
-import org.exbin.framework.gui.utils.gui.OptionsControlPanel;
+import org.exbin.framework.about.gui.AboutPanel;
+import org.exbin.framework.utils.ActionUtils;
+import org.exbin.framework.utils.BareBonesBrowserLaunch;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.utils.handler.OptionsControlHandler;
+import org.exbin.framework.utils.gui.CloseControlPanel;
+import org.exbin.framework.utils.gui.OptionsControlPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.GrayFilter;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSeparator;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -105,8 +129,9 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
     private TextEncodingStatusApi encodingStatus;
     private CharsetChangeListener charsetChangeListener = null;
     private ModifiedStateListener modifiedChangeListener = null;
-    private final GoToPositionAction goToRowAction;
+    private final GoToPositionAction goToPositionAction;
     private final InsertDataAction insertDataAction;
+    private final EditSelectionAction editSelectionAction;
     private final CompareFilesAction compareFilesAction;
     private final AbstractAction showHeaderAction;
     private final AbstractAction showRowNumbersAction;
@@ -171,8 +196,9 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         );
         statusPanel = new BinaryStatusPanel();
 
-        goToRowAction = new GoToPositionAction(codeArea);
+        goToPositionAction = new GoToPositionAction(codeArea);
         insertDataAction = new InsertDataAction(codeArea);
+        editSelectionAction = new EditSelectionAction(codeArea);
         compareFilesAction = new CompareFilesAction(codeArea);
         showHeaderAction = new AbstractAction() {
             @Override
@@ -272,7 +298,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                             break;
                         }
                         case KeyEvent.VK_G: {
-                            goToRowAction.actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
+                            goToPositionAction.actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
                             break;
                         }
                     }
@@ -293,7 +319,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         codeArea.addEditModeChangedListener(binaryStatus::setEditMode);
         binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
 
-        binaryStatus.setControlHandler(new BinaryStatusApi.StatusControlHandler() {
+        ((BinaryStatusPanel) binaryStatus).setControlHandler(new BinaryStatusPanel.StatusControlHandler() {
             @Override
             public void changeEditOperation(EditOperation editOperation) {
                 codeArea.setEditOperation(editOperation);
@@ -301,7 +327,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
 
             @Override
             public void changeCursorPosition() {
-                goToRowAction.actionPerformed(new ActionEvent(BinEdComponentPanel.this, 0, ""));
+                goToPositionAction.actionPerformed(new ActionEvent(BinEdComponentPanel.this, 0, ""));
             }
 
             @Override
@@ -585,6 +611,9 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                     menu.setVisible(false);
                 });
                 menu.add(selectAllMenuItem);
+
+                JMenuItem editSelectionMenuItem = createEditSelectionMenuItem();
+                menu.add(editSelectionMenuItem);
                 menu.addSeparator();
 
                 JMenuItem insertDataMenuItem = createInsertDataMenuItem();
@@ -735,8 +764,15 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
     private JMenuItem createGoToMenuItem() {
         final JMenuItem goToMenuItem = new JMenuItem("Go To...");
         goToMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionUtils.getMetaMask()));
-        goToMenuItem.addActionListener(goToRowAction);
+        goToMenuItem.addActionListener(goToPositionAction);
         return goToMenuItem;
+    }
+
+    @Nonnull
+    private JMenuItem createEditSelectionMenuItem() {
+        final JMenuItem editSelectionMenuItem = new JMenuItem("Edit Selection...");
+        editSelectionMenuItem.addActionListener(editSelectionAction);
+        return editSelectionMenuItem;
     }
 
     @Nonnull

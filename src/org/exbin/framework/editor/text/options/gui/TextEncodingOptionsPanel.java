@@ -24,11 +24,10 @@ import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.exbin.framework.editor.text.options.impl.TextEncodingOptionsImpl;
-import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
-import org.exbin.framework.gui.utils.LanguageUtils;
-import org.exbin.framework.gui.utils.WindowUtils;
-import org.exbin.framework.gui.options.api.OptionsCapable;
-import org.exbin.framework.gui.options.api.OptionsModifiedListener;
+import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.options.api.OptionsCapable;
+import org.exbin.framework.options.api.OptionsModifiedListener;
 import org.exbin.framework.editor.text.service.TextEncodingService;
 import org.exbin.xbup.core.util.StringUtils;
 

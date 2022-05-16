@@ -19,6 +19,8 @@ import org.exbin.framework.bined.SearchCondition;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.event.KeyListener;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -44,6 +46,7 @@ import org.exbin.auxiliary.paged_data.EditableBinaryData;
  * @version 0.2.1 2018/12/11
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class BinarySearchComboBoxPanel extends JPanel {
 
     public static final String TEXT_MODE = "text";
@@ -103,6 +106,7 @@ public class BinarySearchComboBoxPanel extends JPanel {
         super.add(codeArea, BINARY_MODE);
     }
 
+    @Nonnull
     public SearchCondition getItem() {
         switch (item.getSearchMode()) {
             case TEXT: {

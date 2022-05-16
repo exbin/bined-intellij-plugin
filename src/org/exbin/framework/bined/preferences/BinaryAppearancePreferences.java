@@ -41,7 +41,7 @@ public class BinaryAppearancePreferences {
         return preferences.getBoolean(PREFERENCES_TEXT_WORD_WRAPPING, false);
     }
 
-    public boolean isShowValuesPanel() {
+    public boolean isShowParsingPanel() {
         return preferences.getBoolean(PREFERENCES_SHOW_VALUES_PANEL, true);
     }
 
@@ -53,7 +53,7 @@ public class BinaryAppearancePreferences {
         preferences.putBoolean(PREFERENCES_TEXT_WORD_WRAPPING, wrapping);
     }
 
-    public void setShowValuesPanel(boolean show) {
+    public void setShowParsingPanel(boolean show) {
         preferences.putBoolean(PREFERENCES_SHOW_VALUES_PANEL, show);
     }
 

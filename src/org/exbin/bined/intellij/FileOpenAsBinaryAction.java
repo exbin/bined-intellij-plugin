@@ -29,7 +29,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
-import org.exbin.framework.gui.utils.ActionUtils;
+import org.exbin.framework.utils.ActionUtils;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JOptionPane;
