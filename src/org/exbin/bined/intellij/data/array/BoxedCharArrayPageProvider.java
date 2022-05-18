@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Character array data.
+ * Character array data as binary data provider.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.6 2022/05/16
@@ -55,6 +55,6 @@ public class BoxedCharArrayPageProvider implements PageProvider {
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length * 2;
+        return arrayRef.length * 2L;
     }
 }

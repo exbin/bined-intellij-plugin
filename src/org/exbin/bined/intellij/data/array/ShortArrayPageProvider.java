@@ -22,44 +22,31 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Boolean array as binary data provider.
+ * Short array as binary data provider.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.6 2022/05/16
+ * @version 0.2.6 2022/05/18
  */
 @ParametersAreNonnullByDefault
-public class BoxedBooleanArrayPageProvider implements PageProvider {
+public class ShortArrayPageProvider implements PageProvider {
 
-    private final Boolean[] arrayRef;
+    private final short[] arrayRef;
 
-    public BoxedBooleanArrayPageProvider(Boolean[] arrayRef) {
+    public ShortArrayPageProvider(short[] arrayRef) {
         this.arrayRef = arrayRef;
     }
 
     @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
-        int startPos = (int) (pageIndex * PageProviderBinaryData.PAGE_SIZE * 8);
-        int length = PageProviderBinaryData.PAGE_SIZE * 8;
-        long documentSize = getDocumentSize() * 8;
-        if (documentSize - startPos < PageProviderBinaryData.PAGE_SIZE * 8) {
-            length = (int) (documentSize - startPos);
-        }
-        byte[] result = new byte[(length + 7) / 8];
-        int bitMask = 0x80;
-        int bytePos = 0;
+        int pageSize = PageProviderBinaryData.PAGE_SIZE / 2;
+        int startPos = (int) (pageIndex * pageSize);
+        int length = Math.min(arrayRef.length - startPos, pageSize);
+        byte[] result = new byte[length * 2];
         for (int i = 0; i < length; i++) {
-            boolean value = arrayRef[startPos + i];
-
-            if (value) {
-                result[bytePos] += bitMask;
-            }
-            if (bitMask == 1) {
-                bitMask = 0x80;
-                bytePos++;
-            } else {
-                bitMask = bitMask >> 1;
-            }
+            short value = arrayRef[startPos + i];
+            result[i * 2] = (byte) (value >> 8);
+            result[i * 2 + 1] = (byte) (value & 0xff);
         }
 
         return result;
@@ -67,6 +54,6 @@ public class BoxedBooleanArrayPageProvider implements PageProvider {
 
     @Override
     public long getDocumentSize() {
-        return (arrayRef.length + 7) / 8;
+        return arrayRef.length * 2L;
     }
 }

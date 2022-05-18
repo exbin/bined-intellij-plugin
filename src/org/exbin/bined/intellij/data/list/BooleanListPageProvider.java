@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.data.array;
+package org.exbin.bined.intellij.data.list;
 
 import org.exbin.bined.intellij.data.PageProvider;
 import org.exbin.bined.intellij.data.PageProviderBinaryData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 /**
- * Boolean array as binary data provider.
+ * Boolean list as binary data provider.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.6 2022/05/16
+ * @version 0.2.6 2022/05/18
  */
 @ParametersAreNonnullByDefault
-public class BoxedBooleanArrayPageProvider implements PageProvider {
+public class BooleanListPageProvider implements PageProvider {
 
-    private final Boolean[] arrayRef;
+    private final List<Boolean> listRef;
 
-    public BoxedBooleanArrayPageProvider(Boolean[] arrayRef) {
-        this.arrayRef = arrayRef;
+    public BooleanListPageProvider(List<Boolean> listRef) {
+        this.listRef = listRef;
     }
 
     @Nonnull
@@ -49,7 +50,7 @@ public class BoxedBooleanArrayPageProvider implements PageProvider {
         int bitMask = 0x80;
         int bytePos = 0;
         for (int i = 0; i < length; i++) {
-            boolean value = arrayRef[startPos + i];
+            boolean value = listRef.get(startPos + i);
 
             if (value) {
                 result[bytePos] += bitMask;
@@ -67,6 +68,6 @@ public class BoxedBooleanArrayPageProvider implements PageProvider {
 
     @Override
     public long getDocumentSize() {
-        return (arrayRef.length + 7) / 8;
+        return (listRef.size() + 7) / 8;
     }
 }

@@ -15,28 +15,45 @@
  */
 package org.exbin.bined.intellij.data;
 
-import com.intellij.psi.CommonClassNames;
-import com.sun.jdi.ByteValue;
-import com.sun.jdi.CharValue;
-import com.sun.jdi.DoubleValue;
-import com.sun.jdi.FloatValue;
-import com.sun.jdi.IntegerValue;
-import com.sun.jdi.LongValue;
-import com.sun.jdi.ShortValue;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
+import org.exbin.bined.intellij.data.array.BooleanArrayPageProvider;
+import org.exbin.bined.intellij.data.array.BoxedBooleanArrayPageProvider;
+import org.exbin.bined.intellij.data.array.BoxedByteArrayPageProvider;
+import org.exbin.bined.intellij.data.array.BoxedCharArrayPageProvider;
+import org.exbin.bined.intellij.data.array.BoxedDoubleArrayPageProvider;
+import org.exbin.bined.intellij.data.array.BoxedFloatArrayPageProvider;
+import org.exbin.bined.intellij.data.array.BoxedIntegerArrayPageProvider;
+import org.exbin.bined.intellij.data.array.BoxedLongArrayPageProvider;
+import org.exbin.bined.intellij.data.array.BoxedShortArrayPageProvider;
+import org.exbin.bined.intellij.data.array.CharArrayPageProvider;
+import org.exbin.bined.intellij.data.array.DoubleArrayPageProvider;
+import org.exbin.bined.intellij.data.array.FloatArrayPageProvider;
+import org.exbin.bined.intellij.data.array.IntegerArrayPageProvider;
+import org.exbin.bined.intellij.data.array.LongArrayPageProvider;
+import org.exbin.bined.intellij.data.array.ShortArrayPageProvider;
+import org.exbin.bined.intellij.data.list.BooleanListPageProvider;
+import org.exbin.bined.intellij.data.list.ByteListPageProvider;
+import org.exbin.bined.intellij.data.list.CharListPageProvider;
+import org.exbin.bined.intellij.data.list.DoubleListPageProvider;
+import org.exbin.bined.intellij.data.list.FloatListPageProvider;
+import org.exbin.bined.intellij.data.list.IntegerListPageProvider;
+import org.exbin.bined.intellij.data.list.LongListPageProvider;
+import org.exbin.bined.intellij.data.list.ShortListPageProvider;
 import org.exbin.framework.bined.gui.ValuesPanel;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Class value convertor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.6 2022/05/16
+ * @version 0.2.6 2022/05/18
  */
 @ParametersAreNonnullByDefault
 public class ObjectValueConvertor {
@@ -44,121 +61,184 @@ public class ObjectValueConvertor {
     private final byte[] valuesCache = new byte[8];
     private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
 
-    private static final String BYTE_TYPE = byte.class.getName();
-    private static final String SHORT_TYPE = short.class.getName();
-    private static final String INT_TYPE = int.class.getName();
-    private static final String LONG_TYPE = long.class.getName();
-    private static final String FLOAT_TYPE = float.class.getName();
-    private static final String DOUBLE_TYPE = double.class.getName();
-    private static final String CHAR_TYPE = char.class.getName();
-
     public ObjectValueConvertor() {
     }
 
-    @Nullable
-    private BinaryData process(Object instance) {
+    @Nonnull
+    public Optional<BinaryData> process(Object instance) {
         if (instance.getClass().isArray()) {
-            return processSimpleValue(instance);
-        } else {
             return processArrayValue(instance);
+        } else if (instance instanceof List) {
+            return processListValue(instance);
         }
+
+        return processSimpleValue(instance);
     }
 
-    @Nullable
-    private BinaryData processSimpleValue(Object instance) {
-/*        String typeString = instance.getClass().getTypeName();
-        switch (typeString) {
-            case CommonClassNames.JAVA_LANG_BYTE:
-            case "B":
-            case "byte": {
-                ByteValue value = (ByteValue) getPrimitiveValue(descriptor);
-                byte[] byteArray = new byte[1];
-                byteArray[0] = value.value();
-                return new ByteArrayData(byteArray);
+    @Nonnull
+    public Optional<BinaryData> processSimpleValue(Object instance) {
+        String typeName = instance.getClass().getTypeName();
+        byte[] byteArray = null;
+        if (boolean.class.getName().equals(typeName)) {
+            byteArray = new byte[1];
+            byteArray[0] = (byte) instance;
+        } else if (Boolean.class.getName().equals(typeName)) {
+            byteArray = new byte[1];
+            byteArray[0] = ((Boolean) instance) ? (byte) 1 : (byte) 0;
+        } else if (byte.class.getName().equals(typeName)) {
+            byteArray = new byte[1];
+            byteArray[0] = (byte) instance;
+        } else if (Byte.class.getName().equals(typeName)) {
+            byteArray = new byte[1];
+            byteArray[0] = (Byte) instance;
+        } else if (int.class.getName().equals(typeName)) {
+            byteArray = new byte[4];
+            int value = (int) instance;
+            byteArray[0] = (byte) (value >> 24);
+            byteArray[1] = (byte) ((value >> 16) & 0xff);
+            byteArray[2] = (byte) ((value >> 8) & 0xff);
+            byteArray[3] = (byte) (value & 0xff);
+        } else if (Integer.class.getName().equals(typeName)) {
+            byteArray = new byte[4];
+            int value = (Integer) instance;
+            byteArray[0] = (byte) (value >> 24);
+            byteArray[1] = (byte) ((value >> 16) & 0xff);
+            byteArray[2] = (byte) ((value >> 8) & 0xff);
+            byteArray[3] = (byte) (value & 0xff);
+        } else if (long.class.getName().equals(typeName)) {
+            byteArray = new byte[8];
+            long value = (long) instance;
+            BigInteger bigInteger = BigInteger.valueOf(value);
+            for (int bit = 0; bit < 7; bit++) {
+                BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
+                byteArray[7 - bit] = nextByte.byteValue();
+                bigInteger = bigInteger.shiftRight(8);
             }
-            case CommonClassNames.JAVA_LANG_SHORT:
-            case "S":
-            case "short": {
-                ShortValue valueRecord = (ShortValue) getPrimitiveValue(descriptor);
-                byte[] byteArray = new byte[2];
-                short value = valueRecord.value();
-                byteArray[0] = (byte) (value >> 8);
-                byteArray[1] = (byte) (value & 0xff);
-                return new ByteArrayData(byteArray);
+        } else if (Long.class.getName().equals(typeName)) {
+            byteArray = new byte[8];
+            long value = (Long) instance;
+            BigInteger bigInteger = BigInteger.valueOf(value);
+            for (int bit = 0; bit < 7; bit++) {
+                BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
+                byteArray[7 - bit] = nextByte.byteValue();
+                bigInteger = bigInteger.shiftRight(8);
             }
-            case CommonClassNames.JAVA_LANG_INTEGER:
-            case "I":
-            case "int": {
-                IntegerValue valueRecord = (IntegerValue) getPrimitiveValue(descriptor);
-                byte[] byteArray = new byte[4];
-                int value = valueRecord.value();
-                byteArray[0] = (byte) (value >> 24);
-                byteArray[1] = (byte) ((value >> 16) & 0xff);
-                byteArray[2] = (byte) ((value >> 8) & 0xff);
-                byteArray[3] = (byte) (value & 0xff);
-                return new ByteArrayData(byteArray);
-            }
-            case CommonClassNames.JAVA_LANG_LONG:
-            case "J":
-            case "long": {
-                LongValue valueRecord = (LongValue) getPrimitiveValue(descriptor);
-                byte[] byteArray = new byte[8];
-                long value = valueRecord.value();
-                BigInteger bigInteger = BigInteger.valueOf(value);
-                for (int bit = 0; bit < 7; bit++) {
-                    BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
-                    byteArray[7 - bit] = nextByte.byteValue();
-                    bigInteger = bigInteger.shiftRight(8);
-                }
-                return new ByteArrayData(byteArray);
-            }
-            case CommonClassNames.JAVA_LANG_FLOAT:
-            case "F":
-            case "float": {
-                FloatValue valueRecord = (FloatValue) getPrimitiveValue(descriptor);
-                byte[] byteArray = new byte[4];
-                float value = valueRecord.value();
-                byteBuffer.rewind();
-                byteBuffer.putFloat(value);
-                System.arraycopy(valuesCache, 0, byteArray, 0, 4);
-                return new ByteArrayData(byteArray);
-            }
-            case CommonClassNames.JAVA_LANG_DOUBLE:
-            case "D":
-            case "double": {
-                DoubleValue valueRecord = (DoubleValue) getPrimitiveValue(descriptor);
-                byte[] byteArray = new byte[8];
-                double value = valueRecord.value();
-                byteBuffer.rewind();
-                byteBuffer.putDouble(value);
-                System.arraycopy(valuesCache, 0, byteArray, 0, 8);
-                return new ByteArrayData(byteArray);
-            }
-            case CommonClassNames.JAVA_LANG_CHARACTER:
-            case "C":
-            case "char": {
-                CharValue valueRecord = (CharValue) getPrimitiveValue(descriptor);
-                byte[] byteArray = new byte[2];
-                char value = valueRecord.value();
-                byteBuffer.rewind();
-                byteBuffer.putChar(value);
-                System.arraycopy(valuesCache, 0, byteArray, 0, 2);
-                return new ByteArrayData(byteArray);
-            }
-        } */
+        } else if (short.class.getName().equals(typeName)) {
+            byteArray = new byte[2];
+            short value = (short) instance;
+            byteArray[0] = (byte) (value >> 8);
+            byteArray[1] = (byte) (value & 0xff);
+        } else if (Short.class.getName().equals(typeName)) {
+            byteArray = new byte[2];
+            short value = (Short) instance;
+            byteArray[0] = (byte) (value >> 8);
+            byteArray[1] = (byte) (value & 0xff);
+        } else if (char.class.getName().equals(typeName)) {
+            byteArray = new byte[2];
+            char value = (char) instance;
+            byteBuffer.rewind();
+            byteBuffer.putChar(value);
+            System.arraycopy(valuesCache, 0, byteArray, 0, 2);
+        } else if (Character.class.getName().equals(typeName)) {
+            byteArray = new byte[2];
+            char value = (Character) instance;
+            byteBuffer.rewind();
+            byteBuffer.putChar(value);
+            System.arraycopy(valuesCache, 0, byteArray, 0, 2);
+        } else if (double.class.getName().equals(typeName)) {
+            byteArray = new byte[8];
+            double value = (double) instance;
+            byteBuffer.rewind();
+            byteBuffer.putDouble(value);
+            System.arraycopy(valuesCache, 0, byteArray, 0, 8);
+        } else if (Double.class.getName().equals(typeName)) {
+            byteArray = new byte[8];
+            double value = (Double) instance;
+            byteBuffer.rewind();
+            byteBuffer.putDouble(value);
+            System.arraycopy(valuesCache, 0, byteArray, 0, 8);
+        } else if (float.class.getName().equals(typeName)) {
+            byteArray = new byte[4];
+            float value = (float) instance;
+            byteBuffer.rewind();
+            byteBuffer.putFloat(value);
+            System.arraycopy(valuesCache, 0, byteArray, 0, 4);
+        } else if (Float.class.getName().equals(typeName)) {
+            byteArray = new byte[4];
+            float value = (Float) instance;
+            byteBuffer.rewind();
+            byteBuffer.putFloat(value);
+            System.arraycopy(valuesCache, 0, byteArray, 0, 4);
+        }
 
-        return null;
+        return byteArray != null ? Optional.of(new ByteArrayData(byteArray)) : Optional.empty();
     }
 
-    @Nullable
-    private BinaryData processArrayValue(Object instance) {
+    @Nonnull
+    public static Optional<BinaryData> processArrayValue(Object instance) {
         String typeName = instance.getClass().getComponentType().getTypeName();
         if (byte.class.getName().equals(typeName)) {
-            return new ByteArrayData((byte[]) instance);
-        } else if (int.class.getName().equals(typeName)) {
-
+            return Optional.of(new ByteArrayData((byte[]) instance));
         }
 
-        return null;
+        PageProvider pageProvider = null;
+        if (boolean.class.getName().equals(typeName)) {
+            pageProvider = new BooleanArrayPageProvider((boolean[]) instance);
+        } else if (Boolean.class.getName().equals(typeName)) {
+            pageProvider = new BoxedBooleanArrayPageProvider((Boolean[]) instance);
+        } else if (Byte.class.getName().equals(typeName)) {
+            pageProvider = new BoxedByteArrayPageProvider((Byte[]) instance);
+        } else if (int.class.getName().equals(typeName)) {
+            pageProvider = new IntegerArrayPageProvider((int[]) instance);
+        } else if (Integer.class.getName().equals(typeName)) {
+            pageProvider = new BoxedIntegerArrayPageProvider((Integer[]) instance);
+        } else if (long.class.getName().equals(typeName)) {
+            pageProvider = new LongArrayPageProvider((long[]) instance);
+        } else if (Long.class.getName().equals(typeName)) {
+            pageProvider = new BoxedLongArrayPageProvider((Long[]) instance);
+        } else if (short.class.getName().equals(typeName)) {
+            pageProvider = new ShortArrayPageProvider((short[]) instance);
+        } else if (Short.class.getName().equals(typeName)) {
+            pageProvider = new BoxedShortArrayPageProvider((Short[]) instance);
+        } else if (char.class.getName().equals(typeName)) {
+            pageProvider = new CharArrayPageProvider((char[]) instance);
+        } else if (Character.class.getName().equals(typeName)) {
+            pageProvider = new BoxedCharArrayPageProvider((Character[]) instance);
+        } else if (double.class.getName().equals(typeName)) {
+            pageProvider = new DoubleArrayPageProvider((double[]) instance);
+        } else if (Double.class.getName().equals(typeName)) {
+            pageProvider = new BoxedDoubleArrayPageProvider((Double[]) instance);
+        } else if (float.class.getName().equals(typeName)) {
+            pageProvider = new FloatArrayPageProvider((float[]) instance);
+        } else if (Float.class.getName().equals(typeName)) {
+            pageProvider = new BoxedFloatArrayPageProvider((Float[]) instance);
+        }
+
+        return pageProvider != null ? Optional.of(new PageProviderBinaryData(pageProvider)) : Optional.empty();
+    }
+
+    @Nonnull
+    public static Optional<BinaryData> processListValue(Object instance) {
+        String typeName = instance.getClass().getComponentType().getTypeName();
+        PageProvider pageProvider = null;
+        if (Boolean.class.getName().equals(typeName)) {
+            pageProvider = new BooleanListPageProvider((List<Boolean>) instance);
+        } else if (Byte.class.getName().equals(typeName)) {
+            pageProvider = new ByteListPageProvider((List<Byte>) instance);
+        } else if (Integer.class.getName().equals(typeName)) {
+            pageProvider = new IntegerListPageProvider((List<Integer>) instance);
+        } else if (Long.class.getName().equals(typeName)) {
+            pageProvider = new LongListPageProvider((List<Long>) instance);
+        } else if (Short.class.getName().equals(typeName)) {
+            pageProvider = new ShortListPageProvider((List<Short>) instance);
+        } else if (Character.class.getName().equals(typeName)) {
+            pageProvider = new CharListPageProvider((List<Character>) instance);
+        } else if (Double.class.getName().equals(typeName)) {
+            pageProvider = new DoubleListPageProvider((List<Double>) instance);
+        } else if (Float.class.getName().equals(typeName)) {
+            pageProvider = new FloatListPageProvider((List<Float>) instance);
+        }
+
+        return pageProvider != null ? Optional.of(new PageProviderBinaryData(pageProvider)) : Optional.empty();
     }
 }

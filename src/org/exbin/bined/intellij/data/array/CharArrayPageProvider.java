@@ -15,20 +15,14 @@
  */
 package org.exbin.bined.intellij.data.array;
 
-import com.sun.jdi.ArrayReference;
-import com.sun.jdi.CharValue;
-import com.sun.jdi.Field;
-import com.sun.jdi.ObjectReference;
-import com.sun.jdi.Value;
 import org.exbin.bined.intellij.data.PageProvider;
 import org.exbin.bined.intellij.data.PageProviderBinaryData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 /**
- * Character array data.
+ * Character array as binary data provider.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.6 2022/05/16
@@ -61,6 +55,6 @@ public class CharArrayPageProvider implements PageProvider {
 
     @Override
     public long getDocumentSize() {
-        return arrayRef.length * 2;
+        return arrayRef.length * 2L;
     }
 }

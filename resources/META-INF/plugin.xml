@@ -34,8 +34,9 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     <change-notes><![CDATA[
 <ul><li>Fixed native file mode (issue #39)</li>
 <li>Added options page</li>
-<li>Added link to online help/manual</li>
+<li>Added action for online help/manual</li>
 <li>Added edit selection action</li>
+<li>Added API: view binary data</li>
 </ul>
     ]]>
     </change-notes>
@@ -82,7 +83,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     </extensions>
 
     <extensionPoints>
-        <extensionPoint name="viewBinaryData" interface="org.exbin.bined.intellij.api.BinEdViewData" dynamic="true"/>
+        <extensionPoint name="viewBinaryData" interface="org.exbin.bined.intellij.api.BinaryViewData" dynamic="true"/>
     </extensionPoints>
 
     <actions>

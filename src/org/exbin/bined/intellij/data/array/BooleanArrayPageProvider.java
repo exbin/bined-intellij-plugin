@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Boolean array as binary data.
+ * Boolean array as binary data provider.
  *
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.6 2022/05/16

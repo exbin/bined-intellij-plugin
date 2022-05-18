@@ -13,53 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.data.array;
+package org.exbin.bined.intellij.data.list;
 
 import org.exbin.bined.intellij.data.PageProvider;
 import org.exbin.bined.intellij.data.PageProviderBinaryData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
- * Boolean array as binary data provider.
+ * Double list as binary data provider.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.6 2022/05/16
+ * @version 0.2.6 2022/05/18
  */
 @ParametersAreNonnullByDefault
-public class BoxedBooleanArrayPageProvider implements PageProvider {
+public class DoubleListPageProvider implements PageProvider {
 
-    private final Boolean[] arrayRef;
+    private final byte[] valuesCache = new byte[8];
+    private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
 
-    public BoxedBooleanArrayPageProvider(Boolean[] arrayRef) {
-        this.arrayRef = arrayRef;
+    private final List<Double> listRef;
+
+    public DoubleListPageProvider(List<Double> listRef) {
+        this.listRef = listRef;
     }
 
     @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
-        int startPos = (int) (pageIndex * PageProviderBinaryData.PAGE_SIZE * 8);
-        int length = PageProviderBinaryData.PAGE_SIZE * 8;
-        long documentSize = getDocumentSize() * 8;
-        if (documentSize - startPos < PageProviderBinaryData.PAGE_SIZE * 8) {
-            length = (int) (documentSize - startPos);
-        }
-        byte[] result = new byte[(length + 7) / 8];
-        int bitMask = 0x80;
-        int bytePos = 0;
+        int pageSize = PageProviderBinaryData.PAGE_SIZE / 8;
+        int startPos = (int) (pageIndex * pageSize);
+        int length = Math.min(listRef.size() - startPos, pageSize);
+        byte[] result = new byte[length * 8];
         for (int i = 0; i < length; i++) {
-            boolean value = arrayRef[startPos + i];
+            double value = listRef.get(startPos + i);
 
-            if (value) {
-                result[bytePos] += bitMask;
-            }
-            if (bitMask == 1) {
-                bitMask = 0x80;
-                bytePos++;
-            } else {
-                bitMask = bitMask >> 1;
-            }
+            byteBuffer.rewind();
+            byteBuffer.putDouble(value);
+            System.arraycopy(valuesCache, 0, result, i * 8, 8);
         }
 
         return result;
@@ -67,6 +61,6 @@ public class BoxedBooleanArrayPageProvider implements PageProvider {
 
     @Override
     public long getDocumentSize() {
-        return (arrayRef.length + 7) / 8;
+        return listRef.size() * 8L;
     }
 }

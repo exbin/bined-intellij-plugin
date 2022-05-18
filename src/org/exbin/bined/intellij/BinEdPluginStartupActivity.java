@@ -27,8 +27,9 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.bined.intellij.api.BinEdViewData;
-import org.exbin.bined.intellij.api.BinEdViewHandler;
+import org.exbin.bined.intellij.api.BinaryViewData;
+import org.exbin.bined.intellij.api.BinaryViewHandler;
+import org.exbin.bined.intellij.data.ObjectValueConvertor;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,6 +41,7 @@ import javax.swing.JComponent;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Post startup activity.
@@ -50,14 +52,16 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public final class BinEdPluginStartupActivity implements StartupActivity, DumbAware {
 
-    private static final ExtensionPointName<BinEdViewData> BINED_VIEW_DATA = ExtensionPointName.create("org.exbin.deltahex.intellij.viewBinaryData");
-    private final BinEdViewHandler viewHandler;
-    private final List<BinEdViewData> initialized = new ArrayList<>();
+    private static final ExtensionPointName<BinaryViewData> BINED_VIEW_DATA = ExtensionPointName.create("org.exbin.deltahex.intellij.viewBinaryData");
+    private final BinaryViewHandler viewHandler;
+    private final List<BinaryViewData> initialized = new ArrayList<>();
 
     BinEdPluginStartupActivity() {
-        viewHandler = new BinEdViewHandler() {
+        viewHandler = new BinaryViewHandler() {
+
+            private final ObjectValueConvertor valueConvertor = new ObjectValueConvertor();
             @Override
-            public void showBinEdViewDialog(@Nullable BinaryData binaryData) {
+            public void showBinaryViewDialog(@Nullable BinaryData binaryData) {
                 Project project = ProjectManager.getInstance().getDefaultProject();
                 ApplicationManager.getApplication().invokeLater(() -> {
                     DataDialog dialog = new DataDialog(project, binaryData);
@@ -67,18 +71,9 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             }
 
             @Override
-            public void showBinEdViewDialog(Object object) {
-                BinaryData data = null;
-                Class<?> objectClass = object.getClass();
-                if (objectClass.isArray()) {
-                    Class<?> componentType = objectClass.getComponentType();
-//                    objectClass.getTy
-//                    ((ArrayClass) objectClass)
-//                    processArrayData();
-                } else {
-
-                }
-                showBinEdViewDialog(data);
+            public void showBinaryViewDialog(Object instance) {
+                Optional<BinaryData> binaryData = valueConvertor.process(instance);
+                binaryData.ifPresent(this::showBinaryViewDialog);
             }
 
             @Override
@@ -100,9 +95,9 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
     }
 
     private void initExtensions() {
-        BINED_VIEW_DATA.extensions().filter(binEdViewData -> !initialized.contains(binEdViewData)).forEach(binEdViewData -> {
-            binEdViewData.passHandler(viewHandler);
-            initialized.add(binEdViewData);
+        BINED_VIEW_DATA.extensions().filter(binaryViewData -> !initialized.contains(binaryViewData)).forEach(binaryViewData -> {
+            binaryViewData.passHandler(viewHandler);
+            initialized.add(binaryViewData);
         });
     }
 
