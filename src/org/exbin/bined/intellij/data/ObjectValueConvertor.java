@@ -46,6 +46,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +54,7 @@ import java.util.Optional;
  * Class value convertor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.6 2022/05/18
+ * @version 0.2.6 2022/05/21
  */
 @ParametersAreNonnullByDefault
 public class ObjectValueConvertor {
@@ -66,7 +67,11 @@ public class ObjectValueConvertor {
 
     @Nonnull
     public Optional<BinaryData> process(Object instance) {
-        if (instance.getClass().isArray()) {
+        if (instance instanceof String) {
+            return Optional.of(new ByteArrayData(((String) instance).getBytes(StandardCharsets.UTF_8)));
+        } else if (instance instanceof BinaryData) {
+            return Optional.of((BinaryData) instance);
+        } else if (instance.getClass().isArray()) {
             return processArrayValue(instance);
         } else if (instance instanceof List) {
             return processListValue(instance);

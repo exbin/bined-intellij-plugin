@@ -25,6 +25,7 @@ import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.FileHandlingMode;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -114,7 +115,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
         providerComboBox.addItem(provider.getName());
     }
 
-    public void setData(BinaryData data) {
+    public void setData(@Nullable BinaryData data) {
         componentPanel.setContentData(data);
     }
 }

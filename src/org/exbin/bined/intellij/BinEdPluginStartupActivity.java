@@ -15,7 +15,6 @@
  */
 package org.exbin.bined.intellij;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.ExtensionPointAdapter;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.PluginDescriptor;
@@ -60,20 +59,48 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
         viewHandler = new BinaryViewHandler() {
 
             private final ObjectValueConvertor valueConvertor = new ObjectValueConvertor();
+
+            @Nonnull
             @Override
-            public void showBinaryViewDialog(@Nullable BinaryData binaryData) {
-                Project project = ProjectManager.getInstance().getDefaultProject();
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    DataDialog dialog = new DataDialog(project, binaryData);
-                    dialog.setTitle("View Binary Data");
-                    dialog.show();
-                });
+            public Optional<BinaryData> instanceToBinaryData(Object instance) {
+                return valueConvertor.process(instance);
             }
 
+            @Nonnull
             @Override
-            public void showBinaryViewDialog(Object instance) {
+            public JComponent createBinaryViewPanel(@Nullable BinaryData binaryData) {
+                DebugViewPanel viewPanel = new DebugViewPanel();
+                viewPanel.setData(binaryData);
+                return viewPanel;
+            }
+
+            @Nonnull
+            @Override
+            public Optional<JComponent> createBinaryViewPanel(Object instance) {
                 Optional<BinaryData> binaryData = valueConvertor.process(instance);
-                binaryData.ifPresent(this::showBinaryViewDialog);
+                DebugViewPanel viewPanel = new DebugViewPanel();
+                if (binaryData.isPresent()) {
+                    viewPanel.setData(binaryData.get());
+                    return Optional.of(viewPanel);
+                }
+
+                return Optional.empty();
+            }
+
+            @Nonnull
+            @Override
+            public DialogWrapper createBinaryViewDialog(@Nullable BinaryData binaryData) {
+                Project project = ProjectManager.getInstance().getDefaultProject();
+                DataDialog dialog = new DataDialog(project, binaryData);
+                dialog.setTitle("View Binary Data");
+                return dialog;
+            }
+
+            @Nonnull
+            @Override
+            public DialogWrapper createBinaryViewDialog(Object instance) {
+                Optional<BinaryData> binaryData = valueConvertor.process(instance);
+                return createBinaryViewDialog(binaryData.orElse(null));
             }
 
             @Override
@@ -119,7 +146,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             setCrossClosesWindow(true);
 
             viewPanel = new DebugViewPanel();
-
+            viewPanel.setData(binaryData);
             init();
         }
 

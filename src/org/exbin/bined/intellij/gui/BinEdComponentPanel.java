@@ -1029,7 +1029,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         return codeArea.getContentData();
     }
 
-    public void setContentData(BinaryData data) {
+    public void setContentData(@Nullable BinaryData data) {
         codeArea.setContentData(data);
 
         documentOriginalSize = codeArea.getDataSize();
