@@ -224,7 +224,22 @@ public class ObjectValueConvertor {
 
     @Nonnull
     public static Optional<BinaryData> processListValue(Object instance) {
-        String typeName = instance.getClass().getComponentType().getTypeName();
+        List<?> listInstance = (List<?>) instance;
+        if (listInstance.isEmpty()) {
+            return Optional.of(new ByteArrayData());
+        }
+        Object firstValue = null;
+        for (Object value : listInstance) {
+            if (value != null) {
+                firstValue = value;
+                break;
+            }
+        }
+        if (firstValue == null) {
+            return Optional.empty();
+        }
+
+        String typeName = firstValue.getClass().getTypeName();
         PageProvider pageProvider = null;
         if (Boolean.class.getName().equals(typeName)) {
             pageProvider = new BooleanListPageProvider((List<Boolean>) instance);

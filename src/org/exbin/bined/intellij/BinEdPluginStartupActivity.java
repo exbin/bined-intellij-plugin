@@ -30,6 +30,9 @@ import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.data.ObjectValueConvertor;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
+import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
+import org.exbin.bined.intellij.gui.BinEdComponentPanel;
+import org.exbin.framework.bined.FileHandlingMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -134,7 +137,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
         private final byte[] valuesCache = new byte[8];
         private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
 
-        private final DebugViewPanel viewPanel;
+        private final BinEdComponentPanel viewPanel;
         private BinaryData binaryData;
 
         private DataDialog(Project project, @Nullable BinaryData binaryData) {
@@ -145,8 +148,26 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             getOKAction().setEnabled(false);
             setCrossClosesWindow(true);
 
-            viewPanel = new DebugViewPanel();
-            viewPanel.setData(binaryData);
+            viewPanel = new BinEdComponentPanel();
+            viewPanel.setFileApi(new BinEdComponentFileApi() {
+                @Override
+                public boolean isSaveSupported() {
+                    return false;
+                }
+
+                @Override
+                public void saveDocument() {
+                }
+
+                @Override
+                public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
+                }
+
+                @Override
+                public void closeData() {
+                }
+            });
+            viewPanel.setContentData(binaryData);
             init();
         }
 

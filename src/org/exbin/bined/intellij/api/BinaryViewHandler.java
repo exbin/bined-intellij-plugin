@@ -40,6 +40,7 @@ public interface BinaryViewHandler extends PluginAware {
      * @param instance instance
      * @return binary data if supported
      */
+    @Nonnull
     Optional<BinaryData> instanceToBinaryData(Object instance);
 
     /**
@@ -75,5 +76,6 @@ public interface BinaryViewHandler extends PluginAware {
      * @param instance class instance
      * @return binary view dialog
      */
+    @Nonnull
     DialogWrapper createBinaryViewDialog(Object instance);
 }
