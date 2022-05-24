@@ -51,7 +51,7 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
     public void update(@NotNull AnActionEvent event) {
         super.update(event);
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
-        event.getPresentation().setEnabledAndVisible(virtualFile != null && virtualFile.isValid() && !(virtualFile.getFileType() instanceof DirectoryFileType || virtualFile.getFileType() instanceof UnknownFileType));
+        event.getPresentation().setEnabledAndVisible(virtualFile != null && virtualFile.isValid() && !(virtualFile.isDirectory() || virtualFile.getFileType() instanceof DirectoryFileType));
     }
 
     @Override

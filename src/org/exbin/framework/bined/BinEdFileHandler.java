@@ -335,10 +335,12 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         BinaryData data = codeArea.getContentData();
         componentPanel.setContentData(new ByteArrayData());
         if (data instanceof DeltaDocument) {
-            FileDataSource fileSource = Objects.requireNonNull(((DeltaDocument) data).getFileSource());
+            FileDataSource fileSource = ((DeltaDocument) data).getFileSource();
             data.dispose();
-            segmentsRepository.detachFileSource(fileSource);
-            segmentsRepository.closeFileSource(fileSource);
+            if (fileSource != null) {
+                segmentsRepository.detachFileSource(fileSource);
+                segmentsRepository.closeFileSource(fileSource);
+            }
         } else {
             if (data != null) {
                 data.dispose();

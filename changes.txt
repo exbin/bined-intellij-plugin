@@ -1,3 +1,5 @@
+0.2.7
+
 0.2.6 (2022-05-22)
 - Fixed native file mode (issue #39)
 - Added options page
