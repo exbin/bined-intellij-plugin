@@ -113,8 +113,8 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
     public void openFile(VirtualFile virtualFile) {
         boolean editable = virtualFile.isWritable();
 
+        componentPanel.setContentData(new BinEdFileDataWrapper(virtualFile));
         ExtCodeArea codeArea = componentPanel.getCodeArea();
-        codeArea.setContentData(new BinEdFileDataWrapper(virtualFile));
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
         opened = true;

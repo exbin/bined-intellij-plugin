@@ -73,7 +73,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             @Override
             public JComponent createBinaryViewPanel(@Nullable BinaryData binaryData) {
                 DebugViewPanel viewPanel = new DebugViewPanel();
-                viewPanel.setData(binaryData);
+                viewPanel.setContentData(binaryData);
                 return viewPanel;
             }
 
@@ -83,7 +83,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
                 Optional<BinaryData> binaryData = valueConvertor.process(instance);
                 DebugViewPanel viewPanel = new DebugViewPanel();
                 if (binaryData.isPresent()) {
-                    viewPanel.setData(binaryData.get());
+                    viewPanel.setContentData(binaryData.get());
                     return Optional.of(viewPanel);
                 }
 

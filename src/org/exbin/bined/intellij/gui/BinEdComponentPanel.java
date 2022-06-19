@@ -514,7 +514,6 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
     private javax.swing.JPanel codeAreaPanel;
     // End of variables declaration
 
-    @Nonnull
     private void createContextMenu(final JPopupMenu menu, int x, int y) {
         BasicCodeAreaZone positionZone = codeArea.getPainter().getPositionZone(x, y);
 

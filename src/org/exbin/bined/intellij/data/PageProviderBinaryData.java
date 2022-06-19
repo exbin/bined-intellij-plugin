@@ -17,7 +17,6 @@ package org.exbin.bined.intellij.data;
 
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -41,7 +40,7 @@ public class PageProviderBinaryData implements BinaryData {
     private final CachePage[] pages = new CachePage[2];
     private int nextPage = 0;
 
-    public PageProviderBinaryData(@NotNull PageProvider pageProvider) {
+    public PageProviderBinaryData(PageProvider pageProvider) {
         this.pageProvider = pageProvider;
         pages[0] = new CachePage();
         pages[1] = new CachePage();
