@@ -71,6 +71,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -264,7 +265,8 @@ public class XValueNodeConvertor {
         return providers;
     }
 
-    public static XValueNodeImpl getDataNode(AnActionEvent event) {
+    @Nonnull
+    public static Optional<XValueNodeImpl> getDataNode(AnActionEvent event) {
         if (!classesDetected) detectClasses();
 
         List<XValueNodeImpl> selectedNodes = XDebuggerTreeActionBase.getSelectedNodes(event.getDataContext());
@@ -274,28 +276,28 @@ public class XValueNodeConvertor {
             if (javaValueClassAvailable && container instanceof JavaValue) {
                 ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
                 if (descriptor.isString() || descriptor.isArray() || descriptor.isPrimitive() || isBasicType(descriptor)) {
-                    return node;
+                    return Optional.of(node);
                 }
             }
 
             if (pythonValueClassAvailable && container instanceof PyDebugValue) {
-                return node;
+                return Optional.of(node);
             }
 
 //            if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
-//                return node;
+//                return Optional.of(node);
 //            }
 
             if (cValueClassAvailable && container instanceof CidrValue) {
-                return node;
+                return Optional.of(node);
             }
 
             String valueCanonicalName = container.getClass().getCanonicalName();
             if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {
-                return node;
+                return Optional.of(node);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Nullable

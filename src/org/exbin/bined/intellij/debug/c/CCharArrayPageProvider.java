@@ -15,7 +15,10 @@
  */
 package org.exbin.bined.intellij.debug.c;
 
+import com.intellij.xdebugger.XDebuggerManager;
+import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XValuePlace;
+import com.intellij.xdebugger.impl.XDebuggerManagerImpl;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.jetbrains.cidr.execution.debugger.backend.LLValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrElementValue;
@@ -27,6 +30,7 @@ import org.exbin.bined.intellij.data.PageProviderBinaryData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -43,6 +47,7 @@ public class CCharArrayPageProvider implements PageProvider {
     private final ArrayReference arrayRef;
 
     public CCharArrayPageProvider(XValueNodeImpl myDataNode, CidrPhysicalValue cidrValue) {
+        byte[] data = cidrValue.getPreparedVarData().splitNumberAndData().second.getBytes(StandardCharsets.UTF_8);
         LLValue value = cidrValue.getPresentationVar();
 //        ValueRenderer preparedRenderer = cidrValue.getPreparedRenderer();
 //        preparedRenderer.getChildEvaluationExpression()
@@ -57,7 +62,10 @@ public class CCharArrayPageProvider implements PageProvider {
         cidrElementValue.computePresentation(myDataNode, XValuePlace.TREE);
         LLValue var = cidrElementValue.getVar();
         cidrElementValue.computeChildren(myDataNode);
-//        myDataNode.getChildCount()
+        XDebuggerManager debuggerManager = XDebuggerManagerImpl.getInstance(myDataNode.getTree().getProject());
+        XDebuggerEvaluator evaluator = debuggerManager.getCurrentSession().getCurrentStackFrame().getEvaluator();
+//        myDataNode.eva
+        //        myDataNode.getChildCount()
 //        KeyFMap userMap = var.getUserData(GDBDriver.LLVALUE_DATA);
 //        LLValueData preparedVarData = cidrElementValue.getPreparedVarData();
 

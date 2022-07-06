@@ -26,7 +26,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.Toggleable;
 import com.intellij.openapi.actionSystem.ex.ActionButtonLook;
-import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
@@ -42,8 +41,14 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.util.logging.Level;
@@ -218,7 +223,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
             if (mousePressType == CodeTypeSplitAction.SplitButton.MousePressType.Popup) {
                 showGroupInPopup(event, myActionGroup);
             } else if (selectedActionEnabled()) {
-                AnActionEvent newEvent = AnActionEvent.createFromInputEvent(event.getInputEvent(), myPlace, event.getPresentation(), getDataContext());
+                final AnActionEvent newEvent = AnActionEvent.createFromInputEvent(event.getInputEvent(), myPlace, event.getPresentation(), getDataContext());
                 AnAction[] actions = myActionGroup.getChildren(null);
                 if (selectedIndex >= actions.length -1) {
                     selectedIndex = 0;
@@ -228,7 +233,9 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
                 AnAction action = actions[selectedIndex];
                 myPresentation.setIcon(action.getTemplatePresentation().getIcon());
                 myPresentation.setText(action.getTemplatePresentation().getText());
-                ActionUtil.performActionDumbAwareWithCallbacks(action, newEvent, getDataContext());
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    action.actionPerformed(newEvent);
+                });
             }
         }
 

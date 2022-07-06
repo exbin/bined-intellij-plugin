@@ -44,7 +44,7 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
     @Nonnull
     @Override
     protected ValueCollector createCollector(AnActionEvent e) {
-        XValueNodeImpl node = XValueNodeConvertor.getDataNode(e);
+        XValueNodeImpl node = XValueNodeConvertor.getDataNode(e).orElse(null);
         return new ValueCollector(XDebuggerTree.getTree(e.getDataContext())) {
             DebugViewDataDialog dialog = null;
 
@@ -68,8 +68,8 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
     @Override
     public void update(AnActionEvent event) {
         super.update(event);
-        if (XValueNodeConvertor.getDataNode(event) != null) {
-            event.getPresentation().setText("View as Binary");
-        }
+//        if (XValueNodeConvertor.getDataNode(event).isPresent()) {
+//            event.getPresentation().setText("View as Binary");
+//        }
     }
 }
