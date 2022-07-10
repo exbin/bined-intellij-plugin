@@ -22,10 +22,15 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.io.FileTooBigException;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.exbin.auxiliary.paged_data.*;
+import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.paged_data.ByteArrayData;
+import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.auxiliary.paged_data.OutOfBoundsException;
+import org.exbin.auxiliary.paged_data.PagedData;
 import org.exbin.xbup.core.util.StreamUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +45,6 @@ import java.io.OutputStream;
 @ParametersAreNonnullByDefault
 public class BinEdFileDataWrapper implements EditableBinaryData {
 
-	public static final String BROKEN_VIRTUAL_FILE = "Broken virtual file";
     private static final int BUFFER_SIZE = 4096;
     public static final int PAGE_SIZE = 4096;
 
@@ -88,7 +92,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
         try {
             return new ByteArrayData(file.contentsToByteArray());
         } catch (IOException e) {
-            throw new IllegalStateException(BROKEN_VIRTUAL_FILE, e);
+            throw createBrokenVirtualFileException(e);
         }
     }
 
@@ -157,7 +161,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             StreamUtils.copyInputStreamToOutputStream(inputStream, outputStream);
             inputStream.close();
         } catch (IOException e) {
-            throw new IllegalStateException(BROKEN_VIRTUAL_FILE, e);
+            throw createBrokenVirtualFileException(e);
         }
     }
 
@@ -167,7 +171,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
         try {
             return file.getInputStream();
         } catch (IOException e) {
-            throw new IllegalStateException(BROKEN_VIRTUAL_FILE, e);
+            throw createBrokenVirtualFileException(e);
         }
     }
 
@@ -456,7 +460,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
                         }
                     });
                 } else {
-                    throw new IllegalStateException(BROKEN_VIRTUAL_FILE, ex);
+                    throw createBrokenVirtualFileException(ex);
                 }
             }
             resetCache();
@@ -527,7 +531,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
                     inputStream = getCachedInputStream(position + done, true);
                     copied = inputStream.read(cachePages[usedPage].page, done, remains);
                     if (copied < 0) {
-                        throw new IllegalStateException(BROKEN_VIRTUAL_FILE);
+                        throw createBrokenVirtualFileException(null);
                     }
                 }
                 cachePosition += copied;
@@ -538,7 +542,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             cachePages[usedPage].pageIndex = pageIndex;
             nextCachePage = 1 - nextCachePage;
         } catch (IOException e) {
-            throw new IllegalStateException(BROKEN_VIRTUAL_FILE, e);
+            throw createBrokenVirtualFileException(e);
         }
 
         return usedPage;
@@ -551,5 +555,12 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
 
     public interface WriteRunnable {
         void run() throws IOException;
+    }
+
+    @Nonnull
+    private IllegalStateException createBrokenVirtualFileException(@Nullable Exception ex) {
+        String filePath = file.getCanonicalPath();
+        String message = "Broken virtual file" + (filePath != null ? ":" + filePath : "");
+        return new IllegalStateException(message, ex);
     }
 }
