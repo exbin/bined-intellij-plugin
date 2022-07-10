@@ -483,8 +483,8 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Nonnull
-    private InputStream getInputStream(long position) throws IOException {
-        if (cacheInputStream != null && cachePosition <= position) {
+    private InputStream getCachedInputStream(long position, boolean forceRefresh) throws IOException {
+        if (cacheInputStream != null && cachePosition <= position && !forceRefresh) {
             if (cachePosition < position) {
                 StreamUtils.skipInputStreamData(cacheInputStream, position - cachePosition);
                 cachePosition = position;
@@ -517,14 +517,18 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
         long position = pageIndex * PAGE_SIZE;
         long dataSize = getDataSize();
         try {
-            InputStream inputStream = getInputStream(position);
+            InputStream inputStream = getCachedInputStream(position, false);
 
             int done = 0;
             int remains = position + PAGE_SIZE > dataSize ? (int) (dataSize - position) : PAGE_SIZE;
             while (remains > 0) {
                 int copied = inputStream.read(cachePages[usedPage].page, done, remains);
                 if (copied < 0) {
-                    throw new IllegalStateException(BROKEN_VIRTUAL_FILE);
+                    inputStream = getCachedInputStream(position + done, true);
+                    copied = inputStream.read(cachePages[usedPage].page, done, remains);
+                    if (copied < 0) {
+                        throw new IllegalStateException(BROKEN_VIRTUAL_FILE);
+                    }
                 }
                 cachePosition += copied;
                 remains -= copied;
