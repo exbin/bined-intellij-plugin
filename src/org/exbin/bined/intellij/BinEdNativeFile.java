@@ -106,7 +106,7 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
     }
 
     @Nonnull
-    public JPanel getPanel() {
+    public JComponent getComponent() {
         return componentPanel;
     }
 

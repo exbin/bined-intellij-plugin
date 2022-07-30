@@ -15,10 +15,11 @@
  */
 package org.exbin.framework.bined;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Parameters for action to replace for occurences of text or data.
+ * Parameters for action to replace for occurrences of text or data.
  *
  * @version 0.2.0 2016/12/21
  * @author ExBin Project (http://exbin.org)
@@ -33,6 +34,7 @@ public class ReplaceParameters {
     public ReplaceParameters() {
     }
 
+    @Nonnull
     public SearchCondition getCondition() {
         return condition;
     }

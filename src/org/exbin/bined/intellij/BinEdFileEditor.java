@@ -127,7 +127,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
     @Nonnull
     @Override
     public JComponent getComponent() {
-        return virtualFile.getEditorPanel();
+        return virtualFile.getEditorComponent();
     }
 
     @Nullable

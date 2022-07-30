@@ -929,6 +929,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         }
     }
 
+    @Nonnull
     public ExtCodeArea getCodeArea() {
         return codeArea;
     }

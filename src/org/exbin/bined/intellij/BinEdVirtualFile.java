@@ -72,8 +72,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     }
 
     @Nonnull
-    public JPanel getEditorPanel() {
-        return getEditorFile().getPanel();
+    public JComponent getEditorComponent() {
+        return getEditorFile().getComponent();
     }
 
     @Nonnull

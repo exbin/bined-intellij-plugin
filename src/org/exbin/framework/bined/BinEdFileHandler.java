@@ -113,7 +113,7 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
     }
 
     @Nonnull
-    public JPanel getPanel() {
+    public JComponent getComponent() {
         return componentPanel;
     }
 
@@ -143,10 +143,8 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
                 }
             } else {
                 try (InputStream stream = virtualFile.getInputStream()) {
-                    if (stream != null) {
-                        closeData();
-                        openDocument(stream, editable);
-                    }
+                    closeData();
+                    openDocument(stream, editable);
                 } catch (IOException ex) {
                     Logger.getLogger(BinEdFileHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -196,32 +194,6 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
         componentPanel.setContentData(data);
     }
-
-//    public void reopenFile(@Nonnull BinEdVirtualFile virtualFile) {
-//        this.virtualFile = virtualFile;
-//        BinaryData data = codeArea.getContentData();
-//        boolean editable = virtualFile.isWritable();
-//        codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
-//
-//        switchFileHandlingMode(data instanceof DeltaDocument ? FileHandlingMode.DELTA : FileHandlingMode.MEMORY);
-//        if (data instanceof DeltaDocument) {
-//            DeltaDocument document = (DeltaDocument) codeArea.getContentData();
-//            document.setFileSource(((DeltaDocument) data).getFileSource());
-//        }
-//
-//        opened = true;
-//        documentOriginalSize = codeArea.getDataSize();
-//        updateModified();
-//        updateCurrentMemoryMode();
-//
-//        this.undoHandler.clear();
-//        // TODO migrate undo
-//        try {
-//            this.undoHandler.execute(new InsertDataCommand(codeArea, 0, (EditableBinaryData) CMSObjectIdentifiers.data));
-//        } catch (BinaryDataOperationException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     @Override
     public void saveDocument() {
@@ -379,7 +351,6 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
     }
 
     private void setNewData() {
-        ExtCodeArea codeArea = componentPanel.getCodeArea();
         FileHandlingMode fileHandlingMode = componentPanel.getFileHandlingMode();
         if (fileHandlingMode == FileHandlingMode.DELTA) {
             componentPanel.setContentData(segmentsRepository.createDocument());

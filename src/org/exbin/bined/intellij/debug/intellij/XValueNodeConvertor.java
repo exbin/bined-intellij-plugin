@@ -89,12 +89,14 @@ public class XValueNodeConvertor {
     private static boolean pythonValueClassAvailable = false;
     private static boolean cValueClassAvailable = false;
     private static boolean dotNetValueClassAvailable = false;
+    private static boolean goValueClassAvailable = false;
 
     private static final String JAVA_VALUE_CLASS = "com.intellij.debugger.engine.JavaValue";
     private static final String PYTHON_VALUE_CLASS = "com.jetbrains.python.debugger.PyDebugValue";
     private static final String PHP_VALUE_CLASS = "com.jetbrains.php.debug.xdebug.debugger.XdebugValue";
     private static final String C_VALUE_CLASS = "com.jetbrains.cidr.execution.debugger.evaluation.CidrValue";
     private static final String DOTNET_VALUE_CLASS = "com.jetbrains.rider.debugger.DotNetNamedValue";
+    private static final String GO_VALUE_CLASS = "com.goide.dlv.DlvXValue";
 
     private final byte[] valuesCache = new byte[8];
     private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
@@ -123,6 +125,12 @@ public class XValueNodeConvertor {
         try {
             Class.forName(DOTNET_VALUE_CLASS);
             dotNetValueClassAvailable = true;
+        } catch (ClassNotFoundException ignore) {
+        }
+
+        try {
+            Class.forName(GO_VALUE_CLASS);
+            goValueClassAvailable = true;
         } catch (ClassNotFoundException ignore) {
         }
     }
@@ -295,6 +303,11 @@ public class XValueNodeConvertor {
             String valueCanonicalName = container.getClass().getCanonicalName();
             if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {
                 return Optional.of(node);
+            }
+
+            if (GO_VALUE_CLASS.equals(valueCanonicalName)) {
+//                Method myValue = DlvXValue.class.getDeclaredField("myVariable");
+                Class<? extends XValue> aClass = container.getClass();
             }
         }
         return Optional.empty();
