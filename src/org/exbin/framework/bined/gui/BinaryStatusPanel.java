@@ -15,7 +15,6 @@
  */
 package org.exbin.framework.bined.gui;
 
-import com.intellij.ui.components.JBPanel;
 import org.exbin.framework.bined.StatusDocumentSizeFormat;
 import org.exbin.framework.bined.StatusCursorPositionFormat;
 import java.awt.Toolkit;
@@ -62,7 +61,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinaryStatusPanel.class);
 
     private StatusPreferences statusParameters;
-    private StatusControlHandler controller;
+    private Controller controller;
 
     private StatusCursorPositionFormat cursorPositionFormat = new StatusCursorPositionFormat();
     private StatusDocumentSizeFormat documentSizeFormat = new StatusDocumentSizeFormat();
@@ -646,8 +645,8 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
         }
     }
 
-    public void setControlHandler(StatusControlHandler statusControlHandler) {
-        this.controller = statusControlHandler;
+    public void setController(Controller controller) {
+        this.controller = controller;
     }
 
     @Override
@@ -810,7 +809,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     }
 
     @ParametersAreNonnullByDefault
-    public static interface StatusControlHandler {
+    public static interface Controller {
 
         /**
          * Requests change of edit operation from given operation.

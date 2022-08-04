@@ -112,6 +112,8 @@ import java.nio.charset.Charset;
 @ParametersAreNonnullByDefault
 public class BinEdComponentPanel extends JBPanel implements DumbAware {
 
+    private static final String BINED_TANGO_ICON_THEME_PREFIX = "/org/exbin/framework/bined/resources/icons/tango-icon-theme/16x16/actions/";
+    private static final String FRAMEWORK_TANGO_ICON_THEME_PREFIX = "/org/exbin/framework/action/resources/icons/tango-icon-theme/16x16/actions/";
     private static final FileHandlingMode DEFAULT_FILE_HANDLING_MODE = FileHandlingMode.DELTA;
     private static final String ONLINE_HELP_URL = "https://bined.exbin.org/intellij-plugin/?manual";
 
@@ -319,7 +321,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         codeArea.addEditModeChangedListener(binaryStatus::setEditMode);
         binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
 
-        ((BinaryStatusPanel) binaryStatus).setControlHandler(new BinaryStatusPanel.StatusControlHandler() {
+        ((BinaryStatusPanel) binaryStatus).setController(new BinaryStatusPanel.Controller() {
             @Override
             public void changeEditOperation(EditOperation editOperation) {
                 codeArea.setEditOperation(editOperation);
@@ -534,7 +536,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
             }
             default: {
                 final JMenuItem cutMenuItem = new JMenuItem("Cut");
-                ImageIcon cutMenuItemIcon = new ImageIcon(getClass().getResource("/org/exbin/framework/gui/action/resources/icons/tango-icon-theme/16x16/actions/edit-cut.png"));
+                ImageIcon cutMenuItemIcon = new ImageIcon(getClass().getResource(FRAMEWORK_TANGO_ICON_THEME_PREFIX + "edit-cut.png"));
                 cutMenuItem.setIcon(cutMenuItemIcon);
                 cutMenuItem.setDisabledIcon(new ImageIcon(GrayFilter.createDisabledImage(cutMenuItemIcon.getImage())));
                 cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionUtils.getMetaMask()));
@@ -546,7 +548,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 menu.add(cutMenuItem);
 
                 final JMenuItem copyMenuItem = new JMenuItem("Copy");
-                ImageIcon copyMenuItemIcon = new ImageIcon(getClass().getResource("/org/exbin/framework/gui/action/resources/icons/tango-icon-theme/16x16/actions/edit-copy.png"));
+                ImageIcon copyMenuItemIcon = new ImageIcon(getClass().getResource(FRAMEWORK_TANGO_ICON_THEME_PREFIX + "edit-copy.png"));
                 copyMenuItem.setIcon(copyMenuItemIcon);
                 copyMenuItem.setDisabledIcon(new ImageIcon(GrayFilter.createDisabledImage(copyMenuItemIcon.getImage())));
                 copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionUtils.getMetaMask()));
@@ -566,7 +568,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 menu.add(copyAsCodeMenuItem);
 
                 final JMenuItem pasteMenuItem = new JMenuItem("Paste");
-                ImageIcon pasteMenuItemIcon = new ImageIcon(getClass().getResource("/org/exbin/framework/gui/action/resources/icons/tango-icon-theme/16x16/actions/edit-paste.png"));
+                ImageIcon pasteMenuItemIcon = new ImageIcon(getClass().getResource(FRAMEWORK_TANGO_ICON_THEME_PREFIX + "edit-paste.png"));
                 pasteMenuItem.setIcon(pasteMenuItemIcon);
                 pasteMenuItem.setDisabledIcon(new ImageIcon(GrayFilter.createDisabledImage(pasteMenuItemIcon.getImage())));
                 pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionUtils.getMetaMask()));
@@ -590,7 +592,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 menu.add(pasteFromCodeMenuItem);
 
                 final JMenuItem deleteMenuItem = new JMenuItem("Delete");
-                ImageIcon deleteMenuItemIcon = new ImageIcon(getClass().getResource("/org/exbin/framework/gui/action/resources/icons/tango-icon-theme/16x16/actions/edit-delete.png"));
+                ImageIcon deleteMenuItemIcon = new ImageIcon(getClass().getResource(FRAMEWORK_TANGO_ICON_THEME_PREFIX + "edit-delete.png"));
                 deleteMenuItem.setIcon(deleteMenuItemIcon);
                 deleteMenuItem.setDisabledIcon(new ImageIcon(GrayFilter.createDisabledImage(deleteMenuItemIcon.getImage())));
                 deleteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -603,7 +605,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 menu.addSeparator();
 
                 final JMenuItem selectAllMenuItem = new JMenuItem("Select All");
-                selectAllMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/action/resources/icons/tango-icon-theme/16x16/actions/edit-select-all.png")));
+                selectAllMenuItem.setIcon(new ImageIcon(getClass().getResource(FRAMEWORK_TANGO_ICON_THEME_PREFIX + "edit-select-all.png")));
                 selectAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionUtils.getMetaMask()));
                 selectAllMenuItem.addActionListener((ActionEvent e) -> {
                     codeArea.selectAll();
@@ -622,7 +624,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 menu.add(goToMenuItem);
 
                 final JMenuItem findMenuItem = new JMenuItem("Find...");
-                findMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/tango-icon-theme/16x16/actions/edit-find.png")));
+                findMenuItem.setIcon(new ImageIcon(getClass().getResource(BINED_TANGO_ICON_THEME_PREFIX + "edit-find.png")));
                 findMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionUtils.getMetaMask()));
                 findMenuItem.addActionListener((ActionEvent e) -> {
                     searchAction.actionPerformed(e);
@@ -631,7 +633,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 menu.add(findMenuItem);
 
                 final JMenuItem replaceMenuItem = new JMenuItem("Replace...");
-                replaceMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/tango-icon-theme/16x16/actions/edit-find-replace.png")));
+                replaceMenuItem.setIcon(new ImageIcon(getClass().getResource(BINED_TANGO_ICON_THEME_PREFIX + "edit-find-replace.png")));
                 replaceMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionUtils.getMetaMask()));
                 replaceMenuItem.setEnabled(codeArea.isEditable());
                 replaceMenuItem.addActionListener((ActionEvent e) -> {
@@ -662,7 +664,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         menu.add(compareFilesMenuItem);
 
         final JMenuItem optionsMenuItem = new JMenuItem("Options...");
-        optionsMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/gui/options/resources/icons/Preferences16.gif")));
+        optionsMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/options/gui/resources/icons/Preferences16.gif")));
         optionsMenuItem.addActionListener(createOptionsAction());
         menu.add(optionsMenuItem);
 
