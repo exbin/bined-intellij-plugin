@@ -1,4 +1,5 @@
 0.2.7
+- Fixed User Data exception (issue #42)
 
 0.2.6 (2022-05-22)
 - Fixed native file mode (issue #39)
