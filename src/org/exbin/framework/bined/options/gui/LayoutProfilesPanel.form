@@ -20,7 +20,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="profilesListScrollPane" pref="544" max="32767" attributes="1"/>
+                  <Component id="profilesListScrollPane" pref="0" max="32767" attributes="1"/>
                   <Component id="previewPanel" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -30,7 +30,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="profilesControlPanel" alignment="0" pref="483" max="32767" attributes="0"/>
+          <Component id="profilesControlPanel" alignment="0" max="32767" attributes="0"/>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="profilesListScrollPane" min="-2" max="-2" attributes="1"/>

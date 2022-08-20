@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.framework.bined.options.gui;
+package org.exbin.framework.bined.model;
 
 import java.awt.Color;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.event.TableModelEvent;
@@ -105,7 +106,7 @@ public class ColorProfileTableModel implements TableModel {
                 return "Value";
         }
 
-        throw new InvalidParameterException("Unexpected column index " + columnIndex);
+        throw createUnexpectedColumnException(columnIndex);
     }
 
     @Override
@@ -117,7 +118,7 @@ public class ColorProfileTableModel implements TableModel {
                 return Color.class;
         }
 
-        throw new InvalidParameterException("Unexpected column index " + columnIndex);
+        throw createUnexpectedColumnException(columnIndex);
     }
 
     @Override
@@ -129,7 +130,7 @@ public class ColorProfileTableModel implements TableModel {
                 return true;
         }
 
-        throw new InvalidParameterException("Unexpected column index " + columnIndex);
+        throw createUnexpectedColumnException(columnIndex);
     }
 
     @Override
@@ -141,7 +142,7 @@ public class ColorProfileTableModel implements TableModel {
                 return colorProfile == null ? null : colorProfile.getColor(rows.get(rowIndex).colorType);
         }
 
-        throw new InvalidParameterException("Unexpected column index " + columnIndex);
+        throw createUnexpectedColumnException(columnIndex);
     }
 
     @Override
@@ -158,7 +159,7 @@ public class ColorProfileTableModel implements TableModel {
             }
         }
 
-        throw new InvalidParameterException("Unexpected column index " + columnIndex);
+        throw createUnexpectedColumnException(columnIndex);
     }
 
     @Override
@@ -177,6 +178,11 @@ public class ColorProfileTableModel implements TableModel {
 
     private void notifyAllListeners() {
         listeners.forEach((listener) -> listener.tableChanged(new TableModelEvent(this, 0, rows.size() - 1, 1, TableModelEvent.UPDATE)));
+    }
+
+    @Nonnull
+    private static InvalidParameterException createUnexpectedColumnException(int columnIndex) {
+        return new InvalidParameterException("Unexpected column index " + columnIndex);
     }
 
     private static class ColorRow {

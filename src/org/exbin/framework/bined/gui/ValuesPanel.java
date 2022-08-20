@@ -651,7 +651,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 String characterText = characterTextField.getText();
-                if (characterText.length() == 0) {
+                if (characterText.isEmpty()) {
                     throw new InputMismatchException("Empty value not valid");
                 }
 
@@ -674,7 +674,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 String characterText = stringTextField.getText();
-                if (characterText.length() == 0) {
+                if (characterText.isEmpty()) {
                     throw new InputMismatchException("Empty value not valid");
                 }
 

@@ -15,8 +15,10 @@
  */
 package org.exbin.framework.bined.options.gui;
 
+import org.exbin.framework.bined.model.ColorProfileTableModel;
 import java.awt.Color;
 import java.awt.Component;
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.JTable;
@@ -33,6 +35,7 @@ public class ColorCellTableRenderer implements TableCellRenderer {
     public ColorCellTableRenderer() {
     }
 
+    @Nonnull
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         return new ColorCellPanel(new ColorCellPanel.ColorHandler() {

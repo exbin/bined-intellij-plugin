@@ -16,7 +16,6 @@
 package org.exbin.bined.intellij.action;
 
 import org.exbin.bined.SelectionRange;
-import org.exbin.bined.basic.PositionScrollVisibility;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.gui.EditSelectionPanel;
 import org.exbin.framework.bined.gui.GoToBinaryPanel;

@@ -15,7 +15,6 @@
  */
 package org.exbin.framework.bined;
 
-import java.awt.event.MouseEvent;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

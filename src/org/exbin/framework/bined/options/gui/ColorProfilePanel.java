@@ -15,11 +15,13 @@
  */
 package org.exbin.framework.bined.options.gui;
 
+import org.exbin.framework.bined.model.ColorProfileTableModel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.framework.utils.LanguageUtils;
@@ -31,6 +33,7 @@ import org.exbin.framework.utils.WindowUtils;
  * @version 0.2.1 2021/09/21
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class ColorProfilePanel extends javax.swing.JPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ColorProfilePanel.class);

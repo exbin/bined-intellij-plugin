@@ -22,7 +22,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="showValuesPanelCheckBox" alignment="0" max="32767" attributes="0"/>
+                  <Component id="showParsingPanelCheckBox" alignment="0" max="32767" attributes="0"/>
                   <Component id="multiFileModeCheckBox" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -33,7 +33,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="showValuesPanelCheckBox" min="-2" max="-2" attributes="0"/>
+              <Component id="showParsingPanelCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="multiFileModeCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
@@ -51,13 +51,13 @@
         <Property name="name" type="java.lang.String" value="multiFileModeCheckBox" noResource="true"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JCheckBox" name="showValuesPanelCheckBox">
+    <Component class="javax.swing.JCheckBox" name="showParsingPanelCheckBox">
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/bined/options/gui/resources/BinaryAppearanceOptionsPanel.properties" key="showValuesPanelCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/bined/options/gui/resources/BinaryAppearanceOptionsPanel.properties" key="showParsingPanelCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
-        <Property name="name" type="java.lang.String" value="showValuesPanelCheckBox" noResource="true"/>
+        <Property name="name" type="java.lang.String" value="showParsingPanelCheckBox" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>

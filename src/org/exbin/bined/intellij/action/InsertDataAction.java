@@ -28,7 +28,6 @@ import org.exbin.framework.bined.gui.BinaryMultilinePanel;
 import org.exbin.framework.bined.gui.InsertDataPanel;
 import org.exbin.framework.bined.operation.InsertDataOperation;
 import org.exbin.framework.bined.operation.ReplaceDataOperation;
-import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.utils.gui.DefaultControlPanel;

@@ -495,16 +495,16 @@ public class EditSelectionPanel extends javax.swing.JPanel {
 
     @Nonnull
     public Optional<SelectionRange> getSelectionRange() {
-        return Optional.of(new SelectionRange(getStartPositionValue(), getEndPositionValue()));
+        return Optional.of(new SelectionRange(getStartTargetPosition(), getEndTargetPosition()));
     }
 
     public void setSelectionRange(@Nullable SelectionRange selection) {
         if (selection == null) {
-            setStartPositionValue(0);
-            setEndPositionValue(0);
+            setStartTargetPosition(0);
+            setEndTargetPosition(0);
         } else {
-            setStartPositionValue(selection.getStart());
-            setEndPositionValue(selection.getEnd());
+            setStartTargetPosition(selection.getStart());
+            setEndTargetPosition(selection.getEnd());
         }
     }
 

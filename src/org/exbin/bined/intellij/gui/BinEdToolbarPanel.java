@@ -312,7 +312,7 @@ public class BinEdToolbarPanel extends JBPanel {
         AnAction settingsAction = new AnAction(
                 "Options",
                 null,
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/gui/options/resources/icons/Preferences16.gif"))
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/options/gui/resources/icons/Preferences16.gif"))
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.RowWrappingMode;
@@ -38,6 +39,7 @@ import org.exbin.framework.utils.WindowUtils;
  * @version 0.2.0 2021/09/21
  * @author ExBin Project (http://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class PreviewPanel extends javax.swing.JPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(PreviewPanel.class);
