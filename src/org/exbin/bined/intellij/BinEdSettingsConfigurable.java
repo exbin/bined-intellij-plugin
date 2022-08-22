@@ -25,7 +25,7 @@ import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import javax.swing.*;
+import javax.swing.JComponent;
 
 /**
  * Settings component.
@@ -36,6 +36,7 @@ import javax.swing.*;
 public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
     private BinEdOptionsPanelBorder optionsPanelWrapper;
+    private boolean modified = true;
 
     public BinEdSettingsConfigurable() {
     }
@@ -54,17 +55,24 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
         BinaryEditorPreferences preferences = new BinaryEditorPreferences(new IntelliJPreferencesWrapper(BinEdComponentPanel.getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
         optionsPanel.setPreferences(preferences);
         optionsPanel.loadFromPreferences();
+//        optionsPanelWrapper.addFocusListener(new FocusAdapter() {
+//            @Override
+//            public void focusGained(FocusEvent e) {
+//                modified = true;
+//                optionsPanelWrapper.firePropertyChange("modified", false, true);
+//            }
+//        });
         return optionsPanelWrapper;
     }
 
     @Override
     public boolean isModified() {
-        return false;
+        return modified;
     }
 
     @Override
     public void apply() throws ConfigurationException {
         BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
-        optionsPanel.applyToOptions();
+        optionsPanel.saveToPreferences();
     }
 }

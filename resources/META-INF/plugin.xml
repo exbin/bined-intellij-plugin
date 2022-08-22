@@ -77,7 +77,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
         <fileEditorProvider implementation="org.exbin.bined.intellij.BinEdFileEditorProvider"/>
         <fileEditorProvider implementation="org.exbin.bined.intellij.BinEdNativeFileEditorProvider"/>
         <!-- <diff.DiffTool implementation="org.exbin.bined.intellij.BinEdDiffTool"/> -->
-        <applicationConfigurable instance="org.exbin.bined.intellij.BinEdSettingsConfigurable" id="org.exbin.bined.intellij.BinEdSettingsConfigurable" parentId="tools"/>
+        <applicationConfigurable instance="org.exbin.bined.intellij.BinEdSettingsConfigurable" id="org.exbin.bined.intellij.BinEdSettingsConfigurable" parentId="tools" displayName="BinEd Plugin"/>
     </extensions>
 
     <extensionPoints>

@@ -1,4 +1,7 @@
 0.2.7
+- Minor layout fix (issue #45)
+- Fixed settings save (issue #44)
+- Fixed event context does not match assertion (issue #43)
 - Fixed User Data exception (issue #42)
 
 0.2.6 (2022-05-22)
