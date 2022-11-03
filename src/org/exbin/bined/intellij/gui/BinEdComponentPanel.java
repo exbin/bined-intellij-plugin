@@ -78,6 +78,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.GrayFilter;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
@@ -111,6 +112,10 @@ import java.nio.charset.Charset;
  */
 @ParametersAreNonnullByDefault
 public class BinEdComponentPanel extends JBPanel implements DumbAware {
+
+    public static final String ACTION_CLIPBOARD_CUT = "cut-to-clipboard";
+    public static final String ACTION_CLIPBOARD_COPY = "copy-to-clipboard";
+    public static final String ACTION_CLIPBOARD_PASTE = "paste-from-clipboard";
 
     private static final String BINED_TANGO_ICON_THEME_PREFIX = "/org/exbin/framework/bined/resources/icons/tango-icon-theme/16x16/actions/";
     private static final String FRAMEWORK_TANGO_ICON_THEME_PREFIX = "/org/exbin/framework/action/resources/icons/tango-icon-theme/16x16/actions/";
@@ -305,6 +310,26 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                         }
                     }
                 }
+            }
+        });
+
+        ActionMap actionMap = getActionMap();
+        actionMap.put(ACTION_CLIPBOARD_COPY, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeArea.copy();
+            }
+        });
+        actionMap.put(ACTION_CLIPBOARD_CUT, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeArea.cut();
+            }
+        });
+        actionMap.put(ACTION_CLIPBOARD_PASTE, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                codeArea.paste();
             }
         });
     }

@@ -504,7 +504,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
     private void wordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wordTextFieldKeyReleased
         if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
-                Integer intValue = Integer.valueOf(wordTextField.getText());
+                int intValue = Integer.parseInt(wordTextField.getText());
                 if (isSigned()) {
                     if (intValue < SWORD_MIN_VALUE || intValue > SWORD_MAX_VALUE) {
                         throw new NumberFormatException(VALUE_OUT_OF_RANGE);
@@ -533,7 +533,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
     private void intTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_intTextFieldKeyReleased
         if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
-                Long longValue = Long.valueOf(intTextField.getText());
+                long longValue = Long.parseLong(intTextField.getText());
                 if (isSigned()) {
                     if (longValue < Integer.MIN_VALUE || longValue > Integer.MAX_VALUE) {
                         throw new NumberFormatException(VALUE_OUT_OF_RANGE);
@@ -568,7 +568,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
             try {
                 ByteOrder byteOrder = getByteOrder();
                 if (isSigned()) {
-                    Long longValue = Long.valueOf(longTextField.getText());
+                    long longValue = Long.parseLong(longTextField.getText());
 
                     byteBuffer.rewind();
                     if (byteBuffer.order() != byteOrder) {
@@ -609,7 +609,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 ByteOrder byteOrder = getByteOrder();
-                Float floatValue = Float.valueOf(floatTextField.getText());
+                float floatValue = Float.parseFloat(floatTextField.getText());
 
                 byteBuffer.rewind();
                 if (byteBuffer.order() != byteOrder) {
@@ -630,7 +630,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
                 ByteOrder byteOrder = getByteOrder();
-                Double doubleValue = Double.valueOf(doubleTextField.getText());
+                double doubleValue = Double.parseDouble(doubleTextField.getText());
 
                 byteBuffer.rewind();
                 if (byteBuffer.order() != byteOrder) {
@@ -697,7 +697,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
      *
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         WindowUtils.invokeDialog(new ValuesPanel());
     }
 

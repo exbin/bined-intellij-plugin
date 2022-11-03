@@ -19,7 +19,10 @@ import com.google.common.util.concurrent.AbstractFuture;
 import com.intellij.debugger.engine.JavaValue;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.util.NlsContexts;
 import com.intellij.psi.CommonClassNames;
+import com.intellij.xdebugger.XDebuggerManager;
+import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValuePlace;
@@ -60,6 +63,7 @@ import org.exbin.bined.intellij.debug.jdi.JdiShortArrayPageProvider;
 import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.framework.bined.gui.ValuesPanel;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -238,6 +242,28 @@ public class XValueNodeConvertor {
                 }
             }
 
+            if (GO_VALUE_CLASS.equals(valueCanonicalName)) {
+//                myDataNode.getFullValueEvaluator().startEvaluation(new XFullValueEvaluator.XFullValueEvaluationCallback() {
+//                    @Override
+//                    public void evaluated(@NotNull String s) {
+//                        BinaryData data = new ByteArrayData(s.getBytes(Charset.defaultCharset()));
+//                        providers.add(new DefaultDebugViewDataProvider("GO value", data));
+//                    }
+//
+//                    @Override
+//                    public void evaluated(@NotNull String s, @Nullable Font font) {
+//                        System.out.println(s);
+//                    }
+//
+//                    @Override
+//                    public void errorOccurred(@NotNull @NlsContexts.DialogMessage String s) {
+//                        System.out.println(s);
+//                    }
+//                });
+//                Method myValue = DlvXValue.class.getDeclaredField("myVariable");
+//                Class<? extends XValue> aClass = container.getClass();
+            }
+
 //                else if (phpValueClassAvailable && container instanceof XdebugValue) {
 //                    PhpType dataType = ((XdebugValue) container).getType();
 //                    switch (dataType) {
@@ -306,8 +332,7 @@ public class XValueNodeConvertor {
             }
 
             if (GO_VALUE_CLASS.equals(valueCanonicalName)) {
-//                Method myValue = DlvXValue.class.getDeclaredField("myVariable");
-                Class<? extends XValue> aClass = container.getClass();
+                return Optional.of(node);
             }
         }
         return Optional.empty();

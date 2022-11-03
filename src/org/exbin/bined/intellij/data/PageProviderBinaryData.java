@@ -197,6 +197,7 @@ public class PageProviderBinaryData implements BinaryData {
     public void dispose() {
     }
 
+    @Nonnull
     private static IndexOutOfBoundsException createIndexOutOfBoundsException() {
         return new IndexOutOfBoundsException("Requested data out of bounds");
     }

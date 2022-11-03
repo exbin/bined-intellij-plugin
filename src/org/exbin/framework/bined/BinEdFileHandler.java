@@ -56,10 +56,6 @@ import java.util.logging.Logger;
 @ParametersAreNonnullByDefault
 public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
 
-    public static final String ACTION_CLIPBOARD_CUT = "cut-to-clipboard";
-    public static final String ACTION_CLIPBOARD_COPY = "copy-to-clipboard";
-    public static final String ACTION_CLIPBOARD_PASTE = "paste-from-clipboard";
-
     private static SegmentsRepository segmentsRepository = null;
 
     private final BinEdComponentPanel componentPanel;
@@ -81,26 +77,6 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
 
         componentPanel.setModifiedChangeListener(() -> {
             updateModified();
-        });
-
-        ActionMap actionMap = componentPanel.getActionMap();
-        actionMap.put(ACTION_CLIPBOARD_COPY, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.copy();
-            }
-        });
-        actionMap.put(ACTION_CLIPBOARD_CUT, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.cut();
-            }
-        });
-        actionMap.put(ACTION_CLIPBOARD_PASTE, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.paste();
-            }
         });
     }
 
@@ -282,19 +258,15 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         }
     }
 
-    public void closeData(boolean closeFileSource) {
-        if (closeFileSource) {
-            closeData();
+    public void disposeData() {
+        ExtCodeArea codeArea = componentPanel.getCodeArea();
+        BinaryData data = codeArea.getContentData();
+        componentPanel.setContentData(new ByteArrayData());
+        if (data instanceof DeltaDocument) {
+            data.dispose();
         } else {
-            ExtCodeArea codeArea = componentPanel.getCodeArea();
-            BinaryData data = codeArea.getContentData();
-            componentPanel.setContentData(new ByteArrayData());
-            if (data instanceof DeltaDocument) {
+            if (data != null) {
                 data.dispose();
-            } else {
-                if (data != null) {
-                    data.dispose();
-                }
             }
         }
 
@@ -319,6 +291,7 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
             }
         }
         componentPanel.setContentData(null);
+        virtualFile = null;
     }
 
     @Nonnull

@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -47,11 +48,8 @@ import java.util.List;
  * @author ExBin Project (http://exbin.org)
  * @version 0.2.3 2020/07/30
  */
+@ParametersAreNonnullByDefault
 public class BinEdNativeFile implements BinEdComponentFileApi {
-
-    public static final String ACTION_CLIPBOARD_CUT = "cut-to-clipboard";
-    public static final String ACTION_CLIPBOARD_COPY = "copy-to-clipboard";
-    public static final String ACTION_CLIPBOARD_PASTE = "paste-from-clipboard";
 
     private final BinEdComponentPanel componentPanel;
 
@@ -74,26 +72,6 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 
         componentPanel.setModifiedChangeListener(() -> {
             updateModified();
-        });
-
-        ActionMap actionMap = componentPanel.getActionMap();
-        actionMap.put(ACTION_CLIPBOARD_COPY, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.copy();
-            }
-        });
-        actionMap.put(ACTION_CLIPBOARD_CUT, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.cut();
-            }
-        });
-        actionMap.put(ACTION_CLIPBOARD_PASTE, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.paste();
-            }
         });
     }
 
@@ -186,6 +164,7 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
         return false;
     }
 
+    @Nullable
     public JComponent getPreferredFocusedComponent() {
         return componentPanel.getCodeArea();
     }

@@ -63,7 +63,11 @@ public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
 
         FileChooserDescriptor chooserDescriptor = new FileChooserDescriptor(true, false, true, false, false, false);
         VirtualFile virtualFile = FileChooser.chooseFile(chooserDescriptor, project, null);
-        boolean isValid = virtualFile != null && virtualFile.isValid();
+        if (virtualFile == null) {
+            return;
+        }
+
+        boolean isValid = virtualFile.isValid();
         if (isValid && virtualFile.isDirectory()) {
             isValid = false;
             if (virtualFile.getFileType() instanceof ArchiveFileType) {
