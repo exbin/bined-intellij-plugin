@@ -87,7 +87,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
                     } else {
                         Application application = ApplicationManager.getApplication();
                         ApplicationManager.getApplication().invokeLater(() -> {
-                            editorPanel.closeData(true);
+                            editorPanel.closeData();
                         });
                     }
                 }

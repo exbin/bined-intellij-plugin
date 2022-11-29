@@ -19,20 +19,34 @@ import com.google.common.util.concurrent.AbstractFuture;
 import com.intellij.debugger.engine.JavaValue;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.psi.CommonClassNames;
+import com.intellij.xdebugger.XDebugProcess;
+import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
+import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValuePlace;
+import com.intellij.xdebugger.impl.XDebugSessionImpl;
+import com.intellij.xdebugger.impl.evaluate.quick.common.ValueLookupManager;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrPhysicalValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrValue;
 import com.jetbrains.php.debug.common.PhpNavigatableValue;
+import com.jetbrains.php.debug.xdebug.debugger.XdebugValue;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
+import com.jetbrains.rd.framework.IRdCall;
+import com.jetbrains.rider.debugger.DotNetExecutionStack;
+import com.jetbrains.rider.debugger.DotNetNamedValue;
+import com.jetbrains.rider.debugger.DotNetValue;
+import com.jetbrains.rider.model.debuggerWorker.GetEvaluationExpressionArg;
+import com.jetbrains.rider.model.debuggerWorker.ObjectPropertiesProxy;
+import com.jetbrains.rider.model.debuggerWorker.ObjectProxy;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.ArrayType;
 import com.sun.jdi.ByteValue;
@@ -83,7 +97,6 @@ import java.util.logging.Logger;
  * Debug values convertor.
  *
  * @author ExBin Project (http://exbin.org)
- * @version 0.2.6 2022/05/15
  */
 @ParametersAreNonnullByDefault
 public class XValueNodeConvertor {
@@ -148,39 +161,45 @@ public class XValueNodeConvertor {
 
         List<DebugViewDataProvider> providers = new ArrayList<>();
 
-        if (myDataNode != null) {
-            XValue container = myDataNode.getValueContainer();
-            if (javaValueClassAvailable && container instanceof JavaValue) {
-                ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
-                if (descriptor.isPrimitive() || isBasicType(descriptor) || !descriptor.isNull()) {
-                    if (descriptor.isArray()) {
-                        BinaryData data = processArrayData(descriptor);
-                        if (data != null)
-                            providers.add(new DefaultDebugViewDataProvider("binary sequence from array", data));
-                    } else {
-                        BinaryData data = processSimpleValue(descriptor);
-                        if (data != null) {
-                            providers.add(new DefaultDebugViewDataProvider("binary value", data));
-                        }
+        XValue container = myDataNode.getValueContainer();
+        if (javaValueClassAvailable && container instanceof JavaValue) {
+            ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
+            if (descriptor.isPrimitive() || isBasicType(descriptor) || !descriptor.isNull()) {
+                if (descriptor.isArray()) {
+                    BinaryData data = processArrayData(descriptor);
+                    if (data != null)
+                        providers.add(new DefaultDebugViewDataProvider("binary sequence from array", data));
+                } else {
+                    BinaryData data = processSimpleValue(descriptor);
+                    if (data != null) {
+                        providers.add(new DefaultDebugViewDataProvider("binary value", data));
                     }
                 }
             }
+        }
 
-//                if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
-//                    DotNetNamedValue namedValue = (DotNetNamedValue) container;
-//                    ObjectProxy objectProxy = namedValue.getObjectProxy();
-//                    DotNetValue value = new DotNetValue(namedValue.getFrame(), objectProxy, namedValue.getLifetime(), namedValue.getSessionId());
-////                    value.
-//                    ObjectPropertiesProxy properties = objectProxy.getProperties();
-//                    if (properties.isArray()) {
-//                        switch (properties.getType()) {
+        if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
+            DotNetNamedValue namedValue = (DotNetNamedValue) container;
+            Project project = myDataNode.getTree().getProject();
+            XDebuggerManager debuggerManager = XDebuggerManager.getInstance(project);
+            XDebugSession debuggerSession = debuggerManager.getCurrentSession();
+            XStackFrame debuggerStackFrame = debuggerSession.getCurrentStackFrame();
+            ((DotNetExecutionStack) ((XDebugSessionImpl) debuggerSession).getCurrentExecutionStack()).getContext();
+
+//            ObjectProxy objectProxy = namedValue.getObjectProxy();
+//            DotNetValue value = new DotNetValue(namedValue.getFrame(), objectProxy, namedValue.getLifetime(), namedValue.getSessionId());
+///             value.
+//            ObjectPropertiesProxy properties = objectProxy.getProperties();
+//            if (properties.isArray()) {
+//                switch (properties.getType()) {
 //
-//                        }
-//                    }
 //                }
+//            }
+        }
 
-            if (pythonValueClassAvailable && container instanceof PyDebugValue) {
-                String dataType = ((PyDebugValue) container).getType();
+        if (pythonValueClassAvailable && container instanceof PyDebugValue) {
+            String dataType = ((PyDebugValue) container).getType();
+            if (dataType != null) {
                 switch (dataType) {
                     case "bytearray":
                     case "bytes": {
@@ -209,72 +228,58 @@ public class XValueNodeConvertor {
                     }
                 }
             }
+        }
 
-            if (cValueClassAvailable && container instanceof CidrValue) {
-                String dataType = ((CidrValue) container).getEvaluationExpression(true);
-                switch (dataType) {
-                    case "byteArray": {
-                        BinaryData data = new PageProviderBinaryData(new CCharArrayPageProvider(myDataNode, (CidrPhysicalValue) container));
-                        providers.add(new DefaultDebugViewDataProvider("C bytearray value", data));
+        if (cValueClassAvailable && container instanceof CidrValue) {
+            String dataType = ((CidrValue) container).getEvaluationExpression(true);
+//            ((CidrValue) container).getUserData();
+            switch (dataType) {
+                case "byteArray": {
+                    BinaryData data = new PageProviderBinaryData(new CCharArrayPageProvider(myDataNode, (CidrPhysicalValue) container));
+                    providers.add(new DefaultDebugViewDataProvider("C bytearray value", data));
+                    break;
+                }
+                default: {
+
+                }
+            }
+        }
+
+        String valueCanonicalName = container.getClass().getCanonicalName();
+        if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {
+            try {
+                PhpType dataType = ((PhpNavigatableValue) container).getType();
+
+                switch (dataType.toString()) {
+                    case "array": {
+                        Map<String, String> value = ((PhpNavigatableValue) container).getLoadedChildren();
+                        BinaryData data = new PageProviderBinaryData(new PhpByteArrayPageProvider(value));
+                        providers.add(new DefaultDebugViewDataProvider("PHP bytearray value", data));
                         break;
                     }
-                    default: {
-
-                    }
                 }
+            } catch (Exception e) {
+                Logger.getLogger(XValueNodeConvertor.class.getName()).log(Level.SEVERE, null, e);
             }
+        }
 
-            String valueCanonicalName = container.getClass().getCanonicalName();
-            if (PHP_VALUE_CLASS.equals(valueCanonicalName)) {
-                try {
-                    PhpType dataType = ((PhpNavigatableValue) container).getType();
-
-                    switch (dataType.toString()) {
-                        case "array": {
-                            Map<String, String> value = ((PhpNavigatableValue) container).getLoadedChildren();
-                            BinaryData data = new PageProviderBinaryData(new PhpByteArrayPageProvider(value));
-                            providers.add(new DefaultDebugViewDataProvider("PHP bytearray value", data));
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    Logger.getLogger(XValueNodeConvertor.class.getName()).log(Level.SEVERE, null, e);
+        if (GO_VALUE_CLASS.equals(valueCanonicalName)) { // goValueClassAvailable &&
+            try {
+                java.lang.reflect.Field myVariableField = container.getClass().getDeclaredField("myVariable");
+                myVariableField.setAccessible(true);
+                Object myVariable = myVariableField.get(container);
+                if (myVariable != null) {
+                    java.lang.reflect.Field addrField = myVariable.getClass().getDeclaredField("addr");
+                    BigInteger addr = (BigInteger) addrField.get(myVariable);
+                    Project project = myDataNode.getTree().getProject();
+                    XDebuggerManager debuggerManager = XDebuggerManager.getInstance(project);
+                    XDebugSession debuggerSession = debuggerManager.getCurrentSession();
+                    XDebugProcess debugProcess = debuggerSession.getDebugProcess();
+                    XDebuggerEvaluator evaluator = debugProcess.getEvaluator();
+                    // TODO read value somehow
                 }
-            }
-
-            if (GO_VALUE_CLASS.equals(valueCanonicalName)) {
-//                myDataNode.getFullValueEvaluator().startEvaluation(new XFullValueEvaluator.XFullValueEvaluationCallback() {
-//                    @Override
-//                    public void evaluated(@NotNull String s) {
-//                        BinaryData data = new ByteArrayData(s.getBytes(Charset.defaultCharset()));
-//                        providers.add(new DefaultDebugViewDataProvider("GO value", data));
-//                    }
-//
-//                    @Override
-//                    public void evaluated(@NotNull String s, @Nullable Font font) {
-//                        System.out.println(s);
-//                    }
-//
-//                    @Override
-//                    public void errorOccurred(@NotNull @NlsContexts.DialogMessage String s) {
-//                        System.out.println(s);
-//                    }
-//                });
-//                Method myValue = DlvXValue.class.getDeclaredField("myVariable");
-//                Class<? extends XValue> aClass = container.getClass();
-            }
-
-//                else if (phpValueClassAvailable && container instanceof XdebugValue) {
-//                    PhpType dataType = ((XdebugValue) container).getType();
-//                    switch (dataType) {
-//                        case
-//                    }
-//                }
-
-            String rawValue = myDataNode.getRawValue();
-            if (rawValue != null) {
-                BinaryData data = new ByteArrayData(rawValue.getBytes(Charset.defaultCharset()));
-                providers.add(new DefaultDebugViewDataProvider("RAW value", data));
+            } catch (Exception e) {
+                Logger.getLogger(XValueNodeConvertor.class.getName()).log(Level.SEVERE, null, e);
             }
         }
 
@@ -295,6 +300,12 @@ public class XValueNodeConvertor {
                 }
             }
         });
+
+        String rawValue = myDataNode.getRawValue();
+        if (rawValue != null) {
+            BinaryData data = new ByteArrayData(rawValue.getBytes(Charset.defaultCharset()));
+            providers.add(new DefaultDebugViewDataProvider("RAW value", data));
+        }
 
         return providers;
     }
@@ -318,9 +329,9 @@ public class XValueNodeConvertor {
                 return Optional.of(node);
             }
 
-//            if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
-//                return Optional.of(node);
-//            }
+            if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
+                return Optional.of(node);
+            }
 
             if (cValueClassAvailable && container instanceof CidrValue) {
                 return Optional.of(node);

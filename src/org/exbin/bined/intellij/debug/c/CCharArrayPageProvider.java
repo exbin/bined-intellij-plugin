@@ -21,6 +21,7 @@ import com.intellij.xdebugger.frame.XValuePlace;
 import com.intellij.xdebugger.impl.XDebuggerManagerImpl;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.jetbrains.cidr.execution.debugger.backend.LLValue;
+import com.jetbrains.cidr.execution.debugger.backend.LLValueData;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrElementValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrLocalValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrPhysicalValue;
@@ -47,6 +48,8 @@ public class CCharArrayPageProvider implements PageProvider {
     private final ArrayReference arrayRef;
 
     public CCharArrayPageProvider(XValueNodeImpl myDataNode, CidrPhysicalValue cidrValue) {
+//        LLValueData varData = cidrValue.getVarData();
+
         byte[] data = cidrValue.getPreparedVarData().splitNumberAndData().second.getBytes(StandardCharsets.UTF_8);
         LLValue value = cidrValue.getPresentationVar();
 //        ValueRenderer preparedRenderer = cidrValue.getPreparedRenderer();
