@@ -20,7 +20,6 @@ import com.intellij.debugger.engine.JavaValue;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.NlsContexts;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
@@ -31,22 +30,15 @@ import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValuePlace;
 import com.intellij.xdebugger.impl.XDebugSessionImpl;
-import com.intellij.xdebugger.impl.evaluate.quick.common.ValueLookupManager;
 import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrPhysicalValue;
 import com.jetbrains.cidr.execution.debugger.evaluation.CidrValue;
 import com.jetbrains.php.debug.common.PhpNavigatableValue;
-import com.jetbrains.php.debug.xdebug.debugger.XdebugValue;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
-import com.jetbrains.rd.framework.IRdCall;
 import com.jetbrains.rider.debugger.DotNetExecutionStack;
 import com.jetbrains.rider.debugger.DotNetNamedValue;
-import com.jetbrains.rider.debugger.DotNetValue;
-import com.jetbrains.rider.model.debuggerWorker.GetEvaluationExpressionArg;
-import com.jetbrains.rider.model.debuggerWorker.ObjectPropertiesProxy;
-import com.jetbrains.rider.model.debuggerWorker.ObjectProxy;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.ArrayType;
 import com.sun.jdi.ByteValue;
@@ -77,7 +69,6 @@ import org.exbin.bined.intellij.debug.jdi.JdiShortArrayPageProvider;
 import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
 import org.exbin.framework.bined.gui.ValuesPanel;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -161,11 +152,43 @@ public class XValueNodeConvertor {
 
         List<DebugViewDataProvider> providers = new ArrayList<>();
 
+        ChildNodesPageProvider.ValueType childValueType = null;
+
         XValue container = myDataNode.getValueContainer();
         if (javaValueClassAvailable && container instanceof JavaValue) {
             ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
             if (descriptor.isPrimitive() || isBasicType(descriptor) || !descriptor.isNull()) {
                 if (descriptor.isArray()) {
+                    String declaredType = descriptor.getDeclaredType();
+                    if (declaredType != null && declaredType.endsWith("[]")) {
+                        switch (declaredType.substring(0, declaredType.length() - 2)) {
+                            case CommonClassNames.JAVA_LANG_BOOLEAN:
+                            case "boolean":
+                            case CommonClassNames.JAVA_LANG_CHARACTER:
+                            case "char":
+                            case CommonClassNames.JAVA_LANG_BYTE:
+                            case "byte": {
+                                childValueType = ChildNodesPageProvider.ValueType.BYTE;
+                                break;
+                            }
+                            case CommonClassNames.JAVA_LANG_SHORT:
+                            case "short": {
+                                childValueType = ChildNodesPageProvider.ValueType.SHORT;
+                                break;
+                            }
+                            case CommonClassNames.JAVA_LANG_INTEGER:
+                            case "int": {
+                                childValueType = ChildNodesPageProvider.ValueType.INTEGER;
+                                break;
+                            }
+                            case CommonClassNames.JAVA_LANG_LONG:
+                            case "long": {
+                                childValueType = ChildNodesPageProvider.ValueType.LONG;
+                                break;
+                            }
+                        }
+                    }
+
                     BinaryData data = processArrayData(descriptor);
                     if (data != null)
                         providers.add(new DefaultDebugViewDataProvider("binary sequence from array", data));
@@ -281,6 +304,11 @@ public class XValueNodeConvertor {
             } catch (Exception e) {
                 Logger.getLogger(XValueNodeConvertor.class.getName()).log(Level.SEVERE, null, e);
             }
+        }
+
+        if (childValueType != null) {
+            BinaryData binaryData = new PageProviderBinaryData(new ChildNodesPageProvider(myDataNode, ChildNodesPageProvider.ValueType.BYTE, myDataNode.getChildCount()));
+            providers.add(new DefaultDebugViewDataProvider("Child Nodes", binaryData));
         }
 
         providers.add(new DebugViewDataProvider() {
