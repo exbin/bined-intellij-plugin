@@ -153,6 +153,7 @@ public class XValueNodeConvertor {
         List<DebugViewDataProvider> providers = new ArrayList<>();
 
         ChildNodesPageProvider.ValueType childValueType = null;
+        long childValueSize = 0;
 
         XValue container = myDataNode.getValueContainer();
         if (javaValueClassAvailable && container instanceof JavaValue) {
@@ -160,7 +161,8 @@ public class XValueNodeConvertor {
             if (descriptor.isPrimitive() || isBasicType(descriptor) || !descriptor.isNull()) {
                 if (descriptor.isArray()) {
                     String declaredType = descriptor.getDeclaredType();
-                    if (declaredType != null && declaredType.endsWith("[]")) {
+                    ArrayReference arrayRef = (ArrayReference) descriptor.getValue();
+                    if (declaredType != null && arrayRef != null && declaredType.endsWith("[]")) {
                         switch (declaredType.substring(0, declaredType.length() - 2)) {
                             case CommonClassNames.JAVA_LANG_BOOLEAN:
                             case "boolean":
@@ -169,21 +171,25 @@ public class XValueNodeConvertor {
                             case CommonClassNames.JAVA_LANG_BYTE:
                             case "byte": {
                                 childValueType = ChildNodesPageProvider.ValueType.BYTE;
+                                childValueSize = arrayRef.length();
                                 break;
                             }
                             case CommonClassNames.JAVA_LANG_SHORT:
                             case "short": {
                                 childValueType = ChildNodesPageProvider.ValueType.SHORT;
+                                childValueSize = arrayRef.length();
                                 break;
                             }
                             case CommonClassNames.JAVA_LANG_INTEGER:
                             case "int": {
                                 childValueType = ChildNodesPageProvider.ValueType.INTEGER;
+                                childValueSize = arrayRef.length();
                                 break;
                             }
                             case CommonClassNames.JAVA_LANG_LONG:
                             case "long": {
                                 childValueType = ChildNodesPageProvider.ValueType.LONG;
+                                childValueSize = arrayRef.length();
                                 break;
                             }
                         }
@@ -307,7 +313,7 @@ public class XValueNodeConvertor {
         }
 
         if (childValueType != null) {
-            BinaryData binaryData = new PageProviderBinaryData(new ChildNodesPageProvider(myDataNode, ChildNodesPageProvider.ValueType.BYTE, myDataNode.getChildCount()));
+            BinaryData binaryData = new PageProviderBinaryData(new ChildNodesPageProvider(myDataNode, ChildNodesPageProvider.ValueType.BYTE, childValueSize));
             providers.add(new DefaultDebugViewDataProvider("Child Nodes", binaryData));
         }
 
