@@ -197,11 +197,11 @@ public class XValueNodeConvertor {
 
                     BinaryData data = processArrayData(descriptor);
                     if (data != null)
-                        providers.add(new DefaultDebugViewDataProvider("binary sequence from array", data));
+                        providers.add(new DefaultDebugViewDataProvider("Binary sequence from array", data));
                 } else {
                     BinaryData data = processSimpleValue(descriptor);
                     if (data != null) {
-                        providers.add(new DefaultDebugViewDataProvider("binary value", data));
+                        providers.add(new DefaultDebugViewDataProvider("Binary value", data));
                     }
                 }
             }
@@ -313,8 +313,8 @@ public class XValueNodeConvertor {
         }
 
         if (childValueType != null) {
-            BinaryData binaryData = new PageProviderBinaryData(new ChildNodesPageProvider(myDataNode, ChildNodesPageProvider.ValueType.BYTE, childValueSize));
-            providers.add(new DefaultDebugViewDataProvider("Child Nodes", binaryData));
+            BinaryData binaryData = new ChildNodesPageProvider(myDataNode, ChildNodesPageProvider.ValueType.BYTE, childValueSize);
+            providers.add(new DefaultDebugViewDataProvider("Debug tree child nodes", binaryData));
         }
 
         providers.add(new DebugViewDataProvider() {

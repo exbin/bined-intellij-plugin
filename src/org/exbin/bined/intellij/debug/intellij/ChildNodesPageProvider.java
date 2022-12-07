@@ -15,28 +15,27 @@
  */
 package org.exbin.bined.intellij.debug.intellij;
 
-import com.intellij.openapi.util.Pair;
-import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.util.SmartList;
-import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XDebuggerTreeNodeHyperlink;
 import com.intellij.xdebugger.frame.XValue;
-import com.intellij.xdebugger.frame.XValueChildrenList;
+import com.intellij.xdebugger.frame.XValueNode;
+import com.intellij.xdebugger.frame.XValuePlace;
+import com.intellij.xdebugger.impl.ui.XValueTextProvider;
+import com.intellij.xdebugger.impl.ui.tree.nodes.MessageTreeNode;
+import com.intellij.xdebugger.impl.ui.tree.nodes.XValueContainerNode;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
-import org.exbin.bined.intellij.data.PageProvider;
-import org.exbin.bined.intellij.data.PageProviderBinaryData;
+import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.exbin.framework.bined.gui.ValuesPanel;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.tree.TreeNode;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 
 /**
  * Generic reader for debugger view child nodes.
@@ -44,15 +43,14 @@ import java.util.function.BiFunction;
  * @author ExBin Project (http://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class ChildNodesPageProvider implements PageProvider {
+public class ChildNodesPageProvider implements BinaryData {
 
     private final XValueNodeImpl valueNode;
     private final ValueType childValueType;
     private final long childrenCount;
 
-    private byte[] pageCache = null;
-    private long pageCacheIndex = -1;
-    private ValueNodeSegment valueNodeSegment = null;
+    private byte[] dataCache = new byte[0];
+    private long dataCachePosition = 0;
 
     public ChildNodesPageProvider(XValueNodeImpl valueNode, ValueType childValueType, long childrenCount) {
         this.childValueType = childValueType;
@@ -61,87 +59,160 @@ public class ChildNodesPageProvider implements PageProvider {
     }
 
     @Nonnull
+    private XValue getValueNode(int position) {
+        int childCount = valueNode.getChildCount();
+        while (position >= childCount - 1) {
+            // Emulate click on last item
+            try {
+                MessageTreeNode lastChild = (MessageTreeNode) valueNode.getChildAt(childCount - 1);
+                XDebuggerTreeNodeHyperlink link = lastChild.getLink();
+                if (link != null) {
+                    link.onClick(new MouseEvent(new JButton("CLICK"), MouseEvent.MOUSE_CLICKED, System.currentTimeMillis(), 0, 0, 0, 2, false));
+                    //                int limit = 100;
+                    //                while (limit > 0 && childCount <= valueNode.getChildCount()) {
+                    //                    try {
+                    //                        Thread.sleep(100);
+                    //                    } catch (InterruptedException e) {
+                    //                        e.printStackTrace();
+                    //                    }
+                    //                    limit--;
+                    //                }
+                }
+            } catch (ClassCastException ex) {
+                // Cannot call children loader
+            }
+            int newChildCount = valueNode.getChildCount();
+            if (newChildCount <= childCount) {
+//                throw new IllegalStateException("Broken loading at position " + newChildCount);
+                break;
+            } else {
+                childCount = newChildCount;
+            }
+        }
+        try {
+            TreeNode child = valueNode.getChildAt(position);
+            return ((XValueContainerNode<XValue>) child).getValueContainer();
+        } catch (IndexOutOfBoundsException | ClassCastException ex) {
+            return new XValue() {
+                @Override
+                public void computePresentation(@Nonnull XValueNode xValueNode, @Nonnull XValuePlace xValuePlace) {
+                    xValueNode.setPresentation(null, "0", "0", false);
+                }
+            };
+        }
+    }
+
     @Override
-    public byte[] getPage(long pageIndex) {
-        if (pageCacheIndex == pageIndex) {
-            return pageCache;
-        }
+    public boolean isEmpty() {
+        return childrenCount == 0;
+    }
 
-        int startPos = (int) (pageIndex * PageProviderBinaryData.PAGE_SIZE);
-        int length = PageProviderBinaryData.PAGE_SIZE;
-        long documentSize = getDocumentSize();
-        if (documentSize - startPos < PageProviderBinaryData.PAGE_SIZE) {
-            length = (int) (documentSize - startPos);
-        }
+    @Override
+    public long getDataSize() {
+        return childValueType.valueByteSize * childrenCount;
+    }
 
-        byte[] result = new byte[length];
+    @Override
+    public byte getByte(long position) {
         if (childValueType == ValueType.BYTE) {
-            for (int i = 0; i < result.length; i++) {
-                try {
-                    result[i] = Byte.parseByte(getValueNode(startPos + i).toString());
-                } catch (NumberFormatException ex) {
-                    result[i] = 0;
-                }
+            XValue valueContainer = getValueNode((int) position);
+            String valueText;
+            try {
+                valueText = ((XValueTextProvider) valueContainer).getValueText();
+            } catch (ClassCastException ex) {
+                valueText = valueContainer.toString();
             }
-        } else {
-            byte[] childValue = new byte[childValueType.valueByteSize];
-            for (int i = 0; i < result.length; i++) {
-                int offset = i % childValueType.valueByteSize;
-                if (offset == 0) {
-                    XValue valueNode = getValueNode(i / childValueType.valueByteSize);
-                    switch (childValueType) {
-                        case SHORT: {
-                            short value = Short.parseShort(valueNode.toString());
-                            childValue[0] = (byte) (value >> 8);
-                            childValue[1] = (byte) (value & 0xff);
-                            break;
-                        }
-                        case INTEGER: {
-                            int value = Integer.parseInt(valueNode.toString());
-                            childValue[0] = (byte) (value >> 24);
-                            childValue[1] = (byte) ((value >> 16) & 0xff);
-                            childValue[2] = (byte) ((value >> 8) & 0xff);
-                            childValue[3] = (byte) (value & 0xff);
-                            break;
-                        }
-                        case LONG: {
-                            long value = Long.parseLong(valueNode.toString());
-                            BigInteger bigInteger = BigInteger.valueOf(value);
-                            for (int bit = 0; bit < 7; bit++) {
-                                BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
-                                childValue[7 - bit] = nextByte.byteValue();
-                                bigInteger = bigInteger.shiftRight(8);
-                            }
-                            break;
-                        }
-                    }
-                }
-                result[i] = childValue[offset];
+            try {
+                return (byte) Short.parseShort(valueText);
+            } catch (NumberFormatException ex) {
+                return 0;
             }
         }
 
-        pageCache = result;
-        pageCacheIndex = pageIndex;
-        return result;
+        if (dataCachePosition <= position && dataCachePosition + dataCache.length > position) {
+            return dataCache[(int) (position - dataCachePosition)];
+        }
+
+        if (dataCache.length == 0) {
+            dataCache = new byte[childValueType.valueByteSize];
+        }
+
+        int offset = (int) (position % childValueType.valueByteSize);
+        dataCachePosition = position - offset;
+        XValue valueContainer = getValueNode((int) (position / childValueType.valueByteSize));
+        String valueText;
+        try {
+            valueText = ((XValueTextProvider) valueContainer).getValueText();
+        } catch (ClassCastException ex) {
+            valueText = valueContainer.toString();
+        }
+        switch (childValueType) {
+            case SHORT: {
+                short value = Short.parseShort(valueText);
+                dataCache[0] = (byte) (value >> 8);
+                dataCache[1] = (byte) (value & 0xff);
+                break;
+            }
+            case INTEGER: {
+                int value = Integer.parseInt(valueText);
+                dataCache[0] = (byte) (value >> 24);
+                dataCache[1] = (byte) ((value >> 16) & 0xff);
+                dataCache[2] = (byte) ((value >> 8) & 0xff);
+                dataCache[3] = (byte) (value & 0xff);
+                break;
+            }
+            case LONG: {
+                long value = Long.parseLong(valueText);
+                BigInteger bigInteger = BigInteger.valueOf(value);
+                for (int bit = 0; bit < 7; bit++) {
+                    BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
+                    dataCache[7 - bit] = nextByte.byteValue();
+                    bigInteger = bigInteger.shiftRight(8);
+                }
+                break;
+            }
+        }
+
+        return dataCache[offset];
     }
 
     @Nonnull
-    private XValue getValueNode(int position) {
-        int segmentIndex = position / 100;
-        int segmentPosition = segmentIndex * 100;
-        int segmentOffset = position % 100;
-        if (valueNodeSegment == null || (valueNodeSegment.getTargetPosition() != segmentPosition)) {
-            valueNodeSegment = new ValueNodeSegment(valueNode, segmentPosition);
+    @Override
+    public BinaryData copy() {
+        return copy(0, getDataSize());
+    }
 
-            valueNode.getValueContainer().computeChildren(valueNodeSegment);
-            valueNodeSegment.waitFor();
+    @Nonnull
+    @Override
+    public BinaryData copy(long startFrom, long length) {
+        ByteArrayEditableData result = new ByteArrayEditableData();
+        result.insertUninitialized(0, length);
+        for (int i = 0; i < length; i++) {
+            result.setByte(i, getByte(startFrom + i));
         }
-        return valueNodeSegment.childrenList.get(segmentOffset);
+        return result;
     }
 
     @Override
-    public long getDocumentSize() {
-        return childValueType.valueByteSize * childrenCount;
+    public void copyToArray(long startFrom, byte[] target, int offset, int length) {
+        for (int i = 0; i < length; i++) {
+            target[offset + i] = getByte(startFrom + i);
+        }
+    }
+
+    @Override
+    public void saveToStream(OutputStream outputStream) throws IOException {
+        throw new UnsupportedOperationException("Save to stream is not supported");
+    }
+
+    @Nonnull
+    @Override
+    public InputStream getDataInputStream() {
+        throw new UnsupportedOperationException("Save to stream is not supported");
+    }
+
+    @Override
+    public void dispose() {
     }
 
     public enum ValueType {
@@ -157,92 +228,92 @@ public class ChildNodesPageProvider implements PageProvider {
         }
     }
 
-    private static class ValueNodeSegment implements XCompositeNode {
-        public static final int TIMEOUT_MS = 25_000;
-
-        private final int targetPosition;
-        private final XValueNodeImpl valueNode;
-        private int position = 0;
-        private List<XValue> childrenList = new SmartList<>();
-        private String myErrorMessage;
-        private final Semaphore myFinished = new Semaphore(0);
-
-        public ValueNodeSegment(XValueNodeImpl valueNode, int targetPosition) {
-            this.valueNode = valueNode;
-            this.targetPosition = targetPosition;
-        }
-
-        public int getTargetPosition() {
-            return targetPosition;
-        }
-
-        @Override
-        public void addChildren(@NotNull XValueChildrenList valueChildrenList, boolean b) {
-            int listSize = valueChildrenList.size();
-            for (int i = 0; i < listSize; i++) {
-                if (position >= targetPosition) {
-                    childrenList.add(valueChildrenList.getValue(i));
-                }
-                position++;
-            }
-        }
-
-        public void tooManyChildren(int remaining) {
-            myFinished.release();
-        }
-
-        @Override
-        public void tooManyChildren(int remaining, @NotNull Runnable addNextChildren) {
-            XCompositeNode.super.tooManyChildren(remaining, addNextChildren);
-        }
-
-        @Override
-        public void setAlreadySorted(boolean b) {
-        }
-
-        public void setMessage(@NotNull String message, Icon icon, @NotNull final SimpleTextAttributes attributes, @Nullable XDebuggerTreeNodeHyperlink link) {
-        }
-
-        public void setErrorMessage(@NotNull String message, @Nullable XDebuggerTreeNodeHyperlink link) {
-            setErrorMessage(message);
-        }
-
-        public void setErrorMessage(@NotNull String errorMessage) {
-            myErrorMessage = errorMessage;
-            myFinished.release();
-        }
-
-        @NotNull
-        public Pair<List<XValue>, String> waitFor() {
-            return waitFor(TIMEOUT_MS);
-        }
-
-        @NotNull
-        public Pair<List<XValue>, String> waitFor(long timeoutMs) {
-            return waitFor(timeoutMs, (semaphore, timeout) -> waitFor(myFinished, timeout));
-        }
-
-        @NotNull
-        public Pair<List<XValue>, String> waitFor(long timeoutMs, BiFunction<? super Semaphore, ? super Long, Boolean> waitFunction) {
-            if (!waitFunction.apply(myFinished, timeoutMs)) {
-                throw new AssertionError("Waiting timed out");
-            }
-
-            return Pair.create(childrenList, myErrorMessage);
-        }
-
-        public static boolean waitFor(Semaphore semaphore, long timeoutInMillis) {
-            long end = System.currentTimeMillis() + timeoutInMillis;
-            long remaining = timeoutInMillis;
-            do {
-                try {
-                    return semaphore.tryAcquire(remaining, TimeUnit.MILLISECONDS);
-                }
-                catch (InterruptedException ignored) {
-                    remaining = end - System.currentTimeMillis();
-                }
-            } while (remaining > 0);
-            return false;
-        }
-    }
+//    private static class ValueNodeSegment implements XCompositeNode {
+//        public static final int TIMEOUT_MS = 25_000;
+//
+//        private final int targetPosition;
+//        private final XValueNodeImpl valueNode;
+//        private int position = 0;
+//        private List<XValue> childrenList = new SmartList<>();
+//        private String myErrorMessage;
+//        private final Semaphore myFinished = new Semaphore(0);
+//
+//        public ValueNodeSegment(XValueNodeImpl valueNode, int targetPosition) {
+//            this.valueNode = valueNode;
+//            this.targetPosition = targetPosition;
+//        }
+//
+//        public int getTargetPosition() {
+//            return targetPosition;
+//        }
+//
+//        @Override
+//        public void addChildren(@NotNull XValueChildrenList valueChildrenList, boolean b) {
+//            int listSize = valueChildrenList.size();
+//            for (int i = 0; i < listSize; i++) {
+//                if (position >= targetPosition) {
+//                    childrenList.add(valueChildrenList.getValue(i));
+//                }
+//                position++;
+//            }
+//        }
+//
+//        public void tooManyChildren(int remaining) {
+//            myFinished.release();
+//        }
+//
+//        @Override
+//        public void tooManyChildren(int remaining, @NotNull Runnable addNextChildren) {
+//            XCompositeNode.super.tooManyChildren(remaining, addNextChildren);
+//        }
+//
+//        @Override
+//        public void setAlreadySorted(boolean b) {
+//        }
+//
+//        public void setMessage(@NotNull String message, Icon icon, @NotNull final SimpleTextAttributes attributes, @Nullable XDebuggerTreeNodeHyperlink link) {
+//        }
+//
+//        public void setErrorMessage(@NotNull String message, @Nullable XDebuggerTreeNodeHyperlink link) {
+//            setErrorMessage(message);
+//        }
+//
+//        public void setErrorMessage(@NotNull String errorMessage) {
+//            myErrorMessage = errorMessage;
+//            myFinished.release();
+//        }
+//
+//        @NotNull
+//        public Pair<List<XValue>, String> waitFor() {
+//            return waitFor(TIMEOUT_MS);
+//        }
+//
+//        @NotNull
+//        public Pair<List<XValue>, String> waitFor(long timeoutMs) {
+//            return waitFor(timeoutMs, (semaphore, timeout) -> waitFor(myFinished, timeout));
+//        }
+//
+//        @NotNull
+//        public Pair<List<XValue>, String> waitFor(long timeoutMs, BiFunction<? super Semaphore, ? super Long, Boolean> waitFunction) {
+//            if (!waitFunction.apply(myFinished, timeoutMs)) {
+//                throw new AssertionError("Waiting timed out");
+//            }
+//
+//            return Pair.create(childrenList, myErrorMessage);
+//        }
+//
+//        public static boolean waitFor(Semaphore semaphore, long timeoutInMillis) {
+//            long end = System.currentTimeMillis() + timeoutInMillis;
+//            long remaining = timeoutInMillis;
+//            do {
+//                try {
+//                    return semaphore.tryAcquire(remaining, TimeUnit.MILLISECONDS);
+//                }
+//                catch (InterruptedException ignored) {
+//                    remaining = end - System.currentTimeMillis();
+//                }
+//            } while (remaining > 0);
+//            return false;
+//        }
+//    }
 }
