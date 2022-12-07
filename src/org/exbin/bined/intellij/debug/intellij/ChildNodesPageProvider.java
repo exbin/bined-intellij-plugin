@@ -22,6 +22,7 @@ import com.intellij.xdebugger.frame.XValuePlace;
 import com.intellij.xdebugger.impl.ui.XValueTextProvider;
 import com.intellij.xdebugger.impl.ui.tree.nodes.MessageTreeNode;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueContainerNode;
+import com.intellij.xdebugger.impl.ui.tree.nodes.XValueGroupNodeImpl;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
@@ -47,25 +48,29 @@ public class ChildNodesPageProvider implements BinaryData {
 
     private final XValueNodeImpl valueNode;
     private final ValueType childValueType;
+    private final ValueExtractor valueExtractor;
     private final long childrenCount;
 
     private byte[] dataCache = new byte[0];
     private long dataCachePosition = 0;
 
-    public ChildNodesPageProvider(XValueNodeImpl valueNode, ValueType childValueType, long childrenCount) {
+    public ChildNodesPageProvider(XValueNodeImpl valueNode, ValueType childValueType, long childrenCount, ValueExtractor valueExtractor) {
         this.childValueType = childValueType;
         this.valueNode = valueNode;
         this.childrenCount = childrenCount;
+        this.valueExtractor = valueExtractor;
     }
 
     @Nonnull
     private XValue getValueNode(int position) {
         int childCount = valueNode.getChildCount();
-        while (position >= childCount - 1) {
-            // Emulate click on last item
-            try {
-                MessageTreeNode lastChild = (MessageTreeNode) valueNode.getChildAt(childCount - 1);
-                XDebuggerTreeNodeHyperlink link = lastChild.getLink();
+        TreeNode firstChild = valueNode.getChildAt(0);
+        if (firstChild instanceof XValueGroupNodeImpl) {
+            int groupIndex = position / 100;
+            TreeNode groupNode = valueNode.getChildAt(groupIndex);
+            TreeNode firstGroupChild = groupNode.getChildAt(0);
+            if (firstGroupChild instanceof MessageTreeNode) {
+                XDebuggerTreeNodeHyperlink link = ((MessageTreeNode) firstGroupChild).getLink();
                 if (link != null) {
                     link.onClick(new MouseEvent(new JButton("CLICK"), MouseEvent.MOUSE_CLICKED, System.currentTimeMillis(), 0, 0, 0, 2, false));
                     //                int limit = 100;
@@ -78,27 +83,70 @@ public class ChildNodesPageProvider implements BinaryData {
                     //                    limit--;
                     //                }
                 }
-            } catch (ClassCastException ex) {
-                // Cannot call children loader
             }
-            int newChildCount = valueNode.getChildCount();
-            if (newChildCount <= childCount) {
-//                throw new IllegalStateException("Broken loading at position " + newChildCount);
-                break;
-            } else {
-                childCount = newChildCount;
+            try {
+                TreeNode child = groupNode.getChildAt(position % 100);
+                return ((XValueContainerNode<XValue>) child).getValueContainer();
+            } catch (IndexOutOfBoundsException | ClassCastException ex) {
+                return new XValue() {
+                    @Override
+                    public void computePresentation(@Nonnull XValueNode xValueNode, @Nonnull XValuePlace xValuePlace) {
+                        xValueNode.setPresentation(null, "0", "0", false);
+                    }
+
+                    @Nonnull
+                    @Override
+                    public String toString() {
+                        return "0";
+                    }
+                };
             }
-        }
-        try {
-            TreeNode child = valueNode.getChildAt(position);
-            return ((XValueContainerNode<XValue>) child).getValueContainer();
-        } catch (IndexOutOfBoundsException | ClassCastException ex) {
-            return new XValue() {
-                @Override
-                public void computePresentation(@Nonnull XValueNode xValueNode, @Nonnull XValuePlace xValuePlace) {
-                    xValueNode.setPresentation(null, "0", "0", false);
+        } else {
+            while (position >= childCount - 1) {
+                // Emulate click on last item
+                try {
+                    MessageTreeNode lastChild = (MessageTreeNode) valueNode.getChildAt(childCount - 1);
+                    XDebuggerTreeNodeHyperlink link = lastChild.getLink();
+                    if (link != null) {
+                        link.onClick(new MouseEvent(new JButton("CLICK"), MouseEvent.MOUSE_CLICKED, System.currentTimeMillis(), 0, 0, 0, 2, false));
+                        //                int limit = 100;
+                        //                while (limit > 0 && childCount <= valueNode.getChildCount()) {
+                        //                    try {
+                        //                        Thread.sleep(100);
+                        //                    } catch (InterruptedException e) {
+                        //                        e.printStackTrace();
+                        //                    }
+                        //                    limit--;
+                        //                }
+                    }
+                } catch (ClassCastException ex) {
+                    // Cannot call children loader
                 }
-            };
+                int newChildCount = valueNode.getChildCount();
+                if (newChildCount <= childCount) {
+                    //                throw new IllegalStateException("Broken loading at position " + newChildCount);
+                    break;
+                } else {
+                    childCount = newChildCount;
+                }
+            }
+            try {
+                TreeNode child = valueNode.getChildAt(position);
+                return ((XValueContainerNode<XValue>) child).getValueContainer();
+            } catch (IndexOutOfBoundsException | ClassCastException ex) {
+                return new XValue() {
+                    @Override
+                    public void computePresentation(@Nonnull XValueNode xValueNode, @Nonnull XValuePlace xValuePlace) {
+                        xValueNode.setPresentation(null, "0", "0", false);
+                    }
+
+                    @Nonnull
+                    @Override
+                    public String toString() {
+                        return "0";
+                    }
+                };
+            }
         }
     }
 
@@ -109,23 +157,40 @@ public class ChildNodesPageProvider implements BinaryData {
 
     @Override
     public long getDataSize() {
+        if (childValueType.valueByteSize == 0) {
+            switch (childValueType) {
+                case BOOLEAN: {
+                    return (childrenCount + 7) / 8;
+                }
+            }
+        }
         return childValueType.valueByteSize * childrenCount;
     }
 
     @Override
     public byte getByte(long position) {
-        if (childValueType == ValueType.BYTE) {
-            XValue valueContainer = getValueNode((int) position);
-            String valueText;
-            try {
-                valueText = ((XValueTextProvider) valueContainer).getValueText();
-            } catch (ClassCastException ex) {
-                valueText = valueContainer.toString();
+        switch (childValueType) {
+            case BOOLEAN: {
+                try {
+                    byte result = 0;
+                    for (int i = 0; i < 8; i++) {
+                        XValue valueContainer = getValueNode((int) position * 8 + i);
+                        String valueText = valueExtractor.getValueText(valueContainer);
+                        result = (byte) ((result << 1) + (Boolean.parseBoolean(valueText) ? 1 : 0));
+                    }
+                    return result;
+                } catch (NumberFormatException ex) {
+                    return 0;
+                }
             }
-            try {
-                return (byte) Short.parseShort(valueText);
-            } catch (NumberFormatException ex) {
-                return 0;
+            case BYTE: {
+                XValue valueContainer = getValueNode((int) position);
+                String valueText = valueExtractor.getValueText(valueContainer);
+                try {
+                    return (byte) Short.parseShort(valueText);
+                } catch (NumberFormatException ex) {
+                    return 0;
+                }
             }
         }
 
@@ -140,12 +205,7 @@ public class ChildNodesPageProvider implements BinaryData {
         int offset = (int) (position % childValueType.valueByteSize);
         dataCachePosition = position - offset;
         XValue valueContainer = getValueNode((int) (position / childValueType.valueByteSize));
-        String valueText;
-        try {
-            valueText = ((XValueTextProvider) valueContainer).getValueText();
-        } catch (ClassCastException ex) {
-            valueText = valueContainer.toString();
-        }
+        String valueText = valueExtractor.getValueText(valueContainer);
         switch (childValueType) {
             case SHORT: {
                 short value = Short.parseShort(valueText);
@@ -215,7 +275,22 @@ public class ChildNodesPageProvider implements BinaryData {
     public void dispose() {
     }
 
+    @Nonnull
+    public static String getValueText(XValue valueContainer) {
+        try {
+            return ((XValueTextProvider) valueContainer).getValueText();
+        } catch (ClassCastException ex) {
+            return valueContainer.toString();
+        }
+    }
+
+    public interface ValueExtractor {
+        @Nonnull
+        String getValueText(XValue valueContainer);
+    }
+
     public enum ValueType {
+        BOOLEAN(0),
         BYTE(1),
         SHORT(2),
         INTEGER(4),

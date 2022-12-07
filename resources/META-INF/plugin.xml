@@ -11,7 +11,7 @@
 <li>Associate file extension with Binary File file type in Options/Editor/File Types</li></ul>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.6.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.7.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
 
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
@@ -32,7 +32,11 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Fixed User Data exception (issue #42)</li>
+<ul><li>Added byte array support for some fields for Rider/CLion/GoLand (debug tree child nodes extraction)</li>
+<li>Minor layout fix (issue #45)</li>
+<li>Fixed settings save (issue #44)</li>
+<li>Fixed event context does not match assertion (issue #43)</li>
+<li>Fixed User Data exception (issue #42)</li>
 </ul>
     ]]>
     </change-notes>

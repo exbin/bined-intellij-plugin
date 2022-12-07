@@ -1,4 +1,5 @@
 0.2.7
+- Added byte array support for some fields for Rider/CLion/GoLand (debug tree child nodes extraction)
 - Minor layout fix (issue #45)
 - Fixed settings save (issue #44)
 - Fixed event context does not match assertion (issue #43)
