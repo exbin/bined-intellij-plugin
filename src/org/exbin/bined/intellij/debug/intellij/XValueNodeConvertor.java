@@ -31,7 +31,6 @@ import com.jetbrains.cidr.execution.debugger.evaluation.CidrValue;
 import com.jetbrains.php.debug.common.PhpNavigatableValue;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.python.debugger.PyDebugValue;
-import com.jetbrains.rider.debugger.DotNetNamedValue;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.ArrayType;
 import com.sun.jdi.ByteValue;
@@ -206,64 +205,6 @@ public class XValueNodeConvertor {
                     }
                 }
             }
-        }
-
-        if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
-            String typeName = myDataNode.getRawValue();
-            int arraySizePos = typeName.indexOf("[");
-            if (arraySizePos > 0) {
-                try {
-                    String childType = typeName.substring(0, arraySizePos);
-                    int arraySize = Integer.parseInt(typeName.substring(arraySizePos + 1, typeName.length() - 1));
-                    childValueExtractor = XValueNodeConvertor::getDotNetValueText;
-                    switch (childType) {
-                        case "bool": {
-                            childValueType = ChildNodesPageProvider.ValueType.BOOLEAN;
-                            childValueSize = arraySize;
-                            break;
-                        }
-                        case "byte": {
-                            childValueType = ChildNodesPageProvider.ValueType.BYTE;
-                            childValueSize = arraySize;
-                            break;
-                        }
-                        case "short": {
-                            childValueType = ChildNodesPageProvider.ValueType.SHORT;
-                            childValueSize = arraySize;
-                            break;
-                        }
-                        case "int": {
-                            childValueType = ChildNodesPageProvider.ValueType.INTEGER;
-                            childValueSize = arraySize;
-                            break;
-                        }
-                        case "long": {
-                            childValueType = ChildNodesPageProvider.ValueType.LONG;
-                            childValueSize = arraySize;
-                            break;
-                        }
-                    }
-                } catch (Exception ex) {
-                }
-            }
-
-//            DotNetNamedValue namedValue = (DotNetNamedValue) container;
-//            Project project = myDataNode.getTree().getProject();
-//            XDebuggerManager debuggerManager = XDebuggerManager.getInstance(project);
-//            XDebugSession debuggerSession = debuggerManager.getCurrentSession();
-//            XStackFrame debuggerStackFrame = debuggerSession.getCurrentStackFrame();
-//            ((DotNetExecutionStack) ((XDebugSessionImpl) debuggerSession).getCurrentExecutionStack()).getContext();
-//
-//            ObjectProxy objectProxy = namedValue.getObjectProxy();
-//            DotNetValue value = new DotNetValue(namedValue.getFrame(), objectProxy, namedValue.getLifetime(), namedValue.getSessionId());
-///             value.
-//            ObjectPropertiesProxy properties = objectProxy.getProperties();
-//            if (properties.isArray()) {
-//                switch (properties.getType()) {
-//
-//                }
-//            }
-            // TODO Extract value somehow
         }
 
         if (pythonValueClassAvailable && container instanceof PyDebugValue) {
@@ -452,6 +393,64 @@ public class XValueNodeConvertor {
             }
         }
 
+        if (dotNetValueClassAvailable && DOTNET_VALUE_CLASS.equals(valueCanonicalName)) {
+            String typeName = myDataNode.getRawValue();
+            int arraySizePos = typeName.indexOf("[");
+            if (arraySizePos > 0) {
+                try {
+                    String childType = typeName.substring(0, arraySizePos);
+                    int arraySize = Integer.parseInt(typeName.substring(arraySizePos + 1, typeName.length() - 1));
+                    childValueExtractor = XValueNodeConvertor::getDotNetValueText;
+                    switch (childType) {
+                        case "bool": {
+                            childValueType = ChildNodesPageProvider.ValueType.BOOLEAN;
+                            childValueSize = arraySize;
+                            break;
+                        }
+                        case "byte": {
+                            childValueType = ChildNodesPageProvider.ValueType.BYTE;
+                            childValueSize = arraySize;
+                            break;
+                        }
+                        case "short": {
+                            childValueType = ChildNodesPageProvider.ValueType.SHORT;
+                            childValueSize = arraySize;
+                            break;
+                        }
+                        case "int": {
+                            childValueType = ChildNodesPageProvider.ValueType.INTEGER;
+                            childValueSize = arraySize;
+                            break;
+                        }
+                        case "long": {
+                            childValueType = ChildNodesPageProvider.ValueType.LONG;
+                            childValueSize = arraySize;
+                            break;
+                        }
+                    }
+                } catch (Exception ex) {
+                }
+            }
+
+//            DotNetNamedValue namedValue = (DotNetNamedValue) container;
+//            Project project = myDataNode.getTree().getProject();
+//            XDebuggerManager debuggerManager = XDebuggerManager.getInstance(project);
+//            XDebugSession debuggerSession = debuggerManager.getCurrentSession();
+//            XStackFrame debuggerStackFrame = debuggerSession.getCurrentStackFrame();
+//            ((DotNetExecutionStack) ((XDebugSessionImpl) debuggerSession).getCurrentExecutionStack()).getContext();
+//
+//            ObjectProxy objectProxy = namedValue.getObjectProxy();
+//            DotNetValue value = new DotNetValue(namedValue.getFrame(), objectProxy, namedValue.getLifetime(), namedValue.getSessionId());
+///             value.
+//            ObjectPropertiesProxy properties = objectProxy.getProperties();
+//            if (properties.isArray()) {
+//                switch (properties.getType()) {
+//
+//                }
+//            }
+            // TODO Extract value somehow
+        }
+
         if (VARIABLE_VIEW_VALUE_CLASS.equals(valueCanonicalName)) {
             org.jetbrains.debugger.values.Value value = ((VariableView) container).getValue();
             String valueType = value.getValueString();
@@ -496,7 +495,7 @@ public class XValueNodeConvertor {
         if (childValueType != null) {
             // Debug tree child nodes extraction calls child tree nodes generation in GUI and tries to extract single values from it
             BinaryData binaryData = new ChildNodesPageProvider(myDataNode, childValueType, childValueSize, childValueExtractor);
-            providers.add(new DefaultDebugViewDataProvider("Debug tree child nodes", binaryData));
+            providers.add(new DefaultDebugViewDataProvider("Tree child nodes (lazy)", binaryData));
         }
 
         providers.add(new DebugViewDataProvider() {
@@ -545,10 +544,6 @@ public class XValueNodeConvertor {
                 return Optional.of(node);
             }
 
-            if (dotNetValueClassAvailable && container instanceof DotNetNamedValue) {
-                return Optional.of(node);
-            }
-
             if (cValueClassAvailable && container instanceof CidrValue) {
                 return Optional.of(node);
             }
@@ -559,6 +554,10 @@ public class XValueNodeConvertor {
             }
 
             if (GO_VALUE_CLASS.equals(valueCanonicalName)) {
+                return Optional.of(node);
+            }
+
+            if (dotNetValueClassAvailable && DOTNET_VALUE_CLASS.equals(valueCanonicalName)) {
                 return Optional.of(node);
             }
 

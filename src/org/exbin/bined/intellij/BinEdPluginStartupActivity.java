@@ -125,7 +125,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
     }
 
     private void initExtensions() {
-        BINED_VIEW_DATA.extensions().filter(binaryViewData -> !initialized.contains(binaryViewData)).forEach(binaryViewData -> {
+        BINED_VIEW_DATA.getExtensionList().stream().filter(binaryViewData -> !initialized.contains(binaryViewData)).forEach(binaryViewData -> {
             binaryViewData.passHandler(viewHandler);
             initialized.add(binaryViewData);
         });

@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://bined.exbin.org/intellij-plugin">
     <id>org.exbin.deltahex.intellij</id>
     <name>BinEd - Binary/Hexadecimal Editor</name>
-    <version>0.2.7.snapshot</version>
+    <version>0.2.7</version>
     <vendor email="exbinproject@gmail.com" url="https://exbin.org">ExBin Project</vendor>
 
     <description><![CDATA[
@@ -24,7 +24,7 @@
 <li>Show debug variables as binary data</li></ul>
 
 <h1>License</h1>
-<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>
+<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>
 
 <h1>Links</h1>
 Homepage: <a href="https://bined.exbin.org/intellij-plugin/">https://bined.exbin.org/intellij-plugin/</a><br/>
@@ -41,10 +41,10 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]>
     </change-notes>
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="211.1"/>
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="debugger-ext.xml">com.intellij.modules.xdebugger</depends>
@@ -92,7 +92,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
         <action id="BinEdEditor.OpenAsBinaryAction" class="org.exbin.bined.intellij.OpenAsBinaryAction"
                 text="Open As Binary" description="Opens file in binary/hexadecimal viewer/editor"
                 icon="/images/icon-idea.png"/>
-        <group>
+        <group id="BinEdEditor.ProjectView">
             <reference id="BinEdEditor.OpenAsBinaryAction"/>
             <add-to-group group-id="ProjectViewPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
         </group>
@@ -103,7 +103,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
             <add-to-group group-id="FileOpenGroup" relative-to-action="OpenFile" anchor="after"/>
         </action>
 
-        <group>
+        <group id="BinEdEditor.Editor">
             <reference id="BinEdEditor.OpenAsBinaryAction"/>
             <add-to-group group-id="EditorPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
         </group>
