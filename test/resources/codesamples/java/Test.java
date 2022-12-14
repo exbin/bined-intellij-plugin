@@ -1,7 +1,7 @@
 import java.nio.ByteBuffer;
 
 /**
- * Testing arrays for binary debug view. 
+ * Testing arrays for binary debug view.
  */
 public class Test {
 

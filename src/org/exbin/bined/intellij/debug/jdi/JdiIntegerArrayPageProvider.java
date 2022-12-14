@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,8 +26,7 @@ import java.util.List;
 /**
  * Integer array data source for debugger view.
  *
- * @author ExBin Project (http://exbin.org)
- * @version 0.1.6 2018/03/03
+ * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class JdiIntegerArrayPageProvider implements PageProvider {

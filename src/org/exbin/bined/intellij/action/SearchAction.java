@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,8 +42,7 @@ import java.util.List;
 /**
  * Search action.
  *
- * @version 0.2.1 2019/07/21
- * @author ExBin Project (http://exbin.org)
+ * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public final class SearchAction implements ActionListener {
@@ -167,7 +166,7 @@ public final class SearchAction implements ActionListener {
             binarySearchPanel.requestSearchFocus();
         }
     }
-    
+
     public void switchReplaceMode(BinarySearchPanel.SearchOperation searchOperation) {
         binarySearchPanel.switchReplaceMode(searchOperation);
     }
