@@ -213,6 +213,10 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         });
     }
 
+    public void reloadFile() {
+        openFile(virtualFile);
+    }
+
     @Override
     public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
         FileHandlingMode fileHandlingMode = componentPanel.getFileHandlingMode();

@@ -34,6 +34,7 @@ import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAreaPainter;
 import org.exbin.bined.intellij.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
+import org.exbin.bined.intellij.BinEdNativeFile;
 import org.exbin.bined.intellij.action.CompareFilesAction;
 import org.exbin.bined.intellij.action.EditSelectionAction;
 import org.exbin.bined.intellij.action.GoToPositionAction;
@@ -48,6 +49,7 @@ import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
 import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
+import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.options.CodeAreaColorOptions;
@@ -139,6 +141,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
     private final InsertDataAction insertDataAction;
     private final EditSelectionAction editSelectionAction;
     private final CompareFilesAction compareFilesAction;
+    private final AbstractAction reloadFileAction;
     private final AbstractAction showHeaderAction;
     private final AbstractAction showRowNumbersAction;
     private final SearchAction searchAction;
@@ -228,6 +231,18 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 boolean showRowPosition = layoutProfile.isShowRowPosition();
                 layoutProfile.setShowRowPosition(!showRowPosition);
                 codeArea.setLayoutProfile(layoutProfile);
+            }
+        };
+        reloadFileAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (releaseFile()) {
+                    if (fileApi instanceof BinEdFileHandler) {
+                        ((BinEdFileHandler) fileApi).reloadFile();
+                    } else if (fileApi instanceof BinEdNativeFile) {
+                        ((BinEdNativeFile) fileApi).reloadFile();
+                    }
+                }
             }
         };
         searchAction = new SearchAction(codeArea, codeAreaPanel);
@@ -331,6 +346,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 codeArea.paste();
             }
         });
+        actionMap.put("reloadFile", reloadFileAction);
     }
 
     public void registerBinaryStatus(BinaryStatusApi binaryStatusApi) {
@@ -686,6 +702,8 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
 
         JMenuItem compareFilesMenuItem = createCompareFilesMenuItem();
         menu.add(compareFilesMenuItem);
+        JMenuItem reloadFileMenuItem = createReloadFileMenuItem();
+        menu.add(reloadFileMenuItem);
 
         final JMenuItem optionsMenuItem = new JMenuItem("Options...");
         optionsMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/options/gui/resources/icons/Preferences16.gif")));
@@ -813,6 +831,14 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         final JMenuItem compareFilesMenuItem = new JMenuItem("Compare Files...");
         compareFilesMenuItem.addActionListener(compareFilesAction);
         return compareFilesMenuItem;
+    }
+
+    @Nonnull
+    private JMenuItem createReloadFileMenuItem() {
+        final JMenuItem reloadFileMenuItem = new JMenuItem("Reload File");
+        reloadFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionUtils.getMetaMask() + KeyEvent.ALT_DOWN_MASK));
+        reloadFileMenuItem.addActionListener(reloadFileAction);
+        return reloadFileMenuItem;
     }
 
     @Nonnull

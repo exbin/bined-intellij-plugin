@@ -130,6 +130,10 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
         // Ignore
     }
 
+    public void reloadFile() {
+        openFile(virtualFile);
+    }
+
     @Override
     public void closeData() {
         BinaryData contentData = componentPanel.getCodeArea().getContentData();
