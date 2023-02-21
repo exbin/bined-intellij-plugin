@@ -17,9 +17,10 @@ package org.exbin.framework.utils.gui;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JButton;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.OkCancelListener;
-import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.utils.UiUtils;
 import org.exbin.framework.utils.handler.MultiStepControlHandler;
 
 /**
@@ -166,24 +167,30 @@ public class MultiStepControlPanel extends javax.swing.JPanel implements MultiSt
     public void performClick(MultiStepControlHandler.ControlActionType actionType) {
         switch (actionType) {
             case FINISH: {
-                WindowUtils.doButtonClick(finishButton);
+                UiUtils.doButtonClick(finishButton);
                 break;
             }
             case CANCEL: {
-                WindowUtils.doButtonClick(cancelButton);
+                UiUtils.doButtonClick(cancelButton);
                 break;
             }
             case NEXT: {
-                WindowUtils.doButtonClick(nextButton);
+                UiUtils.doButtonClick(nextButton);
                 break;
             }
             case PREVIOUS: {
-                WindowUtils.doButtonClick(previousButton);
+                UiUtils.doButtonClick(previousButton);
                 break;
             }
             default:
                 throw new IllegalStateException("Illegal action type " + actionType.name());
         }
+    }
+
+    @Nonnull
+    @Override
+    public JButton getDefaultButton() {
+        return finishButton;
     }
 
     @Nonnull

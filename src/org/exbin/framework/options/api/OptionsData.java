@@ -15,13 +15,10 @@
  */
 package org.exbin.framework.options.api;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 /**
  * Interface for options page.
  *
  * @author ExBin Project (https://exbin.org)
  */
-@ParametersAreNonnullByDefault
 public interface OptionsData {
 }

@@ -19,6 +19,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -47,7 +48,12 @@ public class DropDownButton extends JButton {
         setFocusable(false);
         setActionText((String) action.getValue(Action.NAME));
         addActionListener(action);
-        setToolTipText((String) action.getValue(Action.SHORT_DESCRIPTION));
+        action.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            setEnabled(action.isEnabled());
+        });
+        String toolTipText = (String) action.getValue(Action.SHORT_DESCRIPTION);
+        setToolTipText(toolTipText);
+        setActionTooltip(toolTipText);
 
         setMargin(new Insets(0, 0, 0, 0));
         add(buttonPanel);
@@ -92,6 +98,17 @@ public class DropDownButton extends JButton {
         });
     }
 
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        if (buttonPanel != null) {
+            buttonPanel.updateUI();
+        }
+        if (popupMenu != null) {
+            popupMenu.updateUI();
+        }
+    }
+    
     protected void setRolloverBorder() {
         JButton menuButton = buttonPanel.getMenuButton();
         menuButton.setBorderPainted(true);

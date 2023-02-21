@@ -87,7 +87,7 @@ public class ActionUtils {
      * @param resourceClass resourceClass
      * @param actionId action identifier and bundle key prefix
      */
-    public static void setupAction(Action action, ResourceBundle bundle, Class resourceClass, String actionId) {
+    public static void setupAction(Action action, ResourceBundle bundle, Class<?> resourceClass, String actionId) {
         action.putValue(Action.NAME, bundle.getString(actionId + ACTION_NAME_POSTFIX));
         action.putValue(ACTION_ID, actionId);
 

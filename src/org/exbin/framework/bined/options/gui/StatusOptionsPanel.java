@@ -186,7 +186,7 @@ public class StatusOptionsPanel extends javax.swing.JPanel implements OptionsCap
      *
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         WindowUtils.invokeDialog(new StatusOptionsPanel());
     }
 

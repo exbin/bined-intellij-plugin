@@ -225,7 +225,7 @@ public class TextFontOptionsPanel extends javax.swing.JPanel implements OptionsC
      *
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         WindowUtils.invokeDialog(new TextFontOptionsPanel());
     }
 

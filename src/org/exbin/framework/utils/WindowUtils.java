@@ -42,7 +42,9 @@ import java.util.logging.Logger;
 @ParametersAreNonnullByDefault
 public class WindowUtils {
 
-    private static final int BUTTON_CLICK_TIME = 150;
+    public static final String ESC_CANCEL_KEY = "esc-cancel";
+    public static final String ENTER_OK_KEY = "enter-ok";
+
     private static LookAndFeel lookAndFeel = null;
 
     private WindowUtils() {
@@ -66,7 +68,7 @@ public class WindowUtils {
         if (window instanceof WindowHeaderPanel.WindowHeaderDecorationProvider) {
             ((WindowHeaderPanel.WindowHeaderDecorationProvider) window).setHeaderDecoration(headerPanel);
         } else {
-            Frame frame = getFrame(window);
+            Frame frame = UiUtils.getFrame(window);
             if (frame instanceof WindowHeaderPanel.WindowHeaderDecorationProvider) {
                 ((WindowHeaderPanel.WindowHeaderDecorationProvider) frame).setHeaderDecoration(headerPanel);
             }
@@ -165,7 +167,8 @@ public class WindowUtils {
         JDialog dialog = new JDialog();
         Dimension size = component.getPreferredSize();
         dialog.add(component);
-        dialog.setSize(size.width + 8, size.height + 24);
+        dialog.getContentPane().setPreferredSize(new Dimension(size.width, size.height));
+        dialog.pack();
         if (component instanceof OkCancelService) {
             assignGlobalKeyListener(dialog, ((OkCancelService) component).getOkCancelListener());
         }
@@ -182,6 +185,7 @@ public class WindowUtils {
         invokeWindow(dialog);
     }
 
+    @Nullable
     public static LookAndFeel getLookAndFeel() {
         return lookAndFeel;
     }
@@ -200,24 +204,6 @@ public class WindowUtils {
         dialog.setSize(640, 480);
         dialog.setLocationByPlatform(true);
         return dialog;
-    }
-
-    /**
-     * Finds frame component for given component.
-     *
-     * @param component instantiated component
-     * @return frame instance if found
-     */
-    @Nullable
-    public static Frame getFrame(Component component) {
-        Window parentComponent = SwingUtilities.getWindowAncestor(component);
-        while (!(parentComponent == null || parentComponent instanceof Frame)) {
-            parentComponent = SwingUtilities.getWindowAncestor(parentComponent);
-        }
-        if (parentComponent == null) {
-            parentComponent = JOptionPane.getRootFrame();
-        }
-        return (Frame) parentComponent;
     }
 
     @Nullable
@@ -246,12 +232,12 @@ public class WindowUtils {
         assignGlobalKeyListener(component, new OkCancelListener() {
             @Override
             public void okEvent() {
-                doButtonClick(okButton);
+                UiUtils.doButtonClick(okButton);
             }
 
             @Override
             public void cancelEvent() {
-                doButtonClick(cancelButton);
+                UiUtils.doButtonClick(cancelButton);
             }
         });
     }
@@ -264,10 +250,8 @@ public class WindowUtils {
      */
     public static void assignGlobalKeyListener(Component component, @Nullable final OkCancelListener listener) {
         JRootPane rootPane = SwingUtilities.getRootPane(component);
-        final String ESC_CANCEL = "esc-cancel";
-        final String ENTER_OK = "enter-ok";
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ESC_CANCEL);
-        rootPane.getActionMap().put(ESC_CANCEL, new AbstractAction() {
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ESC_CANCEL_KEY);
+        rootPane.getActionMap().put(ESC_CANCEL_KEY, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 if (listener == null) {
@@ -293,8 +277,8 @@ public class WindowUtils {
             }
         });
 
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), ENTER_OK);
-        rootPane.getActionMap().put(ENTER_OK, new AbstractAction() {
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), ENTER_OK_KEY);
+        rootPane.getActionMap().put(ENTER_OK_KEY, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 if (listener == null) {
@@ -316,15 +300,6 @@ public class WindowUtils {
                 }
             }
         });
-    }
-
-    /**
-     * Performs visually visible click on the button component.
-     *
-     * @param button button component
-     */
-    public static void doButtonClick(JButton button) {
-        button.doClick(BUTTON_CLICK_TIME);
     }
 
     @Nonnull
@@ -357,7 +332,7 @@ public class WindowUtils {
         position.setRelativeY(window.getY() - screenY);
         position.setWidth(window.getWidth());
         position.setHeight(window.getHeight());
-        position.setMaximized(window instanceof Frame ? (((Frame) window).getExtendedState() & JFrame.MAXIMIZED_BOTH) > 0 : false);
+        position.setMaximized(window instanceof Frame ? (((Frame) window).getExtendedState() & Frame.MAXIMIZED_BOTH) > 0 : false);
         return position;
     }
 
@@ -386,7 +361,7 @@ public class WindowUtils {
         if (position.isMaximized()) {
             window.setLocation((int) absoluteX, (int) absoluteY);
             if (window instanceof Frame) {
-                ((Frame) window).setExtendedState(JFrame.MAXIMIZED_BOTH);
+                ((Frame) window).setExtendedState(Frame.MAXIMIZED_BOTH);
             } else {
                 // TODO if (window instanceof JDialog)
             }
@@ -414,7 +389,8 @@ public class WindowUtils {
         dialogPanel.add(controlPanel, BorderLayout.SOUTH);
         Dimension mainPreferredSize = mainPanel.getPreferredSize();
         Dimension controlPreferredSize = controlPanel.getPreferredSize();
-        dialogPanel.setPreferredSize(new Dimension(mainPreferredSize.width, mainPreferredSize.height + controlPreferredSize.height));
+        int height = mainPreferredSize.height + (controlPreferredSize != null ? controlPreferredSize.height : 0);
+        dialogPanel.setPreferredSize(new Dimension(mainPreferredSize.width, height));
         return dialogPanel;
     }
 
@@ -426,6 +402,12 @@ public class WindowUtils {
         public DialogPanel(OkCancelService okCancelService) {
             super(new BorderLayout());
             this.okCancelService = okCancelService;
+        }
+
+        @Nullable
+        @Override
+        public JButton getDefaultButton() {
+            return null;
         }
 
         @Nonnull

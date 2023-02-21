@@ -23,6 +23,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicArrowButton;
 import org.exbin.framework.utils.WindowUtils;
 
@@ -64,15 +65,9 @@ public class DropDownButtonPanel extends javax.swing.JPanel {
             }
 
             private void passMouseEventToParent(MouseEvent me) {
-                Component child = me.getComponent();
                 Component parent = DropDownButtonPanel.this.getParent();
-
-                //transform the mouse coordinate to be relative to the parent component:
-                int deltaX = child.getX() + me.getX();
-                int deltaY = child.getY() + me.getY();
-
                 //dispatch it to the parent component
-                parent.dispatchEvent(new MouseEvent(parent, me.getID(), me.getWhen(), me.getModifiersEx(), deltaX, deltaY, me.getClickCount(), false));
+                parent.dispatchEvent(SwingUtilities.convertMouseEvent(actionLabel, me, parent));
             }
         });
     }
@@ -99,6 +94,7 @@ public class DropDownButtonPanel extends javax.swing.JPanel {
         menuButton = new BasicArrowButton(SwingConstants.SOUTH);
         actionLabel = new javax.swing.JLabel();
 
+        setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         setFocusable(false);
         setOpaque(false);
 
@@ -132,7 +128,7 @@ public class DropDownButtonPanel extends javax.swing.JPanel {
      *
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         WindowUtils.invokeDialog(new DropDownButtonPanel());
     }
 

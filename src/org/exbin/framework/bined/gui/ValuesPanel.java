@@ -24,6 +24,7 @@ import java.util.InputMismatchException;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JOptionPane;
@@ -480,7 +481,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
     private void byteTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_byteTextFieldKeyReleased
         if (evt.getKeyCode() == KeyEvent.VK_ENTER && isEditable()) {
             try {
-                Integer intValue = Integer.valueOf(byteTextField.getText());
+                int intValue = Integer.parseInt(byteTextField.getText());
                 if (isSigned()) {
                     if (intValue < Byte.MIN_VALUE || intValue > Byte.MAX_VALUE) {
                         throw new NumberFormatException(VALUE_OUT_OF_RANGE);
@@ -491,7 +492,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
                     }
                 }
 
-                valuesCache[0] = intValue.byteValue();
+                valuesCache[0] = (byte) intValue;
                 modifyValues(1);
                 updateValues();
             } catch (NumberFormatException ex) {
@@ -859,6 +860,7 @@ public class ValuesPanel extends com.intellij.ui.components.JBPanel {
         return ((EditModeCapable) codeArea).isEditable();
     }
 
+    @Nonnull
     private ByteOrder getByteOrder() {
         return littleEndianRadioButton.isSelected() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
     }

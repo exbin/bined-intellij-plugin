@@ -69,7 +69,7 @@ import org.exbin.framework.editor.text.options.TextFontOptions;
 import org.exbin.framework.editor.text.service.TextFontService;
 import org.exbin.framework.about.gui.AboutPanel;
 import org.exbin.framework.utils.ActionUtils;
-import org.exbin.framework.utils.BareBonesBrowserLaunch;
+import org.exbin.framework.utils.DesktopUtils;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.handler.OptionsControlHandler;
 import org.exbin.framework.utils.gui.CloseControlPanel;
@@ -361,7 +361,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         codeArea.addEditModeChangedListener(binaryStatus::setEditMode);
         binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
 
-        ((BinaryStatusPanel) binaryStatus).setController(new BinaryStatusPanel.Controller() {
+        ((BinaryStatusPanel) binaryStatus).setStatusControlHandler(new BinaryStatusPanel.StatusControlHandler() {
             @Override
             public void changeEditOperation(EditOperation editOperation) {
                 codeArea.setEditOperation(editOperation);
@@ -547,7 +547,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
      *
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         WindowUtils.invokeDialog(new BinEdComponentPanel());
     }
 
@@ -798,7 +798,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         return new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BareBonesBrowserLaunch.openURL(ONLINE_HELP_URL);
+                DesktopUtils.openDesktopURL(ONLINE_HELP_URL);
             }
         };
     }

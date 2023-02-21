@@ -48,7 +48,7 @@
     <Component class="javax.swing.JButton" name="finishButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/gui/utils/gui/resources/MultiStepControlPanel.properties" key="finishButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/utils/gui/resources/MultiStepControlPanel.properties" key="finishButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -58,7 +58,7 @@
     <Component class="javax.swing.JButton" name="nextButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/gui/utils/gui/resources/MultiStepControlPanel.properties" key="nextButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/utils/gui/resources/MultiStepControlPanel.properties" key="nextButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -69,7 +69,7 @@
     <Component class="javax.swing.JButton" name="previousButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/gui/utils/gui/resources/MultiStepControlPanel.properties" key="previousButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/utils/gui/resources/MultiStepControlPanel.properties" key="previousButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -80,7 +80,7 @@
     <Component class="javax.swing.JButton" name="cancelButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/gui/utils/gui/resources/MultiStepControlPanel.properties" key="cancelButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/utils/gui/resources/MultiStepControlPanel.properties" key="cancelButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>

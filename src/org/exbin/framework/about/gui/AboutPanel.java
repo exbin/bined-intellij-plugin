@@ -15,10 +15,12 @@
  */
 package org.exbin.framework.about.gui;
 
-import org.exbin.framework.utils.BareBonesBrowserLaunch;
+import org.exbin.framework.utils.DesktopUtils;
 import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.UiUtils;
 import org.exbin.framework.utils.WindowUtils;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -38,6 +40,7 @@ import java.util.logging.Logger;
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener {
 
     private ResourceBundle appBundle;
@@ -52,9 +55,7 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
 
     private void init() {
         initComponents();
-        Color backgroundColor = getBackground();
-        int medium = (backgroundColor.getRed() + backgroundColor.getBlue() + backgroundColor.getGreen()) / 3;
-        darkMode = medium < 96;
+        darkMode = UiUtils.isDarkUI();
         if (darkMode) {
             aboutHeaderPanel.setBackground(Color.BLACK);
             appTitleLabel.setForeground(Color.WHITE);
@@ -71,13 +72,9 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
                     resourceBundle.getString("environmentTable.propertyColumn"), resourceBundle.getString("environmentTable.valueColumn")
                 }
         ) {
-            boolean[] canEdit = new boolean[]{
-                false, false
-            };
-
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit[columnIndex];
+                return false;
             }
         });
 
@@ -100,7 +97,7 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent event) {
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            BareBonesBrowserLaunch.openURL(event.getURL().toExternalForm());
+            DesktopUtils.openDesktopURL(event.getURL().toExternalForm());
         }
     }
 
@@ -349,7 +346,7 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
     private void appHomepageLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_appHomepageLabelMouseClicked
         if (!evt.isPopupTrigger()) {
             String targetURL = ((JLabel) evt.getSource()).getText();
-            BareBonesBrowserLaunch.openDesktopURL(targetURL);
+            DesktopUtils.openDesktopURL(targetURL);
         }
     }//GEN-LAST:event_appHomepageLabelMouseClicked
 
@@ -358,7 +355,7 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
      *
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         WindowUtils.invokeDialog(new AboutPanel());
     }
 

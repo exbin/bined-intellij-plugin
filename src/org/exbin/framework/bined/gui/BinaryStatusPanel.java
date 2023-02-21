@@ -60,7 +60,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinaryStatusPanel.class);
 
     private StatusPreferences statusParameters;
-    private Controller controller;
+    private StatusControlHandler statusControlHandler;
 
     private StatusCursorPositionFormat cursorPositionFormat = new StatusCursorPositionFormat();
     private StatusDocumentSizeFormat documentSizeFormat = new StatusDocumentSizeFormat();
@@ -420,23 +420,23 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     }// </editor-fold>//GEN-END:initComponents
 
     private void editModeLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_editModeLabelMouseClicked
-        if (controller != null && evt.getButton() == MouseEvent.BUTTON1) {
+        if (statusControlHandler != null && evt.getButton() == MouseEvent.BUTTON1) {
             if (editOperation == EditOperation.INSERT) {
-                controller.changeEditOperation(EditOperation.OVERWRITE);
+                statusControlHandler.changeEditOperation(EditOperation.OVERWRITE);
             } else if (editOperation == EditOperation.OVERWRITE) {
-                controller.changeEditOperation(EditOperation.INSERT);
+                statusControlHandler.changeEditOperation(EditOperation.INSERT);
             }
         }
     }//GEN-LAST:event_editModeLabelMouseClicked
 
     private void cursorPositionLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cursorPositionLabelMouseClicked
         if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() > 1) {
-            controller.changeCursorPosition();
+            statusControlHandler.changeCursorPosition();
         }
     }//GEN-LAST:event_cursorPositionLabelMouseClicked
 
     private void positionGoToMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_positionGoToMenuItemActionPerformed
-        controller.changeCursorPosition();
+        statusControlHandler.changeCursorPosition();
     }//GEN-LAST:event_positionGoToMenuItemActionPerformed
 
     private void positionCopyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_positionCopyMenuItemActionPerformed
@@ -459,7 +459,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
 
     private void encodingLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_encodingLabelMouseClicked
         if (evt.getButton() == MouseEvent.BUTTON1) {
-            controller.cycleEncodings();
+            statusControlHandler.cycleEncodings();
         } else {
             handleEncodingPopup(evt);
         }
@@ -474,11 +474,11 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     }//GEN-LAST:event_encodingLabelMouseReleased
 
     private void deltaMemoryModeRadioButtonMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deltaMemoryModeRadioButtonMenuItemActionPerformed
-        controller.changeMemoryMode(MemoryMode.DELTA_MODE);
+        statusControlHandler.changeMemoryMode(MemoryMode.DELTA_MODE);
     }//GEN-LAST:event_deltaMemoryModeRadioButtonMenuItemActionPerformed
 
     private void ramMemoryModeRadioButtonMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ramMemoryModeRadioButtonMenuItemActionPerformed
-        controller.changeMemoryMode(MemoryMode.RAM_MEMORY);
+        statusControlHandler.changeMemoryMode(MemoryMode.RAM_MEMORY);
     }//GEN-LAST:event_ramMemoryModeRadioButtonMenuItemActionPerformed
 
     private void cursorPositionShowOffsetCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cursorPositionShowOffsetCheckBoxMenuItemActionPerformed
@@ -532,7 +532,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
 
     private void handleEncodingPopup(java.awt.event.MouseEvent evt) {
         if (evt.isPopupTrigger()) {
-            controller.encodingsPopupEncodingsMenu(evt);
+            statusControlHandler.encodingsPopupEncodingsMenu(evt);
         }
     }
 
@@ -541,7 +541,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
      *
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         WindowUtils.invokeDialog(new BinaryStatusPanel());
     }
 
@@ -644,8 +644,8 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
         }
     }
 
-    public void setController(Controller controller) {
-        this.controller = controller;
+    public void setStatusControlHandler(StatusControlHandler statusControlHandler) {
+        this.statusControlHandler = statusControlHandler;
     }
 
     @Override
@@ -808,7 +808,7 @@ public class BinaryStatusPanel extends javax.swing.JPanel implements BinaryStatu
     }
 
     @ParametersAreNonnullByDefault
-    public static interface Controller {
+    public static interface StatusControlHandler {
 
         /**
          * Requests change of edit operation from given operation.
