@@ -246,7 +246,6 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
             myPresentation.setText(action.getTemplatePresentation().getText());
         }
 
-        @Override
         protected void showGroupInPopup(AnActionEvent event, ActionGroup actionGroup) {
             ActionManagerImpl am = (ActionManagerImpl) ActionManager.getInstance();
             ActionPopupMenu popupMenu = am.createActionPopupMenu(event.getPlace(), actionGroup, new MenuItemPresentationFactory() {
