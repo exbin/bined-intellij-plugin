@@ -152,7 +152,7 @@ public class XValueNodeConvertor {
 
         XValue container = myDataNode != null ? myDataNode.getValueContainer() : null;
         if (javaValueClassAvailable && container instanceof JavaValue) {
-            ValueDescriptorImpl descriptor = null; // TODO ((JavaValue) container).getDescriptor();
+            ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
             if (descriptor.isPrimitive() || isBasicType(descriptor) || !descriptor.isNull()) {
                 if (descriptor.isArray()) {
                     String declaredType = descriptor.getDeclaredType();
@@ -534,7 +534,7 @@ public class XValueNodeConvertor {
             XValueNodeImpl node = selectedNodes.get(0);
             XValue container = node.getValueContainer();
             if (javaValueClassAvailable && container instanceof JavaValue) {
-                ValueDescriptorImpl descriptor = null; // TODO ((JavaValue) container).getDescriptor();
+                ValueDescriptorImpl descriptor = ((JavaValue) container).getDescriptor();
                 if (descriptor.isString() || descriptor.isArray() || descriptor.isPrimitive() || isBasicType(descriptor)) {
                     return Optional.of(node);
                 }
