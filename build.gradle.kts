@@ -66,9 +66,9 @@ dependencies {
     implementation(pagedDataLibrary("paged_data"))
     implementation(pagedDataLibrary("paged_data-delta"))
     compileOnly(":debugvalue-clion-2019.2")
-    compileOnly(":debugvalue-goland-2021.1.1")
+    compileOnly(":debugvalue-goland-2022.2.1")
     compileOnly(":debugvalue-intellij-2022.2.1")
-    compileOnly(":debugvalue-phpstorm-2019.2")
+    compileOnly(":debugvalue-phpstorm-2022.2.1")
     compileOnly(":debugvalue-pycharm-2019.2")
     compileOnly(":debugvalue-rider-2022.2.1")
 }
