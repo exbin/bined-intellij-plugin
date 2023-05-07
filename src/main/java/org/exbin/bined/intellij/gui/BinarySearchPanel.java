@@ -40,6 +40,7 @@ import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -53,6 +54,7 @@ import java.util.List;
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class BinarySearchPanel extends JBPanel {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinarySearchPanel.class);

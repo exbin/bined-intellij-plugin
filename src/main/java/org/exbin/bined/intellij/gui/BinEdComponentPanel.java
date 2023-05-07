@@ -41,6 +41,7 @@ import org.exbin.bined.intellij.action.GoToPositionAction;
 import org.exbin.bined.intellij.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.action.SearchAction;
 import org.exbin.bined.intellij.action.InsertDataAction;
+import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
@@ -1004,6 +1005,12 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
             @Override
             public TextFontOptions getFontOptions() {
                 return preferences.getFontPreferences();
+            }
+
+            @Nonnull
+            @Override
+            public IntegrationOptions getIntegrationOptions() {
+                return preferences.getIntegrationPreferences();
             }
 
             @Nonnull

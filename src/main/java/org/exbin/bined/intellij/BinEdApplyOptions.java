@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij;
 
+import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.framework.bined.options.*;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.options.TextFontOptions;
@@ -38,6 +39,9 @@ public interface BinEdApplyOptions {
 
     @Nonnull
     TextFontOptions getFontOptions();
+
+    @Nonnull
+    IntegrationOptions getIntegrationOptions();
 
     @Nonnull
     EditorOptions getEditorOptions();

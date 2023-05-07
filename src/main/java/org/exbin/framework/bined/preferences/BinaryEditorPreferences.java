@@ -15,6 +15,7 @@
  */
 package org.exbin.framework.bined.preferences;
 
+import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.framework.api.Preferences;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,6 +45,7 @@ public class BinaryEditorPreferences {
 
     private final Preferences preferences;
 
+    private final IntegrationPreferences integrationPreferences;
     private final EditorPreferences editorPreferences;
     private final StatusPreferences statusPreferences;
     private final CodeAreaPreferences codeAreaPreferences;
@@ -56,6 +58,7 @@ public class BinaryEditorPreferences {
     public BinaryEditorPreferences(Preferences preferences) {
         this.preferences = preferences;
 
+        integrationPreferences = new IntegrationPreferences(preferences);
         editorPreferences = new EditorPreferences(preferences);
         statusPreferences = new StatusPreferences(preferences);
         codeAreaPreferences = new CodeAreaPreferences(preferences);
@@ -82,6 +85,11 @@ public class BinaryEditorPreferences {
     @Nonnull
     public Preferences getPreferences() {
         return preferences;
+    }
+
+    @Nonnull
+    public IntegrationPreferences getIntegrationPreferences() {
+        return integrationPreferences;
     }
 
     @Nonnull
