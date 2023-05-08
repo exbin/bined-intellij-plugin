@@ -18,6 +18,7 @@ package org.exbin.bined.intellij;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.openapi.vfs.VirtualFileListener;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 
 /**
@@ -25,6 +26,7 @@ import javax.swing.*;
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class BinEdFileListener implements VirtualFileListener {
 
     private JPanel editor;
@@ -34,8 +36,8 @@ public class BinEdFileListener implements VirtualFileListener {
     }
 
     public void contentsChanged(VirtualFileEvent event) {
-//        if (event.getFile().equals(this.editor.getCanvas().getFile())) {
-//            this.editor.getCanvas().showSelectedFile();
-//        }
+        // if (event.getFile().equals(this.editor.getCanvas().getFile())) {
+        //     this.editor.getCanvas().showSelectedFile();
+        // }
     }
 }

@@ -455,7 +455,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
                     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
                         @Override
                         public void run() {
-                            Notifications.Bus.notify(new Notification(BinEdIntelliJPlugin.PLUGIN_ID, "Write Failed", "File too big: " + ex.getMessage(), NotificationType.ERROR));
+                            Notifications.Bus.notify(new Notification(BinEdIntelliJPlugin.PLUGIN_ID, "Write failed", "File too big: " + ex.getMessage(), NotificationType.ERROR));
                         }
                     });
                 } else {

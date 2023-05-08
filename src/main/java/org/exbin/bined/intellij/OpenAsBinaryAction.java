@@ -32,6 +32,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import java.util.List;
 
@@ -40,6 +41,7 @@ import java.util.List;
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class OpenAsBinaryAction extends AnAction implements DumbAware {
 
     public OpenAsBinaryAction() {
@@ -47,14 +49,14 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent event) {
+    public void update(AnActionEvent event) {
         super.update(event);
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
         event.getPresentation().setEnabledAndVisible(virtualFile != null && virtualFile.isValid() && !(virtualFile.isDirectory() || virtualFile.getFileType() instanceof DirectoryFileType));
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent event) {
+    public void actionPerformed(AnActionEvent event) {
         Project project = event.getProject();
         if (project == null) {
             project = ProjectManager.getInstance().getDefaultProject();

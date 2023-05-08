@@ -23,14 +23,17 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * Edit cell value as binary data action.
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class DbEditBinaryAction extends AnAction implements DumbAware { // , GridAction
 
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(AnActionEvent e) {
 //        DataGrid grid = DataGridUtil.getDataGrid(e.getDataContext());
 //        if (grid != null) {
 //            grid.cancelEditing();

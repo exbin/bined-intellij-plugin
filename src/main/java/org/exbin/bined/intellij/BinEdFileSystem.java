@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * File system for binary editor.
+ * Virtual file system for binary editor.
  *
  * @author ExBin Project (https://exbin.org)
  */

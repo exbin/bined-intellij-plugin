@@ -20,6 +20,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 
 /**
@@ -27,6 +28,7 @@ import javax.swing.*;
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class EditorListener implements FileEditorManagerListener {
 
     private JPanel editor;

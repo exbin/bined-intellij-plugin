@@ -18,11 +18,14 @@ package org.exbin.bined.intellij;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * File editor state for hexadecimal editor.
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class BinEdFileEditorState implements FileEditorState {
 
     @Override

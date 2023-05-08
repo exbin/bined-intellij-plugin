@@ -40,7 +40,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -133,15 +132,10 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
     @ParametersAreNonnullByDefault
     private static class DataDialog extends DialogWrapper {
 
-        private final byte[] valuesCache = new byte[8];
-        private final ByteBuffer byteBuffer = ByteBuffer.wrap(valuesCache);
-
         private final BinEdComponentPanel viewPanel;
-        private BinaryData binaryData;
 
         private DataDialog(Project project, @Nullable BinaryData binaryData) {
             super(project, false);
-            this.binaryData = binaryData;
             setModal(false);
             setCancelButtonText("Close");
             getOKAction().setEnabled(false);
@@ -156,14 +150,17 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
 
                 @Override
                 public void saveDocument() {
+                    throw new IllegalStateException("Save not supported");
                 }
 
                 @Override
                 public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
+                    throw new IllegalStateException("Save not supported");
                 }
 
                 @Override
                 public void closeData() {
+                    // Ignore
                 }
             });
             viewPanel.setContentData(binaryData);
@@ -187,11 +184,13 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             return viewPanel;
         }
 
+        @Nullable
         @Override
         protected String getDimensionServiceKey() {
             return "#org.exbin.bined.intellij.debug.ViewBinaryAction";
         }
 
+        @Nullable
         @Override
         protected JComponent createCenterPanel() {
             BorderLayoutPanel panel = JBUI.Panels.simplePanel(viewPanel);

@@ -23,57 +23,60 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jdom.Element;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Native file editor provider for binary files.
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAware {
 
     public static final String NATIVE_BINED_EDITOR_TYPE_ID = "org.exbin.bined.native";
 
     @Override
-    public void disposeEditor(@NotNull FileEditor editor) {
+    public void disposeEditor(FileEditor editor) {
         if (editor instanceof BinEdNativeFileEditor) {
             editor.dispose();
         }
     }
 
     @Override
-    public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
+    public boolean accept(Project project, VirtualFile file) {
         return file.getFileType() == BinaryFileType.INSTANCE && !(file instanceof BinEdVirtualFile);
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+    public FileEditor createEditor(Project project, VirtualFile virtualFile) {
         BinEdNativeFileEditor fileEditor = new BinEdNativeFileEditor(project, virtualFile);
         fileEditor.setDisplayName(virtualFile.getPresentableName());
 
         return fileEditor;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getEditorTypeId() {
         return NATIVE_BINED_EDITOR_TYPE_ID;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public FileEditorPolicy getPolicy() {
         return FileEditorPolicy.HIDE_DEFAULT_EDITOR;
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public FileEditorState readState(@NotNull Element sourceElement, @NotNull Project project, @NotNull VirtualFile file) {
+    public FileEditorState readState(Element sourceElement, Project project, VirtualFile file) {
         return FileEditorState.INSTANCE;
     }
 
     @Override
-    public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) {
+    public void writeState(FileEditorState state, Project project, Element targetElement) {
     }
 }

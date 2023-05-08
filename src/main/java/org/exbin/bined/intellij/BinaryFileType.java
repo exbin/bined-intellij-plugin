@@ -18,13 +18,12 @@ package org.exbin.bined.intellij;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAware;
-import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNullableByDefault;
-import javax.swing.*;
+import javax.swing.Icon;
 
 /**
  * File type for binary files.
@@ -40,19 +39,19 @@ public class BinaryFileType implements FileType, DumbAware {
     private BinaryFileType() {
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getName() {
         return "Binary File";
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getDescription() {
-        return "Binary File (opened by BinEd Plugin)";
+        return "Binary File (opened by BinEd plugin)";
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getDefaultExtension() {
         return DEFAULT_EXTENSION;
@@ -76,7 +75,7 @@ public class BinaryFileType implements FileType, DumbAware {
 
     @Nullable
     @Override
-    public String getCharset(@NotNull VirtualFile file, @NotNull byte[] content) {
+    public String getCharset(@Nonnull VirtualFile file, @Nonnull byte[] content) {
         return "US-ASCII";
     }
 }
