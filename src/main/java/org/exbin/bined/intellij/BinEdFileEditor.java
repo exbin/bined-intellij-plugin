@@ -16,9 +16,15 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
-import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationListener;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorLocation;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.fileEditor.FileEditorState;
+import com.intellij.openapi.fileEditor.FileEditorStateLevel;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
@@ -26,14 +32,16 @@ import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
+import com.intellij.openapi.vfs.newvfs.impl.VfsData;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import org.exbin.framework.bined.BinEdFileHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -65,62 +73,30 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
 
         MessageBus messageBus = project.getMessageBus();
         MessageBusConnection connect = messageBus.connect();
-        connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+        connect.subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, new FileEditorManagerListener.Before() {
             @Override
-            public void fileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile virtualFile) {
-                if (virtualFile instanceof BinEdVirtualFile && !((BinEdVirtualFile) virtualFile).isMoved() && !((BinEdVirtualFile) virtualFile).isClosed()) {
-                    ((BinEdVirtualFile) virtualFile).setClosed(true);
-                    BinEdFileHandler editorPanel = ((BinEdVirtualFile) virtualFile).getEditorFile();
+            public void beforeFileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile file) {
+                if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isMoved() && !((BinEdVirtualFile) file).isClosing()) {
+                    ((BinEdVirtualFile) file).setClosing(true);
+                    BinEdFileHandler editorPanel = ((BinEdVirtualFile) file).getEditorFile();
                     if (!editorPanel.releaseFile()) {
-                        // TODO Intercept close event instead of editor recreation
-                        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-                        fileEditorManager.setSelectedEditor(virtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
-//                      OpenFileDescriptor descriptor = new OpenFileDescriptor(project, virtualFile, 0);
-//                          List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
-//                        for (FileEditor fileEditor : editors) {
-//                            if (fileEditor instanceof BinEdFileEditor) {
-//                                // ((BinEdFileEditor) fileEditor).editorPanel.reopenFile(virtualFile);
-//                            }
-//                        }
-                        // editorPanel.closeData(false);
-                    } else {
-                        Application application = ApplicationManager.getApplication();
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            editorPanel.closeData();
-                        });
+                        ((BinEdVirtualFile) file).setClosing(false);
+                        throw new ProcessCanceledException();
                     }
+                    ((BinEdVirtualFile) file).setClosing(false);
                 }
             }
         });
 
-//        FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
-//        connect.subscribe(AppTopics.FILE_DOCUMENT_SYNC, new FileDocumentManagerAdapter() {
+        // TODO Project or application manager
+//        ApplicationManager.getApplication().addApplicationListener(new ApplicationListener() {
 //            @Override
-//            public void beforeDocumentSaving(Document document) {
-//                if (virtualFile != null) {
-//                    BinEdEditorPanel editorPanel = virtualFile.getEditorPanel();
-//                    if (!editorPanel.releaseFile()) {
-//                        // TODO Intercept close event instead of editor recreation
-//                        OpenFileDescriptor descriptor = new OpenFileDescriptor(project, virtualFile, 0);
-//                        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-//                        List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
-//                        fileEditorManager.setSelectedEditor(virtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
-//                        for (FileEditor fileEditor : editors) {
-//                            if (fileEditor instanceof BinEdFileEditor) {
-//                                // ((BinEdFileEditor) fileEditor).reopenFile(virtualFile, codeArea.getContentData(), undoHandler);
-//                            }
-//                        }
-//                        editorPanel.closeData(false);
-//                    } else {
-//                        editorPanel.closeData(true);
-//                    }
-//                }
-//
-////                virtualFile = null;
+//            public boolean canExitApplication() {
+//                return ApplicationListener.super.canExitApplication();
 //            }
-//        });
+//        }, ApplicationManager.getApplication());
 
-//        editorPanel.invalidate();
+        // editorPanel.invalidate();
     }
 
     @Nonnull
@@ -191,7 +167,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
     @Override
     public FileEditorLocation getCurrentLocation() {
         return null;
-//        return new TextEditorLocation(codeArea.getCaretPosition(), this);
+        //        return new TextEditorLocation(codeArea.getCaretPosition(), this);
     }
 
     @Override
@@ -278,7 +254,8 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
 
         @Nonnull
         @Override
-        public OutputStream getOutputStream(Object requestor, long newModificationStamp, long newTimeStamp) throws IOException {
+        public OutputStream getOutputStream(Object requestor, long newModificationStamp, long newTimeStamp)
+                throws IOException {
             throw new UnsupportedOperationException();
         }
 

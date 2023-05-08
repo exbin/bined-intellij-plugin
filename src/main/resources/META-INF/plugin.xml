@@ -104,6 +104,12 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
             <add-to-group group-id="ProjectViewPopupMenu" relative-to-action="EditorDelete" anchor="after"/>
         </group>
 
+        <action id="BinEdEditor.OpenInBinaryEditorAction" class="org.exbin.bined.intellij.OpenInBinaryEditorAction"
+                text="Binary Editor (BinEd Plugin)" description="Opens file in binary/hexadecimal viewer/editor"
+                icon="/images/icon-idea.png">
+            <add-to-group group-id="RevealGroup" anchor="last"/>
+        </action>
+
         <action id="BinEdEditor.FileOpenAsBinary" class="org.exbin.bined.intellij.FileOpenAsBinaryAction"
                 text="Open as Binary..." description="Opens file in binary/hexadecimal viewer/editor"
                 icon="/images/icon-idea.png">

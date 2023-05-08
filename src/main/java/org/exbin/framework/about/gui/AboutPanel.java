@@ -21,11 +21,14 @@ import org.exbin.framework.utils.UiUtils;
 import org.exbin.framework.utils.WindowUtils;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.io.IOException;
 import java.util.HashMap;
@@ -344,7 +347,7 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
     }// </editor-fold>//GEN-END:initComponents
 
     private void appHomepageLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_appHomepageLabelMouseClicked
-        if (!evt.isPopupTrigger()) {
+        if (evt.getButton() == MouseEvent.BUTTON1 && !evt.isPopupTrigger()) {
             String targetURL = ((JLabel) evt.getSource()).getText();
             DesktopUtils.openDesktopURL(targetURL);
         }

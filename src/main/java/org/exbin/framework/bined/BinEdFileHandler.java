@@ -107,6 +107,9 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
 
     public void openFile(BinEdVirtualFile virtualFile) {
         if (!virtualFile.isDirectory() && virtualFile.isValid()) {
+            if (this.virtualFile != null) {
+                closeData();
+            }
             this.virtualFile = virtualFile;
             boolean editable = virtualFile.isWritable();
             File file = extractFile(virtualFile);
@@ -118,7 +121,6 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
                 }
             } else {
                 try (InputStream stream = virtualFile.getInputStream()) {
-                    closeData();
                     openDocument(stream, editable);
                 } catch (IOException ex) {
                     Logger.getLogger(BinEdFileHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -272,27 +274,11 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
                 data.dispose();
             }
         }
-
-        virtualFile = null;
     }
 
     @Override
     public void closeData() {
-        ExtCodeArea codeArea = componentPanel.getCodeArea();
-        BinaryData data = codeArea.getContentData();
-        componentPanel.setContentData(new ByteArrayData());
-        if (data instanceof DeltaDocument) {
-            FileDataSource fileSource = ((DeltaDocument) data).getFileSource();
-            data.dispose();
-            if (fileSource != null) {
-                segmentsRepository.detachFileSource(fileSource);
-                segmentsRepository.closeFileSource(fileSource);
-            }
-        } else {
-            if (data != null) {
-                data.dispose();
-            }
-        }
+        disposeData();
         componentPanel.setContentData(null);
         virtualFile = null;
     }
@@ -309,10 +295,10 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
     private void updateModified() {
         boolean modified = componentPanel.isModified();
 //        // TODO: Trying to force "modified behavior"
-        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
-        if (document instanceof DocumentEx) {
-            ((DocumentEx) document).setModificationStamp(LocalTimeCounter.currentTime());
-        }
+//        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+//        if (document instanceof DocumentEx) {
+//            ((DocumentEx) document).setModificationStamp(LocalTimeCounter.currentTime());
+//        }
 //        propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
     }
 

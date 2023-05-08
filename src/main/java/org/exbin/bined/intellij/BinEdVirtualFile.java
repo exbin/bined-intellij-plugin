@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,7 +43,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     private final VirtualFile parentFile;
     private String displayName;
     private BinEdFileHandler editorFile;
-    private boolean closed = false;
+    private boolean closing = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
         if (parentFile.getPath().startsWith(PATH_PREFIX)) {
@@ -184,12 +183,12 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return closingToReopen != null && closingToReopen;
     }
 
-    public boolean isClosed() {
-        return closed;
+    public boolean isClosing() {
+        return closing;
     }
 
-    public void setClosed(boolean closed) {
-        this.closed = closed;
+    public void setClosing(boolean closing) {
+        this.closing = closing;
     }
 
     public JComponent getPreferredFocusedComponent() {
