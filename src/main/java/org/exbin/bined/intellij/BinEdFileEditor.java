@@ -71,31 +71,6 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
 
         propertyChangeSupport = new PropertyChangeSupport(this);
 
-        MessageBus messageBus = project.getMessageBus();
-        MessageBusConnection connect = messageBus.connect();
-        connect.subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, new FileEditorManagerListener.Before() {
-            @Override
-            public void beforeFileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile file) {
-                if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isMoved() && !((BinEdVirtualFile) file).isClosing()) {
-                    ((BinEdVirtualFile) file).setClosing(true);
-                    BinEdFileHandler editorPanel = ((BinEdVirtualFile) file).getEditorFile();
-                    if (!editorPanel.releaseFile()) {
-                        ((BinEdVirtualFile) file).setClosing(false);
-                        throw new ProcessCanceledException();
-                    }
-                    ((BinEdVirtualFile) file).setClosing(false);
-                }
-            }
-        });
-
-        // TODO Project or application manager
-//        ApplicationManager.getApplication().addApplicationListener(new ApplicationListener() {
-//            @Override
-//            public boolean canExitApplication() {
-//                return ApplicationListener.super.canExitApplication();
-//            }
-//        }, ApplicationManager.getApplication());
-
         // editorPanel.invalidate();
     }
 

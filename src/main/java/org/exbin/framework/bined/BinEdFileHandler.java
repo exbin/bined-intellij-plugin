@@ -17,11 +17,7 @@ package org.exbin.framework.bined;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.ex.DocumentEx;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.DumbAware;
-import com.intellij.util.LocalTimeCounter;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
@@ -40,9 +36,12 @@ import org.exbin.bined.swing.extended.ExtCodeArea;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.*;
+import javax.swing.JComponent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,21 +61,23 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
     private boolean opened = false;
     private BinEdVirtualFile virtualFile;
     private BinEdFileEditorState fileEditorState = new BinEdFileEditorState();
+    private CodeAreaUndoHandler undoHandler;
+    private long documentOriginalSize;
 
     public BinEdFileHandler() {
         componentPanel = new BinEdComponentPanel();
+        init();
+    }
+
+    private void init() {
         ExtCodeArea codeArea = componentPanel.getCodeArea();
-        CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
+        undoHandler = new CodeAreaUndoHandler(codeArea);
         componentPanel.setFileApi(this);
         componentPanel.setUndoHandler(undoHandler);
 
         // TODO undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, this);
 
         getSegmentsRepository();
-
-        componentPanel.setModifiedChangeListener(() -> {
-            updateModified();
-        });
     }
 
     public boolean isModified() {
@@ -88,7 +89,7 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
     }
 
     @Nonnull
-    public JComponent getComponent() {
+    public BinEdComponentPanel getComponent() {
         return componentPanel;
     }
 
@@ -128,10 +129,9 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
             }
 
             opened = true;
-//            documentOriginalSize = codeArea.getDataSize();
-            updateModified();
-//            updateCurrentMemoryMode();
+
             componentPanel.getUndoHandler().clear();
+            fileSync();
         }
     }
 
@@ -175,13 +175,7 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
     @Override
     public void saveDocument() {
         Application application = ApplicationManager.getApplication();
-        application.runWriteAction(new Runnable() {
-            @Override
-            public void run() {
-                saveFile();
-            }
-        });
-        updateModified();
+        application.runWriteAction(() -> saveFile());
     }
 
     public void saveFile() {
@@ -213,6 +207,16 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
                 }
             });
         });
+        fileSync();
+    }
+
+    private void fileSync() {
+        documentOriginalSize = getCodeArea().getDataSize();
+        undoHandler.setSyncPoint();
+    }
+
+    public long getDocumentOriginalSize() {
+        return documentOriginalSize;
     }
 
     public void reloadFile() {
@@ -292,16 +296,6 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         return new File(path);
     }
 
-    private void updateModified() {
-        boolean modified = componentPanel.isModified();
-//        // TODO: Trying to force "modified behavior"
-//        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
-//        if (document instanceof DocumentEx) {
-//            ((DocumentEx) document).setModificationStamp(LocalTimeCounter.currentTime());
-//        }
-//        propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
-    }
-
     @Nullable
     public BinEdVirtualFile getVirtualFile() {
         return virtualFile;
@@ -321,6 +315,7 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         }
     }
 
+    @Nonnull
     public JComponent getPreferredFocusedComponent() {
         return componentPanel.getCodeArea();
     }

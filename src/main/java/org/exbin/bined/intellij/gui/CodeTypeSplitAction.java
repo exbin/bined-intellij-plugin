@@ -41,6 +41,8 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
@@ -61,18 +63,19 @@ import static com.intellij.openapi.actionSystem.ActionToolbar.DEFAULT_MINIMUM_BU
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class CodeTypeSplitAction extends AnAction implements CustomComponentAction {
 
     private final ActionGroup myActionGroup;
     private int selectedIndex = -1;
     private CodeTypeSplitAction.SplitButton splitButton = null;
 
-    public CodeTypeSplitAction(@NotNull ActionGroup actionGroup) {
+    public CodeTypeSplitAction(ActionGroup actionGroup) {
         myActionGroup = actionGroup;
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(AnActionEvent e) {
     }
 
     @Override
@@ -80,9 +83,9 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
         return myActionGroup.isDumbAware();
     }
 
+    @Nonnull
     @Override
-    @NotNull
-    public JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
+    public JComponent createCustomComponent(Presentation presentation, String place) {
         splitButton = new CodeTypeSplitAction.SplitButton(this, presentation, place, myActionGroup);
         splitButton.setSelectedIndex(selectedIndex);
         return splitButton;
@@ -95,6 +98,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
         }
     }
 
+    @ParametersAreNonnullByDefault
     private static class SplitButton extends ActionButton implements AnActionListener {
         private enum MousePressType {
             Action, Popup, None
@@ -126,6 +130,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
             myPresentation.setEnabled(true);
         }
 
+        @Nonnull
         @Override
         public Dimension getPreferredSize() {
             Dimension size = super.getPreferredSize();

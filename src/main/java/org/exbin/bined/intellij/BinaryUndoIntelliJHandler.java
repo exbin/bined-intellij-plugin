@@ -29,6 +29,7 @@ import org.exbin.bined.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import java.util.List;
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
 
     private final ExtCodeArea codeArea;

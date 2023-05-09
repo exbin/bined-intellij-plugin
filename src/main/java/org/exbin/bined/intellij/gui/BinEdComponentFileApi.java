@@ -17,11 +17,14 @@ package org.exbin.bined.intellij.gui;
 
 import org.exbin.framework.bined.FileHandlingMode;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * Binary editor component file API.
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public interface BinEdComponentFileApi {
 
     boolean isSaveSupported();

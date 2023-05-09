@@ -19,7 +19,6 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -41,12 +40,12 @@ public class BinEdFileSystem extends VirtualFileSystem implements DumbAware {
     private static final BinEdFileSystem INSTANCE = new BinEdFileSystem();
     private List<VirtualFileListener> fileListeners = new ArrayList<>();
 
-    @NotNull
+    @Nonnull
     public static BinEdFileSystem getInstance() {
         return INSTANCE;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public String getProtocol() {
         return PROTOCOL;
@@ -54,7 +53,7 @@ public class BinEdFileSystem extends VirtualFileSystem implements DumbAware {
 
     @Nullable
     @Override
-    public VirtualFile findFileByPath(@NotNull String s) {
+    public VirtualFile findFileByPath(String s) {
         return null;
     }
 

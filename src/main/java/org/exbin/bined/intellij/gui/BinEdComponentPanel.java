@@ -35,12 +35,12 @@ import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAre
 import org.exbin.bined.intellij.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdNativeFile;
+import org.exbin.bined.intellij.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.action.CompareFilesAction;
 import org.exbin.bined.intellij.action.EditSelectionAction;
 import org.exbin.bined.intellij.action.GoToPositionAction;
-import org.exbin.bined.intellij.IntelliJPreferencesWrapper;
-import org.exbin.bined.intellij.action.SearchAction;
 import org.exbin.bined.intellij.action.InsertDataAction;
+import org.exbin.bined.intellij.action.SearchAction;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
@@ -50,9 +50,12 @@ import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
 import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
+import org.exbin.framework.about.gui.AboutPanel;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.gui.BinaryStatusPanel;
+import org.exbin.framework.bined.gui.ValuesPanel;
 import org.exbin.framework.bined.options.CodeAreaColorOptions;
 import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
 import org.exbin.framework.bined.options.CodeAreaOptions;
@@ -60,31 +63,30 @@ import org.exbin.framework.bined.options.CodeAreaThemeOptions;
 import org.exbin.framework.bined.options.EditorOptions;
 import org.exbin.framework.bined.options.StatusOptions;
 import org.exbin.framework.bined.options.impl.CodeAreaOptionsImpl;
-import org.exbin.framework.bined.gui.BinaryStatusPanel;
-import org.exbin.framework.bined.gui.ValuesPanel;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.options.TextFontOptions;
 import org.exbin.framework.editor.text.service.TextFontService;
-import org.exbin.framework.about.gui.AboutPanel;
 import org.exbin.framework.utils.ActionUtils;
 import org.exbin.framework.utils.DesktopUtils;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.utils.handler.OptionsControlHandler;
 import org.exbin.framework.utils.gui.CloseControlPanel;
 import org.exbin.framework.utils.gui.OptionsControlPanel;
-import org.jetbrains.annotations.NotNull;
+import org.exbin.framework.utils.handler.OptionsControlHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.GrayFilter;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -102,6 +104,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -145,6 +148,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
     private final AbstractAction reloadFileAction;
     private final AbstractAction showHeaderAction;
     private final AbstractAction showRowNumbersAction;
+    private final AbstractAction saveDocumentAction;
     private final SearchAction searchAction;
     private EncodingsHandler encodingsHandler;
     private ValuesPanel valuesPanel = null;
@@ -193,13 +197,13 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         toolbarPanel = new BinEdToolbarPanel(preferences, codeArea,
                 new AnAction() {
                     @Override
-                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                    public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
                         createOptionsAction().actionPerformed(new ActionEvent(BinEdComponentPanel.this, 0, "COMMAND", 0));
                     }
                 },
                 new AnAction() {
                     @Override
-                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                    public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
                         createOnlineHelpAction().actionPerformed(new ActionEvent(BinEdComponentPanel.this, 0, "COMMAND", 0));
                     }
                 }
@@ -243,6 +247,14 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                     } else if (fileApi instanceof BinEdNativeFile) {
                         ((BinEdNativeFile) fileApi).reloadFile();
                     }
+                }
+            }
+        };
+        saveDocumentAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (fileApi.isSaveSupported() && isModified()) {
+                    saveDocument();
                 }
             }
         };
@@ -308,12 +320,6 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
                 if (keyEvent.getModifiersEx() == ActionUtils.getMetaMask()) {
                     int keyCode = keyEvent.getKeyCode();
                     switch (keyCode) {
-                        case KeyEvent.VK_S: {
-                            if (fileApi.isSaveSupported() && isModified()) {
-                                saveDocument();
-                            }
-                            break;
-                        }
                         case KeyEvent.VK_F: {
                             searchAction.actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
                             searchAction.switchReplaceMode(BinarySearchPanel.SearchOperation.FIND);
@@ -348,6 +354,14 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
             }
         });
         actionMap.put("reloadFile", reloadFileAction);
+        actionMap.put("saveDocument", saveDocumentAction);
+
+        InputMap inputMap = getInputMap();
+        inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, ActionUtils.getMetaMask()), ACTION_CLIPBOARD_CUT);
+        inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, ActionUtils.getMetaMask()), ACTION_CLIPBOARD_COPY);
+        inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, ActionUtils.getMetaMask()), ACTION_CLIPBOARD_PASTE);
+        inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, ActionUtils.getMetaMask()), "saveDocument");
+        inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, ActionUtils.getMetaMask() | InputEvent.SHIFT_DOWN_MASK), "saveDocument");
     }
 
     public void registerBinaryStatus(BinaryStatusApi binaryStatusApi) {
@@ -478,10 +492,9 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         return true;
     }
 
-    private void saveDocument() {
+    public void saveDocument() {
         fileApi.saveDocument();
 
-        undoHandler.setSyncPoint();
         notifyModified();
         documentOriginalSize = codeArea.getDataSize();
         updateCurrentDocumentSize();

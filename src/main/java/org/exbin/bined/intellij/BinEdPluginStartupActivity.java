@@ -33,10 +33,9 @@ import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.FileHandlingMode;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -52,7 +51,8 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 public final class BinEdPluginStartupActivity implements StartupActivity, DumbAware {
 
-    private static final ExtensionPointName<BinaryViewData> BINED_VIEW_DATA = ExtensionPointName.create("org.exbin.deltahex.intellij.viewBinaryData");
+    private static final ExtensionPointName<BinaryViewData> BINED_VIEW_DATA =
+            ExtensionPointName.create("org.exbin.deltahex.intellij.viewBinaryData");
     private final BinaryViewHandler viewHandler;
     private final List<BinaryViewData> initialized = new ArrayList<>();
 
@@ -105,14 +105,16 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             }
 
             @Override
-            public void setPluginDescriptor(@NotNull PluginDescriptor pluginDescriptor) {
+            public void setPluginDescriptor(@Nonnull PluginDescriptor pluginDescriptor) {
                 // ignore
             }
         };
     }
 
     @Override
-    public void runActivity(@NotNull Project project) {
+    public void runActivity(Project project) {
+        ProjectManager.getInstance().addProjectManagerListener(new BinEdVetoableProjectListener());
+
         BINED_VIEW_DATA.addExtensionPointListener(new ExtensionPointAdapter<>() {
             @Override
             public void extensionListChanged() {
@@ -123,10 +125,13 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
     }
 
     private void initExtensions() {
-        BINED_VIEW_DATA.getExtensionList().stream().filter(binaryViewData -> !initialized.contains(binaryViewData)).forEach(binaryViewData -> {
-            binaryViewData.passHandler(viewHandler);
-            initialized.add(binaryViewData);
-        });
+        BINED_VIEW_DATA.getExtensionList()
+                .stream()
+                .filter(binaryViewData -> !initialized.contains(binaryViewData))
+                .forEach(binaryViewData -> {
+                    binaryViewData.passHandler(viewHandler);
+                    initialized.add(binaryViewData);
+                });
     }
 
     @ParametersAreNonnullByDefault
@@ -175,7 +180,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
         @Nonnull
         @Override
         protected Action[] createActions() {
-            return new Action[]{getCancelAction()};
+            return new Action[] { getCancelAction() };
         }
 
         @Nullable

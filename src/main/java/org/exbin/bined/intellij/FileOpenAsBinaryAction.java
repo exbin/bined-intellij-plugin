@@ -72,11 +72,10 @@ public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
             if (virtualFile.getFileType() instanceof ArchiveFileType) {
                 if (virtualFile.getFileSystem() instanceof JarFileSystem) {
                     virtualFile = ((JarFileSystem) virtualFile.getFileSystem()).getVirtualFileForJar(virtualFile);
-                    isValid = virtualFile != null && virtualFile.isValid();
                 } else {
                     virtualFile = ((ArchiveFileSystem) virtualFile.getFileSystem()).getLocalByEntry(virtualFile);
-                    isValid = virtualFile != null && virtualFile.isValid();
                 }
+                isValid = virtualFile != null && virtualFile.isValid();
             }
         }
         if (isValid) {
@@ -95,7 +94,10 @@ public class FileOpenAsBinaryAction extends AnAction implements DumbAware {
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(null, "File reported as invalid", "Unable to open file", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "File reported as invalid",
+                    "Unable to open file",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 }
