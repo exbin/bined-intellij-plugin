@@ -19,7 +19,7 @@
 <li>Associate file extension with Binary File file type in Options/Editor/File Types</li></ul>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.7.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.8.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
 
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
@@ -87,7 +87,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
         <virtualFileSystem implementationClass="org.exbin.bined.intellij.BinEdFileSystem" key="bined" physical="false"/>
         <fileEditorProvider implementation="org.exbin.bined.intellij.BinEdFileEditorProvider"/>
         <fileEditorProvider implementation="org.exbin.bined.intellij.BinEdNativeFileEditorProvider"/>
-        <!-- <diff.DiffTool implementation="org.exbin.bined.intellij.BinEdDiffTool"/> -->
+        <diff.DiffTool implementation="org.exbin.bined.intellij.BinEdDiffTool"/>
         <applicationConfigurable instance="org.exbin.bined.intellij.BinEdSettingsConfigurable" id="org.exbin.bined.intellij.BinEdSettingsConfigurable" parentId="tools" displayName="BinEd Plugin"/>
     </extensions>
 
@@ -100,7 +100,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     </projectListeners>
 
     <actions>
-        <action id="BinEdEditor.OpenAsBinaryAction" class="org.exbin.bined.intellij.OpenAsBinaryAction"
+        <action id="BinEdEditor.OpenAsBinaryAction" class="org.exbin.bined.intellij.OpenFileAsBinaryAction"
                 text="Open As Binary" description="Opens file in binary/hexadecimal viewer/editor"
                 icon="/images/icon-idea.png"/>
         <group id="BinEdEditor.ProjectView">
@@ -114,10 +114,16 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
             <add-to-group group-id="RevealGroup" anchor="last"/>
         </action>
 
-        <action id="BinEdEditor.FileOpenAsBinary" class="org.exbin.bined.intellij.FileOpenAsBinaryAction"
+        <action id="BinEdEditor.FileOpenAsBinary" class="org.exbin.bined.intellij.FileMenuOpenAsBinaryAction"
                 text="Open as Binary..." description="Opens file in binary/hexadecimal viewer/editor"
                 icon="/images/icon-idea.png">
             <add-to-group group-id="FileOpenGroup" relative-to-action="OpenFile" anchor="after"/>
+        </action>
+
+        <action id="BinEdEditor.FileOpenToolbarAsBinary" class="org.exbin.bined.intellij.OpenFileAsBinaryToolbarAction"
+                text="Open as Binary" description="Opens file in binary/hexadecimal viewer/editor"
+                icon="/images/icon-idea.png">
+            <add-to-group group-id="FileChooserToolbar" anchor="last"/>
         </action>
 
         <group id="BinEdEditor.Editor">

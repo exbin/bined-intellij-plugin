@@ -28,6 +28,7 @@ import org.exbin.framework.utils.ActionUtils;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import java.awt.*;
@@ -328,7 +329,8 @@ public final class SearchAction implements ActionListener {
         }
     }
 
-    private JPopupMenu createCodeAreaPopupMenu(final ExtCodeArea codeArea, String menuPostfix) {
+    @Nonnull
+    public static JPopupMenu createCodeAreaPopupMenu(final ExtCodeArea codeArea, String menuPostfix) {
         JPopupMenu popupMenu = new JPopupMenu();
 
         JMenuItem cutMenuItem = new JMenuItem(new AbstractAction() {

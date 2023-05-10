@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij.debug;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -35,6 +36,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 public class DebugViewBinaryAction extends XFetchValueActionBase implements DumbAware {
+
+    private boolean actionVisible = true;
 
     @Override
     protected void handle(Project project, String value, XDebuggerTree tree) {
@@ -67,8 +70,15 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
     @Override
     public void update(AnActionEvent event) {
         super.update(event);
-//        if (XValueNodeConvertor.getDataNode(event).isPresent()) {
+        Presentation presentation = event.getPresentation();
+        presentation.setVisible(actionVisible);
+
+        //        if (XValueNodeConvertor.getDataNode(event).isPresent()) {
 //            event.getPresentation().setText("View as Binary");
 //        }
+    }
+
+    public void setActionVisible(boolean actionVisible) {
+        this.actionVisible = actionVisible;
     }
 }

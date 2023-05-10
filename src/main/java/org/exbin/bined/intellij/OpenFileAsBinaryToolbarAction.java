@@ -19,34 +19,32 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.fileTypes.DirectoryFileType;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Open file in binary editor for Open In submenu action.
+ * Open file in binary editor action.
  *
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class OpenInBinaryEditorAction extends OpenFileAsBinaryAction {
+public class OpenFileAsBinaryToolbarAction extends OpenFileAsBinaryAction {
 
     private boolean actionVisible = true;
-
-    public OpenInBinaryEditorAction() {
-        super("Binary Editor (BinEd Plugin)");
-    }
 
     @Override
     public void update(AnActionEvent event) {
         super.update(event);
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
+
         Presentation presentation = event.getPresentation();
         if (actionVisible) {
             presentation.setEnabled(virtualFile != null && virtualFile.isValid() && !(virtualFile.isDirectory()
                     || virtualFile.getFileType() instanceof DirectoryFileType));
+            presentation.setDisabledIcon(IconLoader.getDisabledIcon(presentation.getIcon()));
         }
-
         presentation.setVisible(actionVisible);
     }
 

@@ -23,14 +23,14 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileTypes.DirectoryFileType;
-import com.intellij.openapi.fileTypes.UnknownFileType;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.NlsActions;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
@@ -42,17 +42,25 @@ import java.util.List;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class OpenAsBinaryAction extends AnAction implements DumbAware {
+public class OpenFileAsBinaryAction extends AnAction implements DumbAware {
 
-    public OpenAsBinaryAction() {
+    private boolean actionVisible = true;
+
+    public OpenFileAsBinaryAction() {
         super("Open As Binary");
+    }
+
+    public OpenFileAsBinaryAction(@Nullable @NlsActions.ActionText String text) {
+        super(text);
     }
 
     @Override
     public void update(AnActionEvent event) {
         super.update(event);
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
-        event.getPresentation().setEnabledAndVisible(virtualFile != null && virtualFile.isValid() && !(virtualFile.isDirectory() || virtualFile.getFileType() instanceof DirectoryFileType));
+        event.getPresentation()
+                .setEnabledAndVisible(actionVisible && virtualFile != null && virtualFile.isValid() && !(virtualFile.isDirectory()
+                        || virtualFile.getFileType() instanceof DirectoryFileType));
     }
 
     @Override
@@ -63,19 +71,23 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
         }
 
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
+        openVirtualFileAsBinary(project, virtualFile);
+    }
+
+    public static void openVirtualFileAsBinary(Project project, @Nullable VirtualFile virtualFile) {
         boolean isValid = virtualFile != null && virtualFile.isValid();
         if (isValid && virtualFile.isDirectory()) {
             isValid = false;
             if (virtualFile.getFileType() instanceof ArchiveFileType) {
                 if (virtualFile.getFileSystem() instanceof JarFileSystem) {
                     virtualFile = ((JarFileSystem) virtualFile.getFileSystem()).getVirtualFileForJar(virtualFile);
-                    isValid = virtualFile != null && virtualFile.isValid();
                 } else {
                     virtualFile = ((ArchiveFileSystem) virtualFile.getFileSystem()).getLocalByEntry(virtualFile);
-                    isValid = virtualFile != null && virtualFile.isValid();
                 }
+                isValid = virtualFile != null && virtualFile.isValid();
             }
         }
+
         if (isValid) {
             BinEdVirtualFile binEdVirtualFile = new BinEdVirtualFile(virtualFile);
             OpenFileDescriptor descriptor = new OpenFileDescriptor(project, binEdVirtualFile, 0);
@@ -85,14 +97,20 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
             for (FileEditor fileEditor : editors) {
                 if (fileEditor instanceof BinEdFileEditor) {
                     binEdVirtualFile.getEditorFile().openFile(binEdVirtualFile);
-                    // ((BinEdFileEditor) fileEditor).openFile(binEdVirtualFile);
                 } else {
                     // TODO: Drop other editors
                     fileEditor.dispose();
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(null,  "File reported as invalid", "Unable to open file", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "File reported as invalid",
+                    "Unable to open file",
+                    JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public void setActionVisible(boolean actionVisible) {
+        this.actionVisible = actionVisible;
     }
 }

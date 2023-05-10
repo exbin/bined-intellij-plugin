@@ -1,7 +1,9 @@
 0.2.8
+- Added byte-to-byte compare diff option
+- Added integration options page
+- Reworked save on close
 - Added reload file action (issue #49)
 - Fixed illegal argument exception (issue #50)
-- Reworked save on close
 
 0.2.7 (2022-12-08)
 - Added byte array support for some fields for Rider/CLion/GoLand (debug tree child nodes extraction)
