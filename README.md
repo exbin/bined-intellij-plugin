@@ -36,4 +36,4 @@ Assign SDK using 2022.2.1 IntelliJ platform / add and use "Plugin" run configura
 License
 -------
 
-Apache License, Version 2.0 - see LICENSE-2.0.txt
+Apache License, Version 2.0 - see LICENSE.txt
