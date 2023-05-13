@@ -25,13 +25,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public interface IntegrationOptions {
 
-    boolean isRegisterOpenFileAsBinary();
+    boolean isRegisterFileMenuOpenAsBinary();
 
-    boolean isRegisterOpenFileToolbarBinary();
+    boolean isRegisterOpenFileAsBinaryViaToolbar();
 
     boolean isRegisterContextOpenAsBinary();
 
     boolean isRegisterContextOpenInBinaryEditor();
 
-    boolean isRegisterDebugVariablesAsBinary();
+    boolean isRegisterDebugViewAsBinary();
+
+    boolean isRegisterByteToByteDiffTool();
 }

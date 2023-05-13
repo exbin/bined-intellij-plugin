@@ -30,9 +30,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class OpenFileAsBinaryToolbarAction extends OpenFileAsBinaryAction {
+public class OpenFileAsBinaryViaToolbarAction extends ContextOpenAsBinaryAction {
 
     private boolean actionVisible = true;
+
+    public OpenFileAsBinaryViaToolbarAction() {
+        BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterOpenFileAsBinaryViaToolbar());
+    }
 
     @Override
     public void update(AnActionEvent event) {
@@ -46,9 +50,5 @@ public class OpenFileAsBinaryToolbarAction extends OpenFileAsBinaryAction {
             presentation.setDisabledIcon(IconLoader.getDisabledIcon(presentation.getIcon()));
         }
         presentation.setVisible(actionVisible);
-    }
-
-    public void setActionVisible(boolean actionVisible) {
-        this.actionVisible = actionVisible;
     }
 }

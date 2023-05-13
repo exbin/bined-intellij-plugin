@@ -42,6 +42,12 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class BinEdDiffTool implements FrameDiffTool, DumbAware {
 
+    private boolean actionVisible = true;
+
+    public BinEdDiffTool() {
+        BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterByteToByteDiffTool());
+    }
+
     @Nonnull
     @Nls(capitalization = Nls.Capitalization.Sentence)
     @Override
@@ -51,7 +57,7 @@ public class BinEdDiffTool implements FrameDiffTool, DumbAware {
 
     @Override
     public boolean canShow(DiffContext context, DiffRequest request) {
-        return true;
+        return actionVisible;
     }
 
     @Nonnull

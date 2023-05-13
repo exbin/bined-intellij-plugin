@@ -27,11 +27,12 @@ import org.exbin.bined.intellij.options.IntegrationOptions;
 @ParametersAreNonnullByDefault
 public class IntegrationPreferences implements IntegrationOptions {
 
-    public static final String PREFERENCES_REGISTER_OPEN_FILE_AS_BINARY = "registerOpenFileAsBinary";
-    public static final String PREFERENCES_REGISTER_OPEN_FILE_TOOLBAR_BINARY = "registerOpenFileToolbarBinary";
+    public static final String PREFERENCES_REGISTER_FILE_MENU_OPEN_AS_BINARY = "registerFileMenuOpenAsBinary";
+    public static final String PREFERENCES_REGISTER_OPEN_FILE_AS_BINARY_VIA_TOOLBAR = "registerOpenFileAsBinaryViaToolbar";
     public static final String PREFERENCES_REGISTER_CONTEXT_OPEN_AS_BINARY = "registerContextOpenAsBinary";
     public static final String PREFERENCES_REGISTER_CONTEXT_OPEN_IN_BINARY_EDITOR = "registerContextOpenInBinaryEditor";
-    public static final String PREFERENCES_REGISTER_DEBUG_VARIABLES_AS_BINARY = "registerDebugVariablesAsBinary";
+    public static final String PREFERENCES_REGISTER_DEBUG_VIEW_AS_BINARY = "registerDebugVariablesAsBinary";
+    public static final String PREFERENCES_REGISTER_BYTE_TO_BYTE_DIFF_TOOL = "registerByteToByteDiffTool";
 
     private final Preferences preferences;
 
@@ -40,21 +41,21 @@ public class IntegrationPreferences implements IntegrationOptions {
     }
 
     @Override
-    public boolean isRegisterOpenFileAsBinary() {
-        return preferences.getBoolean(PREFERENCES_REGISTER_OPEN_FILE_AS_BINARY, false);
+    public boolean isRegisterFileMenuOpenAsBinary() {
+        return preferences.getBoolean(PREFERENCES_REGISTER_FILE_MENU_OPEN_AS_BINARY, false);
     }
 
-    public void setRegisterOpenFileAsBinary(boolean registerOpenFileAsBinary) {
-        preferences.putBoolean(PREFERENCES_REGISTER_OPEN_FILE_AS_BINARY, registerOpenFileAsBinary);
+    public void setRegisterFileMenuOpenAsBinary(boolean registerFileMenuOpenAsBinary) {
+        preferences.putBoolean(PREFERENCES_REGISTER_FILE_MENU_OPEN_AS_BINARY, registerFileMenuOpenAsBinary);
     }
 
     @Override
-    public boolean isRegisterOpenFileToolbarBinary() {
-        return preferences.getBoolean(PREFERENCES_REGISTER_OPEN_FILE_TOOLBAR_BINARY, true);
+    public boolean isRegisterOpenFileAsBinaryViaToolbar() {
+        return preferences.getBoolean(PREFERENCES_REGISTER_OPEN_FILE_AS_BINARY_VIA_TOOLBAR, true);
     }
 
-    public void setRegisterOpenFileToolbarBinary(boolean registerOpenFileToolbarBinary) {
-        preferences.putBoolean(PREFERENCES_REGISTER_OPEN_FILE_TOOLBAR_BINARY, registerOpenFileToolbarBinary);
+    public void setRegisterOpenFileAsBinaryViaToolbar(boolean registerOpenFileAsBinaryViaToolbar) {
+        preferences.putBoolean(PREFERENCES_REGISTER_OPEN_FILE_AS_BINARY_VIA_TOOLBAR, registerOpenFileAsBinaryViaToolbar);
     }
 
     @Override
@@ -76,11 +77,20 @@ public class IntegrationPreferences implements IntegrationOptions {
     }
 
     @Override
-    public boolean isRegisterDebugVariablesAsBinary() {
-        return preferences.getBoolean(PREFERENCES_REGISTER_DEBUG_VARIABLES_AS_BINARY, true);
+    public boolean isRegisterDebugViewAsBinary() {
+        return preferences.getBoolean(PREFERENCES_REGISTER_DEBUG_VIEW_AS_BINARY, true);
     }
 
-    public void setRegisterDebugVariablesAsBinary(boolean registerDebugVariablesAsBinary) {
-        preferences.putBoolean(PREFERENCES_REGISTER_DEBUG_VARIABLES_AS_BINARY, registerDebugVariablesAsBinary);
+    public void setRegisterDebugViewAsBinary(boolean registerDebugViewAsBinary) {
+        preferences.putBoolean(PREFERENCES_REGISTER_DEBUG_VIEW_AS_BINARY, registerDebugViewAsBinary);
+    }
+
+    @Override
+    public boolean isRegisterByteToByteDiffTool() {
+        return preferences.getBoolean(PREFERENCES_REGISTER_BYTE_TO_BYTE_DIFF_TOOL, true);
+    }
+
+    public void setRegisterByteToByteDiffTool(boolean registerByteToByteDiffTool) {
+        preferences.putBoolean(PREFERENCES_REGISTER_BYTE_TO_BYTE_DIFF_TOOL, registerByteToByteDiffTool);
     }
 }

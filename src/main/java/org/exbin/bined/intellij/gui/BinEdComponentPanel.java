@@ -35,6 +35,7 @@ import org.exbin.bined.highlight.swing.extended.ExtendedHighlightNonAsciiCodeAre
 import org.exbin.bined.intellij.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdNativeFile;
+import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.action.CompareFilesAction;
 import org.exbin.bined.intellij.action.EditSelectionAction;
@@ -80,13 +81,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.GrayFilter;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -565,7 +564,6 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         WindowUtils.invokeDialog(new BinEdComponentPanel());
     }
 
-
     // Variables declaration - do not modify
     private javax.swing.JPanel codeAreaPanel;
     // End of variables declaration
@@ -927,6 +925,7 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
     }
 
     private void applyOptions(BinEdApplyOptions applyOptions) {
+        BinEdPluginStartupActivity.applyIntegrationOptions(applyOptions.getIntegrationOptions());
         CodeAreaOptionsImpl.applyToCodeArea(applyOptions.getCodeAreaOptions(), codeArea);
 
         ((CharsetCapable) codeArea).setCharset(Charset.forName(applyOptions.getEncodingOptions().getSelectedEncoding()));

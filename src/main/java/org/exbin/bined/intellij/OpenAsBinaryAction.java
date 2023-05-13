@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
-import com.intellij.openapi.fileTypes.DirectoryFileType;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -33,7 +32,7 @@ import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import java.util.List;
 
 /**
@@ -42,25 +41,14 @@ import java.util.List;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class OpenFileAsBinaryAction extends AnAction implements DumbAware {
+public class OpenAsBinaryAction extends AnAction implements DumbAware {
 
-    private boolean actionVisible = true;
-
-    public OpenFileAsBinaryAction() {
+    public OpenAsBinaryAction() {
         super("Open As Binary");
     }
 
-    public OpenFileAsBinaryAction(@Nullable @NlsActions.ActionText String text) {
+    public OpenAsBinaryAction(@Nullable @NlsActions.ActionText String text) {
         super(text);
-    }
-
-    @Override
-    public void update(AnActionEvent event) {
-        super.update(event);
-        VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
-        event.getPresentation()
-                .setEnabledAndVisible(actionVisible && virtualFile != null && virtualFile.isValid() && !(virtualFile.isDirectory()
-                        || virtualFile.getFileType() instanceof DirectoryFileType));
     }
 
     @Override
@@ -108,9 +96,5 @@ public class OpenFileAsBinaryAction extends AnAction implements DumbAware {
                     "Unable to open file",
                     JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    public void setActionVisible(boolean actionVisible) {
-        this.actionVisible = actionVisible;
     }
 }

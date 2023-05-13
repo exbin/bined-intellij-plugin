@@ -28,28 +28,29 @@ import org.exbin.framework.options.api.OptionsData;
 @ParametersAreNonnullByDefault
 public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
 
-    private boolean registerOpenFileAsBinary = false;
-    private boolean registerOpenFileToolbarBinary = true;
+    private boolean registerFileMenuOpenAsBinary = false;
+    private boolean registerOpenFileAsBinaryViaToolbar = true;
     private boolean registerContextOpenAsBinary = false;
     private boolean registerContextOpenInBinaryEditor = true;
-    private boolean registerDebugVariablesAsBinary = true;
+    private boolean registerDebugViewAsBinary = true;
+    private boolean registerByteToByteDiffTool = true;
 
     @Override
-    public boolean isRegisterOpenFileAsBinary() {
-        return registerOpenFileAsBinary;
+    public boolean isRegisterFileMenuOpenAsBinary() {
+        return registerFileMenuOpenAsBinary;
     }
 
-    public void setRegisterOpenFileAsBinary(boolean registerOpenFileAsBinary) {
-        this.registerOpenFileAsBinary = registerOpenFileAsBinary;
+    public void setRegisterFileMenuOpenAsBinary(boolean registerFileMenuOpenAsBinary) {
+        this.registerFileMenuOpenAsBinary = registerFileMenuOpenAsBinary;
     }
 
     @Override
-    public boolean isRegisterOpenFileToolbarBinary() {
-        return registerOpenFileToolbarBinary;
+    public boolean isRegisterOpenFileAsBinaryViaToolbar() {
+        return registerOpenFileAsBinaryViaToolbar;
     }
 
-    public void setRegisterOpenFileToolbarBinary(boolean registerOpenFileToolbarBinary) {
-        this.registerOpenFileToolbarBinary = registerOpenFileToolbarBinary;
+    public void setRegisterOpenFileAsBinaryViaToolbar(boolean registerOpenFileAsBinaryViaToolbar) {
+        this.registerOpenFileAsBinaryViaToolbar = registerOpenFileAsBinaryViaToolbar;
     }
 
     @Override
@@ -71,35 +72,46 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
     }
 
     @Override
-    public boolean isRegisterDebugVariablesAsBinary() {
-        return registerDebugVariablesAsBinary;
+    public boolean isRegisterDebugViewAsBinary() {
+        return registerDebugViewAsBinary;
     }
 
-    public void setRegisterDebugVariablesAsBinary(boolean registerDebugVariablesAsBinary) {
-        this.registerDebugVariablesAsBinary = registerDebugVariablesAsBinary;
+    public void setRegisterDebugViewAsBinary(boolean registerDebugViewAsBinary) {
+        this.registerDebugViewAsBinary = registerDebugViewAsBinary;
+    }
+
+    public boolean isRegisterByteToByteDiffTool() {
+        return registerByteToByteDiffTool;
+    }
+
+    public void setRegisterByteToByteDiffTool(boolean registerByteToByteDiffTool) {
+        this.registerByteToByteDiffTool = registerByteToByteDiffTool;
     }
 
     public void loadFromPreferences(IntegrationPreferences preferences) {
-        registerOpenFileAsBinary = preferences.isRegisterOpenFileAsBinary();
-        registerOpenFileToolbarBinary = preferences.isRegisterOpenFileToolbarBinary();
+        registerFileMenuOpenAsBinary = preferences.isRegisterFileMenuOpenAsBinary();
+        registerOpenFileAsBinaryViaToolbar = preferences.isRegisterOpenFileAsBinaryViaToolbar();
         registerContextOpenAsBinary = preferences.isRegisterContextOpenAsBinary();
         registerContextOpenInBinaryEditor = preferences.isRegisterContextOpenInBinaryEditor();
-        registerDebugVariablesAsBinary = preferences.isRegisterDebugVariablesAsBinary();
+        registerDebugViewAsBinary = preferences.isRegisterDebugViewAsBinary();
+        registerByteToByteDiffTool = preferences.isRegisterByteToByteDiffTool();
     }
 
     public void saveToPreferences(IntegrationPreferences preferences) {
-        preferences.setRegisterOpenFileAsBinary(registerOpenFileAsBinary);
-        preferences.setRegisterOpenFileToolbarBinary(registerOpenFileToolbarBinary);
+        preferences.setRegisterFileMenuOpenAsBinary(registerFileMenuOpenAsBinary);
+        preferences.setRegisterOpenFileAsBinaryViaToolbar(registerOpenFileAsBinaryViaToolbar);
         preferences.setRegisterContextOpenAsBinary(registerContextOpenAsBinary);
         preferences.setRegisterContextOpenInBinaryEditor(registerContextOpenInBinaryEditor);
-        preferences.setRegisterDebugVariablesAsBinary(registerDebugVariablesAsBinary);
+        preferences.setRegisterDebugViewAsBinary(registerDebugViewAsBinary);
+        preferences.setRegisterByteToByteDiffTool(registerByteToByteDiffTool);
     }
 
     public void setOptions(IntegrationOptionsImpl options) {
-        registerOpenFileAsBinary = options.isRegisterOpenFileAsBinary();
-        registerOpenFileToolbarBinary = options.isRegisterOpenFileToolbarBinary();
+        registerFileMenuOpenAsBinary = options.isRegisterFileMenuOpenAsBinary();
+        registerOpenFileAsBinaryViaToolbar = options.isRegisterOpenFileAsBinaryViaToolbar();
         registerContextOpenAsBinary = options.isRegisterContextOpenAsBinary();
         registerContextOpenInBinaryEditor = options.isRegisterContextOpenInBinaryEditor();
-        registerDebugVariablesAsBinary = options.isRegisterDebugVariablesAsBinary();
+        registerDebugViewAsBinary = options.isRegisterDebugViewAsBinary();
+        registerByteToByteDiffTool = options.isRegisterByteToByteDiffTool();
     }
 }

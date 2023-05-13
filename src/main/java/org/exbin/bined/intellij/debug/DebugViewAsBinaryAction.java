@@ -24,6 +24,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
+import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.debug.intellij.XValueNodeConvertor;
 
 import javax.annotation.Nonnull;
@@ -35,9 +36,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class DebugViewBinaryAction extends XFetchValueActionBase implements DumbAware {
+public class DebugViewAsBinaryAction extends XFetchValueActionBase implements DumbAware {
 
     private boolean actionVisible = true;
+
+    public DebugViewAsBinaryAction() {
+        BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterDebugViewAsBinary());
+    }
 
     @Override
     protected void handle(Project project, String value, XDebuggerTree tree) {
@@ -76,9 +81,5 @@ public class DebugViewBinaryAction extends XFetchValueActionBase implements Dumb
         //        if (XValueNodeConvertor.getDataNode(event).isPresent()) {
 //            event.getPresentation().setText("View as Binary");
 //        }
-    }
-
-    public void setActionVisible(boolean actionVisible) {
-        this.actionVisible = actionVisible;
     }
 }

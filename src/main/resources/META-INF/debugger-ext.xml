@@ -1,7 +1,7 @@
 <idea-plugin>
     <actions>
         <group>
-            <action id="Debugger.BinEdShowAsBinary" class="org.exbin.bined.intellij.debug.DebugViewBinaryAction"
+            <action id="Debugger.BinEdShowAsBinary" class="org.exbin.bined.intellij.debug.DebugViewAsBinaryAction"
                     text="Show As Binary" icon="/images/icon-idea.png"/>
 
             <add-to-group group-id="XDebugger.Watches.Tree.Popup" anchor="last"/>

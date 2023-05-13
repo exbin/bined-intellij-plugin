@@ -29,12 +29,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class OpenInBinaryEditorAction extends OpenFileAsBinaryAction {
+public class ContextOpenInBinaryEditorAction extends OpenAsBinaryAction {
 
     private boolean actionVisible = true;
 
-    public OpenInBinaryEditorAction() {
+    public ContextOpenInBinaryEditorAction() {
         super("Binary Editor (BinEd Plugin)");
+        BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterContextOpenInBinaryEditor());
     }
 
     @Override
@@ -48,9 +49,5 @@ public class OpenInBinaryEditorAction extends OpenFileAsBinaryAction {
         }
 
         presentation.setVisible(actionVisible);
-    }
-
-    public void setActionVisible(boolean actionVisible) {
-        this.actionVisible = actionVisible;
     }
 }

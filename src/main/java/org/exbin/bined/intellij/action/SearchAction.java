@@ -257,7 +257,7 @@ public final class SearchAction implements ActionListener {
         }
 
         painter.setMatches(foundMatches);
-        if (foundMatches.size() > 0) {
+        if (!foundMatches.isEmpty()) {
             painter.setCurrentMatchIndex(0);
             ExtendedHighlightCodeAreaPainter.SearchMatch firstMatch = painter.getCurrentMatch();
             codeArea.revealPosition(new DefaultCodeAreaCaretPosition(firstMatch.getPosition(), 0, codeArea.getActiveSection()));
@@ -289,7 +289,7 @@ public final class SearchAction implements ActionListener {
 
         List<ExtendedHighlightCodeAreaPainter.SearchMatch> foundMatches = new ArrayList<>();
 
-        long dataSize = data.getDataSize();
+        long dataSize = codeArea.getDataSize();
         while (position < dataSize - searchData.getDataSize()) {
             int matchLength = 0;
             while (matchLength < searchData.getDataSize()) {
@@ -314,7 +314,7 @@ public final class SearchAction implements ActionListener {
         }
 
         painter.setMatches(foundMatches);
-        if (foundMatches.size() > 0) {
+        if (!foundMatches.isEmpty()) {
             painter.setCurrentMatchIndex(0);
             ExtendedHighlightCodeAreaPainter.SearchMatch firstMatch = painter.getCurrentMatch();
             codeArea.revealPosition(new DefaultCodeAreaCaretPosition(firstMatch.getPosition(), 0, codeArea.getActiveSection()));

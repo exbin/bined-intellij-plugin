@@ -32,6 +32,8 @@ import org.exbin.bined.intellij.data.ObjectValueConvertor;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
+import org.exbin.bined.intellij.options.IntegrationOptions;
+import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.framework.bined.FileHandlingMode;
 
 import javax.annotation.Nonnull;
@@ -53,62 +55,13 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
 
     private static final ExtensionPointName<BinaryViewData> BINED_VIEW_DATA =
             ExtensionPointName.create("org.exbin.deltahex.intellij.viewBinaryData");
-    private final BinaryViewHandler viewHandler;
+    private static final List<IntegrationOptionsListener> INTEGRATION_OPTIONS_LISTENERS = new ArrayList<>();
+    private static IntegrationOptions initialIntegrationOptions = null;
+
+    private final BinaryViewHandler viewHandler = new MainBinaryViewHandler();
     private final List<BinaryViewData> initialized = new ArrayList<>();
 
     BinEdPluginStartupActivity() {
-        viewHandler = new BinaryViewHandler() {
-
-            private final ObjectValueConvertor valueConvertor = new ObjectValueConvertor();
-
-            @Nonnull
-            @Override
-            public Optional<BinaryData> instanceToBinaryData(Object instance) {
-                return valueConvertor.process(instance);
-            }
-
-            @Nonnull
-            @Override
-            public JComponent createBinaryViewPanel(@Nullable BinaryData binaryData) {
-                DebugViewPanel viewPanel = new DebugViewPanel();
-                viewPanel.setContentData(binaryData);
-                return viewPanel;
-            }
-
-            @Nonnull
-            @Override
-            public Optional<JComponent> createBinaryViewPanel(Object instance) {
-                Optional<BinaryData> binaryData = valueConvertor.process(instance);
-                DebugViewPanel viewPanel = new DebugViewPanel();
-                if (binaryData.isPresent()) {
-                    viewPanel.setContentData(binaryData.get());
-                    return Optional.of(viewPanel);
-                }
-
-                return Optional.empty();
-            }
-
-            @Nonnull
-            @Override
-            public DialogWrapper createBinaryViewDialog(@Nullable BinaryData binaryData) {
-                Project project = ProjectManager.getInstance().getDefaultProject();
-                DataDialog dialog = new DataDialog(project, binaryData);
-                dialog.setTitle("View Binary Data");
-                return dialog;
-            }
-
-            @Nonnull
-            @Override
-            public DialogWrapper createBinaryViewDialog(Object instance) {
-                Optional<BinaryData> binaryData = valueConvertor.process(instance);
-                return createBinaryViewDialog(binaryData.orElse(null));
-            }
-
-            @Override
-            public void setPluginDescriptor(@Nonnull PluginDescriptor pluginDescriptor) {
-                // ignore
-            }
-        };
     }
 
     @Override
@@ -122,6 +75,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             }
         }, null);
         initExtensions();
+        initIntegration();
     }
 
     private void initExtensions() {
@@ -132,6 +86,79 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
                     binaryViewData.passHandler(viewHandler);
                     initialized.add(binaryViewData);
                 });
+    }
+
+    private void initIntegration() {
+        initialIntegrationOptions = new IntegrationPreferences(
+                new IntelliJPreferencesWrapper(BinEdComponentPanel.getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX)
+        );
+        applyIntegrationOptions(initialIntegrationOptions);
+    }
+
+    public static void addIntegrationOptionsListener(IntegrationOptionsListener integrationOptionsListener) {
+        INTEGRATION_OPTIONS_LISTENERS.add(integrationOptionsListener);
+        if (initialIntegrationOptions != null) {
+            integrationOptionsListener.integrationInit(initialIntegrationOptions);
+        }
+    }
+
+    public static void applyIntegrationOptions(IntegrationOptions integrationOptions) {
+        for (IntegrationOptionsListener listener : INTEGRATION_OPTIONS_LISTENERS) {
+            listener.integrationInit(integrationOptions);
+        }
+    }
+
+    @ParametersAreNonnullByDefault
+    private static class MainBinaryViewHandler implements BinaryViewHandler {
+        private final ObjectValueConvertor valueConvertor = new ObjectValueConvertor();
+
+        @Nonnull
+        @Override
+        public Optional<BinaryData> instanceToBinaryData(Object instance) {
+            return valueConvertor.process(instance);
+        }
+
+        @Nonnull
+        @Override
+        public JComponent createBinaryViewPanel(@Nullable BinaryData binaryData) {
+            DebugViewPanel viewPanel = new DebugViewPanel();
+            viewPanel.setContentData(binaryData);
+            return viewPanel;
+        }
+
+        @Nonnull
+        @Override
+        public Optional<JComponent> createBinaryViewPanel(Object instance) {
+            Optional<BinaryData> binaryData = valueConvertor.process(instance);
+            DebugViewPanel viewPanel = new DebugViewPanel();
+            if (binaryData.isPresent()) {
+                viewPanel.setContentData(binaryData.get());
+                return Optional.of(viewPanel);
+            }
+
+            return Optional.empty();
+        }
+
+        @Nonnull
+        @Override
+        public DialogWrapper createBinaryViewDialog(@Nullable BinaryData binaryData) {
+            Project project = ProjectManager.getInstance().getDefaultProject();
+            DataDialog dialog = new DataDialog(project, binaryData);
+            dialog.setTitle("View Binary Data");
+            return dialog;
+        }
+
+        @Nonnull
+        @Override
+        public DialogWrapper createBinaryViewDialog(Object instance) {
+            Optional<BinaryData> binaryData = valueConvertor.process(instance);
+            return createBinaryViewDialog(binaryData.orElse(null));
+        }
+
+        @Override
+        public void setPluginDescriptor(PluginDescriptor pluginDescriptor) {
+            // ignore
+        }
     }
 
     @ParametersAreNonnullByDefault
@@ -202,5 +229,10 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             panel.setPreferredSize(JBUI.size(600, 400));
             return panel;
         }
+    }
+
+    @ParametersAreNonnullByDefault
+    public interface IntegrationOptionsListener {
+        void integrationInit(IntegrationOptions integrationOptions);
     }
 }

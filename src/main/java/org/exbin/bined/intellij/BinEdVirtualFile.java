@@ -111,11 +111,13 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return parentFile.isValid();
     }
 
+    @Nullable
     @Override
     public VirtualFile getParent() {
         return parentFile.getParent();
     }
 
+    @Nullable
     @Override
     public VirtualFile[] getChildren() {
         return parentFile.getChildren();
