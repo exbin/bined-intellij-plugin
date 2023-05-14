@@ -5,6 +5,7 @@ plugins {
 
 group = "org.exbin.deltahex.intellij"
 version = "0.2.8-SNAPSHOT"
+val ideLocalPath = providers.gradleProperty("ideLocalPath").getOrElse("")
 
 repositories {
     mavenCentral()
@@ -13,10 +14,20 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2022.2.1")
     type.set("IC") // Target IDE Platform
+}
 
-    plugins.set(listOf("java"))
+if (ideLocalPath.isEmpty()) {
+    intellij {
+        version.set("2022.2.1")
+        plugins.set(listOf("java"))
+    }
+} else {
+    intellij {
+        localPath.set(ideLocalPath)
+        // Some variants require to add java plugin due to detection bug
+        plugins.set(listOf("java"))
+    }
 }
 
 tasks {
@@ -71,4 +82,5 @@ dependencies {
     compileOnly(":debugvalue-phpstorm-2022.2.1")
     compileOnly(":debugvalue-pycharm-2019.2")
     compileOnly(":debugvalue-rider-2022.2.1")
+    compileOnly(":jsr305-2.0.1")
 }

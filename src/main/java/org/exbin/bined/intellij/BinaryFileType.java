@@ -19,10 +19,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNullableByDefault;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Icon;
 
 /**
@@ -30,7 +30,7 @@ import javax.swing.Icon;
  *
  * @author ExBin Project (https://exbin.org)
  */
-@ParametersAreNullableByDefault
+@ParametersAreNonnullByDefault
 public class BinaryFileType implements FileType, DumbAware {
 
     public static final String DEFAULT_EXTENSION = "bin";
@@ -75,7 +75,7 @@ public class BinaryFileType implements FileType, DumbAware {
 
     @Nullable
     @Override
-    public String getCharset(@Nonnull VirtualFile file, @Nonnull byte[] content) {
+    public String getCharset(VirtualFile file, byte[] content) {
         return "US-ASCII";
     }
 }

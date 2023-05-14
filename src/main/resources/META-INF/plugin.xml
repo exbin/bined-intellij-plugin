@@ -52,7 +52,6 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="debugger-ext.xml">com.intellij.modules.xdebugger</depends>
     <depends optional="true" config-file="java-ext.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="cidr-ext.xml">com.intellij.modules.cidr.debugger</depends>

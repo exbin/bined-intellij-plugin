@@ -19,10 +19,10 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNullableByDefault;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author ExBin Project (https://exbin.org)
  */
-@ParametersAreNullableByDefault
+@ParametersAreNonnullByDefault
 public class BinEdFileSystem extends VirtualFileSystem implements DumbAware {
 
     private static final String PROTOCOL = "bined";
