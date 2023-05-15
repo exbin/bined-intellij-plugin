@@ -76,11 +76,11 @@ dependencies {
     implementation(binedLibrary("bined-swing-extended"))
     implementation(pagedDataLibrary("paged_data"))
     implementation(pagedDataLibrary("paged_data-delta"))
-    compileOnly(":debugvalue-clion-2019.2")
+    compileOnly(":debugvalue-clion-2022.2.1")
     compileOnly(":debugvalue-goland-2022.2.1")
     compileOnly(":debugvalue-intellij-2022.2.1")
     compileOnly(":debugvalue-phpstorm-2022.2.1")
-    compileOnly(":debugvalue-pycharm-2019.2")
+    compileOnly(":debugvalue-pycharm-2022.2.1")
     compileOnly(":debugvalue-rider-2022.2.1")
     compileOnly(":jsr305-2.0.1")
 }

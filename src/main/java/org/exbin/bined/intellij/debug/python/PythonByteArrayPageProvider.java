@@ -50,15 +50,15 @@ public class PythonByteArrayPageProvider implements PageProvider {
         if (pageIndex > documentSize / PageProviderBinaryData.PAGE_SIZE)
             throw new OutOfBoundsException();
 
-        int length;
+        int pageSize;
         if (documentSize / PageProviderBinaryData.PAGE_SIZE == pageIndex) {
-            length = (int) (documentSize % PageProviderBinaryData.PAGE_SIZE);
+            pageSize = (int) (documentSize % PageProviderBinaryData.PAGE_SIZE);
         } else {
-            length = PageProviderBinaryData.PAGE_SIZE;
+            pageSize = PageProviderBinaryData.PAGE_SIZE;
         }
-        byte[] page = new byte[length];
+        byte[] page = new byte[pageSize];
 
-        readByteData((int) (pageIndex * PageProviderBinaryData.PAGE_SIZE), page, length);
+        readByteData((int) (pageIndex * PageProviderBinaryData.PAGE_SIZE), page, pageSize);
 
         return page;
     }
@@ -72,9 +72,9 @@ public class PythonByteArrayPageProvider implements PageProvider {
         return length;
     }
 
-    private long computeLength(String value) {
+    private static long computeLength(String value) {
         int skipEnd = 1;
-        long length = 0;
+        long computedLength = 0;
         int position = 0;
         if (value.startsWith(BYTEARRAY_PREFIX)) {
             position += BYTEARRAY_PREFIX.length();
@@ -101,10 +101,10 @@ public class PythonByteArrayPageProvider implements PageProvider {
                 position++;
             }
 
-            length++;
+            computedLength++;
         }
 
-        return length;
+        return computedLength;
     }
 
     private void readByteData(long bytePosition, byte[] targetArray, int length) {

@@ -20,6 +20,7 @@ import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.UiUtils;
 import org.exbin.framework.utils.WindowUtils;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -392,7 +393,7 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
     private javax.swing.JTextField versionTextField;
     // End of variables declaration//GEN-END:variables
 
-    public void setSideComponent(JComponent sideComponent) {
+    public void setSideComponent(@Nullable JComponent sideComponent) {
         if (this.sideComponent != null) {
             remove(this.sideComponent);
         }
