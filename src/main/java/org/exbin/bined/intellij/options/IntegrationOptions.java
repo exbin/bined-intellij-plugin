@@ -36,4 +36,6 @@ public interface IntegrationOptions {
     boolean isRegisterDebugViewAsBinary();
 
     boolean isRegisterByteToByteDiffTool();
+
+    boolean isRegisterEditAsBinaryForDbColumn();
 }

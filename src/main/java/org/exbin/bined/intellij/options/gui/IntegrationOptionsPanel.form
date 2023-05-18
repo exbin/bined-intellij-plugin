@@ -26,6 +26,7 @@
                   <Component id="binaryEditorInContextOpenInCheckBox" alignment="0" max="32767" attributes="0"/>
                   <Component id="openAsBinaryInDebugViewCheckBox" alignment="0" max="32767" attributes="0"/>
                   <Component id="byteToByteDiffToolCheckBox" alignment="0" max="32767" attributes="0"/>
+                  <Component id="editAsBinaryForDbColumnCheckBox" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -46,6 +47,8 @@
               <Component id="openAsBinaryInDebugViewCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="byteToByteDiffToolCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="editAsBinaryForDbColumnCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -114,6 +117,17 @@
       </Properties>
       <Events>
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="byteToByteDiffToolCheckBoxStateChanged"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="editAsBinaryForDbColumnCheckBox">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/exbin/bined/intellij/options/gui/resources/IntegrationOptionsPanel.properties" key="IntegrationOptionsPanel.editAsBinaryForDbColumnCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="editAsBinaryForDbColumnCheckBoxStateChanged"/>
       </Events>
     </Component>
   </SubComponents>

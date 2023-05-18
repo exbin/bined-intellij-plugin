@@ -35,6 +35,8 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
     private boolean registerDebugViewAsBinary = true;
     private boolean registerByteToByteDiffTool = true;
 
+    private boolean registerEditAsBinaryForDbColumn = true;
+
     @Override
     public boolean isRegisterFileMenuOpenAsBinary() {
         return registerFileMenuOpenAsBinary;
@@ -88,6 +90,15 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
         this.registerByteToByteDiffTool = registerByteToByteDiffTool;
     }
 
+    @Override
+    public boolean isRegisterEditAsBinaryForDbColumn() {
+        return registerEditAsBinaryForDbColumn;
+    }
+
+    public void setRegisterEditAsBinaryForDbColumn(boolean registerEditAsBinaryForDbColumn) {
+        this.registerEditAsBinaryForDbColumn = registerEditAsBinaryForDbColumn;
+    }
+
     public void loadFromPreferences(IntegrationPreferences preferences) {
         registerFileMenuOpenAsBinary = preferences.isRegisterFileMenuOpenAsBinary();
         registerOpenFileAsBinaryViaToolbar = preferences.isRegisterOpenFileAsBinaryViaToolbar();
@@ -95,6 +106,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
         registerContextOpenInBinaryEditor = preferences.isRegisterContextOpenInBinaryEditor();
         registerDebugViewAsBinary = preferences.isRegisterDebugViewAsBinary();
         registerByteToByteDiffTool = preferences.isRegisterByteToByteDiffTool();
+        registerEditAsBinaryForDbColumn = preferences.isRegisterEditAsBinaryForDbColumn();
     }
 
     public void saveToPreferences(IntegrationPreferences preferences) {
@@ -104,6 +116,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
         preferences.setRegisterContextOpenInBinaryEditor(registerContextOpenInBinaryEditor);
         preferences.setRegisterDebugViewAsBinary(registerDebugViewAsBinary);
         preferences.setRegisterByteToByteDiffTool(registerByteToByteDiffTool);
+        preferences.setRegisterEditAsBinaryForDbColumn(registerEditAsBinaryForDbColumn);
     }
 
     public void setOptions(IntegrationOptionsImpl options) {
@@ -113,5 +126,6 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
         registerContextOpenInBinaryEditor = options.isRegisterContextOpenInBinaryEditor();
         registerDebugViewAsBinary = options.isRegisterDebugViewAsBinary();
         registerByteToByteDiffTool = options.isRegisterByteToByteDiffTool();
+        registerEditAsBinaryForDbColumn = options.isRegisterEditAsBinaryForDbColumn();
     }
 }

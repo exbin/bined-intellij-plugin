@@ -82,5 +82,6 @@ dependencies {
     compileOnly(":debugvalue-phpstorm-2022.2.1")
     compileOnly(":debugvalue-pycharm-2022.2.1")
     compileOnly(":debugvalue-rider-2022.2.1")
+    compileOnly(":database-plugin-2022.2.1")
     compileOnly(":jsr305-2.0.1")
 }

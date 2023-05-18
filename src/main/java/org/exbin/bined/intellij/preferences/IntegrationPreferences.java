@@ -34,6 +34,8 @@ public class IntegrationPreferences implements IntegrationOptions {
     public static final String PREFERENCES_REGISTER_DEBUG_VIEW_AS_BINARY = "registerDebugVariablesAsBinary";
     public static final String PREFERENCES_REGISTER_BYTE_TO_BYTE_DIFF_TOOL = "registerByteToByteDiffTool";
 
+    public static final String PREFERENCES_REGISTER_EDIT_AS_BINARY_FOR_DB_COLUMN = "registerEditAsBinaryForDbColumn";
+
     private final Preferences preferences;
 
     public IntegrationPreferences(Preferences preferences) {
@@ -92,5 +94,14 @@ public class IntegrationPreferences implements IntegrationOptions {
 
     public void setRegisterByteToByteDiffTool(boolean registerByteToByteDiffTool) {
         preferences.putBoolean(PREFERENCES_REGISTER_BYTE_TO_BYTE_DIFF_TOOL, registerByteToByteDiffTool);
+    }
+
+    @Override
+    public boolean isRegisterEditAsBinaryForDbColumn() {
+        return preferences.getBoolean(PREFERENCES_REGISTER_EDIT_AS_BINARY_FOR_DB_COLUMN, true);
+    }
+
+    public void setRegisterEditAsBinaryForDbColumn(boolean registerEditAsBinaryForDbColumn) {
+        preferences.putBoolean(PREFERENCES_REGISTER_EDIT_AS_BINARY_FOR_DB_COLUMN, registerEditAsBinaryForDbColumn);
     }
 }
