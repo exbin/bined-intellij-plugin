@@ -18,11 +18,17 @@ package org.exbin.bined.intellij;
 import com.intellij.openapi.extensions.ExtensionPointAdapter;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.PluginDescriptor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.messages.MessageBus;
+import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.paged_data.BinaryData;
@@ -34,6 +40,7 @@ import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
+import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.FileHandlingMode;
 
 import javax.annotation.Nonnull;
@@ -66,16 +73,20 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
 
     @Override
     public void runActivity(Project project) {
-        ProjectManager.getInstance().addProjectManagerListener(new BinEdVetoableProjectListener());
+        if (initialIntegrationOptions == null) {
+            ProjectManager.getInstance().addProjectManagerListener(new BinEdVetoableProjectListener());
 
-        BINED_VIEW_DATA.addExtensionPointListener(new ExtensionPointAdapter<>() {
-            @Override
-            public void extensionListChanged() {
-                initExtensions();
-            }
-        }, null);
-        initExtensions();
-        initIntegration();
+            BINED_VIEW_DATA.addExtensionPointListener(new ExtensionPointAdapter<>() {
+                @Override
+                public void extensionListChanged() {
+                    initExtensions();
+                }
+            }, null);
+            initExtensions();
+            initIntegration();
+        }
+
+        projectOpened(project);
     }
 
     private void initExtensions() {
@@ -88,11 +99,31 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
                 });
     }
 
-    private void initIntegration() {
+    private static void initIntegration() {
         initialIntegrationOptions = new IntegrationPreferences(
                 new IntelliJPreferencesWrapper(BinEdComponentPanel.getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX)
         );
         applyIntegrationOptions(initialIntegrationOptions);
+    }
+
+    private static void projectOpened(Project project) {
+        MessageBus messageBus = project.getMessageBus();
+        MessageBusConnection connect = messageBus.connect();
+        connect.subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, new FileEditorManagerListener.Before() {
+            @Override
+            public void beforeFileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile file) {
+                if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isMoved()
+                        && !((BinEdVirtualFile) file).isClosing()) {
+                    ((BinEdVirtualFile) file).setClosing(true);
+                    BinEdFileHandler editorPanel = ((BinEdVirtualFile) file).getEditorFile();
+                    if (!editorPanel.releaseFile()) {
+                        ((BinEdVirtualFile) file).setClosing(false);
+                        throw new ProcessCanceledException();
+                    }
+                    ((BinEdVirtualFile) file).setClosing(false);
+                }
+            }
+        });
     }
 
     public static void addIntegrationOptionsListener(IntegrationOptionsListener integrationOptionsListener) {

@@ -15,22 +15,30 @@
  */
 package org.exbin.bined.intellij.gui;
 
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.actionSystem.Toggleable;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
-import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.utils.LanguageUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -47,7 +55,7 @@ public class BinEdToolbarPanel extends JBPanel {
     private static final Key<Boolean> SELECTED_PROPERTY_KEY = Key.create(Toggleable.SELECTED_PROPERTY);
 
     private final BinaryEditorPreferences preferences;
-    private final ExtCodeArea codeArea;
+    private final Control codeAreaControl;
     private final AnAction optionsAction;
     private final AnAction onlineHelpAction;
     private BinaryDataUndoHandler undoHandler;
@@ -64,16 +72,16 @@ public class BinEdToolbarPanel extends JBPanel {
     private final AnAction hexadecimalCodeTypeAction;
     private boolean modified = false;
 
-    public BinEdToolbarPanel(BinaryEditorPreferences preferences, ExtCodeArea codeArea, AnAction optionsAction, AnAction onlineHelpAction) {
+    public BinEdToolbarPanel(BinaryEditorPreferences preferences, JComponent targetComponent, Control codeAreaControl, AnAction optionsAction, AnAction onlineHelpAction) {
         this.preferences = preferences;
-        this.codeArea = codeArea;
+        this.codeAreaControl = codeAreaControl;
         this.optionsAction = optionsAction;
         this.onlineHelpAction = onlineHelpAction;
 
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
         toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE, actionGroup, true);
-        toolbar.setTargetComponent(codeArea);
+        toolbar.setTargetComponent(targetComponent);
         add(toolbar, BorderLayout.CENTER);
 
         binaryCodeTypeAction = new AnAction(
@@ -83,7 +91,7 @@ public class BinEdToolbarPanel extends JBPanel {
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                codeArea.setCodeType(CodeType.BINARY);
+                codeAreaControl.setCodeType(CodeType.BINARY);
                 updateCycleButtonState();
             }
         };
@@ -95,7 +103,7 @@ public class BinEdToolbarPanel extends JBPanel {
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                codeArea.setCodeType(CodeType.OCTAL);
+                codeAreaControl.setCodeType(CodeType.OCTAL);
                 updateCycleButtonState();
             }
         };
@@ -106,7 +114,7 @@ public class BinEdToolbarPanel extends JBPanel {
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                codeArea.setCodeType(CodeType.DECIMAL);
+                codeAreaControl.setCodeType(CodeType.DECIMAL);
                 updateCycleButtonState();
             }
         };
@@ -117,7 +125,7 @@ public class BinEdToolbarPanel extends JBPanel {
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                codeArea.setCodeType(CodeType.HEXADECIMAL);
+                codeAreaControl.setCodeType(CodeType.HEXADECIMAL);
                 updateCycleButtonState();
             }
         };
@@ -155,7 +163,7 @@ public class BinEdToolbarPanel extends JBPanel {
     }
 
     private void updateCycleButtonState() {
-        CodeType codeType = codeArea.getCodeType();
+        CodeType codeType = codeAreaControl.getCodeType();
 
         switch (codeType) {
             case BINARY: {
@@ -192,7 +200,7 @@ public class BinEdToolbarPanel extends JBPanel {
     }
 
     public void loadFromPreferences() {
-        codeArea.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
+        codeAreaControl.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
         updateCycleButtonState();
         updateUnprintables();
     }
@@ -203,7 +211,7 @@ public class BinEdToolbarPanel extends JBPanel {
     }
 
     public void updateUnprintables() {
-        boolean showUnprintables = codeArea.isShowUnprintables();
+        boolean showUnprintables = codeAreaControl.isShowUnprintables();
         setActionSelection(showUnprintablesToggleButton, showUnprintables);
     }
 
@@ -293,12 +301,12 @@ public class BinEdToolbarPanel extends JBPanel {
         ) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return codeArea.isShowUnprintables();
+                return codeAreaControl.isShowUnprintables();
             }
 
             @Override
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean selected) {
-                codeArea.setShowUnprintables(selected);
+                codeAreaControl.setShowUnprintables(selected);
                 updateUnprintables();
             }
         };
@@ -343,7 +351,7 @@ public class BinEdToolbarPanel extends JBPanel {
     private void undoEditButtonActionPerformed() {
         try {
             undoHandler.performUndo();
-            codeArea.repaint();
+            codeAreaControl.repaint();
             updateUndoState();
         } catch (Exception e) {
             e.printStackTrace();
@@ -353,7 +361,7 @@ public class BinEdToolbarPanel extends JBPanel {
     private void redoEditButtonActionPerformed() {
         try {
             undoHandler.performRedo();
-            codeArea.repaint();
+            codeAreaControl.repaint();
             updateUndoState();
         } catch (Exception e) {
             e.printStackTrace();
@@ -370,5 +378,20 @@ public class BinEdToolbarPanel extends JBPanel {
 
     private Icon load(String path) {
         return IconLoader.getIcon(path, getClass());
+    }
+
+    @ParametersAreNonnullByDefault
+    public interface Control {
+
+        @Nonnull
+        CodeType getCodeType();
+
+        void setCodeType(CodeType codeType);
+
+        boolean isShowUnprintables();
+
+        void setShowUnprintables(boolean showUnprintables);
+
+        void repaint();
     }
 }

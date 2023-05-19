@@ -21,10 +21,10 @@ import com.intellij.database.datagrid.GridColumn;
 import com.intellij.database.datagrid.GridModel;
 import com.intellij.database.datagrid.GridRow;
 import com.intellij.database.datagrid.SelectionModel;
+import com.intellij.database.extractors.ExtractorsUtil;
 import com.intellij.database.extractors.TextInfo;
 import com.intellij.database.run.actions.GridAction;
 import com.intellij.database.run.ui.DataAccessType;
-import com.intellij.database.run.ui.grid.editors.CoreGridCellEditorHelper;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -35,6 +35,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 import org.exbin.bined.EditMode;
@@ -62,7 +63,7 @@ import java.util.logging.Logger;
 public class DbEditBinaryAction extends AnAction implements DumbAware, GridAction {
 
     private boolean actionVisible = true;
-    private ObjectValueConvertor objectValueConvertor = new ObjectValueConvertor();
+    private final ObjectValueConvertor objectValueConvertor = new ObjectValueConvertor();
 
     public DbEditBinaryAction() {
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible =
@@ -78,22 +79,28 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
             GridRow row = Objects.requireNonNull(dataModel.getRow(selectionModel.getSelectedRow()));
             Object value = column.getValue(row);
 
-            // TODO detect BLOB types somehow? column.getType()
-//            switch (CoreGridCellEditorHelper.get(grid).guessJdbcTypeForEditing(grid, row, column)) {
-//            case -4:
-//            case -3:
-//            case -2:
-//            case 2004:
-//                return 1;
-//            default:
-//                return 0;
-//            }
+            boolean isBlobType;
+            // CoreGridCellEditorHelper.get(grid).guessJdbcTypeForEditing() is obsolete
+            switch (ExtractorsUtil.guessJdbcType(column,
+                    dataModel.getValueAt(selectionModel.getSelectedRow(), selectionModel.getSelectedColumn()),
+                    DataGridUtil.getDbms(grid))) {
+            case -4:
+            case -3:
+            case -2:
+            case 2004:
+                isBlobType = true;
+                break;
+            default:
+                isBlobType = false;
+            }
 
             BinaryData binaryData;
-            if (value instanceof byte[] || value == null) {
-                binaryData = value == null ? new ByteArrayEditableData() : new ByteArrayEditableData((byte[]) value);
+            if (value instanceof byte[]) {
+                binaryData = new ByteArrayEditableData((byte[]) value);
             } else if (value instanceof TextInfo) {
                 binaryData = new ByteArrayEditableData(((TextInfo) value).bytes);
+            } else if (value == null) {
+                binaryData = isBlobType ? new ByteArrayEditableData() : new ByteArrayData();
             } else {
                 binaryData = objectValueConvertor.process(value).orElse(null);
             }
@@ -131,14 +138,16 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
 
         private final BinEdComponentPanel viewPanel;
         private final DataGrid grid;
+        private final boolean editable;
 
         private DataDialog(Project project, DataGrid grid, @Nullable BinaryData binaryData) {
             super(project, false);
             this.grid = grid;
+            editable = binaryData instanceof EditableBinaryData;
+
             setModal(false);
             setCancelButtonText("Close");
             setOKButtonText("Set");
-            boolean editable = binaryData instanceof EditableBinaryData;
             setOKActionEnabled(editable);
             setCrossClosesWindow(true);
 
@@ -156,7 +165,7 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
 
                 @Override
                 public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
-                    throw new IllegalStateException("Save not supported");
+                    // Ignore
                 }
 
                 @Override
@@ -197,7 +206,11 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
         @Nonnull
         @Override
         protected Action[] createActions() {
-            return new Action[] { getOKAction(), getCancelAction() };
+            if (editable) {
+                return new Action[] { getOKAction(), getCancelAction() };
+            }
+
+            return new Action[] { getCancelAction() };
         }
 
         @Nullable

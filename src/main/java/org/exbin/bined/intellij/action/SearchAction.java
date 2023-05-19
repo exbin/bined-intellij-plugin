@@ -341,7 +341,7 @@ public final class SearchAction implements ActionListener {
 
             @Override
             public boolean isEnabled() {
-                return codeArea.hasSelection();
+                return codeArea.isEditable() && codeArea.hasSelection();
             }
         });
         cutMenuItem.setText("Cut");
@@ -369,7 +369,7 @@ public final class SearchAction implements ActionListener {
 
             @Override
             public boolean isEnabled() {
-                return codeArea.canPaste();
+                return codeArea.isEditable() && codeArea.canPaste();
             }
         });
         pasteMenuItem.setText("Paste");
@@ -383,7 +383,7 @@ public final class SearchAction implements ActionListener {
 
             @Override
             public boolean isEnabled() {
-                return codeArea.hasSelection();
+                return codeArea.isEditable() && codeArea.hasSelection();
             }
         });
         deleteMenuItem.setText("Delete");

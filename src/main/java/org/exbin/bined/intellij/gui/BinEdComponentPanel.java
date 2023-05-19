@@ -25,6 +25,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.CodeAreaCaretPosition;
+import org.exbin.bined.CodeType;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.PositionCodeType;
@@ -76,6 +77,7 @@ import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.gui.CloseControlPanel;
 import org.exbin.framework.utils.gui.OptionsControlPanel;
 import org.exbin.framework.utils.handler.OptionsControlHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -115,7 +117,7 @@ import java.nio.charset.Charset;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdComponentPanel extends JBPanel implements DumbAware {
+public class BinEdComponentPanel extends JBPanel {
 
     public static final String ACTION_CLIPBOARD_CUT = "cut-to-clipboard";
     public static final String ACTION_CLIPBOARD_COPY = "copy-to-clipboard";
@@ -194,6 +196,33 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
         defaultThemeProfile = codeArea.getThemeProfile();
         defaultColorProfile = codeArea.getColorsProfile();
         toolbarPanel = new BinEdToolbarPanel(preferences, codeArea,
+                new BinEdToolbarPanel.Control() {
+                    @Nonnull
+                    @Override
+                    public CodeType getCodeType() {
+                        return codeArea.getCodeType();
+                    }
+
+                    @Override
+                    public void setCodeType(CodeType codeType) {
+                        codeArea.setCodeType(codeType);
+                    }
+
+                    @Override
+                    public boolean isShowUnprintables() {
+                        return codeArea.isShowUnprintables();
+                    }
+
+                    @Override
+                    public void setShowUnprintables(boolean showUnprintables) {
+                        codeArea.setShowUnprintables(showUnprintables);
+                    }
+
+                    @Override
+                    public void repaint() {
+                        codeArea.repaint();
+                    }
+                },
                 new AnAction() {
                     @Override
                     public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
@@ -714,8 +743,10 @@ public class BinEdComponentPanel extends JBPanel implements DumbAware {
 
         JMenuItem compareFilesMenuItem = createCompareFilesMenuItem();
         menu.add(compareFilesMenuItem);
-        JMenuItem reloadFileMenuItem = createReloadFileMenuItem();
-        menu.add(reloadFileMenuItem);
+        if (fileApi instanceof BinEdFileHandler || fileApi instanceof BinEdNativeFile) {
+            JMenuItem reloadFileMenuItem = createReloadFileMenuItem();
+            menu.add(reloadFileMenuItem);
+        }
 
         final JMenuItem optionsMenuItem = new JMenuItem("Options...");
         optionsMenuItem.setIcon(new ImageIcon(getClass().getResource("/org/exbin/framework/options/gui/resources/icons/Preferences16.gif")));

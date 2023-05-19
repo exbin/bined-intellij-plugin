@@ -1,4 +1,4 @@
-0.2.8
+0.2.8 (2023-05-19)
 - Added edit as binary action for columns in database view
 - Added byte-to-byte compare diff option
 - Added integration options page
