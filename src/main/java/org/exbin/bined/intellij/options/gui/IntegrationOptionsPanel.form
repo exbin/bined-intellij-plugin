@@ -112,7 +112,7 @@
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/bined/intellij/options/gui/resources/IntegrationOptionsPanel.properties" key="IntegrationOptionsPanel.byteToByteDiffToolCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/bined/intellij/options/gui/resources/IntegrationOptionsPanel.properties" key="byteToByteDiffToolCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -123,7 +123,7 @@
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/bined/intellij/options/gui/resources/IntegrationOptionsPanel.properties" key="IntegrationOptionsPanel.editAsBinaryForDbColumnCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/bined/intellij/options/gui/resources/IntegrationOptionsPanel.properties" key="editAsBinaryForDbColumnCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>

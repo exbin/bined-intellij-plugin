@@ -123,7 +123,7 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
         });
 
         byteToByteDiffToolCheckBox.setSelected(true);
-        byteToByteDiffToolCheckBox.setText(resourceBundle.getString("IntegrationOptionsPanel.byteToByteDiffToolCheckBox.text")); // NOI18N
+        byteToByteDiffToolCheckBox.setText(resourceBundle.getString("byteToByteDiffToolCheckBox.text")); // NOI18N
         byteToByteDiffToolCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 byteToByteDiffToolCheckBoxStateChanged(evt);
@@ -131,7 +131,7 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
         });
 
         editAsBinaryForDbColumnCheckBox.setSelected(true);
-        editAsBinaryForDbColumnCheckBox.setText(resourceBundle.getString("IntegrationOptionsPanel.editAsBinaryForDbColumnCheckBox.text")); // NOI18N
+        editAsBinaryForDbColumnCheckBox.setText(resourceBundle.getString("editAsBinaryForDbColumnCheckBox.text")); // NOI18N
         editAsBinaryForDbColumnCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 editAsBinaryForDbColumnCheckBoxStateChanged(evt);
