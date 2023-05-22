@@ -15,16 +15,21 @@
  */
 package org.exbin.bined.intellij.diff.gui;
 
+import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.contents.DocumentContent;
+import com.intellij.diff.contents.FileContent;
 import com.intellij.diff.requests.ContentDiffRequest;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBPanel;
+import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.CodeType;
-import org.exbin.bined.EditMode;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
@@ -66,12 +71,12 @@ import org.exbin.framework.utils.gui.OptionsControlPanel;
 import org.exbin.framework.utils.handler.OptionsControlHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JViewport;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -82,6 +87,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -199,29 +205,56 @@ public class BinedDiffPanel extends JBPanel {
     }
 
     public void setDiffContent(ContentDiffRequest request) {
-        List<VirtualFile> filesToRefresh = request.getFilesToRefresh();
-        VirtualFile virtualFile = filesToRefresh.get(0);
-        diffPanel.setLeftContentData(new BinEdFileDataWrapper(virtualFile));
-        ExtCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
-        leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
-            @Override
-            public void show(Component invoker, int x, int y) {
-                JPopupMenu popupMenu = SearchAction.createCodeAreaPopupMenu(leftCodeArea, "left");
-                popupMenu.show(invoker, x, y);
+        List<DiffContent> contents = request.getContents();
+        if (!contents.isEmpty()) {
+            BinaryData leftData = getDiffBinaryData(request, 0);
+            if (leftData == null) {
+                return;
             }
-        });
-        if (filesToRefresh.size() > 1) {
-            VirtualFile secondFile = filesToRefresh.get(1);
-            diffPanel.setRightContentData(new BinEdFileDataWrapper(secondFile));
+            diffPanel.setLeftContentData(leftData);
+            ExtCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
+            leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
+                @Override
+                public void show(Component invoker, int x, int y) {
+                    JPopupMenu popupMenu = SearchAction.createCodeAreaPopupMenu(leftCodeArea, "left");
+                    popupMenu.show(invoker, x, y);
+                }
+            });
+            BinaryData rightData = getDiffBinaryData(request, 1);
+            if (rightData != null) {
+                diffPanel.setRightContentData(rightData);
+            }
+            ExtCodeArea rightCodeArea = diffPanel.getRightCodeArea();
+            rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
+                @Override
+                public void show(Component invoker, int x, int y) {
+                    JPopupMenu popupMenu = SearchAction.createCodeAreaPopupMenu(rightCodeArea, "right");
+                    popupMenu.show(invoker, x, y);
+                }
+            });
         }
-        ExtCodeArea rightCodeArea = diffPanel.getRightCodeArea();
-        rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
-            @Override
-            public void show(Component invoker, int x, int y) {
-                JPopupMenu popupMenu = SearchAction.createCodeAreaPopupMenu(rightCodeArea, "right");
-                popupMenu.show(invoker, x, y);
+    }
+
+    @Nullable
+    private static BinaryData getDiffBinaryData(ContentDiffRequest request, int index) {
+        List<VirtualFile> filesToRefresh = request.getFilesToRefresh();
+        if (filesToRefresh.size() > index) {
+            return new BinEdFileDataWrapper(filesToRefresh.get(index));
+        }
+
+        List<DiffContent> contents = request.getContents();
+        if (contents.size() > index) {
+            DiffContent diffContent = contents.get(index);
+            if (diffContent instanceof FileContent) {
+                return new BinEdFileDataWrapper(((FileContent) diffContent).getFile());
             }
-        });
+            if (diffContent instanceof DocumentContent) {
+                Document document = ((DocumentContent) diffContent).getDocument();
+                return new ByteArrayData(document.getText().getBytes(StandardCharsets.UTF_8));
+            }
+        }
+
+        return null;
     }
 
     public void registerBinaryStatus(BinaryStatusApi binaryStatusApi) {
