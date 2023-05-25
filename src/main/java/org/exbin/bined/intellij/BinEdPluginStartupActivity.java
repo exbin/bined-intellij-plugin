@@ -15,6 +15,13 @@
  */
 package org.exbin.bined.intellij;
 
+import com.intellij.diff.impl.DiffSettingsHolder;
+import com.intellij.diff.tools.combined.CombinedDiffComponentFactory;
+import com.intellij.diff.tools.combined.CombinedDiffMainUI;
+import com.intellij.diff.tools.combined.CombinedDiffTool;
+import com.intellij.diff.tools.combined.CombinedDiffViewer;
+import com.intellij.diff.tools.fragmented.UnifiedDiffTool;
+import com.intellij.diff.tools.simple.SimpleDiffTool;
 import com.intellij.openapi.extensions.ExtensionPointAdapter;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.PluginDescriptor;
@@ -36,6 +43,7 @@ import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.data.ObjectValueConvertor;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
+import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.options.IntegrationOptions;
@@ -51,6 +59,8 @@ import javax.swing.JComponent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Post startup activity.
@@ -62,6 +72,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
 
     private static final ExtensionPointName<BinaryViewData> BINED_VIEW_DATA =
             ExtensionPointName.create("org.exbin.deltahex.intellij.viewBinaryData");
+    private static final String BINED_DIFF_TOOL_ID = BinEdDiffTool.class.getCanonicalName();
     private static final List<IntegrationOptionsListener> INTEGRATION_OPTIONS_LISTENERS = new ArrayList<>();
     private static IntegrationOptions initialIntegrationOptions = null;
 
@@ -124,6 +135,33 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
                 }
             }
         });
+
+        moveBinEdDiffToolToLastPosition();
+    }
+
+    private static void moveBinEdDiffToolToLastPosition() {
+        try {
+            DiffSettingsHolder.DiffSettings settings = DiffSettingsHolder.DiffSettings.getSettings();
+            List<String> diffToolsOrder = settings.getDiffToolsOrder();
+            if (diffToolsOrder.isEmpty()) {
+                // Prefer basic and unified diff tools before added BinEd diff
+                diffToolsOrder.add(SimpleDiffTool.class.getCanonicalName());
+                diffToolsOrder.add(UnifiedDiffTool.class.getCanonicalName());
+                diffToolsOrder.add(BINED_DIFF_TOOL_ID);
+            } else {
+                for (int i = 0; i < diffToolsOrder.size(); i++) {
+                    if (BINED_DIFF_TOOL_ID.equals(diffToolsOrder.get(i))) {
+                        diffToolsOrder.remove(i);
+                        break;
+                    }
+                }
+                // Add as last option
+                diffToolsOrder.add(BINED_DIFF_TOOL_ID);
+            }
+            settings.setDiffToolsOrder(diffToolsOrder);
+        } catch (Exception ex) {
+            Logger.getLogger(BinEdPluginStartupActivity.class.getName()).log(Level.SEVERE, "Unable to move BinEd diff tool to lowest priority", ex);
+        }
     }
 
     public static void addIntegrationOptionsListener(IntegrationOptionsListener integrationOptionsListener) {

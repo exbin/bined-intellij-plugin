@@ -1,4 +1,5 @@
-0.2.9
+0.2.8.1 (2023-05-25)
+- Fixed plugin breaks VCS history log reading (Issue #51)
 
 0.2.8 (2023-05-19)
 - Added edit as binary action for columns in database view
