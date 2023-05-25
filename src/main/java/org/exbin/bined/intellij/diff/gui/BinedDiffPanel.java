@@ -237,11 +237,6 @@ public class BinedDiffPanel extends JBPanel {
 
     @Nullable
     private static BinaryData getDiffBinaryData(ContentDiffRequest request, int index) {
-        List<VirtualFile> filesToRefresh = request.getFilesToRefresh();
-        if (filesToRefresh.size() > index) {
-            return new BinEdFileDataWrapper(filesToRefresh.get(index));
-        }
-
         List<DiffContent> contents = request.getContents();
         if (contents.size() > index) {
             DiffContent diffContent = contents.get(index);

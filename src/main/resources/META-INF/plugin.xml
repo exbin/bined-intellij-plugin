@@ -5,7 +5,7 @@
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
     <name>BinEd - Binary/Hexadecimal Editor</name>
-    <version>0.2.8.1</version>
+    <version>0.2.9.snapshot</version>
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="exbinproject@gmail.com" url="https://exbin.org">ExBin Project</vendor>
 
@@ -21,7 +21,7 @@
 <li>Use "Edit as Binary" in column context menu in DB view</li></ul>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.8.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.9.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
 
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
@@ -42,13 +42,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Added edit as binary action for columns in database view</li>
-<li>Added byte-to-byte compare diff option</li>
-<li>Added integration options page</li>
-<li>Reworked save on close</li>
-<li>Added reload file action (issue #49)</li>
-<li>Fixed illegal argument exception (issue #50)</li>
-<li>Fixed plugin breaks VCS history log reading (issue #51)</li>
+<ul><li>-</li>
 </ul>
     ]]>
     </change-notes>

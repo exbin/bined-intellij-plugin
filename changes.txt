@@ -1,3 +1,5 @@
+0.2.9
+
 0.2.8.1 (2023-05-25)
 - Fixed plugin breaks VCS history log reading (Issue #51)
 
