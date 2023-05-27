@@ -32,6 +32,8 @@ import org.exbin.xbup.core.util.StreamUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,7 +53,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
 
     private InputStream cacheInputStream = null;
     private long cachePosition = 0;
-    private final DataPage[] cachePages = new DataPage[]{new DataPage(), new DataPage()};
+    private final DataPage[] cachePages = new DataPage[] { new DataPage(), new DataPage() };
     private int nextCachePage = 0;
 
     private volatile boolean writeInProgress = false;
@@ -156,7 +158,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     @Override
     public void saveToStream(OutputStream outputStream) throws IOException {
         try {
-            InputStream inputStream = file.getInputStream();
+            InputStream inputStream = getFileInputStream();
             StreamUtils.copyInputStreamToOutputStream(inputStream, outputStream);
             inputStream.close();
         } catch (IOException e) {
@@ -168,10 +170,25 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     @Override
     public InputStream getDataInputStream() {
         try {
-            return file.getInputStream();
+            return getFileInputStream();
         } catch (IOException e) {
             throw createBrokenVirtualFileException(e);
         }
+    }
+
+    @Nonnull
+    private InputStream getFileInputStream() throws IOException {
+        return new ByteArrayInputStream(file.contentsToByteArray());
+    }
+
+    @Nonnull
+    private OutputStream getFileOutputStream() throws IOException {
+        return new ByteArrayOutputStream() {
+            @Override public void close() throws IOException {
+                super.close();
+                file.setBinaryContent(toByteArray());
+            }
+        };
     }
 
     @Override
@@ -193,15 +210,17 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     public synchronized void setByte(long position, byte value) {
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             if (position > 0) {
                 StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, position);
             }
             if (fileLength > position + 1) {
                 StreamUtils.skipInputStreamData(inputStream, 1);
                 outputStream.write(value);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - position - 1);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream,
+                        outputStream,
+                        fileLength - position - 1);
             } else {
                 outputStream.write(value);
             }
@@ -220,8 +239,8 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     public synchronized void insert(long startFrom, long length) {
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
             long remains = length;
             while (remains > 0) {
@@ -243,11 +262,14 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public synchronized void insert(long startFrom, byte[] insertedData, int insertedDataOffset, int insertedDataLength) {
+    public synchronized void insert(long startFrom,
+            byte[] insertedData,
+            int insertedDataOffset,
+            int insertedDataLength) {
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
             outputStream.write(insertedData, insertedDataOffset, insertedDataLength);
             if (fileLength > startFrom) {
@@ -263,8 +285,8 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     public synchronized void insert(long startFrom, BinaryData insertedData) {
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
             insertedData.saveToStream(outputStream);
             if (fileLength > startFrom) {
@@ -277,11 +299,14 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public synchronized void insert(long startFrom, BinaryData insertedData, final long insertedDataOffset, final long insertedDataLength) {
+    public synchronized void insert(long startFrom,
+            BinaryData insertedData,
+            final long insertedDataOffset,
+            final long insertedDataLength) {
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
             long length = insertedDataLength;
             long offset = insertedDataOffset;
@@ -306,8 +331,8 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     public synchronized long insert(long startFrom, InputStream insertStream, long maximumDataSize) throws IOException {
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
             StreamUtils.copyFixedSizeInputStreamToOutputStream(insertStream, outputStream, maximumDataSize);
             if (fileLength > startFrom) {
@@ -327,15 +352,18 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     }
 
     @Override
-    public synchronized void replace(long targetPosition, BinaryData replacingData, long startFrom, long replacingLength) {
+    public synchronized void replace(long targetPosition,
+            BinaryData replacingData,
+            long startFrom,
+            long replacingLength) {
         if (targetPosition + replacingLength > getDataSize()) {
             throw new OutOfBoundsException("Data can be replaced only inside or at the end");
         }
 
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, targetPosition);
             long length = replacingLength;
             long offset = startFrom;
@@ -349,7 +377,9 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             }
             if (fileLength > startFrom + replacingLength) {
                 StreamUtils.skipInputStreamData(inputStream, replacingLength);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - targetPosition - replacingLength);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream,
+                        outputStream,
+                        fileLength - targetPosition - replacingLength);
             }
 
             inputStream.close();
@@ -370,13 +400,15 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
 
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, targetPosition);
             outputStream.write(replacingData, replacingDataOffset, length);
             if (fileLength > targetPosition + length) {
                 StreamUtils.skipInputStreamData(inputStream, length);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - targetPosition - length);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream,
+                        outputStream,
+                        fileLength - targetPosition - length);
             }
 
             inputStream.close();
@@ -393,15 +425,17 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     public synchronized void fillData(long startFrom, long length, byte fill) {
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
             for (int i = 0; i < length; i++) {
                 outputStream.write(fill);
             }
             if (fileLength > startFrom + length) {
                 StreamUtils.skipInputStreamData(inputStream, length);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom - length);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream,
+                        outputStream,
+                        fileLength - startFrom - length);
             }
 
             inputStream.close();
@@ -413,12 +447,14 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     public synchronized void remove(long startFrom, long length) {
         writeAction(() -> {
             long fileLength = file.getLength();
-            InputStream inputStream = file.getInputStream();
-            OutputStream outputStream = file.getOutputStream(null);
+            InputStream inputStream = getFileInputStream();
+            OutputStream outputStream = getFileOutputStream();
             StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, startFrom);
             if (fileLength > startFrom + length) {
                 StreamUtils.skipInputStreamData(inputStream, length);
-                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream, outputStream, fileLength - startFrom - length);
+                StreamUtils.copyFixedSizeInputStreamToOutputStream(inputStream,
+                        outputStream,
+                        fileLength - startFrom - length);
             }
 
             inputStream.close();
@@ -429,7 +465,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
     @Override
     public synchronized void clear() {
         writeAction(() -> {
-            OutputStream outputStream = file.getOutputStream(null);
+            OutputStream outputStream = getFileOutputStream();
             outputStream.close();
         });
     }
@@ -455,7 +491,10 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
                     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
                         @Override
                         public void run() {
-                            Notifications.Bus.notify(new Notification(BinEdIntelliJPlugin.PLUGIN_ID, "Write failed", "File too big: " + ex.getMessage(), NotificationType.ERROR));
+                            Notifications.Bus.notify(new Notification(BinEdIntelliJPlugin.PLUGIN_ID,
+                                    "Write failed",
+                                    "File too big: " + ex.getMessage(),
+                                    NotificationType.ERROR));
                         }
                     });
                 } else {
@@ -496,7 +535,7 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
             if (cacheInputStream != null) {
                 cacheInputStream.close();
             }
-            cacheInputStream = file.getInputStream();
+            cacheInputStream = getFileInputStream();
             StreamUtils.skipInputStreamData(cacheInputStream, position);
             cachePosition = position;
         }
@@ -562,4 +601,67 @@ public class BinEdFileDataWrapper implements EditableBinaryData {
         String message = "Broken virtual file" + (filePath != null ? ":" + filePath : "");
         return new IllegalStateException(message, ex);
     }
+
+// TODO: Cannot use due to getBOM doesn't return skipped header when combination is not valid
+// Tested with header EF BB BF
+//
+//    @ParametersAreNonnullByDefault
+//    private static class VirtualFileInputStream extends InputStream {
+//
+//        private final byte[] bom;
+//        private int bomRemains;
+//        private final InputStream fileStream;
+//
+//        public VirtualFileInputStream(VirtualFile virtualFile) throws IOException {
+//            this.bom = virtualFile.getBOM();
+//            bomRemains = bom == null ? 0 : bom.length;
+//            this.fileStream = virtualFile.getInputStream();
+//        }
+//
+//        @Override
+//        public int read() throws IOException {
+//            if (bomRemains > 0) {
+//                bomRemains--;
+//                return this.bom[this.bom.length - 1 - bomRemains];
+//            }
+//
+//            return fileStream.read();
+//        }
+//
+//        @Override
+//        public int read(byte[] b) throws IOException {
+//            if (bomRemains > 0) {
+//                // TODO: optimize
+//                return super.read(b);
+//            }
+//
+//            return fileStream.read(b);
+//        }
+//
+//        @Override
+//        public int read(byte[] b, int off, int len) throws IOException {
+//            if (bomRemains > 0) {
+//                // TODO: optimize
+//                return super.read(b, off, len);
+//            }
+//
+//            return fileStream.read(b, off, len);
+//        }
+//
+//        @Override public long skip(long n) throws IOException {
+//            if (bomRemains > 0) {
+//                if (n > bomRemains) {
+//                    int skipped = bomRemains;
+//                    n -= skipped;
+//                    bomRemains = 0;
+//                    return skipped + super.skip(n);
+//                } else {
+//                    bomRemains -= n;
+//                    return n;
+//                }
+//            }
+//
+//            return super.skip(n);
+//        }
+//    }
 }
