@@ -26,7 +26,7 @@ import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.PagedData;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.gui.CompareFilesPanel;
+import org.exbin.framework.bined.compare.gui.CompareFilesPanel;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.gui.CloseControlPanel;
 

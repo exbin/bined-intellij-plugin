@@ -204,8 +204,8 @@ public class CodeAreaColorPreferences implements CodeAreaColorOptions {
     /**
      * Converts color to text.
      *
-     * @param color
-     * @return
+     * @param color color
+     * @return color string in hex format, e.g. "#FFFFFF"
      */
     @Nullable
     private static String colorAsText(@Nullable Color color) {

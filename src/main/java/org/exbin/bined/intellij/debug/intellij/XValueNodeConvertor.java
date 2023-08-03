@@ -46,7 +46,7 @@ import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
-import org.exbin.bined.intellij.data.PageProviderBinaryData;
+import org.exbin.framework.bined.objectdata.PageProviderBinaryData;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.debug.DefaultDebugViewDataProvider;
 import org.exbin.bined.intellij.debug.jdi.JdiBooleanArrayPageProvider;
@@ -59,7 +59,7 @@ import org.exbin.bined.intellij.debug.jdi.JdiLongArrayPageProvider;
 import org.exbin.bined.intellij.debug.jdi.JdiShortArrayPageProvider;
 import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
-import org.exbin.framework.bined.gui.ValuesPanel;
+import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.debugger.VariableView;
 
@@ -663,7 +663,7 @@ public class XValueNodeConvertor {
                 long value = valueRecord.value();
                 BigInteger bigInteger = BigInteger.valueOf(value);
                 for (int bit = 0; bit < 7; bit++) {
-                    BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
+                    BigInteger nextByte = bigInteger.and(BasicValuesPanel.BIG_INTEGER_BYTE_MASK);
                     byteArray[7 - bit] = nextByte.byteValue();
                     bigInteger = bigInteger.shiftRight(8);
                 }

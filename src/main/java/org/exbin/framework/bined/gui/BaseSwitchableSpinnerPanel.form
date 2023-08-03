@@ -10,8 +10,8 @@
       <SubComponents>
         <MenuItem class="javax.swing.JMenuItem" name="octalMenuItem">
           <Properties>
-            <Property name="text" type="java.lang.String" value="OCT"/>
-            <Property name="toolTipText" type="java.lang.String" value="Octal"/>
+            <Property name="text" type="java.lang.String" value="OCT - Octal"/>
+            <Property name="toolTipText" type="java.lang.String" value="Swith to octal numerical base"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="octalMenuItemActionPerformed"/>
@@ -19,8 +19,8 @@
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="decimalMenuItem">
           <Properties>
-            <Property name="text" type="java.lang.String" value="DEC"/>
-            <Property name="toolTipText" type="java.lang.String" value="Decimal"/>
+            <Property name="text" type="java.lang.String" value="DEC - Decimal"/>
+            <Property name="toolTipText" type="java.lang.String" value="Switch to decimal numerical base"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="decimalMenuItemActionPerformed"/>
@@ -28,8 +28,8 @@
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="hexadecimalMenuItem">
           <Properties>
-            <Property name="text" type="java.lang.String" value="HEX"/>
-            <Property name="toolTipText" type="java.lang.String" value="Hexadecimal"/>
+            <Property name="text" type="java.lang.String" value="HEX - Hexadecimal"/>
+            <Property name="toolTipText" type="java.lang.String" value="Switch to hexadecimal numerical base"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hexadecimalMenuItemActionPerformed"/>
@@ -61,7 +61,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="baseSwitchButton" min="-2" pref="65" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="spinner" pref="166" max="32767" attributes="0"/>
+              <Component id="spinner" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

@@ -95,8 +95,8 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         baseSwitchButton = new javax.swing.JButton();
         spinner = new javax.swing.JSpinner();
 
-        octalMenuItem.setText("OCT");
-        octalMenuItem.setToolTipText("Octal");
+        octalMenuItem.setText("OCT - Octal");
+        octalMenuItem.setToolTipText("Swith to octal numerical base");
         octalMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 octalMenuItemActionPerformed(evt);
@@ -104,8 +104,8 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         });
         baseSwitchPopupMenu.add(octalMenuItem);
 
-        decimalMenuItem.setText("DEC");
-        decimalMenuItem.setToolTipText("Decimal");
+        decimalMenuItem.setText("DEC - Decimal");
+        decimalMenuItem.setToolTipText("Switch to decimal numerical base");
         decimalMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 decimalMenuItemActionPerformed(evt);
@@ -113,8 +113,8 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         });
         baseSwitchPopupMenu.add(decimalMenuItem);
 
-        hexadecimalMenuItem.setText("HEX");
-        hexadecimalMenuItem.setToolTipText("Hexadecimal");
+        hexadecimalMenuItem.setText("HEX - Hexadecimal");
+        hexadecimalMenuItem.setToolTipText("Switch to hexadecimal numerical base");
         hexadecimalMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hexadecimalMenuItemActionPerformed(evt);
@@ -142,7 +142,7 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(baseSwitchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(spinner, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE))
+                .addComponent(spinner))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

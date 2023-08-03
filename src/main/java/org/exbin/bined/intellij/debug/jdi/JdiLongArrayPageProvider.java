@@ -16,9 +16,9 @@
 package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.bined.intellij.data.PageProvider;
-import org.exbin.bined.intellij.data.PageProviderBinaryData;
-import org.exbin.framework.bined.gui.ValuesPanel;
+import org.exbin.framework.bined.objectdata.PageProvider;
+import org.exbin.framework.bined.objectdata.PageProviderBinaryData;
+import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -58,7 +58,7 @@ public class JdiLongArrayPageProvider implements PageProvider {
 
             BigInteger bigInteger = BigInteger.valueOf(value);
             for (int bit = 0; bit < 7; bit++) {
-                BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
+                BigInteger nextByte = bigInteger.and(BasicValuesPanel.BIG_INTEGER_BYTE_MASK);
                 result[i * 8 + 7 - bit] = nextByte.byteValue();
                 bigInteger = bigInteger.shiftRight(8);
             }

@@ -15,8 +15,8 @@
  */
 package org.exbin.bined.intellij.gui;
 
-import org.exbin.framework.bined.ReplaceParameters;
-import org.exbin.framework.bined.SearchParameters;
+import org.exbin.framework.bined.search.ReplaceParameters;
+import org.exbin.framework.bined.search.SearchParameters;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

@@ -17,8 +17,8 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="colorLabel" min="-2" pref="68" max="-2" attributes="0"/>
-              <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
+              <Component id="colorLabel" pref="65" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="colorButton" min="-2" pref="72" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
               <Component id="clearButton" min="-2" max="-2" attributes="0"/>
@@ -27,7 +27,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="colorLabel" pref="20" max="32767" attributes="0"/>
+          <Component id="colorLabel" max="32767" attributes="0"/>
           <Group type="103" groupAlignment="3" attributes="0">
               <Component id="colorButton" alignment="3" pref="0" max="32767" attributes="0"/>
               <Component id="clearButton" alignment="3" pref="0" max="32767" attributes="0"/>

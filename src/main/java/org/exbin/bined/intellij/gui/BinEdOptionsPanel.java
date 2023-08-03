@@ -22,6 +22,9 @@ import org.exbin.bined.intellij.options.impl.IntegrationOptionsImpl;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
+import org.exbin.framework.bined.inspector.options.DataInspectorOptions;
+import org.exbin.framework.bined.inspector.options.gui.DataInspectorOptionsPanel;
+import org.exbin.framework.bined.inspector.options.impl.DataInspectorOptionsImpl;
 import org.exbin.framework.bined.options.*;
 import org.exbin.framework.bined.options.impl.*;
 import org.exbin.framework.bined.options.gui.*;
@@ -70,6 +73,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyO
     private final TextEncodingOptionsImpl encodingOptions = new TextEncodingOptionsImpl();
     private final TextFontOptionsImpl fontOptions = new TextFontOptionsImpl();
     private final CodeAreaOptionsImpl codeAreaOptions = new CodeAreaOptionsImpl();
+    private final DataInspectorOptionsImpl dataInspectorOptions = new DataInspectorOptionsImpl();
     private final CodeAreaLayoutOptionsImpl layoutOptions = new CodeAreaLayoutOptionsImpl();
     private final CodeAreaColorOptionsImpl colorOptions = new CodeAreaColorOptionsImpl();
     private final CodeAreaThemeOptionsImpl themeOptions = new CodeAreaThemeOptionsImpl();
@@ -80,6 +84,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyO
     private final CodeAreaOptionsPanel codeAreaOptionsPanel = new CodeAreaOptionsPanel();
     private final TextEncodingOptionsPanel encodingOptionsPanel = new TextEncodingOptionsPanel();
     private final TextFontOptionsPanel fontOptionsPanel = new TextFontOptionsPanel();
+    private final DataInspectorOptionsPanel dataInspectorOptionsPanel = new DataInspectorOptionsPanel();
     private final LayoutProfilesPanel layoutProfilesPanel = new LayoutProfilesPanel();
     private final ProfileSelectionPanel layoutSelectionPanel = new ProfileSelectionPanel(layoutProfilesPanel);
     private final ThemeProfilesPanel themeProfilesPanel = new ThemeProfilesPanel();
@@ -99,6 +104,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyO
         categoryModel.addElement(new CategoryItem("Layout Profiles", layoutSelectionPanel));
         categoryModel.addElement(new CategoryItem("Theme Profiles", themeSelectionPanel));
         categoryModel.addElement(new CategoryItem("Colors Profiles", colorSelectionPanel));
+        categoryModel.addElement(new CategoryItem("Data Inspector", dataInspectorOptionsPanel));
         categoriesList.setModel(categoryModel);
 
         categoriesList.addListSelectionListener((ListSelectionEvent e) -> {
@@ -692,6 +698,11 @@ public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyO
     @Override
     public StatusOptions getStatusOptions() {
         return statusOptions;
+    }
+
+    @Nonnull
+    @Override public DataInspectorOptions getDataInspectorOptions() {
+        return dataInspectorOptions;
     }
 
     @Nonnull

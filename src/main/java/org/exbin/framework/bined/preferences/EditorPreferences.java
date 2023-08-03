@@ -33,7 +33,6 @@ import org.exbin.framework.bined.options.EditorOptions;
 public class EditorPreferences implements EditorOptions {
 
     public static final String PREFERENCES_FILE_HANDLING_MODE = "fileHandlingMode";
-    public static final String PREFERENCES_SHOW_VALUES_PANEL = "valuesPanel";
     public static final String PREFERENCES_ENTER_KEY_HANDLING_MODE = "enterKeyHandlingMode";
 
     private final Preferences preferences;
@@ -57,16 +56,6 @@ public class EditorPreferences implements EditorOptions {
     @Override
     public void setFileHandlingMode(FileHandlingMode fileHandlingMode) {
         preferences.put(PREFERENCES_FILE_HANDLING_MODE, fileHandlingMode.name());
-    }
-
-    @Override
-    public boolean isShowValuesPanel() {
-        return preferences.getBoolean(PREFERENCES_SHOW_VALUES_PANEL, true);
-    }
-
-    @Override
-    public void setShowValuesPanel(boolean showValuesPanel) {
-        preferences.putBoolean(PREFERENCES_SHOW_VALUES_PANEL, showValuesPanel);
     }
 
     @Nonnull

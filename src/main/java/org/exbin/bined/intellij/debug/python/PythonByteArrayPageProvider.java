@@ -15,8 +15,8 @@
  */
 package org.exbin.bined.intellij.debug.python;
 
-import org.exbin.bined.intellij.data.PageProvider;
-import org.exbin.bined.intellij.data.PageProviderBinaryData;
+import org.exbin.framework.bined.objectdata.PageProvider;
+import org.exbin.framework.bined.objectdata.PageProviderBinaryData;
 import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 
 import javax.annotation.Nonnull;

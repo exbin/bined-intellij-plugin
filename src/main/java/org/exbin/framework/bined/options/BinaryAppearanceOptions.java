@@ -29,11 +29,7 @@ public interface BinaryAppearanceOptions {
 
     boolean isMultiFileMode();
 
-    boolean isShowParsingPanel();
-
     void setLineWrapping(boolean lineWrapping);
 
     void setMultiFileMode(boolean multiTabMode);
-
-    void setShowParsingPanel(boolean showParsingPanel);
 }

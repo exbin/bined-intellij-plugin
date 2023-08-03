@@ -18,7 +18,6 @@ package org.exbin.bined.intellij.gui;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
 import com.intellij.ui.Graphics2DDelegate;
 import com.intellij.ui.components.JBPanel;
@@ -57,7 +56,8 @@ import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
-import org.exbin.framework.bined.gui.ValuesPanel;
+import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
+import org.exbin.framework.bined.inspector.options.DataInspectorOptions;
 import org.exbin.framework.bined.options.CodeAreaColorOptions;
 import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
 import org.exbin.framework.bined.options.CodeAreaOptions;
@@ -77,7 +77,6 @@ import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.gui.CloseControlPanel;
 import org.exbin.framework.utils.gui.OptionsControlPanel;
 import org.exbin.framework.utils.handler.OptionsControlHandler;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -152,9 +151,9 @@ public class BinEdComponentPanel extends JBPanel {
     private final AbstractAction saveDocumentAction;
     private final SearchAction searchAction;
     private EncodingsHandler encodingsHandler;
-    private ValuesPanel valuesPanel = null;
+    private BasicValuesPanel valuesPanel = null;
     private JBScrollPane valuesPanelScrollPane = null;
-    private boolean valuesPanelVisible = false;
+    private boolean parsingPanelVisible = false;
 
     private FileHandlingMode fileHandlingMode = DEFAULT_FILE_HANDLING_MODE;
     private final Font defaultFont;
@@ -458,8 +457,8 @@ public class BinEdComponentPanel extends JBPanel {
         }
     }
 
-    private void switchShowValuesPanel(boolean showValuesPanel) {
-        if (showValuesPanel) {
+    private void switchShowParsingPanel(boolean showParsingPanel) {
+        if (showParsingPanel) {
             showValuesPanel();
         } else {
             hideValuesPanel();
@@ -945,8 +944,9 @@ public class BinEdComponentPanel extends JBPanel {
         CodeAreaOptionsImpl.applyFromCodeArea(applyOptions.getCodeAreaOptions(), codeArea);
         applyOptions.getEncodingOptions().setSelectedEncoding(((CharsetCapable) codeArea).getCharset().name());
 
+        DataInspectorOptions dataInspectorOptions = applyOptions.getDataInspectorOptions();
+        dataInspectorOptions.setShowParsingPanel(parsingPanelVisible);
         EditorOptions editorOptions = applyOptions.getEditorOptions();
-        editorOptions.setShowValuesPanel(valuesPanelVisible);
         editorOptions.setFileHandlingMode(fileHandlingMode);
         if (codeArea.getCommandHandler() instanceof CodeAreaOperationCommandHandler) {
             editorOptions.setEnterKeyHandlingMode(((CodeAreaOperationCommandHandler) codeArea.getCommandHandler()).getEnterKeyHandlingMode());
@@ -963,8 +963,9 @@ public class BinEdComponentPanel extends JBPanel {
         encodingsHandler.setEncodings(applyOptions.getEncodingOptions().getEncodings());
         ((FontCapable) codeArea).setCodeFont(applyOptions.getFontOptions().isUseDefaultFont() ? defaultFont : applyOptions.getFontOptions().getFont(defaultFont));
 
+        DataInspectorOptions dataInspectorOptions = applyOptions.getDataInspectorOptions();
+        switchShowParsingPanel(dataInspectorOptions.isShowParsingPanel());
         EditorOptions editorOptions = applyOptions.getEditorOptions();
-        switchShowValuesPanel(editorOptions.isShowValuesPanel());
         if (codeArea.getCommandHandler() instanceof CodeAreaOperationCommandHandler) {
             ((CodeAreaOperationCommandHandler) codeArea.getCommandHandler()).setEnterKeyHandlingMode(editorOptions.getEnterKeyHandlingMode());
         }
@@ -999,10 +1000,10 @@ public class BinEdComponentPanel extends JBPanel {
     }
 
     public void showValuesPanel() {
-        if (!valuesPanelVisible) {
-            valuesPanelVisible = true;
+        if (!parsingPanelVisible) {
+            parsingPanelVisible = true;
             if (valuesPanel == null) {
-                valuesPanel = new ValuesPanel();
+                valuesPanel = new BasicValuesPanel();
                 valuesPanel.setCodeArea(codeArea, undoHandler);
                 valuesPanelScrollPane = new JBScrollPane(valuesPanel);
                 valuesPanelScrollPane.setBorder(null);
@@ -1016,8 +1017,8 @@ public class BinEdComponentPanel extends JBPanel {
     }
 
     public void hideValuesPanel() {
-        if (valuesPanelVisible) {
-            valuesPanelVisible = false;
+        if (parsingPanelVisible) {
+            parsingPanelVisible = false;
             valuesPanel.disableUpdate();
             this.remove(valuesPanelScrollPane);
             this.revalidate();
@@ -1066,6 +1067,12 @@ public class BinEdComponentPanel extends JBPanel {
             @Override
             public StatusOptions getStatusOptions() {
                 return preferences.getStatusPreferences();
+            }
+
+            @Nonnull
+            @Override
+            public DataInspectorOptions getDataInspectorOptions() {
+                return preferences.getDataInspectorPreferences();
             }
 
             @Nonnull

@@ -27,7 +27,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class BinaryAppearancePreferences {
 
     public static final String PREFERENCES_TEXT_WORD_WRAPPING = "textAppearance.wordWrap";
-    public static final String PREFERENCES_SHOW_VALUES_PANEL = "showValuesPanel";
     public static final String PREFERENCES_MULTIFILE_MODE = "multiFileMode";
 
     private final Preferences preferences;
@@ -40,20 +39,12 @@ public class BinaryAppearancePreferences {
         return preferences.getBoolean(PREFERENCES_TEXT_WORD_WRAPPING, false);
     }
 
-    public boolean isShowParsingPanel() {
-        return preferences.getBoolean(PREFERENCES_SHOW_VALUES_PANEL, true);
-    }
-
     public boolean isMultiFileMode() {
         return preferences.getBoolean(PREFERENCES_MULTIFILE_MODE, true);
     }
 
     public void setLineWrapping(boolean wrapping) {
         preferences.putBoolean(PREFERENCES_TEXT_WORD_WRAPPING, wrapping);
-    }
-
-    public void setShowParsingPanel(boolean show) {
-        preferences.putBoolean(PREFERENCES_SHOW_VALUES_PANEL, show);
     }
 
     public void setMultiFileMode(boolean mode) {

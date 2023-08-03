@@ -29,7 +29,6 @@ import org.exbin.framework.options.api.OptionsData;
 public class BinaryAppearanceOptionsImpl implements OptionsData, BinaryAppearanceOptions {
 
     private boolean lineWrapping;
-    private boolean showParsingPanel;
     private boolean multiFileMode;
 
     @Override
@@ -40,16 +39,6 @@ public class BinaryAppearanceOptionsImpl implements OptionsData, BinaryAppearanc
     @Override
     public void setLineWrapping(boolean lineWrapping) {
         this.lineWrapping = lineWrapping;
-    }
-
-    @Override
-    public boolean isShowParsingPanel() {
-        return showParsingPanel;
-    }
-
-    @Override
-    public void setShowParsingPanel(boolean showParsingPanel) {
-        this.showParsingPanel = showParsingPanel;
     }
 
     @Override
@@ -64,13 +53,11 @@ public class BinaryAppearanceOptionsImpl implements OptionsData, BinaryAppearanc
 
     public void loadFromPreferences(BinaryAppearancePreferences preferences) {
         lineWrapping = preferences.isLineWrapping();
-        showParsingPanel = preferences.isShowParsingPanel();
         multiFileMode = preferences.isMultiFileMode();
     }
 
     public void saveToPreferences(BinaryAppearancePreferences preferences) {
         preferences.setLineWrapping(lineWrapping);
-        preferences.setShowParsingPanel(showParsingPanel);
         preferences.setMultiFileMode(multiFileMode);
     }
 }

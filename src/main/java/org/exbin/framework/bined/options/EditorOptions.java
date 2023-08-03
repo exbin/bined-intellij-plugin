@@ -34,11 +34,7 @@ public interface EditorOptions {
     @Nonnull
     FileHandlingMode getFileHandlingMode();
 
-    boolean isShowValuesPanel();
-
     void setEnterKeyHandlingMode(EnterKeyHandlingMode enterKeyHandlingMode);
 
     void setFileHandlingMode(FileHandlingMode fileHandlingMode);
-
-    void setShowValuesPanel(boolean showValuesPanel);
 }

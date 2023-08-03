@@ -40,7 +40,7 @@ import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
-import org.exbin.bined.intellij.data.ObjectValueConvertor;
+import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.FileHandlingMode;

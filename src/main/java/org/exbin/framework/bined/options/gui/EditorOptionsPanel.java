@@ -49,14 +49,12 @@ public class EditorOptionsPanel extends javax.swing.JPanel implements OptionsCap
     @Override
     public void saveToOptions(EditorOptionsImpl options) {
         options.setFileHandlingMode(FileHandlingMode.valueOf((String) fileHandlingModeComboBox.getSelectedItem()));
-        options.setShowValuesPanel(showValuesPanelCheckBox.isSelected());
         options.setEnterKeyHandlingMode(EnterKeyHandlingMode.valueOf((String) enterKeyHandlingModeComboBox.getSelectedItem()));
     }
 
     @Override
     public void loadFromOptions(EditorOptionsImpl options) {
         fileHandlingModeComboBox.setSelectedIndex(options.getFileHandlingMode().ordinal());
-        showValuesPanelCheckBox.setSelected(options.isShowValuesPanel());
         enterKeyHandlingModeComboBox.setSelectedIndex(options.getEnterKeyHandlingMode().ordinal());
     }
 
@@ -71,15 +69,12 @@ public class EditorOptionsPanel extends javax.swing.JPanel implements OptionsCap
 
         fileHandlingModeLabel = new javax.swing.JLabel();
         fileHandlingModeComboBox = new javax.swing.JComboBox<>();
-        showValuesPanelCheckBox = new javax.swing.JCheckBox();
         enterKeyHandlingModeLabel = new javax.swing.JLabel();
         enterKeyHandlingModeComboBox = new javax.swing.JComboBox<>();
 
         fileHandlingModeLabel.setText(resourceBundle.getString("fileHandlingModeLabel.text")); // NOI18N
 
         fileHandlingModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "MEMORY", "DELTA" }));
-
-        showValuesPanelCheckBox.setText(resourceBundle.getString("showValuesPanelCheckBox.text")); // NOI18N
 
         enterKeyHandlingModeLabel.setText(resourceBundle.getString("enterKeyHandlingModeLabel.text")); // NOI18N
 
@@ -93,7 +88,6 @@ public class EditorOptionsPanel extends javax.swing.JPanel implements OptionsCap
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(fileHandlingModeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(showValuesPanelCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(fileHandlingModeLabel)
@@ -106,8 +100,6 @@ public class EditorOptionsPanel extends javax.swing.JPanel implements OptionsCap
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(showValuesPanelCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(fileHandlingModeLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(fileHandlingModeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -133,7 +125,6 @@ public class EditorOptionsPanel extends javax.swing.JPanel implements OptionsCap
     private javax.swing.JLabel enterKeyHandlingModeLabel;
     private javax.swing.JComboBox<String> fileHandlingModeComboBox;
     private javax.swing.JLabel fileHandlingModeLabel;
-    private javax.swing.JCheckBox showValuesPanelCheckBox;
     // End of variables declaration//GEN-END:variables
 
     @Override

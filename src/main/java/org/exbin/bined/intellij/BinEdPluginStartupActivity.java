@@ -16,10 +16,6 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.diff.impl.DiffSettingsHolder;
-import com.intellij.diff.tools.combined.CombinedDiffComponentFactory;
-import com.intellij.diff.tools.combined.CombinedDiffMainUI;
-import com.intellij.diff.tools.combined.CombinedDiffTool;
-import com.intellij.diff.tools.combined.CombinedDiffViewer;
 import com.intellij.diff.tools.fragmented.UnifiedDiffTool;
 import com.intellij.diff.tools.simple.SimpleDiffTool;
 import com.intellij.openapi.extensions.ExtensionPointAdapter;
@@ -41,7 +37,7 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
-import org.exbin.bined.intellij.data.ObjectValueConvertor;
+import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
@@ -126,8 +122,8 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
                 if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isMoved()
                         && !((BinEdVirtualFile) file).isClosing()) {
                     ((BinEdVirtualFile) file).setClosing(true);
-                    BinEdFileHandler editorPanel = ((BinEdVirtualFile) file).getEditorFile();
-                    if (!editorPanel.releaseFile()) {
+                    BinEdFileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
+                    if (!fileHandler.releaseFile()) {
                         ((BinEdVirtualFile) file).setClosing(false);
                         throw new ProcessCanceledException();
                     }

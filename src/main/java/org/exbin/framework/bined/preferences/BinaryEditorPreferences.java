@@ -28,6 +28,7 @@ import org.exbin.bined.swing.extended.layout.DefaultExtendedCodeAreaLayoutProfil
 import org.exbin.bined.swing.extended.layout.ExtendedCodeAreaDecorations;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.inspector.preferences.DataInspectorPreferences;
 import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
 import org.exbin.framework.editor.text.preferences.TextFontPreferences;
 import org.exbin.xbup.core.util.StringUtils;
@@ -51,6 +52,7 @@ public class BinaryEditorPreferences {
     private final CodeAreaPreferences codeAreaPreferences;
     private final TextEncodingPreferences encodingPreferences;
     private final TextFontPreferences fontPreferences;
+    private final DataInspectorPreferences dataInspectorPreferences;
     private final CodeAreaLayoutPreferences layoutPreferences;
     private final CodeAreaThemePreferences themePreferences;
     private final CodeAreaColorPreferences colorPreferences;
@@ -64,6 +66,7 @@ public class BinaryEditorPreferences {
         codeAreaPreferences = new CodeAreaPreferences(preferences);
         encodingPreferences = new TextEncodingPreferences(preferences);
         fontPreferences = new TextFontPreferences(preferences);
+        dataInspectorPreferences = new DataInspectorPreferences(preferences);
         layoutPreferences = new CodeAreaLayoutPreferences(preferences);
         themePreferences = new CodeAreaThemePreferences(preferences);
         colorPreferences = new CodeAreaColorPreferences(preferences);
@@ -118,6 +121,11 @@ public class BinaryEditorPreferences {
     }
 
     @Nonnull
+    public DataInspectorPreferences getDataInspectorPreferences() {
+        return dataInspectorPreferences;
+    }
+
+    @Nonnull
     public CodeAreaLayoutPreferences getLayoutPreferences() {
         return layoutPreferences;
     }
@@ -144,7 +152,7 @@ public class BinaryEditorPreferences {
         codeAreaPreferences.setCodeColorization(legacyPreferences.isCodeColorization());
 
         editorPreferences.setFileHandlingMode(legacyPreferences.isDeltaMemoryMode() ? FileHandlingMode.DELTA : FileHandlingMode.MEMORY);
-        editorPreferences.setShowValuesPanel(legacyPreferences.isShowValuesPanel());
+        dataInspectorPreferences.setShowParsingPanel(legacyPreferences.isShowValuesPanel());
 
         List<String> layoutProfiles = new ArrayList<>();
         layoutProfiles.add("Imported profile");

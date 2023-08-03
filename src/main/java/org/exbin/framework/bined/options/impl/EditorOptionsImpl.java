@@ -32,7 +32,6 @@ import org.exbin.framework.options.api.OptionsData;
 public class EditorOptionsImpl implements OptionsData, EditorOptions {
 
     private FileHandlingMode fileHandlingMode = FileHandlingMode.DELTA;
-    private boolean showValuesPanel = true;
     private EnterKeyHandlingMode enterKeyHandlingMode = EnterKeyHandlingMode.PLATFORM_SPECIFIC;
 
     @Nonnull
@@ -44,16 +43,6 @@ public class EditorOptionsImpl implements OptionsData, EditorOptions {
     @Override
     public void setFileHandlingMode(FileHandlingMode fileHandlingMode) {
         this.fileHandlingMode = fileHandlingMode;
-    }
-
-    @Override
-    public boolean isShowValuesPanel() {
-        return showValuesPanel;
-    }
-
-    @Override
-    public void setShowValuesPanel(boolean showValuesPanel) {
-        this.showValuesPanel = showValuesPanel;
     }
 
     @Nonnull
@@ -69,19 +58,16 @@ public class EditorOptionsImpl implements OptionsData, EditorOptions {
 
     public void loadFromPreferences(EditorPreferences preferences) {
         fileHandlingMode = preferences.getFileHandlingMode();
-        showValuesPanel = preferences.isShowValuesPanel();
         enterKeyHandlingMode = preferences.getEnterKeyHandlingMode();
     }
 
     public void saveToPreferences(EditorPreferences preferences) {
         preferences.setFileHandlingMode(fileHandlingMode);
-        preferences.setShowValuesPanel(showValuesPanel);
         preferences.setEnterKeyHandlingMode(enterKeyHandlingMode);
     }
 
     public void setOptions(EditorOptionsImpl editorOptions) {
         fileHandlingMode = editorOptions.fileHandlingMode;
-        showValuesPanel = editorOptions.showValuesPanel;
         enterKeyHandlingMode = editorOptions.enterKeyHandlingMode;
     }
 }

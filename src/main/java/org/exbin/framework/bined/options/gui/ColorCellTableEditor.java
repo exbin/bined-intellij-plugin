@@ -43,13 +43,14 @@ public class ColorCellTableEditor extends AbstractCellEditor implements TableCel
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         currentColor = (Color) value;
         return new ColorCellPanel(new ColorCellPanel.ColorHandler() {
+            @Nullable
             @Override
             public Color getColor() {
                 return currentColor;
             }
 
             @Override
-            public void setColor(Color color) {
+            public void setColor(@Nullable Color color) {
                 currentColor = color;
 
                 ColorProfileTableModel model = (ColorProfileTableModel) table.getModel();

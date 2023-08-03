@@ -96,6 +96,7 @@ public class ColorProfileTableModel implements TableModel {
         return 2;
     }
 
+    @Nonnull
     @Override
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
@@ -108,6 +109,7 @@ public class ColorProfileTableModel implements TableModel {
         throw createUnexpectedColumnException(columnIndex);
     }
 
+    @Nonnull
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         switch (columnIndex) {
@@ -132,6 +134,7 @@ public class ColorProfileTableModel implements TableModel {
         throw createUnexpectedColumnException(columnIndex);
     }
 
+    @Nullable
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
@@ -184,14 +187,15 @@ public class ColorProfileTableModel implements TableModel {
         return new InvalidParameterException("Unexpected column index " + columnIndex);
     }
 
+    @ParametersAreNonnullByDefault
     private static class ColorRow {
+
+        String colorName;
+        CodeAreaColorType colorType;
 
         public ColorRow(String colorName, CodeAreaColorType colorType) {
             this.colorName = colorName;
             this.colorType = colorType;
         }
-
-        String colorName;
-        CodeAreaColorType colorType;
     }
 }

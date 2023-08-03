@@ -20,9 +20,9 @@ import org.exbin.bined.highlight.swing.extended.ExtendedHighlightCodeAreaPainter
 import org.exbin.bined.intellij.gui.BinarySearchPanel;
 import org.exbin.bined.intellij.gui.BinarySearchPanelApi;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.ReplaceParameters;
-import org.exbin.framework.bined.SearchCondition;
-import org.exbin.framework.bined.SearchParameters;
+import org.exbin.framework.bined.search.ReplaceParameters;
+import org.exbin.framework.bined.search.SearchCondition;
+import org.exbin.framework.bined.search.SearchParameters;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.utils.ActionUtils;
 import org.exbin.auxiliary.paged_data.BinaryData;

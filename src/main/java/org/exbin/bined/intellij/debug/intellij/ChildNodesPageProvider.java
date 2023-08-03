@@ -26,7 +26,7 @@ import com.intellij.xdebugger.impl.ui.tree.nodes.XValueGroupNodeImpl;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
-import org.exbin.framework.bined.gui.ValuesPanel;
+import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -225,7 +225,7 @@ public class ChildNodesPageProvider implements BinaryData {
                 long value = Long.parseLong(valueText);
                 BigInteger bigInteger = BigInteger.valueOf(value);
                 for (int bit = 0; bit < 7; bit++) {
-                    BigInteger nextByte = bigInteger.and(ValuesPanel.BIG_INTEGER_BYTE_MASK);
+                    BigInteger nextByte = bigInteger.and(BasicValuesPanel.BIG_INTEGER_BYTE_MASK);
                     dataCache[7 - bit] = nextByte.byteValue();
                     bigInteger = bigInteger.shiftRight(8);
                 }

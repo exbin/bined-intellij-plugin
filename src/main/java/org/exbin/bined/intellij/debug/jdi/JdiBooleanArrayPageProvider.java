@@ -20,8 +20,8 @@ import com.sun.jdi.BooleanValue;
 import com.sun.jdi.Field;
 import com.sun.jdi.ObjectReference;
 import com.sun.jdi.Value;
-import org.exbin.bined.intellij.data.PageProvider;
-import org.exbin.bined.intellij.data.PageProviderBinaryData;
+import org.exbin.framework.bined.objectdata.PageProvider;
+import org.exbin.framework.bined.objectdata.PageProviderBinaryData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
