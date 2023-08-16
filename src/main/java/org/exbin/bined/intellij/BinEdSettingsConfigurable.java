@@ -21,6 +21,8 @@ import com.intellij.openapi.project.DumbAware;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
+import org.exbin.bined.intellij.main.BinEdManager;
+import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +53,7 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
     public JComponent createComponent() {
         optionsPanelWrapper = new BinEdOptionsPanelBorder();
         BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
-        BinaryEditorPreferences preferences = new BinaryEditorPreferences(new IntelliJPreferencesWrapper(BinEdComponentPanel.getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
+        BinaryEditorPreferences preferences = new BinaryEditorPreferences(new IntelliJPreferencesWrapper(BinEdManager.getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
         optionsPanel.setPreferences(preferences);
         optionsPanel.loadFromPreferences();
 //        optionsPanelWrapper.addFocusListener(new FocusAdapter() {

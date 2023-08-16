@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij;
+package org.exbin.bined.intellij.main;
 
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.framework.bined.inspector.options.DataInspectorOptions;

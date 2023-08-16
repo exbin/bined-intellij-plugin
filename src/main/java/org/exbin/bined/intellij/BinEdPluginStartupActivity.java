@@ -37,15 +37,17 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
-import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
-import org.exbin.bined.intellij.gui.BinEdComponentPanel;
+import org.exbin.bined.intellij.main.BinEdEditorComponent;
+import org.exbin.bined.intellij.main.BinEdManager;
+import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -108,7 +110,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
 
     private static void initIntegration() {
         initialIntegrationOptions = new IntegrationPreferences(
-                new IntelliJPreferencesWrapper(BinEdComponentPanel.getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX)
+                new IntelliJPreferencesWrapper(BinEdManager.getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX)
         );
         applyIntegrationOptions(initialIntegrationOptions);
     }
@@ -229,7 +231,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
     @ParametersAreNonnullByDefault
     private static class DataDialog extends DialogWrapper {
 
-        private final BinEdComponentPanel viewPanel;
+        private final BinEdEditorComponent editorComponent;
 
         private DataDialog(Project project, @Nullable BinaryData binaryData) {
             super(project, false);
@@ -238,8 +240,9 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             getOKAction().setEnabled(false);
             setCrossClosesWindow(true);
 
-            viewPanel = new BinEdComponentPanel();
-            viewPanel.setFileApi(new BinEdComponentFileApi() {
+            BinEdManager binEdManager = BinEdManager.getInstance();
+            editorComponent = binEdManager.createBinEdEditor();
+            editorComponent.setFileApi(new BinEdComponentFileApi() {
                 @Override
                 public boolean isSaveSupported() {
                     return false;
@@ -260,7 +263,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
                     // Ignore
                 }
             });
-            viewPanel.setContentData(binaryData);
+            editorComponent.setContentData(binaryData);
             init();
         }
 
@@ -278,7 +281,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
         @Nullable
         @Override
         public JComponent getPreferredFocusedComponent() {
-            return viewPanel;
+            return editorComponent.getComponentPanel();
         }
 
         @Nullable
@@ -290,7 +293,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
         @Nullable
         @Override
         protected JComponent createCenterPanel() {
-            BorderLayoutPanel panel = JBUI.Panels.simplePanel(viewPanel);
+            BorderLayoutPanel panel = JBUI.Panels.simplePanel(editorComponent.getBinaryStatusPanel());
             panel.setPreferredSize(JBUI.size(600, 400));
             return panel;
         }

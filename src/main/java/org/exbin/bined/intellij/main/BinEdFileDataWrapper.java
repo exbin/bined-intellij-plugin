@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij;
+package org.exbin.bined.intellij.main;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -27,6 +27,7 @@ import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 import org.exbin.auxiliary.paged_data.OutOfBoundsException;
 import org.exbin.auxiliary.paged_data.PagedData;
+import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.xbup.core.util.StreamUtils;
 
 import javax.annotation.Nonnull;

@@ -15,18 +15,18 @@
  */
 package org.exbin.bined.intellij.debug.gui;
 
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.List;
-import org.exbin.bined.EditMode;
 import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
-import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
-import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.bined.intellij.main.BinEdEditorComponent;
+import org.exbin.bined.intellij.main.BinEdManager;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Panel to show debug view.
@@ -39,35 +39,19 @@ public class DebugViewPanel extends javax.swing.JPanel {
     private final List<DebugViewDataProvider> providers = new ArrayList<>();
     private int selectedProvider = 0;
 
-    private final BinEdComponentPanel componentPanel;
+    private final BinEdEditorComponent binEdEditorComponent;
 
     public DebugViewPanel() {
-        componentPanel = new BinEdComponentPanel();
+        BinEdManager binEdManager = BinEdManager.getInstance();
+        binEdEditorComponent = binEdManager.createBinEdEditor();
 
         initComponents();
         init();
     }
 
     private void init() {
+        BinEdComponentPanel componentPanel = binEdEditorComponent.getComponentPanel();
         componentPanel.getCodeArea().setEditMode(EditMode.READ_ONLY);
-        componentPanel.setFileApi(new BinEdComponentFileApi() {
-            @Override
-            public boolean isSaveSupported() {
-                return false;
-            }
-
-            @Override
-            public void saveDocument() {
-            }
-
-            @Override
-            public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
-            }
-
-            @Override
-            public void closeData() {
-            }
-        });
 
         this.add(componentPanel, BorderLayout.CENTER);
     }
@@ -115,6 +99,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
     }
 
     public void setContentData(@Nullable BinaryData data) {
-        componentPanel.setContentData(data);
+        binEdEditorComponent.setContentData(data);
     }
 }

@@ -85,7 +85,7 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         unsavedFilesPanel.setController(new UnsavedFilesPanel.Controller() {
             @Override
             public boolean saveFile(@Nonnull BinEdFileHandler fileHandler) {
-                fileHandler.getComponent().saveDocument();
+                fileHandler.saveDocument();
                 return !fileHandler.isModified();
             }
 

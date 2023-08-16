@@ -54,10 +54,9 @@ public class BinEdToolbarPanel extends JBPanel {
     private static final String TOOLBAR_PLACE = "BinEdPluginMainToolbar";
     private static final Key<Boolean> SELECTED_PROPERTY_KEY = Key.create(Toggleable.SELECTED_PROPERTY);
 
-    private final BinaryEditorPreferences preferences;
     private final Control codeAreaControl;
-    private final AnAction optionsAction;
-    private final AnAction onlineHelpAction;
+    private AnAction optionsAction;
+    private AnAction onlineHelpAction;
     private BinaryDataUndoHandler undoHandler;
 
     private final DefaultActionGroup actionGroup;
@@ -72,11 +71,8 @@ public class BinEdToolbarPanel extends JBPanel {
     private final AnAction hexadecimalCodeTypeAction;
     private boolean modified = false;
 
-    public BinEdToolbarPanel(BinaryEditorPreferences preferences, JComponent targetComponent, Control codeAreaControl, AnAction optionsAction, AnAction onlineHelpAction) {
-        this.preferences = preferences;
+    public BinEdToolbarPanel(JComponent targetComponent, Control codeAreaControl) {
         this.codeAreaControl = codeAreaControl;
-        this.optionsAction = optionsAction;
-        this.onlineHelpAction = onlineHelpAction;
 
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
@@ -162,6 +158,14 @@ public class BinEdToolbarPanel extends JBPanel {
         setActionVisible(redoEditButton, true);
     }
 
+    public void setOptionsAction(AnAction optionsAction) {
+        this.optionsAction = optionsAction;
+    }
+
+    public void setOnlineHelpAction(AnAction onlineHelpAction) {
+        this.onlineHelpAction = onlineHelpAction;
+    }
+
     private void updateCycleButtonState() {
         CodeType codeType = codeAreaControl.getCodeType();
 
@@ -199,7 +203,7 @@ public class BinEdToolbarPanel extends JBPanel {
         updateUnprintables();
     }
 
-    public void loadFromPreferences() {
+    public void loadFromPreferences(BinaryEditorPreferences preferences) {
         codeAreaControl.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
         updateCycleButtonState();
         updateUnprintables();

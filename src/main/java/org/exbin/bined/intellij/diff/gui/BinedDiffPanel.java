@@ -32,13 +32,13 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
-import org.exbin.bined.intellij.BinEdApplyOptions;
-import org.exbin.bined.intellij.BinEdFileDataWrapper;
+import org.exbin.bined.intellij.main.BinEdApplyOptions;
+import org.exbin.bined.intellij.main.BinEdEditorComponent;
+import org.exbin.bined.intellij.main.BinEdFileDataWrapper;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
-import org.exbin.bined.intellij.IntelliJPreferencesWrapper;
+import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.action.SearchAction;
-import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
@@ -113,7 +113,7 @@ public class BinedDiffPanel extends JBPanel {
     private EncodingsHandler encodingsHandler;
     private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi encodingStatus;
-    private BinEdComponentPanel.CharsetChangeListener charsetChangeListener = null;
+    private BinEdEditorComponent.CharsetChangeListener charsetChangeListener = null;
 
     public BinedDiffPanel() {
         setLayout(new java.awt.BorderLayout());
@@ -126,7 +126,7 @@ public class BinedDiffPanel extends JBPanel {
         defaultLayoutProfile = leftCodeArea.getLayoutProfile();
         defaultThemeProfile = leftCodeArea.getThemeProfile();
         defaultColorProfile = leftCodeArea.getColorsProfile();
-        toolbarPanel = new BinEdToolbarPanel(preferences, diffPanel,
+        toolbarPanel = new BinEdToolbarPanel(diffPanel,
                 new BinEdToolbarPanel.Control() {
                     @Nonnull
                     @Override public CodeType getCodeType() {
@@ -154,13 +154,17 @@ public class BinedDiffPanel extends JBPanel {
                     public void repaint() {
                         diffPanel.repaint();
                     }
-                },
+                }
+        );
+        toolbarPanel.setOptionsAction(
                 new AnAction() {
                     @Override
                     public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
                         createOptionsAction().actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, "COMMAND", 0));
                     }
-                },
+                }
+        );
+        toolbarPanel.setOnlineHelpAction(
                 new AnAction() {
                     @Override
                     public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
@@ -391,7 +395,7 @@ public class BinedDiffPanel extends JBPanel {
 
         encodingsHandler.loadFromPreferences(preferences.getEncodingPreferences());
         statusPanel.loadFromPreferences(preferences.getStatusPreferences());
-        toolbarPanel.loadFromPreferences();
+        toolbarPanel.loadFromPreferences(new BinaryEditorPreferences(preferences.getPreferences()));
 
         updateCurrentMemoryMode();
     }
@@ -467,7 +471,7 @@ public class BinedDiffPanel extends JBPanel {
         });
     }
 
-    public void setCharsetChangeListener(BinEdComponentPanel.CharsetChangeListener charsetChangeListener) {
+    public void setCharsetChangeListener(BinEdEditorComponent.CharsetChangeListener charsetChangeListener) {
         this.charsetChangeListener = charsetChangeListener;
     }
 

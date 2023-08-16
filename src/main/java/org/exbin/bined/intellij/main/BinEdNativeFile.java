@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij;
+package org.exbin.bined.intellij.main;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.ex.DocumentEx;
@@ -28,8 +28,8 @@ import com.intellij.util.LocalTimeCounter;
 import com.intellij.util.messages.MessageBusConnection;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.EditMode;
+import org.exbin.bined.intellij.BinEdFileEditorState;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
-import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.FileHandlingMode;
@@ -39,7 +39,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
@@ -50,7 +49,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class BinEdNativeFile implements BinEdComponentFileApi {
 
-    private final BinEdComponentPanel componentPanel;
+    private final BinEdEditorComponent componentPanel;
 
     private boolean opened = false;
     private VirtualFile virtualFile;
@@ -59,7 +58,8 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 
     public BinEdNativeFile(VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
-        componentPanel = new BinEdComponentPanel();
+        BinEdManager binEdManager = BinEdManager.getInstance();
+        componentPanel = binEdManager.createBinEdEditor();
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
         componentPanel.setFileApi(this);
@@ -84,7 +84,12 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 
     @Nonnull
     public JComponent getComponent() {
-        return componentPanel;
+        return componentPanel.getComponentPanel();
+    }
+
+    @Nonnull
+    public JComponent getUndoHandler() {
+        return componentPanel.getComponentPanel();
     }
 
     public void openFile(VirtualFile virtualFile) {

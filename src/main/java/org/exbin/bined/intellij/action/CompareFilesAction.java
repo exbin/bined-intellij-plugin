@@ -24,6 +24,7 @@ import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
 import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.auxiliary.paged_data.PagedData;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.compare.gui.CompareFilesPanel;
@@ -112,7 +113,8 @@ public class CompareFilesAction implements ActionListener {
             @Nonnull
             @Override
             public BinaryData getFileData(int index) {
-                return codeArea.getContentData();
+                BinaryData contentData = codeArea.getContentData();
+                return contentData != null ? contentData : new ByteArrayData();
             }
         });
         compareFilesPanel.setAvailableFiles(availableFiles);

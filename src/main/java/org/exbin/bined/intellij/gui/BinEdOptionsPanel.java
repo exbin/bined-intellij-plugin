@@ -15,7 +15,7 @@
  */
 package org.exbin.bined.intellij.gui;
 
-import org.exbin.bined.intellij.BinEdApplyOptions;
+import org.exbin.bined.intellij.main.BinEdApplyOptions;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.options.gui.IntegrationOptionsPanel;
 import org.exbin.bined.intellij.options.impl.IntegrationOptionsImpl;

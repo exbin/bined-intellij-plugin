@@ -40,10 +40,11 @@ import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
-import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
-import org.exbin.bined.intellij.gui.BinEdComponentPanel;
+import org.exbin.bined.intellij.main.BinEdEditorComponent;
+import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -136,7 +137,7 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
     @ParametersAreNonnullByDefault
     private static class DataDialog extends DialogWrapper {
 
-        private final BinEdComponentPanel viewPanel;
+        private final BinEdEditorComponent binEdEditorComponent;
         private final DataGrid grid;
         private final boolean editable;
 
@@ -151,8 +152,9 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
             setOKActionEnabled(editable);
             setCrossClosesWindow(true);
 
-            viewPanel = new BinEdComponentPanel();
-            viewPanel.setFileApi(new BinEdComponentFileApi() {
+            BinEdManager binEdManager = BinEdManager.getInstance();
+            binEdEditorComponent = binEdManager.createBinEdEditor();
+            binEdEditorComponent.setFileApi(new BinEdComponentFileApi() {
                 @Override
                 public boolean isSaveSupported() {
                     return false;
@@ -173,9 +175,9 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
                     // Ignore
                 }
             });
-            viewPanel.setContentData(binaryData);
+            binEdEditorComponent.setContentData(binaryData);
             if (!editable) {
-                viewPanel.getCodeArea().setEditMode(EditMode.READ_ONLY);
+                binEdEditorComponent.getCodeArea().setEditMode(EditMode.READ_ONLY);
             }
             init();
         }
@@ -187,7 +189,7 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
             try {
                 SelectionModel<GridRow, GridColumn> selectionModel = grid.getSelectionModel();
                 grid.cancelEditing();
-                BinaryData contentData = viewPanel.getContentData();
+                BinaryData contentData = binEdEditorComponent.getContentData();
                 int size = contentData != null ? (int) contentData.getDataSize() : 0;
                 byte[] resultData = new byte[size];
                 if (size > 0) {
@@ -216,7 +218,7 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
         @Nullable
         @Override
         public JComponent getPreferredFocusedComponent() {
-            return viewPanel;
+            return binEdEditorComponent.getComponentPanel();
         }
 
         @Nullable
@@ -228,7 +230,7 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
         @Nullable
         @Override
         protected JComponent createCenterPanel() {
-            BorderLayoutPanel panel = JBUI.Panels.simplePanel(viewPanel);
+            BorderLayoutPanel panel = JBUI.Panels.simplePanel(binEdEditorComponent.getComponentPanel());
             panel.setPreferredSize(JBUI.size(600, 400));
             return panel;
         }
