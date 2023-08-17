@@ -40,7 +40,6 @@ import java.util.ResourceBundle;
 @ParametersAreNonnullByDefault
 public class ManageBookmarksAction implements ActionListener {
 
-    private ResourceBundle resourceBundle;
     private BookmarksManager bookmarksManager;
 
     public ManageBookmarksAction() {
@@ -66,8 +65,7 @@ public class ManageBookmarksAction implements ActionListener {
         DefaultControlPanel controlPanel = new DefaultControlPanel(panelResourceBundle);
 
         JPanel dialogPanel = WindowUtils.createDialogPanel(bookmarksPanel, controlPanel);
-        final WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), resourceBundle.getString("dialog.title"), Dialog.ModalityType.APPLICATION_MODAL);
-        WindowUtils.addHeaderPanel(dialog.getWindow(), bookmarksPanel.getClass(), bookmarksPanel.getResourceBundle());
+        final WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), "Manage Bookmarks", Dialog.ModalityType.APPLICATION_MODAL);
         Dimension preferredSize = dialog.getWindow().getPreferredSize();
         dialog.getWindow().setPreferredSize(new Dimension(preferredSize.width, preferredSize.height + 450));
         controlPanel.setHandler((actionType) -> {

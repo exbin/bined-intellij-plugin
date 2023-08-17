@@ -29,10 +29,10 @@ import com.intellij.util.messages.MessageBusConnection;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.BinEdFileEditorState;
-import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;

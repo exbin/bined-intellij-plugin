@@ -13,25 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.gui;
+package org.exbin.bined.intellij.clipboard;
 
-import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.utils.LanguageUtils;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ResourceBundle;
 
 /**
- * Binary editor component file API.
+ * Clipboard content manager.
  *
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public interface BinEdComponentFileApi {
+public class ClipboardContentManager {
 
-    boolean isSaveSupported();
+    private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ClipboardContentManager.class);
 
-    void saveDocument();
-
-    void switchFileHandlingMode(FileHandlingMode newHandlingMode);
-
-    void closeData();
 }

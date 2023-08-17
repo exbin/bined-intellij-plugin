@@ -27,7 +27,7 @@ import org.exbin.bined.intellij.action.EditSelectionAction;
 import org.exbin.bined.intellij.action.GoToPositionAction;
 import org.exbin.bined.intellij.action.InsertDataAction;
 import org.exbin.bined.intellij.action.SearchAction;
-import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
+import org.exbin.bined.intellij.clipboard.action.ClipboardContentAction;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
@@ -37,6 +37,7 @@ import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.about.gui.AboutPanel;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.service.TextFontService;
@@ -48,11 +49,13 @@ import org.exbin.framework.utils.gui.OptionsControlPanel;
 import org.exbin.framework.utils.handler.OptionsControlHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.GrayFilter;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -67,6 +70,8 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -87,11 +92,12 @@ public class BinEdManager {
 
     private final BinaryEditorPreferences preferences;
     private BinEdFileManager fileManager = new BinEdFileManager();
+    private BookmarksSupport bookmarksSupport;
 
     private EncodingsHandler encodingsHandler;
 
     private BinEdManager() {
-        preferences = new BinaryEditorPreferences(new IntelliJPreferencesWrapper(getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
+        preferences = new BinaryEditorPreferences(new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
     }
 
     @Nonnull
@@ -120,7 +126,7 @@ public class BinEdManager {
                     clickedY += invoker.getParent().getY();
                 }
                 removeAll();
-                createContextMenu(binEdEditorComponent,this, clickedX, clickedY);
+                createContextMenu(binEdEditorComponent.getCodeArea(), binEdEditorComponent.getFileApi(), binEdEditorComponent, this, PopupMenuVariant.EDITOR, clickedX, clickedY);
                 super.show(invoker, x, y);
             }
         });
@@ -165,12 +171,31 @@ public class BinEdManager {
                 }
         );
 
+        bookmarksSupport.registerBookmarksComponentActions(codeArea);
+        binEdEditorComponent.getComponentPanel().addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                // TODO bookmarksSupport.setActiveFile(binEdEditorComponent.getFileApi());
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+            }
+        });
+
         return binEdEditorComponent;
     }
 
-    private void createContextMenu(BinEdEditorComponent editorComponent, final JPopupMenu menu, int x, int y) {
-        ExtCodeArea codeArea = editorComponent.getCodeArea();
-        BinEdComponentFileApi fileApi = editorComponent.getFileApi();
+    @Nonnull
+    public BinEdFileManager getFileManager() {
+        return fileManager;
+    }
+
+    public void createContextMenu(ExtCodeArea codeArea, final JPopupMenu menu, PopupMenuVariant variant, int x, int y) {
+        createContextMenu(codeArea, null, null, menu, variant, x, y);
+    }
+
+    public void createContextMenu(ExtCodeArea codeArea, @Nullable BinEdComponentFileApi fileApi, @Nullable BinEdEditorComponent editorComponent, final JPopupMenu menu, PopupMenuVariant variant, int x, int y) {
         BasicCodeAreaZone positionZone = codeArea.getPainter().getPositionZone(x, y);
 
         switch (positionZone) {
@@ -269,6 +294,8 @@ public class BinEdManager {
 
             JMenuItem editSelectionMenuItem = createEditSelectionMenuItem(codeArea);
             menu.add(editSelectionMenuItem);
+            menu.add(createClipboardContentMenuItem());
+
             menu.addSeparator();
 
             JMenuItem insertDataMenuItem = createInsertDataMenuItem(codeArea);
@@ -297,6 +324,7 @@ public class BinEdManager {
                 searchAction.switchReplaceMode(BinarySearchPanel.SearchOperation.REPLACE);
             });
             menu.add(replaceMenuItem);
+            menu.add(bookmarksSupport.createBookmarksPopupMenu());
         }
         }
 
@@ -552,8 +580,32 @@ public class BinEdManager {
         return menu;
     }
 
+    public JMenuItem createClipboardContentMenuItem() {
+        JMenuItem clipboardContentMenuItem = new JMenuItem("Clipboard Content...");
+        clipboardContentMenuItem.addActionListener(new ClipboardContentAction());
+        return clipboardContentMenuItem;
+    }
+
     @Nonnull
-    public static PropertiesComponent getPreferences() {
-        return PropertiesComponent.getInstance();
+    public BinaryEditorPreferences getPreferences() {
+        return preferences;
+    }
+
+    public void setBookmarksSupport(BookmarksSupport bookmarksSupport) {
+        this.bookmarksSupport = bookmarksSupport;
+    }
+
+    public enum PopupMenuVariant {
+        BASIC, NORMAL, EDITOR
+    }
+
+    @ParametersAreNonnullByDefault
+    public interface BookmarksSupport {
+        @Nonnull
+        JMenu createBookmarksPopupMenu();
+
+        void registerBookmarksComponentActions(JComponent component);
+
+        void setActiveFile(@Nullable BinEdFileHandler activeFile);
     }
 }

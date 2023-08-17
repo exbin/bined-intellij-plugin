@@ -156,6 +156,29 @@ public class BinEdComponentPanel extends JBPanel {
         codeArea.removeFocusListener(focusListener);
     }
 
+    public void addComponentExtension(BinEdComponentExtension extension) {
+        componentExtensions.add(extension);
+        if (undoHandler != null) {
+            extension.onUndoHandlerChange();
+        }
+    }
+
+    @Nonnull
+    public List<BinEdComponentExtension> getComponentExtensions() {
+        return componentExtensions;
+    }
+
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    public <T extends BinEdComponentExtension> T getComponentExtension(Class<T> clazz) {
+        for (BinEdComponentExtension extension : componentExtensions) {
+            if (clazz.isInstance(extension)) {
+                return (T) extension;
+            }
+        }
+        throw new IllegalStateException();
+    }
+
     @ParametersAreNonnullByDefault
     public interface BinEdComponentExtension {
 

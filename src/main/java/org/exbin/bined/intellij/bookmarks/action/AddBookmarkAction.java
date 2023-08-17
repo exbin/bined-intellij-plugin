@@ -15,22 +15,20 @@
  */
 package org.exbin.bined.intellij.bookmarks.action;
 
+import org.exbin.framework.bined.bookmarks.gui.BookmarkEditorPanel;
+import org.exbin.framework.bined.bookmarks.model.BookmarkRecord;
+import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.utils.gui.DefaultControlPanel;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JPanel;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.AbstractAction;
-import javax.swing.JPanel;
-
-import org.exbin.framework.utils.ActionUtils;
-import org.exbin.framework.bined.bookmarks.gui.BookmarkEditorPanel;
-import org.exbin.framework.bined.bookmarks.model.BookmarkRecord;
-import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.utils.gui.DefaultControlPanel;
 
 /**
  * Add bookmark record action.
@@ -40,7 +38,6 @@ import org.exbin.framework.utils.gui.DefaultControlPanel;
 @ParametersAreNonnullByDefault
 public class AddBookmarkAction implements ActionListener {
 
-    private ResourceBundle resourceBundle;
     private BookmarkRecord bookmarkRecord = null;
 
     public AddBookmarkAction() {
@@ -59,7 +56,7 @@ public class AddBookmarkAction implements ActionListener {
         DefaultControlPanel controlPanel = new DefaultControlPanel(panelResourceBundle);
 
         JPanel dialogPanel = WindowUtils.createDialogPanel(bookmarkEditorPanel, controlPanel);
-        final WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), resourceBundle.getString("dialog.title"), Dialog.ModalityType.APPLICATION_MODAL);
+        final WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), "Add Bookmark", Dialog.ModalityType.APPLICATION_MODAL);
         controlPanel.setHandler((actionType) -> {
             switch (actionType) {
                 case OK: {

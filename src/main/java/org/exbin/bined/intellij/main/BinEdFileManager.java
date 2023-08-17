@@ -15,15 +15,23 @@
  */
 package org.exbin.bined.intellij.main;
 
+import org.exbin.auxiliary.paged_data.delta.SegmentsRepository;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.swing.CodeAreaCore;
+import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.BinEdCodeAreaPainter;
+import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
+import org.exbin.framework.bined.preferences.CodeAreaPreferences;
+import org.exbin.framework.editor.text.EncodingsHandler;
+import org.exbin.framework.editor.text.preferences.TextFontPreferences;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JPopupMenu;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +50,36 @@ public class BinEdFileManager {
     private final List<BinEdCodeAreaPainter.PositionColorModifier> painterPriorityPositionColorModifiers = new ArrayList<>();
 
     public BinEdFileManager() {
+    }
+
+    public void initFileHandler(BinEdFileHandler fileHandler) {
+        fileHandler.setSegmentsRepository(new SegmentsRepository());
+        BinEdComponentPanel componentPanel = fileHandler.getComponent();
+
+        for (BinEdFileExtension fileExtension : binEdComponentExtensions) {
+            Optional<BinEdComponentPanel.BinEdComponentExtension> componentExtension = fileExtension.createComponentExtension(componentPanel);
+            componentExtension.ifPresent((extension) -> {
+                extension.onCreate(componentPanel);
+                componentPanel.addComponentExtension(extension);
+            });
+        }
+
+        BinEdCodeAreaPainter painter = (BinEdCodeAreaPainter) componentPanel.getCodeArea().getPainter();
+        for (BinEdCodeAreaPainter.PositionColorModifier modifier : painterPriorityPositionColorModifiers) {
+            painter.addPriorityColorModifier(modifier);
+        }
+        for (BinEdCodeAreaPainter.PositionColorModifier modifier : painterPositionColorModifiers) {
+            painter.addColorModifier(modifier);
+        }
+
+        BinaryEditorPreferences binaryEditorPreferences = BinEdManager.getInstance().getPreferences();
+        String encoding = binaryEditorPreferences.getEncodingPreferences().getSelectedEncoding();
+        if (!encoding.isEmpty()) {
+            fileHandler.setCharset(Charset.forName(encoding));
+        }
+        TextFontPreferences textFontPreferences = binaryEditorPreferences.getFontPreferences();
+        ExtCodeArea codeArea = fileHandler.getCodeArea();
+        ((FontCapable) codeArea).setCodeFont(textFontPreferences.isUseDefaultFont() ? CodeAreaPreferences.DEFAULT_FONT : textFontPreferences.getFont(CodeAreaPreferences.DEFAULT_FONT));
     }
 
     public void addPainterColorModifier(BinEdCodeAreaPainter.PositionColorModifier modifier) {
@@ -64,6 +102,14 @@ public class BinEdFileManager {
         for (ActionStatusUpdateListener listener : actionStatusUpdateListeners) {
             listener.updateActionStatus(codeArea);
         }
+    }
+
+    public void addBinEdComponentExtension(BinEdFileExtension extension) {
+        binEdComponentExtensions.add(extension);
+    }
+
+    public void addActionStatusUpdateListener(ActionStatusUpdateListener listener) {
+        actionStatusUpdateListeners.add(listener);
     }
 
     @Nonnull

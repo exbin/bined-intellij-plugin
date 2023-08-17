@@ -15,17 +15,20 @@
  */
 package org.exbin.bined.intellij.bookmarks;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import org.exbin.bined.intellij.bookmarks.action.AddBookmarkAction;
+import org.exbin.bined.intellij.bookmarks.action.EditBookmarkAction;
+import org.exbin.bined.intellij.bookmarks.action.ManageBookmarksAction;
+import org.exbin.bined.intellij.main.BinEdManager;
+import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.api.Preferences;
+import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.bookmarks.BookmarksPositionColorModifier;
+import org.exbin.framework.bined.bookmarks.gui.BookmarksManagerPanel;
+import org.exbin.framework.bined.bookmarks.model.BookmarkRecord;
+import org.exbin.framework.bined.bookmarks.preferences.BookmarkPreferences;
+import org.exbin.framework.utils.ActionUtils;
+import org.exbin.framework.utils.LanguageUtils;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -38,18 +41,16 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.api.Preferences;
-import org.exbin.framework.bined.BinEdFileHandler;
-import org.exbin.framework.bined.bookmarks.BookmarksPositionColorModifier;
-import org.exbin.bined.intellij.bookmarks.action.AddBookmarkAction;
-import org.exbin.bined.intellij.bookmarks.action.EditBookmarkAction;
-import org.exbin.bined.intellij.bookmarks.action.ManageBookmarksAction;
-import org.exbin.framework.bined.bookmarks.gui.BookmarksManagerPanel;
-import org.exbin.framework.bined.bookmarks.model.BookmarkRecord;
-import org.exbin.framework.bined.bookmarks.preferences.BookmarkPreferences;
-import org.exbin.framework.utils.ActionUtils;
-import org.exbin.framework.utils.LanguageUtils;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 /**
  * Bookmarks manager.
@@ -78,12 +79,13 @@ public class BookmarksManager {
     private void init() {
         manageBookmarksAction.setBookmarksManager(this);
 
-        Preferences preferences = null; // TODO application.getAppPreferences();
+        BinEdManager binEdManager = BinEdManager.getInstance();
+        Preferences preferences = binEdManager.getPreferences().getPreferences();
         bookmarkPreferences = new BookmarkPreferences(preferences);
         loadBookmarkRecords();
         updateBookmarksMenu();
         bookmarksPositionColorModifier = new BookmarksPositionColorModifier(bookmarkRecords);
-        // TODO binedModule.addPainterColorModifier(bookmarksPositionColorModifier);
+        binEdManager.getFileManager().addPainterColorModifier(bookmarksPositionColorModifier);
     }
 
     private void loadBookmarkRecords() {
@@ -134,7 +136,7 @@ public class BookmarksManager {
         bookmarksManagerPanel.setControl(new BookmarksManagerPanel.Control() {
             @Override
             public void addRecord() {
-                addBookmarkAction.actionPerformed(null);
+                addBookmarkAction.actionPerformed(new ActionEvent(bookmarksManagerPanel, 0, "COMMAND", 0));
                 Optional<BookmarkRecord> bookmarkRecord = addBookmarkAction.getBookmarkRecord();
                 if (bookmarkRecord.isPresent()) {
                     List<BookmarkRecord> records = bookmarksManagerPanel.getBookmarkRecords();
@@ -148,7 +150,7 @@ public class BookmarksManager {
                 BookmarkRecord selectedRecord = bookmarksManagerPanel.getSelectedRecord();
                 int selectedRow = bookmarksManagerPanel.getTable().getSelectedRow();
                 editBookmarkAction.setBookmarkRecord(new BookmarkRecord(selectedRecord));
-                editBookmarkAction.actionPerformed(null);
+                editBookmarkAction.actionPerformed(new ActionEvent(bookmarksManagerPanel, 0, "COMMAND", 0));
                 Optional<BookmarkRecord> bookmarkRecord = editBookmarkAction.getBookmarkRecord();
                 if (bookmarkRecord.isPresent()) {
                     bookmarksManagerPanel.updateRecord(bookmarkRecord.get(), selectedRow);
@@ -239,7 +241,8 @@ public class BookmarksManager {
                 }
             });
             inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0 + i, metaMask), goToActionKey);
-            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_NUMPAD0 + i, metaMask), goToActionKey);
+            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_NUMPAD0 + i, metaMask),
+                    goToActionKey);
 
             String addActionKey = "add-bookmark-" + i;
             actionMap.put(addActionKey, new AbstractAction() {
@@ -248,8 +251,10 @@ public class BookmarksManager {
                     addBookmark(bookmarkIndex);
                 }
             });
-            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0 + i, metaMask | KeyEvent.SHIFT_DOWN_MASK), addActionKey);
-            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_NUMPAD0 + i, metaMask | KeyEvent.SHIFT_DOWN_MASK), addActionKey);
+            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0 + i,
+                    metaMask | KeyEvent.SHIFT_DOWN_MASK), addActionKey);
+            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_NUMPAD0 + i,
+                    metaMask | KeyEvent.SHIFT_DOWN_MASK), addActionKey);
 
             String clearActionKey = "clear-bookmark-" + i;
             actionMap.put(clearActionKey, new AbstractAction() {
@@ -258,8 +263,10 @@ public class BookmarksManager {
                     clearBookmark(bookmarkIndex);
                 }
             });
-            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0 + i, metaMask | KeyEvent.SHIFT_DOWN_MASK | KeyEvent.ALT_DOWN_MASK), clearActionKey);
-            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_NUMPAD0 + i, metaMask | KeyEvent.SHIFT_DOWN_MASK | KeyEvent.ALT_DOWN_MASK), clearActionKey);
+            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0 + i,
+                    metaMask | KeyEvent.SHIFT_DOWN_MASK | KeyEvent.ALT_DOWN_MASK), clearActionKey);
+            inputMap.put(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_NUMPAD0 + i,
+                    metaMask | KeyEvent.SHIFT_DOWN_MASK | KeyEvent.ALT_DOWN_MASK), clearActionKey);
         }
         component.setActionMap(actionMap);
         component.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);
@@ -345,7 +352,8 @@ public class BookmarksManager {
                     }
                 }
             };
-            bookmarkAction.putValue(Action.ACCELERATOR_KEY, javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0 + i, metaMask));
+            bookmarkAction.putValue(Action.ACCELERATOR_KEY,
+                    javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0 + i, metaMask));
             final Color bookmarkColor = bookmarkRecord.getColor();
             bookmarkAction.putValue(Action.SMALL_ICON, new Icon() {
                 @Override
@@ -373,6 +381,12 @@ public class BookmarksManager {
         if (!bookmarkRecords.isEmpty()) {
             menu.addSeparator();
         }
-        // TODO menu.add(ActionUtils.actionToMenuItem(manageBookmarksAction));
+        menu.add(ActionUtils.actionToMenuItem(new AbstractAction(
+                resourceBundle.getString("manageBookmarksAction.text") + "...") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                manageBookmarksAction.actionPerformed(e);
+            }
+        }));
     }
 }

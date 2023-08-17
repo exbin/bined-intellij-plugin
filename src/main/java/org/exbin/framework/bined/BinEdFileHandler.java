@@ -28,13 +28,12 @@ import org.exbin.auxiliary.paged_data.delta.SegmentsRepository;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.BinEdFileEditorState;
 import org.exbin.bined.intellij.BinEdVirtualFile;
-import org.exbin.bined.intellij.bookmarks.BookmarksManager;
-import org.exbin.bined.intellij.gui.BinEdComponentFileApi;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.main.BinEdEditorComponent;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,6 +44,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,7 +57,7 @@ import java.util.logging.Logger;
 @ParametersAreNonnullByDefault
 public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
 
-    private static SegmentsRepository segmentsRepository = null;
+    private static SegmentsRepository segmentsRepository;
 
     private BinEdEditorComponent editorComponent;
 
@@ -319,12 +319,21 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         }
     }
 
+    public void setSegmentsRepository(SegmentsRepository segmentsRepository) {
+        this.segmentsRepository = segmentsRepository;
+    }
+
     @Nonnull
     public JComponent getPreferredFocusedComponent() {
         return editorComponent.getCodeArea();
     }
 
-    private static class BinEdShared {
-        private BookmarksManager bookmarksManager = new BookmarksManager();
+    @Nonnull
+    public Charset getCharset() {
+        return getCodeArea().getCharset();
+    }
+
+    public void setCharset(Charset charset) {
+        getCodeArea().setCharset(charset);
     }
 }

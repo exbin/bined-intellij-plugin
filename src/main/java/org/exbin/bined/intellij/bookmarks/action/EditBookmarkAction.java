@@ -39,7 +39,6 @@ import java.util.ResourceBundle;
 @ParametersAreNonnullByDefault
 public class EditBookmarkAction implements ActionListener {
 
-    private ResourceBundle resourceBundle;
     private BookmarkRecord bookmarkRecord;
 
     public EditBookmarkAction() {
@@ -62,7 +61,7 @@ public class EditBookmarkAction implements ActionListener {
         DefaultControlPanel controlPanel = new DefaultControlPanel(panelResourceBundle);
 
         JPanel dialogPanel = WindowUtils.createDialogPanel(bookmarkEditorPanel, controlPanel);
-        final WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), resourceBundle.getString("dialog.title"), Dialog.ModalityType.APPLICATION_MODAL);
+        final WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), "Edit Bookmark", Dialog.ModalityType.APPLICATION_MODAL);
         controlPanel.setHandler((actionType) -> {
             switch (actionType) {
                 case OK: {
