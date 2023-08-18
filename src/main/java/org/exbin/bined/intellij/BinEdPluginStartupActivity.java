@@ -38,10 +38,11 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
+import org.exbin.bined.intellij.bookmarks.BookmarksManager;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
+import org.exbin.bined.intellij.inspector.BinEdInspectorManager;
 import org.exbin.bined.intellij.main.BinEdEditorComponent;
-import org.exbin.bined.intellij.main.BinEdInit;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.options.IntegrationOptions;
@@ -95,7 +96,9 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             }, null);
             initExtensions();
             initIntegration();
-            BinEdInit.init();
+
+            new BookmarksManager().init();
+            new BinEdInspectorManager().init();
         }
 
         projectOpened(project);

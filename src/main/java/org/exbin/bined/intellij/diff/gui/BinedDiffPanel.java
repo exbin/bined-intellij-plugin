@@ -38,7 +38,7 @@ import org.exbin.bined.intellij.main.BinEdFileDataWrapper;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
-import org.exbin.bined.intellij.action.SearchAction;
+import org.exbin.bined.intellij.search.action.SearchAction;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;

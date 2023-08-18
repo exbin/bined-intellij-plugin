@@ -15,9 +15,12 @@
  */
 package org.exbin.bined.intellij.bookmarks;
 
+import org.exbin.bined.basic.BasicCodeAreaZone;
 import org.exbin.bined.intellij.bookmarks.action.AddBookmarkAction;
 import org.exbin.bined.intellij.bookmarks.action.EditBookmarkAction;
 import org.exbin.bined.intellij.bookmarks.action.ManageBookmarksAction;
+import org.exbin.bined.intellij.gui.BinEdComponentPanel;
+import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.api.Preferences;
@@ -39,6 +42,7 @@ import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import java.awt.Color;
@@ -46,6 +50,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,19 +78,59 @@ public class BookmarksManager {
     private BinEdFileHandler activeFile = null;
 
     public BookmarksManager() {
-        init();
     }
 
-    private void init() {
+    public void init() {
         manageBookmarksAction.setBookmarksManager(this);
 
         BinEdManager binEdManager = BinEdManager.getInstance();
+        BinEdFileManager fileManager = binEdManager.getFileManager();
         Preferences preferences = binEdManager.getPreferences().getPreferences();
         bookmarkPreferences = new BookmarkPreferences(preferences);
         loadBookmarkRecords();
         updateBookmarksMenu();
         bookmarksPositionColorModifier = new BookmarksPositionColorModifier(bookmarkRecords);
         binEdManager.getFileManager().addPainterColorModifier(bookmarksPositionColorModifier);
+
+        fileManager.addBinEdComponentExtension(new BinEdFileManager.BinEdFileExtension() {
+            @Nonnull
+            @Override
+            public Optional<BinEdComponentPanel.BinEdComponentExtension> createComponentExtension(BinEdComponentPanel component) {
+                return Optional.empty();
+            }
+
+            @Override
+            public void onPopupMenuCreation(final JPopupMenu popupMenu,
+                    final ExtCodeArea codeArea, String menuPostfix, int x, int y) {
+                BasicCodeAreaZone positionZone = codeArea.getPainter().getPositionZone(x, y);
+
+                if (positionZone == BasicCodeAreaZone.TOP_LEFT_CORNER || positionZone == BasicCodeAreaZone.HEADER
+                        || positionZone == BasicCodeAreaZone.ROW_POSITIONS) {
+                    return;
+                }
+
+                // TODO: Change position
+                popupMenu.add(createBookmarksPopupMenu());
+            }
+        });
+        binEdManager.setBookmarksSupport(new BinEdManager.BookmarksSupport() {
+
+            @Nonnull
+            @Override
+            public JMenu createBookmarksPopupMenu() {
+                return BookmarksManager.this.createBookmarksPopupMenu();
+            }
+
+            @Override
+            public void registerBookmarksComponentActions(JComponent component) {
+                BookmarksManager.this.registerBookmarksComponentActions(component);
+            }
+
+            @Override
+            public void setActiveFile(@Nullable BinEdFileHandler activeFile) {
+                BookmarksManager.this.setActiveFile(activeFile);
+            }
+        });
     }
 
     private void loadBookmarkRecords() {
