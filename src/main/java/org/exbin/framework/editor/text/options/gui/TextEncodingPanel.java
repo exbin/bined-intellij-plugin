@@ -381,10 +381,14 @@ public class TextEncodingPanel extends javax.swing.JPanel implements OptionsCapa
         }
 
         public void removeIndices(int[] indices) {
+            if (indices.length == 0) {
+                return;
+            }
+
             for (int i = indices.length - 1; i >= 0; i--) {
                 charsets.remove(indices[i]);
+                fireIntervalRemoved(this, indices[i], indices[i]);
             }
-            fireContentsChanged(this, 0, charsets.size());
         }
 
         public void remove(int index) {

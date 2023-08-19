@@ -58,7 +58,6 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
     }
 
     private void init() {
-        initComponents();
         darkMode = UiUtils.isDarkUI();
         if (darkMode) {
             aboutHeaderPanel.setBackground(Color.BLACK);

@@ -97,7 +97,6 @@ public class InsertDataAction implements ActionListener {
             multilineDialog.showCentered(dialog.getWindow());
 //                    multilinePanel.detachMenu();
         });
-        //WindowUtils.addHeaderPanel(dialog.getWindow(), insertDataPanel.getClass(), insertDataPanel.getResourceBundle());
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
             if (actionType == DefaultControlHandler.ControlActionType.OK) {
                 insertDataPanel.acceptInput();

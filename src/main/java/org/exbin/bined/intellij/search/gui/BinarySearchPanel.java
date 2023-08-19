@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.gui;
+package org.exbin.bined.intellij.search.gui;
 
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBPanel;
@@ -389,7 +389,8 @@ public class BinarySearchPanel extends JBPanel {
         findToolBar.setFocusable(false);
         findToolBar.setName("findToolBar"); // NOI18N
 
-        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-left.png"))); // NOI18N
+        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource(
+                "/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-left.png"))); // NOI18N
         prevButton.setEnabled(false);
         prevButton.setFocusable(false);
         prevButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -402,7 +403,8 @@ public class BinarySearchPanel extends JBPanel {
         });
         findToolBar.add(prevButton);
 
-        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-right.png"))); // NOI18N
+        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource(
+                "/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-right.png"))); // NOI18N
         nextButton.setEnabled(false);
         nextButton.setFocusable(false);
         nextButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -415,7 +417,8 @@ public class BinarySearchPanel extends JBPanel {
         });
         findToolBar.add(nextButton);
 
-        matchCaseToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/case_sensitive.gif"))); // NOI18N
+        matchCaseToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource(
+                "/org/exbin/framework/bined/resources/icons/case_sensitive.gif"))); // NOI18N
         matchCaseToggleButton.setSelected(true);
         matchCaseToggleButton.setToolTipText(resourceBundle.getString("matchCaseToggleButton.toolTipText")); // NOI18N
         matchCaseToggleButton.setFocusable(false);
@@ -429,7 +432,8 @@ public class BinarySearchPanel extends JBPanel {
         });
         findToolBar.add(matchCaseToggleButton);
 
-        multipleMatchesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/mark_occurrences.png"))); // NOI18N
+        multipleMatchesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource(
+                "/org/exbin/framework/bined/resources/icons/mark_occurrences.png"))); // NOI18N
         multipleMatchesToggleButton.setSelected(true);
         multipleMatchesToggleButton.setToolTipText(resourceBundle.getString("multipleMatchesToggleButton.toolTipText")); // NOI18N
         multipleMatchesToggleButton.setFocusable(false);
@@ -466,7 +470,8 @@ public class BinarySearchPanel extends JBPanel {
         closeToolBar.setRollover(true);
         closeToolBar.setName("closeToolBar"); // NOI18N
 
-        closeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/dialog-cancel-3.png"))); // NOI18N
+        closeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource(
+                "/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/dialog-cancel-3.png"))); // NOI18N
         closeButton.setToolTipText(resourceBundle.getString("closeButton.toolTipText")); // NOI18N
         closeButton.setFocusable(false);
         closeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);

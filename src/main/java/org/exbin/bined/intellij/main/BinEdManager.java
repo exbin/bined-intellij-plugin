@@ -30,7 +30,7 @@ import org.exbin.bined.intellij.clipboard.action.ClipboardContentAction;
 import org.exbin.bined.intellij.compare.action.CompareFilesAction;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
-import org.exbin.bined.intellij.gui.BinarySearchPanel;
+import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
 import org.exbin.bined.intellij.inspector.action.ShowParsingPanelAction;
 import org.exbin.bined.intellij.search.action.SearchAction;
 import org.exbin.bined.swing.extended.ExtCodeArea;
@@ -342,14 +342,18 @@ public class BinEdManager {
             }
         }
 
-        JMenuItem insertDataMenuItem = createInsertDataMenuItem(codeArea);
-        menu.add(insertDataMenuItem);
+        if (editorComponent != null) {
+            JMenuItem insertDataMenuItem = createInsertDataMenuItem(editorComponent);
+            menu.add(insertDataMenuItem);
+        }
 
         JMenuItem compareFilesMenuItem = createCompareFilesMenuItem(codeArea);
         menu.add(compareFilesMenuItem);
-        if (fileApi instanceof BinEdFileHandler || fileApi instanceof BinEdNativeFile) {
-            JMenuItem reloadFileMenuItem = createReloadFileMenuItem(editorComponent);
-            menu.add(reloadFileMenuItem);
+        if (editorComponent != null) {
+            if (fileApi instanceof BinEdFileHandler || fileApi instanceof BinEdNativeFile) {
+                JMenuItem reloadFileMenuItem = createReloadFileMenuItem(editorComponent);
+                menu.add(reloadFileMenuItem);
+            }
         }
 
         if (editorComponent != null) {
@@ -423,10 +427,12 @@ public class BinEdManager {
     }
 
     @Nonnull
-    private JMenuItem createInsertDataMenuItem(ExtCodeArea codeArea) {
+    private JMenuItem createInsertDataMenuItem(BinEdEditorComponent editorComponent) {
         final JMenuItem insertDataMenuItem = new JMenuItem("Insert Data...");
         insertDataMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionUtils.getMetaMask()));
-        insertDataMenuItem.addActionListener(new InsertDataAction(codeArea));
+        InsertDataAction insertDataAction = new InsertDataAction(editorComponent.getCodeArea());
+        insertDataAction.setUndoHandler(editorComponent.getUndoHandler());
+        insertDataMenuItem.addActionListener(insertDataAction);
         return insertDataMenuItem;
     }
 

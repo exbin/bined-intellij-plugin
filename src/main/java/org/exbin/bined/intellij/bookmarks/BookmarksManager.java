@@ -50,7 +50,6 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +73,6 @@ public class BookmarksManager {
     private ManageBookmarksAction manageBookmarksAction = new ManageBookmarksAction();
     private AddBookmarkAction addBookmarkAction = new AddBookmarkAction();
     private EditBookmarkAction editBookmarkAction = new EditBookmarkAction();
-    private JMenu bookmarksMenu;
     private BinEdFileHandler activeFile = null;
 
     public BookmarksManager() {
@@ -257,15 +255,6 @@ public class BookmarksManager {
     }
 
     @Nonnull
-    public JMenu getBookmarksMenu() {
-        if (bookmarksMenu == null) {
-            bookmarksMenu = new JMenu(resourceBundle.getString("bookmarksMenu.text"));
-            updateBookmarksMenu();
-        }
-        return bookmarksMenu;
-    }
-
-    @Nonnull
     public JMenu createBookmarksPopupMenu() {
         JMenu bookmarksPopupMenu = new JMenu(resourceBundle.getString("bookmarksMenu.text"));
         updateBookmarksMenu(bookmarksPopupMenu);
@@ -367,7 +356,6 @@ public class BookmarksManager {
     }
 
     public void updateBookmarksMenu() {
-        updateBookmarksMenu(bookmarksMenu);
     }
 
     public void updateBookmarksMenu(@Nullable JMenu menu) {

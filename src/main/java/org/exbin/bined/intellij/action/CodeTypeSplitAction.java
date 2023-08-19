@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.gui;
+package org.exbin.bined.intellij.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;

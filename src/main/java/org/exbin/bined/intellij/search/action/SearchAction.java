@@ -17,8 +17,8 @@ package org.exbin.bined.intellij.search.action;
 
 import org.exbin.bined.DefaultCodeAreaCaretPosition;
 import org.exbin.bined.highlight.swing.extended.ExtendedHighlightCodeAreaPainter;
-import org.exbin.bined.intellij.gui.BinarySearchPanel;
-import org.exbin.bined.intellij.gui.BinarySearchPanelApi;
+import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
+import org.exbin.bined.intellij.search.gui.BinarySearchPanelApi;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.search.ReplaceParameters;
 import org.exbin.framework.bined.search.SearchCondition;
@@ -162,7 +162,7 @@ public final class SearchAction implements ActionListener {
         if (!findTextPanelVisible) {
             codeAreaPanel.add(binarySearchPanel, BorderLayout.NORTH);
             codeAreaPanel.revalidate();
-//            revalidate();
+            codeAreaPanel.repaint();
             findTextPanelVisible = true;
             binarySearchPanel.requestSearchFocus();
         }
@@ -178,7 +178,7 @@ public final class SearchAction implements ActionListener {
             binarySearchPanel.clearSearch();
             codeAreaPanel.remove(binarySearchPanel);
             codeAreaPanel.revalidate();
-//            revalidate();
+            codeAreaPanel.repaint();
             findTextPanelVisible = false;
         }
     }

@@ -28,6 +28,7 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
+import org.exbin.bined.intellij.action.CodeTypeSplitAction;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.utils.LanguageUtils;
