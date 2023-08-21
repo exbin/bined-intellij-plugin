@@ -15,8 +15,7 @@
  */
 package org.exbin.framework.editor.gui;
 
-import org.exbin.bined.intellij.BinEdVirtualFile;
-import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 
@@ -36,7 +35,7 @@ import java.util.ResourceBundle;
 public class UnsavedFilesPanel extends javax.swing.JPanel {
 
     private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(UnsavedFilesPanel.class);
-    private List<BinEdFileHandler> fileHandlers;
+    private List<FileHandler> fileHandlers;
     private Controller controller;
 
     public UnsavedFilesPanel() {
@@ -63,14 +62,11 @@ public class UnsavedFilesPanel extends javax.swing.JPanel {
         this.controller = controller;
     }
 
-    public void setUnsavedFiles(List<BinEdFileHandler> fileHandlers) {
+    public void setUnsavedFiles(List<FileHandler> fileHandlers) {
         this.fileHandlers = fileHandlers;
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        for (BinEdFileHandler fileHandler : fileHandlers) {
-            BinEdVirtualFile virtualFile = fileHandler.getVirtualFile();
-            String fileName = virtualFile != null ? virtualFile.getName() : null;
-            String handlerName = fileName != null ? fileName : "unnamed";
-            listModel.addElement(handlerName);
+        for (FileHandler fileHandler : fileHandlers) {
+            listModel.addElement(fileHandler.getFileName());
         }
         filesList.setModel(listModel);
         filesList.invalidate();
@@ -175,7 +171,7 @@ public class UnsavedFilesPanel extends javax.swing.JPanel {
             int shift = 0;
             for (int i = 0; i < selectedIndices.length; i++) {
                 int selectedIndex = selectedIndices[i];
-                BinEdFileHandler fileHandler = fileHandlers.get(selectedIndex - shift);
+                FileHandler fileHandler = fileHandlers.get(selectedIndex - shift);
                 if (controller.saveFile(fileHandler)) {
                     DefaultListModel<String> listModel = (DefaultListModel<String>) filesList.getModel();
                     listModel.remove(selectedIndex - shift);
@@ -197,7 +193,7 @@ public class UnsavedFilesPanel extends javax.swing.JPanel {
             int shift = 0;
             int size = fileHandlers.size();
             for (int index = 0; index < size; index++) {
-                BinEdFileHandler fileHandler = fileHandlers.get(index - shift);
+                FileHandler fileHandler = fileHandlers.get(index - shift);
                 if (controller.saveFile(fileHandler)) {
                     DefaultListModel<String> listModel = (DefaultListModel<String>) filesList.getModel();
                     listModel.remove(index - shift);
@@ -248,9 +244,9 @@ public class UnsavedFilesPanel extends javax.swing.JPanel {
     @ParametersAreNonnullByDefault
     public interface Controller {
 
-        boolean saveFile(BinEdFileHandler fileHandler);
+        boolean saveFile(FileHandler fileHandler);
 
-        void discardAll(List<BinEdFileHandler> fileHandlers);
+        void discardAll(List<FileHandler> fileHandlers);
 
         void cancel();
     }

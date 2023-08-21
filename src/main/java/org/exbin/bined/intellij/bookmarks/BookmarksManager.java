@@ -24,7 +24,7 @@ import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.api.Preferences;
-import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.bined.intellij.main.BinEdFileHandler;
 import org.exbin.framework.bined.bookmarks.BookmarksPositionColorModifier;
 import org.exbin.framework.bined.bookmarks.gui.BookmarksManagerPanel;
 import org.exbin.framework.bined.bookmarks.model.BookmarkRecord;

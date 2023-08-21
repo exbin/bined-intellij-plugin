@@ -26,20 +26,20 @@ import org.exbin.bined.intellij.action.EditSelectionAction;
 import org.exbin.bined.intellij.action.GoToPositionAction;
 import org.exbin.bined.intellij.action.OptionsAction;
 import org.exbin.bined.intellij.blockedit.action.InsertDataAction;
+import org.exbin.bined.intellij.bookmarks.BookmarksManager;
 import org.exbin.bined.intellij.clipboard.action.ClipboardContentAction;
 import org.exbin.bined.intellij.compare.action.CompareFilesAction;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.intellij.inspector.BinEdInspectorManager;
 import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
 import org.exbin.bined.intellij.inspector.action.ShowParsingPanelAction;
 import org.exbin.bined.intellij.search.action.SearchAction;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.about.gui.AboutPanel;
-import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
-import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.utils.ActionUtils;
 import org.exbin.framework.utils.DesktopUtils;
 import org.exbin.framework.utils.WindowUtils;
@@ -87,10 +87,10 @@ public class BinEdManager {
 
     private final BinaryEditorPreferences preferences;
     private BinEdFileManager fileManager = new BinEdFileManager();
+
+    private volatile boolean initialized;
     private BookmarksSupport bookmarksSupport;
     private InspectorSupport inspectorSupport;
-
-    private EncodingsHandler encodingsHandler;
 
     private BinEdManager() {
         preferences = new BinaryEditorPreferences(new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
@@ -107,6 +107,12 @@ public class BinEdManager {
 
     @Nonnull
     public BinEdEditorComponent createBinEdEditor() {
+        if (!initialized) {
+            initialized = true;
+            new BookmarksManager().init();
+            new BinEdInspectorManager().init();
+        }
+
         BinEdEditorComponent binEdEditorComponent = new BinEdEditorComponent();
         binEdEditorComponent.initialLoadFromPreferences(preferences);
         BinEdComponentPanel componentPanel = binEdEditorComponent.getComponentPanel();

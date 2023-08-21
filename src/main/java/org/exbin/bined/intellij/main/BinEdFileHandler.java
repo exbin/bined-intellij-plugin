@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.framework.bined;
+package org.exbin.bined.intellij.main;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
@@ -29,11 +29,12 @@ import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.BinEdFileEditorState;
 import org.exbin.bined.intellij.BinEdVirtualFile;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
-import org.exbin.bined.intellij.main.BinEdEditorComponent;
-import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
+import org.exbin.framework.file.api.FileHandler;
+import org.exbin.framework.file.api.FileType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,8 +45,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
+import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,10 +57,9 @@ import java.util.logging.Logger;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
+public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, DumbAware {
 
-    private static SegmentsRepository segmentsRepository;
-
+    private SegmentsRepository segmentsRepository;
     private BinEdEditorComponent editorComponent;
 
     private boolean opened = false;
@@ -80,8 +81,6 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         editorComponent.setUndoHandler(undoHandler);
 
         // TODO undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, this);
-
-        getSegmentsRepository();
     }
 
     public boolean isModified() {
@@ -102,12 +101,46 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         return editorComponent.getCodeArea();
     }
 
-    public static synchronized SegmentsRepository getSegmentsRepository() {
-        if (segmentsRepository == null) {
-            segmentsRepository = new SegmentsRepository();
-        }
+    @Override
+    public int getId() {
+        return 0;
+    }
 
-        return segmentsRepository;
+    @Nonnull
+    @Override
+    public Optional<URI> getFileUri() {
+        return Optional.empty();
+    }
+
+    @Nonnull
+    @Override
+    public String getFileName() {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public Optional<FileType> getFileType() {
+        return Optional.empty();
+    }
+
+    @Override
+    public void setFileType(@Nullable FileType fileType) {
+        // ignore
+    }
+
+    @Override
+    public void newFile() {
+        throw new UnsupportedOperationException("Not supported yet.");    }
+
+    @Override
+    public void loadFromFile(URI fileUri, @Nullable FileType fileType) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void saveToFile(URI fileUri, @Nullable FileType fileType) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void openFile(BinEdVirtualFile virtualFile) {
@@ -182,6 +215,7 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
         application.runWriteAction(() -> saveFile());
     }
 
+    @Override
     public void saveFile() {
         ExtCodeArea codeArea = editorComponent.getCodeArea();
         BinaryData data = codeArea.getContentData();
@@ -326,14 +360,5 @@ public class BinEdFileHandler implements BinEdComponentFileApi, DumbAware {
     @Nonnull
     public JComponent getPreferredFocusedComponent() {
         return editorComponent.getCodeArea();
-    }
-
-    @Nonnull
-    public Charset getCharset() {
-        return getCodeArea().getCharset();
-    }
-
-    public void setCharset(Charset charset) {
-        getCodeArea().setCharset(charset);
     }
 }

@@ -15,31 +15,26 @@
  */
 package org.exbin.bined.intellij.main;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.newvfs.BulkFileListener;
-import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.util.LocalTimeCounter;
-import com.intellij.util.messages.MessageBusConnection;
 import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.paged_data.PagedData;
 import org.exbin.bined.EditMode;
-import org.exbin.bined.intellij.BinEdFileEditorState;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import java.util.List;
+import javax.swing.JComponent;
+import java.io.IOException;
 
 /**
  * File editor wrapper using BinEd editor component.
@@ -53,13 +48,13 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 
     private boolean opened = false;
     private VirtualFile virtualFile;
-    private BinEdFileEditorState fileEditorState = new BinEdFileEditorState();
-    private MessageBusConnection updateConnection = null;
 
     public BinEdNativeFile(VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
         BinEdManager binEdManager = BinEdManager.getInstance();
         componentPanel = binEdManager.createBinEdEditor();
+        binEdManager.getFileManager().initComponentPanel(componentPanel.getComponentPanel());
+
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
         componentPanel.setFileApi(this);
@@ -87,16 +82,21 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
         return componentPanel.getComponentPanel();
     }
 
-    @Nonnull
-    public JComponent getUndoHandler() {
-        return componentPanel.getComponentPanel();
-    }
-
     public void openFile(VirtualFile virtualFile) {
         boolean editable = virtualFile.isWritable();
 
-        componentPanel.setContentData(new BinEdFileDataWrapper(virtualFile));
+        ApplicationManager.getApplication().runReadAction(() -> {
+            try {
+                byte[] fileContent = virtualFile.contentsToByteArray();
+                PagedData binaryData = new PagedData();
+                binaryData.insert(0, fileContent);
+                componentPanel.setContentData(binaryData);
+            } catch (IOException e) {
+                throw createBrokenVirtualFileException(e);
+            }
+        });
         ExtCodeArea codeArea = componentPanel.getCodeArea();
+        codeArea.addDataChangedListener(this::saveDocument);
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
         opened = true;
@@ -104,52 +104,42 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
         updateModified();
 //        updateCurrentMemoryMode();
         componentPanel.getUndoHandler().clear();
+    }
 
-        Project project = ProjectManager.getInstance().getDefaultProject();
-        updateConnection = project.getMessageBus().connect();
-        updateConnection.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
-            @Override
-            public void after(@NotNull List<? extends VFileEvent> events) {
-                for (VFileEvent event : events) {
-                    if (virtualFile.equals(event.getFile())) {
-                        BinEdFileDataWrapper contentData = (BinEdFileDataWrapper) codeArea.getContentData();
-                        if (!contentData.isWriteInProgress()) {
-                            contentData.resetCache();
-                            SwingUtilities.invokeLater(codeArea::notifyDataChanged);
-                            componentPanel.getUndoHandler().clear();
-                            break;
-                        }
-                    }
-                }
+    @Override
+    public void saveDocument() {
+        BinaryData contentData = componentPanel.getContentData();
+        final byte[] fileContent = contentData == null ? new byte[0] : new byte[(int) contentData.getDataSize()];
+        if (contentData != null) {
+            contentData.copyToArray(0L, fileContent, 0, (int) contentData.getDataSize());
+        }
+        Application application = ApplicationManager.getApplication();
+        application.runWriteAction(() -> {
+            try {
+                virtualFile.setBinaryContent(fileContent);
+            } catch (IOException e) {
+                throw createBrokenVirtualFileException(e);
             }
         });
     }
 
     @Override
-    public void saveDocument() {
-        // Ignore
-    }
-
-    @Override
     public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
-        // Ignore
+        throw new IllegalStateException("File handling change not supported");
     }
 
     public void reloadFile() {
         openFile(virtualFile);
+
     }
 
     @Override
     public void closeData() {
-        BinaryData contentData = componentPanel.getCodeArea().getContentData();
-        if (contentData instanceof BinEdFileDataWrapper) {
-            ((BinEdFileDataWrapper) contentData).close();
+        PagedData contentData = (PagedData) componentPanel.getCodeArea().getContentData();
+        if (contentData != null) {
+            contentData.clear();
         }
         componentPanel.setContentData(null);
-        Project project = ProjectManager.getInstance().getDefaultProject();
-        if (updateConnection != null) {
-            updateConnection.disconnect();
-        }
     }
 
     private void updateModified() {
@@ -162,6 +152,13 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 //        propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
     }
 
+    @Nonnull
+    private IllegalStateException createBrokenVirtualFileException(@Nullable Exception ex) {
+        String filePath = virtualFile.getCanonicalPath();
+        String message = "Broken virtual file" + (filePath != null ? ":" + filePath : "");
+        return new IllegalStateException(message, ex);
+    }
+
     @Nullable
     public VirtualFile getVirtualFile() {
         return virtualFile;
@@ -169,6 +166,7 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 
     @Override
     public boolean isSaveSupported() {
+        // Automatic save
         return false;
     }
 

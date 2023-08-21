@@ -21,10 +21,8 @@ import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.BinEdCodeAreaPainter;
-import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.bined.preferences.CodeAreaPreferences;
-import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.preferences.TextFontPreferences;
 
 import javax.annotation.Nonnull;
@@ -44,6 +42,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 public class BinEdFileManager {
 
+    private final SegmentsRepository segmentsRepository = new SegmentsRepository();
     private final List<BinEdFileExtension> binEdComponentExtensions = new ArrayList<>();
     private final List<ActionStatusUpdateListener> actionStatusUpdateListeners = new ArrayList<>();
     private final List<BinEdCodeAreaPainter.PositionColorModifier> painterPositionColorModifiers = new ArrayList<>();
@@ -53,8 +52,13 @@ public class BinEdFileManager {
     }
 
     public void initFileHandler(BinEdFileHandler fileHandler) {
-        fileHandler.setSegmentsRepository(new SegmentsRepository());
+        fileHandler.setSegmentsRepository(segmentsRepository);
         BinEdComponentPanel componentPanel = fileHandler.getComponent();
+        initComponentPanel(componentPanel);
+    }
+
+    public void initComponentPanel(BinEdComponentPanel componentPanel) {
+        ExtCodeArea codeArea = componentPanel.getCodeArea();
 
         for (BinEdFileExtension fileExtension : binEdComponentExtensions) {
             Optional<BinEdComponentPanel.BinEdComponentExtension> componentExtension = fileExtension.createComponentExtension(componentPanel);
@@ -64,7 +68,7 @@ public class BinEdFileManager {
             });
         }
 
-        BinEdCodeAreaPainter painter = (BinEdCodeAreaPainter) componentPanel.getCodeArea().getPainter();
+        BinEdCodeAreaPainter painter = (BinEdCodeAreaPainter) codeArea.getPainter();
         for (BinEdCodeAreaPainter.PositionColorModifier modifier : painterPriorityPositionColorModifiers) {
             painter.addPriorityColorModifier(modifier);
         }
@@ -75,10 +79,9 @@ public class BinEdFileManager {
         BinaryEditorPreferences binaryEditorPreferences = BinEdManager.getInstance().getPreferences();
         String encoding = binaryEditorPreferences.getEncodingPreferences().getSelectedEncoding();
         if (!encoding.isEmpty()) {
-            fileHandler.setCharset(Charset.forName(encoding));
+            codeArea.setCharset(Charset.forName(encoding));
         }
         TextFontPreferences textFontPreferences = binaryEditorPreferences.getFontPreferences();
-        ExtCodeArea codeArea = fileHandler.getCodeArea();
         ((FontCapable) codeArea).setCodeFont(textFontPreferences.isUseDefaultFont() ? CodeAreaPreferences.DEFAULT_FONT : textFontPreferences.getFont(CodeAreaPreferences.DEFAULT_FONT));
     }
 

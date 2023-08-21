@@ -403,11 +403,13 @@ public class BinEdEditorComponent {
 
     @Nonnull
     public FileHandlingMode getFileHandlingMode() {
+        if (fileHandlingMode == FileHandlingMode.NATIVE) {
+            return fileHandlingMode;
+        }
+
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         if (codeArea.getContentData() instanceof DeltaDocument) {
             return FileHandlingMode.DELTA;
-        } else if (codeArea.getContentData() instanceof BinEdFileDataWrapper) {
-            return FileHandlingMode.NATIVE;
         }
         return FileHandlingMode.MEMORY;
     }

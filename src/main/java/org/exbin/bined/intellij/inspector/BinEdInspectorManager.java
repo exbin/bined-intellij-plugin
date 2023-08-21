@@ -64,7 +64,8 @@ public class BinEdInspectorManager {
                 return Optional.of(binEdComponentInspector);
             }
 
-            @Override public void onPopupMenuCreation(JPopupMenu popupMenu,
+            @Override
+            public void onPopupMenuCreation(JPopupMenu popupMenu,
                     ExtCodeArea codeArea, String menuPostfix, int x, int y) {
             }
         });

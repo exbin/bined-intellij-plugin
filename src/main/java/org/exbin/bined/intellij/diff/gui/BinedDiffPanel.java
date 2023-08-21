@@ -27,6 +27,7 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.ByteArrayData;
+import org.exbin.auxiliary.paged_data.PagedData;
 import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
@@ -34,7 +35,6 @@ import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.intellij.main.BinEdApplyOptions;
 import org.exbin.bined.intellij.main.BinEdEditorComponent;
-import org.exbin.bined.intellij.main.BinEdFileDataWrapper;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
@@ -86,6 +86,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -245,7 +246,14 @@ public class BinedDiffPanel extends JBPanel {
         if (contents.size() > index) {
             DiffContent diffContent = contents.get(index);
             if (diffContent instanceof FileContent) {
-                return new BinEdFileDataWrapper(((FileContent) diffContent).getFile());
+                PagedData pageData = new PagedData();
+                try {
+                    byte[] fileContent = ((FileContent) diffContent).getFile().contentsToByteArray();
+                    pageData.insert(0, fileContent);
+                    return pageData;
+                } catch (IOException e) {
+                    throw new IllegalStateException("Unable to read file content", e);
+                }
             }
             if (diffContent instanceof DocumentContent) {
                 Document document = ((DocumentContent) diffContent).getDocument();

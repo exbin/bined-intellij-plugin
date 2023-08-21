@@ -22,6 +22,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.extensions.ExtensionPointAdapter;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.PluginDescriptor;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.progress.ProcessCanceledException;
@@ -31,6 +32,9 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.newvfs.BulkFileListener;
+import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
@@ -43,11 +47,12 @@ import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.inspector.BinEdInspectorManager;
 import org.exbin.bined.intellij.main.BinEdEditorComponent;
+import org.exbin.bined.intellij.main.BinEdFileHandler;
 import org.exbin.bined.intellij.main.BinEdManager;
+import org.exbin.bined.intellij.main.BinEdNativeFile;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
-import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
@@ -88,17 +93,18 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
         if (initialIntegrationOptions == null) {
             ProjectManager.getInstance().addProjectManagerListener(new BinEdVetoableProjectListener());
 
-            BINED_VIEW_DATA.addExtensionPointListener(new ExtensionPointAdapter<>() {
-                @Override
-                public void extensionListChanged() {
-                    initExtensions();
-                }
-            }, null);
+            try {
+                BINED_VIEW_DATA.addExtensionPointListener(new ExtensionPointAdapter<>() {
+                    @Override
+                    public void extensionListChanged() {
+                        initExtensions();
+                    }
+                }, null);
+            } catch (Throwable ex) {
+                Logger.getLogger(BinEdPluginStartupActivity.class.getName()).log(Level.SEVERE, "Extension initialization failed", ex);
+            }
             initExtensions();
             initIntegration();
-
-            new BookmarksManager().init();
-            new BinEdInspectorManager().init();
         }
 
         projectOpened(project);
@@ -136,6 +142,23 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
                         throw new ProcessCanceledException();
                     }
                     ((BinEdVirtualFile) file).setClosing(false);
+                }
+            }
+        });
+        connect.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
+            @Override
+            public void after(@Nonnull List<? extends VFileEvent> events) {
+                for (VFileEvent event : events) {
+                    VirtualFile virtualFile = event.getFile();
+                    if (event.isFromRefresh()) {
+                        FileEditor[] allEditors = FileEditorManager.getInstance(project).getAllEditors(virtualFile);
+                        for (FileEditor fileEditor : allEditors) {
+                            if (fileEditor instanceof BinEdNativeFileEditor) {
+                                BinEdNativeFile nativeFile = ((BinEdNativeFileEditor) fileEditor).getNativeFile();
+                                nativeFile.reloadFile();
+                            }
+                        }
+                    }
                 }
             }
         });

@@ -21,7 +21,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.exbin.bined.intellij.main.BinEdManager;
-import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.bined.intellij.main.BinEdFileHandler;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;

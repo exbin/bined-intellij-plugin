@@ -19,8 +19,9 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.bined.intellij.main.BinEdFileHandler;
 import org.exbin.framework.editor.gui.UnsavedFilesPanel;
+import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.utils.WindowUtils;
 
 import javax.annotation.Nonnull;
@@ -42,11 +43,11 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
     @Override
     public boolean canClose(Project project) {
         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-        List<BinEdFileHandler> fileHandlers = new ArrayList<>();
+        List<FileHandler> fileHandlers = new ArrayList<>();
         VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
         for (VirtualFile file : openFiles) {
             if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isClosing()) {
-                BinEdFileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
+                FileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
                 if (fileHandler.isModified()) {
                     fileHandlers.add(fileHandler);
                 }
@@ -72,7 +73,7 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         return true;
     }
 
-    public static boolean showAskForSaveDialog(@Nonnull List<BinEdFileHandler> fileHandlers,
+    public static boolean showAskForSaveDialog(@Nonnull List<FileHandler> fileHandlers,
             @Nonnull Component parentComponent) {
         UnsavedFilesPanel unsavedFilesPanel = new UnsavedFilesPanel();
         unsavedFilesPanel.setUnsavedFiles(fileHandlers);
@@ -84,13 +85,13 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
                 Dialog.ModalityType.APPLICATION_MODAL);
         unsavedFilesPanel.setController(new UnsavedFilesPanel.Controller() {
             @Override
-            public boolean saveFile(@Nonnull BinEdFileHandler fileHandler) {
-                fileHandler.saveDocument();
+            public boolean saveFile(@Nonnull FileHandler fileHandler) {
+                fileHandler.saveFile();
                 return !fileHandler.isModified();
             }
 
             @Override
-            public void discardAll(@Nonnull List<BinEdFileHandler> fileHandlers) {
+            public void discardAll(@Nonnull List<FileHandler> fileHandlers) {
                 result[0] = true;
                 dialog.close();
             }
