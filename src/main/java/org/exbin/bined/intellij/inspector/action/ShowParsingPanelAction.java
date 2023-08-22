@@ -39,12 +39,20 @@ public class ShowParsingPanelAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        BinEdComponentInspector componentExtension = binEdComponentPanel.getComponentExtension(BinEdComponentInspector.class);
-        setShowValuesPanel(!componentExtension.isShowParsingPanel());
+        try {
+            BinEdComponentInspector componentExtension = binEdComponentPanel.getComponentExtension(BinEdComponentInspector.class);
+            setShowValuesPanel(!componentExtension.isShowParsingPanel());
+        } catch (IllegalStateException ex) {
+            // ignore
+        }
     }
 
     public void setShowValuesPanel(boolean show) {
-        BinEdComponentInspector componentExtension = binEdComponentPanel.getComponentExtension(BinEdComponentInspector.class);
-        componentExtension.setShowParsingPanel(show);
+        try {
+            BinEdComponentInspector componentExtension = binEdComponentPanel.getComponentExtension(BinEdComponentInspector.class);
+            componentExtension.setShowParsingPanel(show);
+        } catch (IllegalStateException ex) {
+            // ignore
+        }
     }
 }

@@ -38,13 +38,6 @@ public class BinEdFileEditorProvider implements FileEditorProvider, DumbAware {
     public static final String BINED_EDITOR_TYPE_ID = "org.exbin.bined";
 
     @Override
-    public void disposeEditor(FileEditor editor) {
-        if (editor instanceof BinEdFileEditor) {
-            editor.dispose();
-        }
-    }
-
-    @Override
     public boolean accept(Project project, VirtualFile file) {
         return file instanceof BinEdVirtualFile || file.getPath().startsWith(BinEdVirtualFile.PATH_PREFIX);
     }

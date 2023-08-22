@@ -53,7 +53,7 @@ public class BinEdFileManager {
 
     public void initFileHandler(BinEdFileHandler fileHandler) {
         fileHandler.setSegmentsRepository(segmentsRepository);
-        BinEdComponentPanel componentPanel = fileHandler.getComponent();
+        BinEdComponentPanel componentPanel = fileHandler.getComponentPanel();
         initComponentPanel(componentPanel);
     }
 

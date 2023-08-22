@@ -79,7 +79,7 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
 
     @Nonnull
     public JComponent getComponent() {
-        return componentPanel.getComponentPanel();
+        return componentPanel.getComponent();
     }
 
     public void openFile(VirtualFile virtualFile) {

@@ -196,6 +196,10 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         this.closing = closing;
     }
 
+    public void dispose() {
+        editorFile.closeData();
+    }
+
     @Nonnull
     public JComponent getPreferredFocusedComponent() {
         return getEditorFile().getPreferredFocusedComponent();

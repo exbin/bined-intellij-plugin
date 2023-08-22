@@ -19,7 +19,6 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.ByteArrayData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 import org.exbin.auxiliary.paged_data.PagedData;
 import org.exbin.auxiliary.paged_data.delta.DeltaDocument;
@@ -30,6 +29,7 @@ import org.exbin.bined.intellij.BinEdFileEditorState;
 import org.exbin.bined.intellij.BinEdVirtualFile;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
+import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
@@ -65,7 +65,6 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
     private boolean opened = false;
     private BinEdVirtualFile virtualFile;
     private BinEdFileEditorState fileEditorState = new BinEdFileEditorState();
-    private CodeAreaUndoHandler undoHandler;
     private long documentOriginalSize;
 
     public BinEdFileHandler() {
@@ -76,9 +75,8 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
         BinEdManager binEdManager = BinEdManager.getInstance();
         editorComponent = binEdManager.createBinEdEditor();
         ExtCodeArea codeArea = editorComponent.getCodeArea();
-        undoHandler = new CodeAreaUndoHandler(codeArea);
         editorComponent.setFileApi(this);
-        editorComponent.setUndoHandler(undoHandler);
+        editorComponent.setUndoHandler(new CodeAreaUndoHandler(codeArea));
 
         // TODO undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, this);
     }
@@ -92,7 +90,12 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
     }
 
     @Nonnull
-    public BinEdComponentPanel getComponent() {
+    public JComponent getComponent() {
+        return editorComponent.getComponent();
+    }
+
+    @Nonnull
+    public BinEdComponentPanel getComponentPanel() {
         return editorComponent.getComponentPanel();
     }
 
@@ -167,7 +170,10 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
 
             opened = true;
 
-            editorComponent.getUndoHandler().clear();
+            BinaryDataUndoHandler undoHandler = editorComponent.getUndoHandler();
+            if (undoHandler != null) {
+                undoHandler.clear();
+            }
             fileSync();
         }
     }
@@ -250,7 +256,10 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
 
     private void fileSync() {
         documentOriginalSize = getCodeArea().getDataSize();
-        undoHandler.setSyncPoint();
+        BinaryDataUndoHandler undoHandler = editorComponent.getUndoHandler();
+        if (undoHandler != null) {
+            undoHandler.setSyncPoint();
+        }
     }
 
     public long getDocumentOriginalSize() {
@@ -282,16 +291,18 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
                 }
             } else {
                 // If document unsaved in memory, switch data in code area
-                if (codeArea.getContentData() instanceof DeltaDocument) {
-                    BinaryData oldData = codeArea.getContentData();
+                BinaryData oldData = codeArea.getContentData();
+                if (oldData instanceof DeltaDocument) {
                     PagedData data = new PagedData();
                     data.insert(0, codeArea.getContentData());
                     editorComponent.setContentData(data);
-                    if (oldData != null) {
-                        oldData.dispose();
+                    FileDataSource fileSource = ((DeltaDocument) oldData).getFileSource();
+                    oldData.dispose();
+                    if (fileSource != null) {
+                        segmentsRepository.detachFileSource(fileSource);
+                        segmentsRepository.closeFileSource(fileSource);
                     }
                 } else {
-                    BinaryData oldData = codeArea.getContentData();
                     DeltaDocument document = segmentsRepository.createDocument();
                     if (oldData != null) {
                         document.insert(0, oldData);
@@ -299,29 +310,37 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
                     }
                     editorComponent.setContentData(document);
                 }
-                editorComponent.getUndoHandler().clear();
+                BinaryDataUndoHandler undoHandler = editorComponent.getUndoHandler();
+                if (undoHandler != null) {
+                    undoHandler.clear();
+                }
                 editorComponent.setFileHandlingMode(newHandlingMode);
-            }
-        }
-    }
-
-    public void disposeData() {
-        ExtCodeArea codeArea = editorComponent.getCodeArea();
-        BinaryData data = codeArea.getContentData();
-        editorComponent.setContentData(new ByteArrayData());
-        if (data instanceof DeltaDocument) {
-            data.dispose();
-        } else {
-            if (data != null) {
-                data.dispose();
             }
         }
     }
 
     @Override
     public void closeData() {
-        disposeData();
-        editorComponent.setContentData(null);
+        ExtCodeArea codeArea = editorComponent.getCodeArea();
+        BinaryDataUndoHandler undoHandler = editorComponent.getUndoHandler();
+        if (undoHandler != null) {
+            undoHandler.clear();
+        }
+        BinaryData data = codeArea.getContentData();
+        editorComponent.getCodeArea().setContentData(null);
+        if (data instanceof DeltaDocument) {
+            FileDataSource fileSource = ((DeltaDocument) data).getFileSource();
+            data.dispose();
+            if (fileSource != null) {
+                segmentsRepository.detachFileSource(fileSource);
+                segmentsRepository.closeFileSource(fileSource);
+            }
+        } else {
+            if (data != null) {
+                data.dispose();
+            }
+        }
+
         virtualFile = null;
     }
 

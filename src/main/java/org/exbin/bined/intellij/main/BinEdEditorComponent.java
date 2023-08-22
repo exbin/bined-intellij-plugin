@@ -15,8 +15,7 @@
  */
 package org.exbin.bined.intellij.main;
 
-import com.intellij.ui.components.JBScrollPane;
-import org.apache.commons.lang.NotImplementedException;
+import com.intellij.ui.components.JBPanel;
 import org.exbin.auxiliary.paged_data.BinaryData;
 import org.exbin.auxiliary.paged_data.delta.DeltaDocument;
 import org.exbin.bined.CodeAreaCaretPosition;
@@ -41,7 +40,6 @@ import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
-import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
 import org.exbin.framework.bined.inspector.options.DataInspectorOptions;
 import org.exbin.framework.bined.options.CodeAreaColorOptions;
 import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
@@ -64,6 +62,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -85,6 +84,7 @@ public class BinEdEditorComponent {
     public static final String ACTION_CLIPBOARD_PASTE = "paste-from-clipboard";
 
     private BinEdComponentPanel componentPanel = new BinEdComponentPanel();
+    private JBPanel wrapperPanel = new JBPanel(new BorderLayout());
     private final BinEdToolbarPanel toolbarPanel;
     private final BinaryStatusPanel statusPanel;
 
@@ -98,9 +98,6 @@ public class BinEdEditorComponent {
     private TextEncodingStatusApi encodingStatus;
     private CharsetChangeListener charsetChangeListener = null;
     private ModifiedStateListener modifiedChangeListener = null;
-    private BasicValuesPanel valuesPanel = null;
-    private JBScrollPane valuesPanelScrollPane = null;
-    private boolean parsingPanelVisible = false;
     private EncodingsHandler encodingsHandler;
 
     private final Font defaultFont;
@@ -108,6 +105,7 @@ public class BinEdEditorComponent {
     private FileHandlingMode fileHandlingMode = FileHandlingMode.DELTA;
 
     public BinEdEditorComponent() {
+        wrapperPanel.add(componentPanel, BorderLayout.CENTER);
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         toolbarPanel = new BinEdToolbarPanel(codeArea,
                 new BinEdToolbarPanel.Control() {
@@ -147,7 +145,7 @@ public class BinEdEditorComponent {
         defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
         codeArea.setCodeFont(defaultFont);
 
-        componentPanel.add(toolbarPanel, BorderLayout.NORTH);
+        wrapperPanel.add(toolbarPanel, BorderLayout.NORTH);
         registerEncodingStatus(statusPanel);
         encodingsHandler = new EncodingsHandler();
         encodingsHandler.setParentComponent(componentPanel);
@@ -170,7 +168,7 @@ public class BinEdEditorComponent {
 
         registerBinaryStatus(statusPanel);
 
-        componentPanel.add(statusPanel, BorderLayout.SOUTH);
+        wrapperPanel.add(statusPanel, BorderLayout.SOUTH);
 
         codeArea.addDataChangedListener(() -> {
             // TODO searchAction.codeAreaDataChanged();
@@ -230,7 +228,7 @@ public class BinEdEditorComponent {
 
             @Override
             public void changeCursorPosition() {
-                throw new NotImplementedException("Not yet implemented.");
+                throw new UnsupportedOperationException("Not supported yet.");
                 // TODO goToPositionAction.actionPerformed(new ActionEvent(BinEdEditorComponent.this, 0, ""));
             }
 
@@ -250,13 +248,23 @@ public class BinEdEditorComponent {
 
             @Override
             public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
+                if (fileHandlingMode == FileHandlingMode.NATIVE && memoryMode != BinaryStatusApi.MemoryMode.NATIVE) {
+                    throw new IllegalStateException("Cannot change from native mode");
+                }
+
                 FileHandlingMode newHandlingMode = memoryMode == BinaryStatusApi.MemoryMode.DELTA_MODE ? FileHandlingMode.DELTA : FileHandlingMode.MEMORY;
-                if (newHandlingMode != fileHandlingMode) {
+                if (newHandlingMode != getFileHandlingMode()) {
                     fileApi.switchFileHandlingMode(newHandlingMode);
                     // TODO preferences.getEditorPreferences().setFileHandlingMode(newHandlingMode);
+                    setFileHandlingMode(newHandlingMode);
                 }
             }
         });
+    }
+
+    @Nonnull
+    public JComponent getComponent() {
+        return wrapperPanel;
     }
 
     @Nonnull
@@ -310,14 +318,6 @@ public class BinEdEditorComponent {
     public void setStatusControlHandler(BinaryStatusPanel.StatusControlHandler statusControlHandler) {
         statusPanel.setStatusControlHandler(statusControlHandler);
     }
-
-//    private void switchShowParsingPanel(boolean showParsingPanel) {
-//        if (showParsingPanel) {
-//            showValuesPanel();
-//        } else {
-//            hideValuesPanel();
-//        }
-//    }
 
     public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi) {
         ExtCodeArea codeArea = componentPanel.getCodeArea();
@@ -403,15 +403,7 @@ public class BinEdEditorComponent {
 
     @Nonnull
     public FileHandlingMode getFileHandlingMode() {
-        if (fileHandlingMode == FileHandlingMode.NATIVE) {
-            return fileHandlingMode;
-        }
-
-        ExtCodeArea codeArea = componentPanel.getCodeArea();
-        if (codeArea.getContentData() instanceof DeltaDocument) {
-            return FileHandlingMode.DELTA;
-        }
-        return FileHandlingMode.MEMORY;
+        return fileHandlingMode;
     }
 
     public void setFileHandlingMode(FileHandlingMode fileHandlingMode) {
@@ -448,8 +440,8 @@ public class BinEdEditorComponent {
         CodeAreaOptionsImpl.applyFromCodeArea(applyOptions.getCodeAreaOptions(), codeArea);
         applyOptions.getEncodingOptions().setSelectedEncoding(((CharsetCapable) codeArea).getCharset().name());
 
-        DataInspectorOptions dataInspectorOptions = applyOptions.getDataInspectorOptions();
-        dataInspectorOptions.setShowParsingPanel(parsingPanelVisible);
+//        TODO DataInspectorOptions dataInspectorOptions = applyOptions.getDataInspectorOptions();
+//        dataInspectorOptions.setShowParsingPanel(isShowInspectorPanel());
         EditorOptions editorOptions = applyOptions.getEditorOptions();
         editorOptions.setFileHandlingMode(fileHandlingMode);
         if (codeArea.getCommandHandler() instanceof CodeAreaOperationCommandHandler) {
@@ -459,43 +451,12 @@ public class BinEdEditorComponent {
         // TODO applyOptions.getStatusOptions().loadFromPreferences(preferences.getStatusPreferences());
     }
 
-//    public void showValuesPanel() {
-//        if (!parsingPanelVisible) {
-//            parsingPanelVisible = true;
-//            if (valuesPanel == null) {
-//                valuesPanel = new BasicValuesPanel();
-//                valuesPanel.setCodeArea(codeArea, undoHandler);
-//                valuesPanelScrollPane = new JBScrollPane(valuesPanel);
-//                valuesPanelScrollPane.setBorder(null);
-//            }
-//            this.add(valuesPanelScrollPane, BorderLayout.EAST);
-//            valuesPanel.enableUpdate();
-//            valuesPanel.updateValues();
-//            this.revalidate();
-//            revalidate();
-//        }
-//    }
-//
-//    public void hideValuesPanel() {
-//        if (parsingPanelVisible) {
-//            parsingPanelVisible = false;
-//            valuesPanel.disableUpdate();
-//            this.remove(valuesPanelScrollPane);
-//            this.revalidate();
-//            revalidate();
-//        }
-//    }
-
     public void setUndoHandler(BinaryDataUndoHandler undoHandler) {
         componentPanel.setUndoHandler(undoHandler);
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         toolbarPanel.setUndoHandler(undoHandler);
         CodeAreaOperationCommandHandler commandHandler = new CodeAreaOperationCommandHandler(codeArea, undoHandler);
         codeArea.setCommandHandler(commandHandler);
-        if (valuesPanel != null) {
-            valuesPanel.setCodeArea(codeArea, undoHandler);
-        }
-//        insertDataAction.setUndoHandler(undoHandler);
         // TODO set ENTER KEY mode in apply options
 
         undoHandler.addUndoUpdateListener(new BinaryDataUndoUpdateListener() {
@@ -603,8 +564,8 @@ public class BinEdEditorComponent {
         statusPanel.loadFromPreferences(preferences.getStatusPreferences());
         toolbarPanel.loadFromPreferences(preferences);
 
-        fileHandlingMode = preferences.getEditorPreferences().getFileHandlingMode();
-        updateCurrentMemoryMode();
+        FileHandlingMode newFileHandlingMode = preferences.getEditorPreferences().getFileHandlingMode();
+        setFileHandlingMode(newFileHandlingMode);
     }
 
     public void applyOptions(BinEdApplyOptions applyOptions) {
@@ -616,8 +577,8 @@ public class BinEdEditorComponent {
         encodingsHandler.setEncodings(applyOptions.getEncodingOptions().getEncodings());
         ((FontCapable) codeArea).setCodeFont(applyOptions.getFontOptions().isUseDefaultFont() ? defaultFont : applyOptions.getFontOptions().getFont(defaultFont));
 
-        DataInspectorOptions dataInspectorOptions = applyOptions.getDataInspectorOptions();
-//        switchShowParsingPanel(dataInspectorOptions.isShowParsingPanel());
+//        DataInspectorOptions dataInspectorOptions = applyOptions.getDataInspectorOptions();
+//        setShowInspectorPanel(dataInspectorOptions.isShowParsingPanel());
         EditorOptions editorOptions = applyOptions.getEditorOptions();
         if (codeArea.getCommandHandler() instanceof CodeAreaOperationCommandHandler) {
             ((CodeAreaOperationCommandHandler) codeArea.getCommandHandler()).setEnterKeyHandlingMode(editorOptions.getEnterKeyHandlingMode());

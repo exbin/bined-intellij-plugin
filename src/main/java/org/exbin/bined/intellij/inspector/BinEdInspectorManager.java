@@ -71,6 +71,17 @@ public class BinEdInspectorManager {
         });
 
         binEdManager.setInspectorSupport(new BinEdManager.InspectorSupport() {
+            @Override
+            public boolean isShowParsingPanel(BinEdComponentPanel binEdComponentPanel) {
+                try {
+                    BinEdComponentInspector componentExtension =
+                            binEdComponentPanel.getComponentExtension(BinEdComponentInspector.class);
+                    return componentExtension.isShowParsingPanel();
+                } catch (IllegalStateException ex) {
+                    return false;
+                }
+            }
+
             @Nonnull
             public ShowParsingPanelAction showParsingPanelAction(BinEdComponentPanel binEdComponentPanel) {
                 return new ShowParsingPanelAction(binEdComponentPanel);

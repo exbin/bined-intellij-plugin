@@ -343,6 +343,7 @@ public class BinEdManager {
                 JMenu showMenu = new JMenu("Show");
                 showMenu.add(createShowHeaderMenuItem(codeArea));
                 showMenu.add(createShowRowPositionMenuItem(codeArea));
+                showMenu.add(createShowInspectorPanel(editorComponent.getComponentPanel()));
                 menu.add(showMenu);
             }
             }
@@ -554,6 +555,15 @@ public class BinEdManager {
         return clipboardContentMenuItem;
     }
 
+    public JMenuItem createShowInspectorPanel(BinEdComponentPanel binEdComponentPanel) {
+        JCheckBoxMenuItem clipboardContentMenuItem = new JCheckBoxMenuItem("Inspector Panel");
+        clipboardContentMenuItem.setSelected(inspectorSupport.isShowParsingPanel(binEdComponentPanel));
+        clipboardContentMenuItem.addActionListener((event) -> {
+            inspectorSupport.showParsingPanelAction(binEdComponentPanel).actionPerformed(event);
+        });
+        return clipboardContentMenuItem;
+    }
+
     @Nonnull
     public BinaryEditorPreferences getPreferences() {
         return preferences;
@@ -583,6 +593,9 @@ public class BinEdManager {
 
     @ParametersAreNonnullByDefault
     public interface InspectorSupport {
+
+        boolean isShowParsingPanel(BinEdComponentPanel binEdComponentPanel);
+
         @Nonnull
         ShowParsingPanelAction showParsingPanelAction(BinEdComponentPanel binEdComponentPanel);
     }

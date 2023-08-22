@@ -137,6 +137,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
 
     @Override
     public void dispose() {
+        virtualFile.dispose();
     }
 
     @Nullable
