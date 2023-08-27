@@ -60,12 +60,12 @@ import java.util.logging.Logger;
 public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, DumbAware {
 
     private SegmentsRepository segmentsRepository;
+
     private BinEdEditorComponent editorComponent;
 
     private boolean opened = false;
     private BinEdVirtualFile virtualFile;
     private BinEdFileEditorState fileEditorState = new BinEdFileEditorState();
-    private long documentOriginalSize;
 
     public BinEdFileHandler() {
         init();
@@ -118,7 +118,7 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
     @Nonnull
     @Override
     public String getFileName() {
-        return null;
+        return virtualFile.getDisplayName();
     }
 
     @Nonnull
@@ -218,7 +218,7 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
     @Override
     public void saveDocument() {
         Application application = ApplicationManager.getApplication();
-        application.runWriteAction(() -> saveFile());
+        application.runWriteAction(this::saveFile);
     }
 
     @Override
@@ -255,15 +255,10 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
     }
 
     private void fileSync() {
-        documentOriginalSize = getCodeArea().getDataSize();
         BinaryDataUndoHandler undoHandler = editorComponent.getUndoHandler();
         if (undoHandler != null) {
             undoHandler.setSyncPoint();
         }
-    }
-
-    public long getDocumentOriginalSize() {
-        return documentOriginalSize;
     }
 
     public void reloadFile() {

@@ -67,6 +67,7 @@ import javax.swing.JOptionPane;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.nio.charset.Charset;
@@ -99,6 +100,7 @@ public class BinEdEditorComponent {
     private CharsetChangeListener charsetChangeListener = null;
     private ModifiedStateListener modifiedChangeListener = null;
     private EncodingsHandler encodingsHandler;
+    private ActionListener goToPositionAction;
 
     private final Font defaultFont;
     private long documentOriginalSize;
@@ -228,8 +230,9 @@ public class BinEdEditorComponent {
 
             @Override
             public void changeCursorPosition() {
-                throw new UnsupportedOperationException("Not supported yet.");
-                // TODO goToPositionAction.actionPerformed(new ActionEvent(BinEdEditorComponent.this, 0, ""));
+                if (goToPositionAction != null) {
+                    goToPositionAction.actionPerformed(new ActionEvent(componentPanel, 0, ""));
+                }
             }
 
             @Override
@@ -326,6 +329,10 @@ public class BinEdEditorComponent {
             String selectedEncoding = codeArea.getCharset().name();
             encodingStatus.setEncoding(selectedEncoding);
         });
+    }
+
+    public void setGoToPositionAction(ActionListener goToPositionAction) {
+        this.goToPositionAction = goToPositionAction;
     }
 
     public void setCharsetChangeListener(CharsetChangeListener charsetChangeListener) {
