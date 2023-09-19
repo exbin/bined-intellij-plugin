@@ -15,13 +15,18 @@
  */
 package org.exbin.bined.intellij;
 
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileTypes.DirectoryFileType;
-import com.intellij.openapi.util.IconLoader;
+import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -30,25 +35,56 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class OpenFileAsBinaryViaToolbarAction extends ContextOpenAsBinaryAction {
+public class OpenFileAsBinaryViaToolbarAction extends AnAction implements DumbAware {
 
     private boolean actionVisible = true;
+    private boolean internalChooser = false;
 
     public OpenFileAsBinaryViaToolbarAction() {
-        BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterOpenFileAsBinaryViaToolbar());
+        super("Open As Binary");
+        BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible =
+                integrationOptions.isRegisterOpenFileAsBinaryViaToolbar());
     }
 
     @Override
     public void update(AnActionEvent event) {
         super.update(event);
+        event.getPresentation().setEnabledAndVisible(actionVisible && !internalChooser);
+    }
+
+    @Override
+    public void actionPerformed(AnActionEvent event) {
+        Project project = event.getProject();
+        if (project == null) {
+            project = ProjectManager.getInstance().getDefaultProject();
+        }
+
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
 
-        Presentation presentation = event.getPresentation();
-        if (actionVisible) {
-            presentation.setEnabled(virtualFile != null && virtualFile.isValid() && !(virtualFile.isDirectory()
-                    || virtualFile.getFileType() instanceof DirectoryFileType));
-            presentation.setDisabledIcon(IconLoader.getDisabledIcon(presentation.getIcon()));
+        if (virtualFile == null || !virtualFile.isValid()) {
+            virtualFile = chooseVirtualFile(project, null);
+            if (virtualFile == null || !virtualFile.isValid())
+                return;
+        } else if (virtualFile.isDirectory() || virtualFile.getFileType() instanceof DirectoryFileType) {
+            virtualFile = chooseVirtualFile(project, virtualFile);
+            if (virtualFile == null || !virtualFile.isValid())
+                return;
         }
-        presentation.setVisible(actionVisible);
+
+        OpenAsBinaryAction.openVirtualFileAsBinary(project, virtualFile);
+    }
+
+    @Nullable
+    private VirtualFile chooseVirtualFile(Project project, @Nullable VirtualFile directory) {
+        FileChooserDescriptor chooserDescriptor = new FileChooserDescriptor(true, false, true, true, false, false);
+        chooserDescriptor.setTitle("Open File in Binary Editor");
+        if (directory != null) {
+            chooserDescriptor.setRoots(directory);
+        }
+        internalChooser = true;
+        VirtualFile virtualFile = FileChooser.chooseFile(chooserDescriptor, project, null);
+        internalChooser = false;
+
+        return virtualFile;
     }
 }
