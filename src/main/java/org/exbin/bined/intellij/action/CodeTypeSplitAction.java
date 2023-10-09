@@ -38,7 +38,6 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ui.JBInsets;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -46,6 +45,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
+import javax.swing.UIManager;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -145,7 +145,7 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
         @Override
         public void paintComponent(Graphics g) {
             ActionButtonLook look = getButtonLook();
-            if (selectedActionEnabled() || !UIUtil.isUnderDarcula()) {
+            if (selectedActionEnabled() || !isUnderDarcula()) {
                 int state = getPopState();
                 if (state == PUSHED) state = POPPED;
                 look.paintBackground(g, this, state);
@@ -194,6 +194,10 @@ public class CodeTypeSplitAction extends AnAction implements CustomComponentActi
             x = baseRect.x + (x - actionIcon.getIconWidth()) / 2;
             y = baseRect.y + (baseRect.height - actionIcon.getIconHeight()) / 2;
             actionIcon.paintIcon(null, g, x, y);
+        }
+
+        private static boolean isUnderDarcula() {
+            return UIManager.getLookAndFeel().getName().contains("Darcula");
         }
 
         private boolean isToggleActionPushed() {
