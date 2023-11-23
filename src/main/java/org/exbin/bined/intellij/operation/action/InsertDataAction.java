@@ -18,11 +18,13 @@ package org.exbin.bined.intellij.operation.action;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CaretCapable;
 import org.exbin.bined.capability.EditModeCapable;
+import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.operation.BinaryDataOperationException;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.operation.swing.command.CodeAreaCommand;
 import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.operation.api.InsertDataMethod;
 import org.exbin.framework.bined.operation.component.RandomDataMethod;
 import org.exbin.framework.bined.operation.component.SimpleFillDataMethod;
@@ -32,8 +34,10 @@ import org.exbin.framework.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.utils.gui.DefaultControlPanel;
 import org.exbin.framework.utils.handler.DefaultControlHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -43,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,13 +89,25 @@ public class InsertDataAction implements ActionListener {
                 }, activeComponent, PREVIEW_LENGTH_LIMIT);
             }
         });
-        ResourceBundle panelResourceBundle = insertDataPanel.getResourceBundle();
         DefaultControlPanel controlPanel = new DefaultControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(insertDataPanel, controlPanel);
         insertDataPanel.setComponents(insertDataComponents);
         insertDataPanel.selectActiveMethod(lastMethod);
-//        BinedModule binedModule = application.getModuleRepository().getModuleByInterface(BinedModule.class);
-//        insertDataPanel.setCodeAreaPopupMenuHandler(binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL));
+        insertDataPanel.setCodeAreaPopupMenuHandler(new CodeAreaPopupMenuHandler() {
+            @Nonnull
+            @Override
+            public JPopupMenu createPopupMenu(ExtCodeArea codeArea, String menuPostfix, int x, int y) {
+                BinEdManager binEdManager = BinEdManager.getInstance();
+                JPopupMenu popupMenu = new JPopupMenu();
+                binEdManager.createContextMenu(codeArea, popupMenu, BinEdManager.PopupMenuVariant.BASIC, x, y);
+                return popupMenu;
+            }
+
+            @Override
+            public void dropPopupMenu(String menuPostfix) {
+
+            }
+        });
         final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, (Component) event.getSource(), "Insert Data", Dialog.ModalityType.APPLICATION_MODAL);
 
         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {

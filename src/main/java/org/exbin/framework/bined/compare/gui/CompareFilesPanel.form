@@ -86,7 +86,7 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="..."/>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/exbin/framework/bined/compare/gui/resources/CompareFilesPanel.properties" key="leftOpenButton1.toolTipText" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="org/exbin/framework/bined/compare/gui/resources/CompareFilesPanel.properties" key="leftOpenButton.toolTipText" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>

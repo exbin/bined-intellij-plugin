@@ -51,6 +51,7 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
     private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(AboutPanel.class);
     private JComponent sideComponent = null;
     private boolean darkMode = false;
+    private String appHomepageLink;
 
     public AboutPanel() {
         initComponents();
@@ -177,7 +178,6 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
         homepageLabel.setFont(homepageLabel.getFont().deriveFont(homepageLabel.getFont().getStyle() | java.awt.Font.BOLD));
         homepageLabel.setText(resourceBundle.getString("homepageLabel.text")); // NOI18N
 
-        appHomepageLabel.setForeground(java.awt.Color.blue);
         appHomepageLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         HashMap<TextAttribute, Object> attribs = new HashMap<TextAttribute, Object>();
         attribs.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL);
@@ -348,8 +348,7 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
 
     private void appHomepageLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_appHomepageLabelMouseClicked
         if (evt.getButton() == MouseEvent.BUTTON1 && !evt.isPopupTrigger()) {
-            String targetURL = ((JLabel) evt.getSource()).getText();
-            DesktopUtils.openDesktopURL(targetURL);
+            DesktopUtils.openDesktopURL(appHomepageLink);
         }
     }//GEN-LAST:event_appHomepageLabelMouseClicked
 
@@ -421,7 +420,8 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
         versionTextField.setText(appBundle.getString("Application.version"));
         vendorTextField.setText(appBundle.getString("Application.vendor"));
         licenseTextField.setText(appBundle.getString("Application.license"));
-        appHomepageLabel.setText(appBundle.getString("Application.homepage"));
+        appHomepageLink = appBundle.getString("Application.homepage");
+        appHomepageLabel.setText("<html><a href=\"\">" + appHomepageLink + "</a></html>");
         authorsTextArea.setText(appBundle.getString("Application.authors"));
         String aboutImagePath = appBundle.getString("Application.aboutImage");
         if (aboutImagePath != null) {

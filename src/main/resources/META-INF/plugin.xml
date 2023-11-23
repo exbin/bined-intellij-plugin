@@ -4,7 +4,7 @@
     <id>org.exbin.deltahex.intellij</id>
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>BinEd - Binary/Hexadecimal Editor</name>
+    <name>BinEd - Binary/Hex Editor</name>
     <version>0.2.9.snapshot</version>
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="exbinproject@gmail.com" url="https://exbin.org">ExBin Project</vendor>
@@ -13,7 +13,7 @@
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-<p>Binary/hexadecimal editor plugin based on BinEd library.</p>
+<p>Binary/hex editor plugin based on BinEd library.</p>
 <ul><li>Use "Open as Binary" action in toolbar of "File/Open" dialog or "Open In/Binary Editor" in project files context menu</li>
 <li>Use "View as Binary" action in context menu in variables/debug window</li>
 <li>Associate file extension with Binary File file type in Options/Editor/File Types</li>
@@ -41,11 +41,12 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Fixed issue with BOM headers with native file wrapper (issue #52)</li>
-<li>Partial mitigation to file locking issue (issue #34)</li>
+<ul><li>Added convert data action</li>
 <li>Added support for bookmarks</li>
-<li>Added clipboard content dialog</li>
-</ul>
+<li>Added clipboard content tool</li>
+<li>Added drag&drop content tool</li>
+<li>Fixed issue with BOM headers with native file wrapper (issue #52)</li>
+<li>Partial mitigation to file locking issue (issue #34)</li></ul>
     ]]>
     </change-notes>
 
@@ -90,6 +91,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
         <virtualFileSystem implementationClass="org.exbin.bined.intellij.BinEdFileSystem" key="bined" physical="false"/>
         <fileEditorProvider implementation="org.exbin.bined.intellij.BinEdFileEditorProvider"/>
         <fileEditorProvider implementation="org.exbin.bined.intellij.BinEdNativeFileEditorProvider"/>
+        <!-- scratch.rootType implementation="org.exbin.bined.intellij.BinaryRootType" / -->
         <diff.DiffTool implementation="org.exbin.bined.intellij.diff.BinEdDiffTool" order="last"/>
         <applicationConfigurable instance="org.exbin.bined.intellij.BinEdSettingsConfigurable" id="org.exbin.bined.intellij.BinEdSettingsConfigurable" parentId="tools" displayName="BinEd Plugin"/>
     </extensions>
@@ -100,7 +102,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
 
     <actions>
         <action id="BinEdEditor.OpenAsBinaryAction" class="org.exbin.bined.intellij.ContextOpenAsBinaryAction"
-                text="Open As Binary" description="Opens file in binary/hexadecimal viewer/editor"
+                text="Open As Binary" description="Opens file in binary/hex viewer/editor"
                 icon="/images/icon-idea.png"/>
         <group id="BinEdEditor.ProjectView">
             <reference id="BinEdEditor.OpenAsBinaryAction"/>
@@ -108,19 +110,19 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
         </group>
 
         <action id="BinEdEditor.OpenInBinaryEditorAction" class="org.exbin.bined.intellij.ContextOpenInBinaryEditorAction"
-                text="Binary Editor (BinEd Plugin)" description="Opens file in binary/hexadecimal viewer/editor"
+                text="Binary Editor (BinEd Plugin)" description="Opens file in binary/hex viewer/editor"
                 icon="/images/icon-idea.png">
             <add-to-group group-id="RevealGroup" anchor="last"/>
         </action>
 
         <action id="BinEdEditor.FileOpenAsBinary" class="org.exbin.bined.intellij.FileMenuOpenAsBinaryAction"
-                text="Open as Binary..." description="Opens file in binary/hexadecimal viewer/editor"
+                text="Open as Binary..." description="Opens file in binary/hex viewer/editor"
                 icon="/images/icon-idea.png">
             <add-to-group group-id="FileOpenGroup" relative-to-action="OpenFile" anchor="after"/>
         </action>
 
         <action id="BinEdEditor.FileOpenToolbarAsBinary" class="org.exbin.bined.intellij.OpenFileAsBinaryViaToolbarAction"
-                text="Open as Binary" description="Opens file in binary/hexadecimal viewer/editor"
+                text="Open as Binary" description="Opens file in binary/hex viewer/editor"
                 icon="/images/icon-idea.png">
             <add-to-group group-id="FileChooserToolbar" anchor="last"/>
         </action>

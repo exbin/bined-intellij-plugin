@@ -22,9 +22,9 @@ import org.exbin.bined.intellij.bookmarks.action.ManageBookmarksAction;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
+import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.api.Preferences;
-import org.exbin.bined.intellij.main.BinEdFileHandler;
 import org.exbin.framework.bined.bookmarks.BookmarksPositionColorModifier;
 import org.exbin.framework.bined.bookmarks.gui.BookmarksManagerPanel;
 import org.exbin.framework.bined.bookmarks.model.BookmarkRecord;
@@ -73,7 +73,7 @@ public class BookmarksManager {
     private ManageBookmarksAction manageBookmarksAction = new ManageBookmarksAction();
     private AddBookmarkAction addBookmarkAction = new AddBookmarkAction();
     private EditBookmarkAction editBookmarkAction = new EditBookmarkAction();
-    private BinEdFileHandler activeFile = null;
+    private CodeAreaCore activeCodeArea = null;
 
     public BookmarksManager() {
     }
@@ -125,8 +125,8 @@ public class BookmarksManager {
             }
 
             @Override
-            public void setActiveFile(@Nullable BinEdFileHandler activeFile) {
-                BookmarksManager.this.setActiveFile(activeFile);
+            public void setActiveCodeArea(@Nullable CodeAreaCore activeFile) {
+                BookmarksManager.this.setActiveCodeArea(activeFile);
             }
         });
     }
@@ -165,12 +165,13 @@ public class BookmarksManager {
         updateBookmarksMenu();
     }
 
-    public Optional<BinEdFileHandler> getActiveFile() {
-        return Optional.ofNullable(activeFile);
+    @Nonnull
+    public Optional<CodeAreaCore> getActiveCodeArea() {
+        return Optional.ofNullable(activeCodeArea);
     }
 
-    public void setActiveFile(@Nullable BinEdFileHandler activeFile) {
-        this.activeFile = activeFile;
+    public void setActiveCodeArea(@Nullable CodeAreaCore codeArea) {
+        this.activeCodeArea = codeArea;
     }
 
     @Nonnull
@@ -313,8 +314,8 @@ public class BookmarksManager {
                 return;
             }
 
-            if (activeFile != null) {
-                ExtCodeArea codeArea = activeFile.getCodeArea();
+            if (activeCodeArea != null) {
+                ExtCodeArea codeArea = (ExtCodeArea) activeCodeArea;
                 codeArea.setCaretPosition(record.getStartPosition());
                 codeArea.centerOnCursor();
             }
@@ -322,9 +323,8 @@ public class BookmarksManager {
     }
 
     public void addBookmark(int bookmarkIndex) {
-        if (activeFile != null) {
-            ExtCodeArea codeArea = activeFile.getCodeArea();
-            long position = codeArea.getDataPosition();
+        if (activeCodeArea != null) {
+            long position = ((ExtCodeArea) activeCodeArea).getDataPosition();
 
             if (bookmarkRecords.size() <= bookmarkIndex) {
                 int recordsToInsert = bookmarkIndex - bookmarkRecords.size() + 1;
@@ -378,8 +378,8 @@ public class BookmarksManager {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     long startPosition = bookmarkRecord.getStartPosition();
-                    if (activeFile != null) {
-                        ExtCodeArea codeArea = activeFile.getCodeArea();
+                    if (activeCodeArea != null) {
+                        ExtCodeArea codeArea = (ExtCodeArea) activeCodeArea;
                         codeArea.setCaretPosition(startPosition);
                         codeArea.centerOnCursor();
                     }

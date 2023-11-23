@@ -203,7 +203,7 @@ public class CompareFilesPanel extends javax.swing.JPanel {
         leftLabel.setText(resourceBundle.getString("leftLabel.text")); // NOI18N
 
         leftOpenButton.setText("...");
-        leftOpenButton.setToolTipText(resourceBundle.getString("leftOpenButton1.toolTipText")); // NOI18N
+        leftOpenButton.setToolTipText(resourceBundle.getString("leftOpenButton.toolTipText")); // NOI18N
         leftOpenButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 leftOpenButtonActionPerformed(evt);

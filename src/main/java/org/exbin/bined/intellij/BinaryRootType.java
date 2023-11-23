@@ -15,21 +15,33 @@
  */
 package org.exbin.bined.intellij;
 
-import com.intellij.openapi.fileEditor.FileEditorState;
-import com.intellij.openapi.fileEditor.FileEditorStateLevel;
+import com.intellij.ide.scratch.RootType;
+import com.intellij.ide.scratch.ScratchRootType;
+import com.intellij.openapi.extensions.ExtensionPointName;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * File editor state for hex editor.
+ * Scratch root type for binary files.
  *
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdFileEditorState implements FileEditorState {
+public class BinaryRootType extends RootType {
 
-    @Override
-    public boolean canBeMergedWith(FileEditorState otherState, FileEditorStateLevel level) {
-        return false;
+    private static final String ID = "org.exbin.bined.intellij.BinaryRootType";
+    public static final ExtensionPointName<BinaryRootType> ROOT_EP = new ExtensionPointName<>(ID);
+
+    public BinaryRootType() {
+        super(ID, "Binary File (BinEd plugin)");
+    }
+
+    @NotNull
+    public static BinaryRootType getInstance() {
+        return findByClass(BinaryRootType.class);
     }
 }

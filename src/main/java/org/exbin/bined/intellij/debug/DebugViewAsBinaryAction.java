@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Show debugger value in hexadecimal editor action.
+ * Show debugger value in binary editor action.
  *
  * @author ExBin Project (https://exbin.org)
  */

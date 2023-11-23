@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Undo handler for hexadecimal editor using IntelliJ Idea's undo.
+ * Undo handler for binary editor using IntelliJ Idea's undo.
  *
  * @author ExBin Project (https://exbin.org)
  */
@@ -56,7 +56,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
     /**
      * Creates a new instance.
      *
-     * @param codeArea hexadecimal component
+     * @param codeArea binary component
      */
     public BinaryUndoIntelliJHandler(ExtCodeArea codeArea, Project project, BinEdFileEditor fileEditor) {
         this.codeArea = codeArea;

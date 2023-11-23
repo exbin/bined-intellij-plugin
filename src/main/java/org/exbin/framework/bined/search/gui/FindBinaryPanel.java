@@ -46,7 +46,7 @@ import org.exbin.framework.utils.WindowUtils;
 import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 
 /**
- * Find text/hexadecimal data panel.
+ * Find text/binary data panel.
  *
  * @author ExBin Project (https://exbin.org)
  */

@@ -25,7 +25,7 @@ import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.options.EditorOptions;
 
 /**
- * Hexadecimal editor preferences.
+ * Binary editor preferences.
  *
  * @author ExBin Project (https://exbin.org)
  */

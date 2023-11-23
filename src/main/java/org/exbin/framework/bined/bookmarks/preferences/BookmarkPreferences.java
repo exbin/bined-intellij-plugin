@@ -51,7 +51,7 @@ public class BookmarkPreferences implements BookmarkOptions {
 
     @Override
     public BookmarkRecord getBookmarkRecord(int index) {
-        String prefix = PREFERENCES_BOOKMARK_VALUE_PREFIX + "." + String.valueOf(index) + ".";
+        String prefix = PREFERENCES_BOOKMARK_VALUE_PREFIX + index + ".";
         long startPosition = preferences.getLong(prefix + BOOKMARK_START_POSITION, 0);
         long length = preferences.getLong(prefix + BOOKMARK_LENGTH, 0);
         Color color = textAsColor(preferences.get(prefix + BOOKMARK_COLOR));
@@ -65,7 +65,7 @@ public class BookmarkPreferences implements BookmarkOptions {
 
     @Override
     public void setBookmarkRecord(int index, BookmarkRecord record) {
-        String prefix = PREFERENCES_BOOKMARK_VALUE_PREFIX + "." + String.valueOf(index) + ".";
+        String prefix = PREFERENCES_BOOKMARK_VALUE_PREFIX + index + ".";
         preferences.putLong(prefix + BOOKMARK_START_POSITION, record.getStartPosition());
         preferences.putLong(prefix + BOOKMARK_LENGTH, record.getLength());
         preferences.put(prefix + BOOKMARK_COLOR, colorAsText(record.getColor()));

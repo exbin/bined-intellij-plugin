@@ -83,7 +83,7 @@ public class IntelliJPreferencesWrapper implements Preferences {
 
     @Override
     public void putLong(String key, long value) {
-        preferences.setValue(prefix + key, (int) value, value + 1);
+        preferences.setValue(prefix + key, String.valueOf(value));
     }
 
     @Override

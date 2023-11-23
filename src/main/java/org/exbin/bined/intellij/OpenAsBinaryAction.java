@@ -31,6 +31,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JOptionPane;
 import java.util.List;
@@ -77,24 +78,30 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
         }
 
         if (isValid) {
-            BinEdVirtualFile binEdVirtualFile = new BinEdVirtualFile(virtualFile);
-            OpenFileDescriptor descriptor = new OpenFileDescriptor(project, binEdVirtualFile, 0);
-            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-            List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
-            fileEditorManager.setSelectedEditor(binEdVirtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
-            for (FileEditor fileEditor : editors) {
-                if (fileEditor instanceof BinEdFileEditor) {
-                    binEdVirtualFile.getEditorFile().openFile(binEdVirtualFile);
-                } else {
-                    // TODO: Drop other editors
-                    fileEditor.dispose();
-                }
-            }
+            openValidVirtualFile(project, virtualFile);
         } else {
             JOptionPane.showMessageDialog(null,
                     "File reported as invalid",
                     "Unable to open file",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    @Nonnull
+    public static BinEdVirtualFile openValidVirtualFile(Project project, VirtualFile virtualFile) {
+        BinEdVirtualFile binEdVirtualFile = new BinEdVirtualFile(virtualFile);
+        OpenFileDescriptor descriptor = new OpenFileDescriptor(project, binEdVirtualFile, 0);
+        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+        List<FileEditor> editors = fileEditorManager.openEditor(descriptor, true);
+        fileEditorManager.setSelectedEditor(binEdVirtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
+        for (FileEditor fileEditor : editors) {
+            if (fileEditor instanceof BinEdFileEditor) {
+                binEdVirtualFile.getEditorFile().openFile(binEdVirtualFile);
+            } else {
+                // TODO: Drop other editors
+                fileEditor.dispose();
+            }
+        }
+        return binEdVirtualFile;
     }
 }

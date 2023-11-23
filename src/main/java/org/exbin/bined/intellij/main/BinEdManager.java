@@ -37,6 +37,7 @@ import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
 import org.exbin.bined.intellij.inspector.action.ShowParsingPanelAction;
 import org.exbin.bined.intellij.search.action.SearchAction;
 import org.exbin.bined.intellij.tool.content.action.DragDropContentAction;
+import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.about.gui.AboutPanel;
 import org.exbin.framework.bined.FileHandlingMode;
@@ -176,17 +177,6 @@ public class BinEdManager {
         );
 
         bookmarksSupport.registerBookmarksComponentActions(codeArea);
-        binEdEditorComponent.getComponentPanel().addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                // TODO bookmarksSupport.setActiveFile(binEdEditorComponent.getFileApi());
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-            }
-        });
-
         binEdEditorComponent.setGoToPositionAction(new GoToPositionAction(codeArea));
 
         return binEdEditorComponent;
@@ -203,6 +193,26 @@ public class BinEdManager {
 
     public void createContextMenu(ExtCodeArea codeArea, @Nullable BinEdComponentFileApi fileApi, @Nullable BinEdEditorComponent editorComponent, final JPopupMenu menu, PopupMenuVariant variant, int x, int y) {
         BasicCodeAreaZone positionZone = codeArea.getPainter().getPositionZone(x, y);
+
+        bookmarksSupport.setActiveCodeArea(codeArea);
+
+        if (variant == PopupMenuVariant.EDITOR) {
+            switch (positionZone) {
+            case TOP_LEFT_CORNER:
+            case HEADER:
+            case ROW_POSITIONS: {
+                break;
+            }
+            default: {
+                JMenu showMenu = new JMenu("Show");
+                showMenu.add(createShowHeaderMenuItem(codeArea));
+                showMenu.add(createShowRowPositionMenuItem(codeArea));
+                showMenu.add(createShowInspectorPanel(editorComponent.getComponentPanel()));
+                menu.add(showMenu);
+                menu.addSeparator();
+            }
+            }
+        }
 
         switch (positionZone) {
         case TOP_LEFT_CORNER:
@@ -302,8 +312,15 @@ public class BinEdManager {
             menu.add(selectAllMenuItem);
 
             menu.add(createEditSelectionMenuItem(codeArea));
-            menu.add(createClipboardContentMenuItem());
-            menu.add(createDragDropContentMenuItem());
+
+            menu.addSeparator();
+
+            if (editorComponent != null) {
+                JMenuItem insertDataMenuItem = createInsertDataMenuItem(editorComponent);
+                menu.add(insertDataMenuItem);
+                JMenuItem convertDataMenuItem = createConvertDataMenuItem(editorComponent);
+                menu.add(convertDataMenuItem);
+            }
 
             menu.addSeparator();
 
@@ -337,32 +354,12 @@ public class BinEdManager {
 
         menu.addSeparator();
 
-        if (variant == PopupMenuVariant.EDITOR) {
-            switch (positionZone) {
-            case TOP_LEFT_CORNER:
-            case HEADER:
-            case ROW_POSITIONS: {
-                break;
-            }
-            default: {
-                JMenu showMenu = new JMenu("Show");
-                showMenu.add(createShowHeaderMenuItem(codeArea));
-                showMenu.add(createShowRowPositionMenuItem(codeArea));
-                showMenu.add(createShowInspectorPanel(editorComponent.getComponentPanel()));
-                menu.add(showMenu);
-            }
-            }
-        }
+        JMenu toolsMenu = new JMenu("Tools");
+        toolsMenu.add(createCompareFilesMenuItem(codeArea));
+        toolsMenu.add(createClipboardContentMenuItem());
+        toolsMenu.add(createDragDropContentMenuItem());
+        menu.add(toolsMenu);
 
-        if (editorComponent != null) {
-            JMenuItem insertDataMenuItem = createInsertDataMenuItem(editorComponent);
-            menu.add(insertDataMenuItem);
-            JMenuItem convertDataMenuItem = createConvertDataMenuItem(editorComponent);
-            menu.add(convertDataMenuItem);
-        }
-
-        JMenuItem compareFilesMenuItem = createCompareFilesMenuItem(codeArea);
-        menu.add(compareFilesMenuItem);
         if (editorComponent != null) {
             if (fileApi instanceof BinEdFileHandler || fileApi instanceof BinEdNativeFile) {
                 JMenuItem reloadFileMenuItem = createReloadFileMenuItem(editorComponent);
@@ -402,7 +399,6 @@ public class BinEdManager {
                 closeControlPanel.setHandler(() -> {
                     dialog.close();
                 });
-                //            dialog.setSize(650, 460);
                 dialog.showCentered((Component) e.getSource());
             });
             menu.add(aboutMenuItem);
@@ -579,7 +575,7 @@ public class BinEdManager {
     public JMenuItem createShowInspectorPanel(BinEdComponentPanel binEdComponentPanel) {
         JCheckBoxMenuItem clipboardContentMenuItem = new JCheckBoxMenuItem("Inspector Panel");
         clipboardContentMenuItem.setSelected(inspectorSupport.isShowParsingPanel(binEdComponentPanel));
-        clipboardContentMenuItem.addActionListener((event) -> {
+        clipboardContentMenuItem.addActionListener(event -> {
             inspectorSupport.showParsingPanelAction(binEdComponentPanel).actionPerformed(event);
         });
         return clipboardContentMenuItem;
@@ -609,7 +605,7 @@ public class BinEdManager {
 
         void registerBookmarksComponentActions(JComponent component);
 
-        void setActiveFile(@Nullable BinEdFileHandler activeFile);
+        void setActiveCodeArea(@Nullable CodeAreaCore codeArea);
     }
 
     @ParametersAreNonnullByDefault

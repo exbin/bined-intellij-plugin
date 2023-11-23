@@ -1,7 +1,7 @@
 0.2.9
 - Added convert data action
 - Added support for bookmarks
-- Added clipboard content dialog
+- Added clipboard content tool
 - Added drag&drop content tool
 - Fixed issue with BOM headers with native file wrapper (issue #52)
 - Partial mitigation to file locking issue (issue #34)

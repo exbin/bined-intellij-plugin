@@ -53,7 +53,7 @@ public class DragDropContentAction implements ActionListener {
     public static final String ACTION_ID = "dragDropContentAction";
 
     private ResourceBundle resourceBundle;
-    private DragDropContentPanel dragDropContentPanel = new DragDropContentPanel();
+    private final DragDropContentPanel dragDropContentPanel = new DragDropContentPanel();
 
     public DragDropContentAction() {
     }
@@ -111,7 +111,6 @@ public class DragDropContentAction implements ActionListener {
             dialog.close();
             dialog.dispose();
         });
-        WindowUtils.addHeaderPanel(dialog.getWindow(), dragDropContentPanel.getClass(), dragDropContentPanel.getResourceBundle());
         dialog.showCentered((Component) event.getSource());
     }
 }
