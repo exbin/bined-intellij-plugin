@@ -1,8 +1,10 @@
 0.2.9
-- Fixed issue with BOM headers with native file wrapper (issue #52)
-- Partial mitigation to file locking issue (issue #34)
+- Added convert data action
 - Added support for bookmarks
 - Added clipboard content dialog
+- Added drag&drop content tool
+- Fixed issue with BOM headers with native file wrapper (issue #52)
+- Partial mitigation to file locking issue (issue #34)
 
 0.2.8.1 (2023-05-25)
 - Fixed plugin breaks VCS history log reading (Issue #51)

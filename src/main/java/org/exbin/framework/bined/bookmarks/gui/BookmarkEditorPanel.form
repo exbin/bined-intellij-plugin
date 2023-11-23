@@ -23,16 +23,17 @@
                   <Component id="startPositionSwitchableSpinnerPanel" alignment="0" max="32767" attributes="0"/>
                   <Component id="endPositionSwitchableSpinnerPanel" alignment="0" max="32767" attributes="0"/>
                   <Component id="lengthSwitchableSpinnerPanel" alignment="0" max="32767" attributes="0"/>
+                  <Component id="colorCellPanel" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="startPositionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="endPositionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="lengthLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="fromSelectionButton" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="colorLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="colorCellPanel" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -53,7 +54,9 @@
               <Component id="lengthLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lengthSwitchableSpinnerPanel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="fromSelectionButton" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="colorLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="colorCellPanel" min="-2" pref="30" max="-2" attributes="0"/>
@@ -89,6 +92,17 @@
       </Properties>
     </Component>
     <Component class="org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel" name="lengthSwitchableSpinnerPanel">
+    </Component>
+    <Component class="javax.swing.JButton" name="fromSelectionButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/exbin/framework/bined/bookmarks/gui/resources/BookmarkEditorPanel.properties" key="fromSelectionButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+        </Property>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fromSelectionButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="colorLabel">
       <Properties>

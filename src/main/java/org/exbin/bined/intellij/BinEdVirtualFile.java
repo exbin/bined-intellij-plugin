@@ -197,7 +197,9 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     }
 
     public void dispose() {
-        editorFile.closeData();
+        if (editorFile != null) {
+            editorFile.closeData();
+        }
     }
 
     @Nonnull

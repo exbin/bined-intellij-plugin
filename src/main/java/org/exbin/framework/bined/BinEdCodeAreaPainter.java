@@ -129,5 +129,7 @@ public class BinEdCodeAreaPainter extends ExtendedHighlightNonAsciiCodeAreaPaint
 
         @Nullable
         Color getPositionTextColor(long rowDataPosition, int byteOnRow, int charOnRow, CodeAreaSection section, boolean unprintables);
+
+        void resetColors();
     }
 }

@@ -21,13 +21,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.SwingUtilities;
+import org.exbin.bined.CodeAreaSelection;
 import org.exbin.framework.bined.bookmarks.model.BookmarkRecord;
 import org.exbin.framework.bined.options.gui.ColorCellPanel;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 
 /**
- * Bookmark panel.
+ * Bookmark editor panel.
  *
  * @author ExBin Project (https://exbin.org)
  */
@@ -51,6 +52,7 @@ public class BookmarkEditorPanel extends javax.swing.JPanel {
             BookmarkEditorPanel.this.color = color;
         }
     };
+    private CodeAreaSelection currentSelection;
 
     public BookmarkEditorPanel() {
         initComponents();
@@ -122,6 +124,11 @@ public class BookmarkEditorPanel extends javax.swing.JPanel {
         colorCellPanel.setColorHandler(colorHandler);
     }
 
+    public void setCurrentSelection(CodeAreaSelection selection) {
+        currentSelection = selection;
+        fromSelectionButton.setEnabled(!selection.isEmpty());
+    }
+
     @Nonnull
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
@@ -142,6 +149,7 @@ public class BookmarkEditorPanel extends javax.swing.JPanel {
         endPositionSwitchableSpinnerPanel = new org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel();
         lengthLabel = new javax.swing.JLabel();
         lengthSwitchableSpinnerPanel = new org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel();
+        fromSelectionButton = new javax.swing.JButton();
         colorLabel = new javax.swing.JLabel();
         colorCellPanel = new org.exbin.framework.bined.options.gui.ColorCellPanel();
 
@@ -150,6 +158,14 @@ public class BookmarkEditorPanel extends javax.swing.JPanel {
         endPositionLabel.setText(resourceBundle.getString("endPositionLabel.text")); // NOI18N
 
         lengthLabel.setText(resourceBundle.getString("lengthLabel.text")); // NOI18N
+
+        fromSelectionButton.setText(resourceBundle.getString("fromSelectionButton.text")); // NOI18N
+        fromSelectionButton.setEnabled(false);
+        fromSelectionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fromSelectionButtonActionPerformed(evt);
+            }
+        });
 
         colorLabel.setText(resourceBundle.getString("colorLabel.text")); // NOI18N
 
@@ -163,14 +179,15 @@ public class BookmarkEditorPanel extends javax.swing.JPanel {
                     .addComponent(startPositionSwitchableSpinnerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(endPositionSwitchableSpinnerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lengthSwitchableSpinnerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(colorCellPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(startPositionLabel)
                             .addComponent(endPositionLabel)
                             .addComponent(lengthLabel)
+                            .addComponent(fromSelectionButton)
                             .addComponent(colorLabel))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(colorCellPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -188,13 +205,20 @@ public class BookmarkEditorPanel extends javax.swing.JPanel {
                 .addComponent(lengthLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lengthSwitchableSpinnerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(fromSelectionButton)
+                .addGap(18, 18, 18)
                 .addComponent(colorLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(colorCellPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void fromSelectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fromSelectionButtonActionPerformed
+        startPositionSwitchableSpinnerPanel.setValue(currentSelection.getFirst());
+        lengthSwitchableSpinnerPanel.setValue(currentSelection.getLength());
+    }//GEN-LAST:event_fromSelectionButtonActionPerformed
 
     /**
      * Test method for this panel.
@@ -211,6 +235,7 @@ public class BookmarkEditorPanel extends javax.swing.JPanel {
     private javax.swing.JLabel colorLabel;
     private javax.swing.JLabel endPositionLabel;
     private org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel endPositionSwitchableSpinnerPanel;
+    private javax.swing.JButton fromSelectionButton;
     private javax.swing.JLabel lengthLabel;
     private org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel lengthSwitchableSpinnerPanel;
     private javax.swing.JLabel startPositionLabel;

@@ -25,9 +25,10 @@ import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.action.EditSelectionAction;
 import org.exbin.bined.intellij.action.GoToPositionAction;
 import org.exbin.bined.intellij.action.OptionsAction;
-import org.exbin.bined.intellij.blockedit.action.InsertDataAction;
+import org.exbin.bined.intellij.operation.action.ConvertDataAction;
+import org.exbin.bined.intellij.operation.action.InsertDataAction;
 import org.exbin.bined.intellij.bookmarks.BookmarksManager;
-import org.exbin.bined.intellij.clipboard.action.ClipboardContentAction;
+import org.exbin.bined.intellij.tool.content.action.ClipboardContentAction;
 import org.exbin.bined.intellij.compare.action.CompareFilesAction;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
@@ -35,6 +36,7 @@ import org.exbin.bined.intellij.inspector.BinEdInspectorManager;
 import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
 import org.exbin.bined.intellij.inspector.action.ShowParsingPanelAction;
 import org.exbin.bined.intellij.search.action.SearchAction;
+import org.exbin.bined.intellij.tool.content.action.DragDropContentAction;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.about.gui.AboutPanel;
 import org.exbin.framework.bined.FileHandlingMode;
@@ -301,6 +303,7 @@ public class BinEdManager {
 
             menu.add(createEditSelectionMenuItem(codeArea));
             menu.add(createClipboardContentMenuItem());
+            menu.add(createDragDropContentMenuItem());
 
             menu.addSeparator();
 
@@ -354,6 +357,8 @@ public class BinEdManager {
         if (editorComponent != null) {
             JMenuItem insertDataMenuItem = createInsertDataMenuItem(editorComponent);
             menu.add(insertDataMenuItem);
+            JMenuItem convertDataMenuItem = createConvertDataMenuItem(editorComponent);
+            menu.add(convertDataMenuItem);
         }
 
         JMenuItem compareFilesMenuItem = createCompareFilesMenuItem(codeArea);
@@ -440,9 +445,17 @@ public class BinEdManager {
         final JMenuItem insertDataMenuItem = new JMenuItem("Insert Data...");
         insertDataMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionUtils.getMetaMask()));
         InsertDataAction insertDataAction = new InsertDataAction(editorComponent.getCodeArea());
-        insertDataAction.setUndoHandler(editorComponent.getUndoHandler());
         insertDataMenuItem.addActionListener(insertDataAction);
         return insertDataMenuItem;
+    }
+
+    @Nonnull
+    private JMenuItem createConvertDataMenuItem(BinEdEditorComponent editorComponent) {
+        final JMenuItem convertDataMenuItem = new JMenuItem("Convert Data...");
+        convertDataMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionUtils.getMetaMask()));
+        ConvertDataAction convertDataAction = new ConvertDataAction(editorComponent.getCodeArea());
+        convertDataMenuItem.addActionListener(convertDataAction);
+        return convertDataMenuItem;
     }
 
     @Nonnull
@@ -555,6 +568,12 @@ public class BinEdManager {
         JMenuItem clipboardContentMenuItem = new JMenuItem("Clipboard Content...");
         clipboardContentMenuItem.addActionListener(new ClipboardContentAction());
         return clipboardContentMenuItem;
+    }
+
+    public JMenuItem createDragDropContentMenuItem() {
+        JMenuItem dragDropContentMenuItem = new JMenuItem("Drag&Drop Content...");
+        dragDropContentMenuItem.addActionListener(new DragDropContentAction());
+        return dragDropContentMenuItem;
     }
 
     public JMenuItem createShowInspectorPanel(BinEdComponentPanel binEdComponentPanel) {

@@ -72,6 +72,11 @@ public class BookmarksPositionColorModifier implements BinEdCodeAreaPainter.Posi
         return null;
     }
 
+    @Override
+    public void resetColors() {
+        // do nothing, maybe invert colors?
+    }
+
     public void notifyBookmarksChanged() {
         colorCache.clear();
     }
