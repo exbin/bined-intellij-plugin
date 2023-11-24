@@ -143,14 +143,37 @@ public class BinEdManager {
                     int keyCode = keyEvent.getKeyCode();
                     switch (keyCode) {
                     case KeyEvent.VK_F: {
-                        SearchAction searchAction = new SearchAction(codeArea, binEdEditorComponent.getComponentPanel());
+                        SearchAction searchAction =
+                                new SearchAction(codeArea, binEdEditorComponent.getComponentPanel());
                         searchAction.actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
                         searchAction.switchReplaceMode(BinarySearchPanel.SearchOperation.FIND);
                         break;
                     }
                     case KeyEvent.VK_G: {
-                        GoToPositionAction goToPositionAction = new GoToPositionAction(codeArea);
-                        goToPositionAction.actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
+                        if (codeArea.isEditable()) {
+                            GoToPositionAction goToPositionAction = new GoToPositionAction(codeArea);
+                            goToPositionAction.actionPerformed(new ActionEvent(keyEvent.getSource(),
+                                    keyEvent.getID(),
+                                    ""));
+                        }
+                        break;
+                    }
+                    case KeyEvent.VK_I: {
+                        if (codeArea.isEditable()) {
+                            InsertDataAction insertDataAction = new InsertDataAction(codeArea);
+                            insertDataAction.actionPerformed(new ActionEvent(keyEvent.getSource(),
+                                    keyEvent.getID(),
+                                    ""));
+                        }
+                        break;
+                    }
+                    case KeyEvent.VK_M: {
+                        if (codeArea.isEditable()) {
+                            ConvertDataAction convertDataAction = new ConvertDataAction(codeArea);
+                            convertDataAction.actionPerformed(new ActionEvent(keyEvent.getSource(),
+                                    keyEvent.getID(),
+                                    ""));
+                        }
                         break;
                     }
                     }
@@ -317,8 +340,10 @@ public class BinEdManager {
 
             if (editorComponent != null) {
                 JMenuItem insertDataMenuItem = createInsertDataMenuItem(editorComponent);
+                insertDataMenuItem.setEnabled(codeArea.isEditable());
                 menu.add(insertDataMenuItem);
                 JMenuItem convertDataMenuItem = createConvertDataMenuItem(editorComponent);
+                convertDataMenuItem.setEnabled(codeArea.isEditable());
                 menu.add(convertDataMenuItem);
             }
 

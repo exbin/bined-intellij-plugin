@@ -60,7 +60,7 @@
     <Component class="javax.swing.JLabel" name="currentPositionLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToBinaryPanel.properties" key="currentPositionLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToPositionPanel.properties" key="currentPositionLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -75,7 +75,7 @@
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
             <TitledBorder title="Go To Position">
-              <ResourceString PropertyName="titleX" bundle="org/exbin/framework/bined/gui/resources/GoToBinaryPanel.properties" key="goToPanel.border.title" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+              <ResourceString PropertyName="titleX" bundle="org/exbin/framework/bined/gui/resources/GoToPositionPanel.properties" key="goToPanel.border.title" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
         </Property>
@@ -90,7 +90,7 @@
                       <Component id="fromCursorRadioButton" max="32767" attributes="0"/>
                       <Component id="fromEndRadioButton" alignment="0" max="32767" attributes="0"/>
                       <Component id="fromStartRadioButton" alignment="0" max="32767" attributes="0"/>
-                      <Component id="baseSwitchableSpinnerPanel" alignment="0" pref="400" max="32767" attributes="0"/>
+                      <Component id="positionBaseSwitchableSpinnerPanel" alignment="0" pref="400" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="positionLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -111,7 +111,7 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="positionLabel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="baseSwitchableSpinnerPanel" min="-2" max="-2" attributes="0"/>
+                  <Component id="positionBaseSwitchableSpinnerPanel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -125,7 +125,7 @@
             </Property>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToBinaryPanel.properties" key="fromStartRadioButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToPositionPanel.properties" key="fromStartRadioButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -138,7 +138,7 @@
               <ComponentRef name="positionTypeButtonGroup"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToBinaryPanel.properties" key="fromEndRadioButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToPositionPanel.properties" key="fromEndRadioButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -151,7 +151,7 @@
               <ComponentRef name="positionTypeButtonGroup"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToBinaryPanel.properties" key="fromCursorRadioButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToPositionPanel.properties" key="fromCursorRadioButton.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -161,18 +161,18 @@
         <Component class="javax.swing.JLabel" name="positionLabel">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToBinaryPanel.properties" key="positionLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToPositionPanel.properties" key="positionLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
         </Component>
-        <Component class="org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel" name="baseSwitchableSpinnerPanel">
+        <Component class="org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel" name="positionBaseSwitchableSpinnerPanel">
         </Component>
       </SubComponents>
     </Container>
     <Component class="javax.swing.JLabel" name="targetPositionLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToBinaryPanel.properties" key="targetPositionLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="org/exbin/framework/bined/gui/resources/GoToPositionPanel.properties" key="targetPositionLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

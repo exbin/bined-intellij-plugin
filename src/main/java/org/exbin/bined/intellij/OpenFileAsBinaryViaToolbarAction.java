@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.DirectoryFileType;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -49,7 +50,12 @@ public class OpenFileAsBinaryViaToolbarAction extends AnAction implements DumbAw
     @Override
     public void update(AnActionEvent event) {
         super.update(event);
-        event.getPresentation().setEnabledAndVisible(actionVisible && !internalChooser);
+        Project project = event.getProject();
+        if (project == null) {
+            project = ProjectManager.getInstance().getDefaultProject();
+        }
+        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+        event.getPresentation().setEnabledAndVisible(actionVisible && !internalChooser && (fileEditorManager != null));
     }
 
     @Override

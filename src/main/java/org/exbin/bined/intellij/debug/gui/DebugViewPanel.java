@@ -20,7 +20,9 @@ import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.main.BinEdEditorComponent;
+import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
+import org.exbin.bined.swing.extended.ExtCodeArea;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -50,8 +52,13 @@ public class DebugViewPanel extends javax.swing.JPanel {
     }
 
     private void init() {
+        BinEdManager binEdManager = BinEdManager.getInstance();
+        BinEdFileManager fileManager = binEdManager.getFileManager();
         BinEdComponentPanel componentPanel = binEdEditorComponent.getComponentPanel();
-        componentPanel.getCodeArea().setEditMode(EditMode.READ_ONLY);
+        fileManager.initComponentPanel(componentPanel);
+
+        ExtCodeArea codeArea = componentPanel.getCodeArea();
+        codeArea.setEditMode(EditMode.READ_ONLY);
 
         this.add(componentPanel, BorderLayout.CENTER);
     }

@@ -44,16 +44,16 @@ public class EditSelectionPanel extends javax.swing.JPanel {
     public EditSelectionPanel() {
         initComponents();
 
-        baseSwitchableSpinnerPanel.setMinimum(0L);
-        baseSwitchableSpinnerPanel.addChangeListener((javax.swing.event.ChangeEvent evt) -> {
+        startPositionBaseSwitchableSpinnerPanel.setMinimum(0L);
+        startPositionBaseSwitchableSpinnerPanel.addChangeListener((javax.swing.event.ChangeEvent evt) -> {
             if (!activeUpdate) {
                 try {
                     activeUpdate = true;
                     long startPosition = getStartPositionValue();
                     long maxLength = maxPosition - startPosition;
-                    baseSwitchableSpinnerPanel2.setMaximum(maxLength);
+                    lengthBaseSwitchableSpinnerPanel.setMaximum(maxLength);
                     long length = getEndPositionValue() - startPosition;
-                    baseSwitchableSpinnerPanel2.setValue(length);
+                    lengthBaseSwitchableSpinnerPanel.setValue(length);
                 } finally {
                     activeUpdate = false;
                 }
@@ -62,14 +62,14 @@ public class EditSelectionPanel extends javax.swing.JPanel {
             updateStartTargetPosition();
             updateEndTargetPosition();
         });
-        baseSwitchableSpinnerPanel1.setMinimum(0L);
-        baseSwitchableSpinnerPanel1.addChangeListener((javax.swing.event.ChangeEvent evt) -> {
+        endPositionBaseSwitchableSpinnerPanel.setMinimum(0L);
+        endPositionBaseSwitchableSpinnerPanel.addChangeListener((javax.swing.event.ChangeEvent evt) -> {
             if (!activeUpdate) {
                 try {
                     activeUpdate = true;
                     long startPosition = getStartPositionValue();
                     long length = getEndPositionValue() - startPosition;
-                    baseSwitchableSpinnerPanel2.setValue(length);
+                    lengthBaseSwitchableSpinnerPanel.setValue(length);
                 } finally {
                     activeUpdate = false;
                 }
@@ -78,13 +78,13 @@ public class EditSelectionPanel extends javax.swing.JPanel {
             updateStartTargetPosition();
             updateEndTargetPosition();
         });
-        baseSwitchableSpinnerPanel2.setMinimum(0L);
-        baseSwitchableSpinnerPanel2.addChangeListener((javax.swing.event.ChangeEvent evt) -> {
+        lengthBaseSwitchableSpinnerPanel.setMinimum(0L);
+        lengthBaseSwitchableSpinnerPanel.addChangeListener((javax.swing.event.ChangeEvent evt) -> {
             if (!activeUpdate) {
                 try {
                     activeUpdate = true;
                     long endPosition = getStartPositionValue() + getSelectionLengthValue();
-                    baseSwitchableSpinnerPanel1.setValue(endPosition);
+                    endPositionBaseSwitchableSpinnerPanel.setValue(endPosition);
                 } finally {
                     activeUpdate = false;
                 }
@@ -118,15 +118,15 @@ public class EditSelectionPanel extends javax.swing.JPanel {
         fromEndRadioButton = new javax.swing.JRadioButton();
         fromCursorRadioButton = new javax.swing.JRadioButton();
         positionLabel = new javax.swing.JLabel();
-        baseSwitchableSpinnerPanel = new org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel();
+        startPositionBaseSwitchableSpinnerPanel = new org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel();
         endPositionPanel = new javax.swing.JPanel();
         fromStartRadioButton1 = new javax.swing.JRadioButton();
         fromEndRadioButton1 = new javax.swing.JRadioButton();
         fromCursorRadioButton1 = new javax.swing.JRadioButton();
         positionLabel1 = new javax.swing.JLabel();
-        baseSwitchableSpinnerPanel1 = new org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel();
+        endPositionBaseSwitchableSpinnerPanel = new org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel();
         selectionLengthPanel = new javax.swing.JPanel();
-        baseSwitchableSpinnerPanel2 = new org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel();
+        lengthBaseSwitchableSpinnerPanel = new org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel();
         startPositionLabel = new javax.swing.JLabel();
         startPositionTextField = new javax.swing.JTextField();
         endPositionLabel = new javax.swing.JLabel();
@@ -170,14 +170,14 @@ public class EditSelectionPanel extends javax.swing.JPanel {
         startPositionPanel.setLayout(startPositionPanelLayout);
         startPositionPanelLayout.setHorizontalGroup(
             startPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(fromStartRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(fromCursorRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(fromEndRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(startPositionPanelLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, startPositionPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(startPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(baseSwitchableSpinnerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(startPositionPanelLayout.createSequentialGroup()
+                .addGroup(startPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(fromCursorRadioButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(fromEndRadioButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(fromStartRadioButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(startPositionBaseSwitchableSpinnerPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, startPositionPanelLayout.createSequentialGroup()
                         .addComponent(positionLabel)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -193,7 +193,7 @@ public class EditSelectionPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(positionLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(baseSwitchableSpinnerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(startPositionBaseSwitchableSpinnerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -230,14 +230,14 @@ public class EditSelectionPanel extends javax.swing.JPanel {
         endPositionPanel.setLayout(endPositionPanelLayout);
         endPositionPanelLayout.setHorizontalGroup(
             endPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(fromStartRadioButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(fromCursorRadioButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(fromEndRadioButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(endPositionPanelLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, endPositionPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(endPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(baseSwitchableSpinnerPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(endPositionPanelLayout.createSequentialGroup()
+                .addGroup(endPositionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(fromCursorRadioButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(fromEndRadioButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(fromStartRadioButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(endPositionBaseSwitchableSpinnerPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, endPositionPanelLayout.createSequentialGroup()
                         .addComponent(positionLabel1)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -253,7 +253,7 @@ public class EditSelectionPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(positionLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(baseSwitchableSpinnerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(endPositionBaseSwitchableSpinnerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -265,14 +265,14 @@ public class EditSelectionPanel extends javax.swing.JPanel {
             selectionLengthPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(selectionLengthPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(baseSwitchableSpinnerPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lengthBaseSwitchableSpinnerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         selectionLengthPanelLayout.setVerticalGroup(
             selectionLengthPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(selectionLengthPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(baseSwitchableSpinnerPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lengthBaseSwitchableSpinnerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -379,7 +379,7 @@ public class EditSelectionPanel extends javax.swing.JPanel {
     }
 
     public void initFocus() {
-        baseSwitchableSpinnerPanel.initFocus();
+        startPositionBaseSwitchableSpinnerPanel.initFocus();
     }
 
     public long getStartTargetPosition() {
@@ -486,9 +486,9 @@ public class EditSelectionPanel extends javax.swing.JPanel {
 
     public void setMaxPosition(long maxPosition) {
         this.maxPosition = maxPosition;
-        baseSwitchableSpinnerPanel.setMaximum(maxPosition);
-        baseSwitchableSpinnerPanel1.setMaximum(maxPosition);
-        baseSwitchableSpinnerPanel2.setMaximum(maxPosition);
+        startPositionBaseSwitchableSpinnerPanel.setMaximum(maxPosition);
+        endPositionBaseSwitchableSpinnerPanel.setMaximum(maxPosition);
+        lengthBaseSwitchableSpinnerPanel.setMaximum(maxPosition);
         updateStartTargetPosition();
     }
 
@@ -508,7 +508,7 @@ public class EditSelectionPanel extends javax.swing.JPanel {
     }
 
     public void setSelected() {
-        baseSwitchableSpinnerPanel.requestFocusInWindow();
+        startPositionBaseSwitchableSpinnerPanel.requestFocusInWindow();
     }
 
     private void switchStartPosMode(RelativePositionMode positionMode) {
@@ -522,16 +522,16 @@ public class EditSelectionPanel extends javax.swing.JPanel {
             case FROM_START:
             case FROM_END: {
                 setStartPositionValue(0L);
-                baseSwitchableSpinnerPanel.setMinimum(0L);
-                baseSwitchableSpinnerPanel.setMaximum(maxPosition);
-                baseSwitchableSpinnerPanel.revalidateSpinner();
+                startPositionBaseSwitchableSpinnerPanel.setMinimum(0L);
+                startPositionBaseSwitchableSpinnerPanel.setMaximum(maxPosition);
+                startPositionBaseSwitchableSpinnerPanel.revalidateSpinner();
                 break;
             }
             case FROM_CURSOR: {
                 setStartPositionValue(0L);
-                baseSwitchableSpinnerPanel.setMinimum(-cursorPosition);
-                baseSwitchableSpinnerPanel.setMaximum(maxPosition - cursorPosition);
-                baseSwitchableSpinnerPanel.revalidateSpinner();
+                startPositionBaseSwitchableSpinnerPanel.setMinimum(-cursorPosition);
+                startPositionBaseSwitchableSpinnerPanel.setMaximum(maxPosition - cursorPosition);
+                startPositionBaseSwitchableSpinnerPanel.revalidateSpinner();
                 break;
             }
             default:
@@ -551,16 +551,16 @@ public class EditSelectionPanel extends javax.swing.JPanel {
             case FROM_START:
             case FROM_END: {
                 setEndPositionValue(0L);
-                baseSwitchableSpinnerPanel.setMinimum(0L);
-                baseSwitchableSpinnerPanel.setMaximum(maxPosition);
-                baseSwitchableSpinnerPanel.revalidateSpinner();
+                startPositionBaseSwitchableSpinnerPanel.setMinimum(0L);
+                startPositionBaseSwitchableSpinnerPanel.setMaximum(maxPosition);
+                startPositionBaseSwitchableSpinnerPanel.revalidateSpinner();
                 break;
             }
             case FROM_CURSOR: {
                 setEndPositionValue(0L);
-                baseSwitchableSpinnerPanel.setMinimum(-cursorPosition);
-                baseSwitchableSpinnerPanel.setMaximum(maxPosition - cursorPosition);
-                baseSwitchableSpinnerPanel.revalidateSpinner();
+                startPositionBaseSwitchableSpinnerPanel.setMinimum(-cursorPosition);
+                startPositionBaseSwitchableSpinnerPanel.setMaximum(maxPosition - cursorPosition);
+                startPositionBaseSwitchableSpinnerPanel.revalidateSpinner();
                 break;
             }
             default:
@@ -570,26 +570,26 @@ public class EditSelectionPanel extends javax.swing.JPanel {
     }
 
     private long getStartPositionValue() {
-        return baseSwitchableSpinnerPanel.getValue();
+        return startPositionBaseSwitchableSpinnerPanel.getValue();
     }
 
     private long getEndPositionValue() {
-        return baseSwitchableSpinnerPanel1.getValue();
+        return endPositionBaseSwitchableSpinnerPanel.getValue();
     }
 
     private long getSelectionLengthValue() {
-        return baseSwitchableSpinnerPanel2.getValue();
+        return lengthBaseSwitchableSpinnerPanel.getValue();
     }
 
     private void setStartPositionValue(long value) {
-        baseSwitchableSpinnerPanel.setValue(value);
-        baseSwitchableSpinnerPanel2.setValue(getEndPositionValue() - value);
+        startPositionBaseSwitchableSpinnerPanel.setValue(value);
+        lengthBaseSwitchableSpinnerPanel.setValue(getEndPositionValue() - value);
         updateStartTargetPosition();
     }
 
     private void setEndPositionValue(long value) {
-        baseSwitchableSpinnerPanel1.setValue(value);
-        baseSwitchableSpinnerPanel2.setValue(value - getStartPositionValue());
+        endPositionBaseSwitchableSpinnerPanel.setValue(value);
+        lengthBaseSwitchableSpinnerPanel.setValue(value - getStartPositionValue());
         updateEndTargetPosition();
     }
 
@@ -603,17 +603,15 @@ public class EditSelectionPanel extends javax.swing.JPanel {
     }
 
     public void acceptInput() {
-        baseSwitchableSpinnerPanel.acceptInput();
-        baseSwitchableSpinnerPanel1.acceptInput();
-        baseSwitchableSpinnerPanel2.acceptInput();
+        startPositionBaseSwitchableSpinnerPanel.acceptInput();
+        endPositionBaseSwitchableSpinnerPanel.acceptInput();
+        lengthBaseSwitchableSpinnerPanel.acceptInput();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel baseSwitchableSpinnerPanel;
-    private org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel baseSwitchableSpinnerPanel1;
-    private org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel baseSwitchableSpinnerPanel2;
     private javax.swing.JLabel currentPositionLabel;
     private javax.swing.JTextField currentPositionTextField;
+    private org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel endPositionBaseSwitchableSpinnerPanel;
     private javax.swing.JLabel endPositionLabel;
     private javax.swing.JPanel endPositionPanel;
     private javax.swing.JTextField endPositionTextField;
@@ -624,9 +622,11 @@ public class EditSelectionPanel extends javax.swing.JPanel {
     private javax.swing.JRadioButton fromEndRadioButton1;
     private javax.swing.JRadioButton fromStartRadioButton;
     private javax.swing.JRadioButton fromStartRadioButton1;
+    private org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel lengthBaseSwitchableSpinnerPanel;
     private javax.swing.JLabel positionLabel;
     private javax.swing.JLabel positionLabel1;
     private javax.swing.JPanel selectionLengthPanel;
+    private org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel startPositionBaseSwitchableSpinnerPanel;
     private javax.swing.JLabel startPositionLabel;
     private javax.swing.JPanel startPositionPanel;
     private javax.swing.JTextField startPositionTextField;

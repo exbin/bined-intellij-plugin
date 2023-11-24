@@ -40,7 +40,9 @@ import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
 import org.exbin.auxiliary.paged_data.EditableBinaryData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
+import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.main.BinEdEditorComponent;
+import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
@@ -154,6 +156,10 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
 
             BinEdManager binEdManager = BinEdManager.getInstance();
             binEdEditorComponent = binEdManager.createBinEdEditor();
+            BinEdFileManager fileManager = binEdManager.getFileManager();
+            BinEdComponentPanel componentPanel = binEdEditorComponent.getComponentPanel();
+            fileManager.initComponentPanel(componentPanel);
+
             binEdEditorComponent.setFileApi(new BinEdComponentFileApi() {
                 @Override
                 public boolean isSaveSupported() {

@@ -18,7 +18,6 @@ package org.exbin.bined.intellij.action;
 import org.exbin.bined.SelectionRange;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.gui.EditSelectionPanel;
-import org.exbin.framework.bined.gui.GoToBinaryPanel;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.WindowUtils.DialogWrapper;
@@ -43,7 +42,7 @@ import java.util.ResourceBundle;
 @ParametersAreNonnullByDefault
 public class EditSelectionAction implements ActionListener {
 
-    private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(GoToBinaryPanel.class);
+    private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(EditSelectionPanel.class);
     private final ExtCodeArea codeArea;
 
     public EditSelectionAction(ExtCodeArea codeArea) {

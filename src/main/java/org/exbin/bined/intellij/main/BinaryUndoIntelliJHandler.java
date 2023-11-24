@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Undo handler for binary editor using IntelliJ Idea's undo.
+ * TODO: Undo handler for binary editor using IntelliJ Idea's undo.
  *
  * @author ExBin Project (https://exbin.org)
  */

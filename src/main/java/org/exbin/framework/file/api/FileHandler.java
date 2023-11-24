@@ -54,12 +54,12 @@ public interface FileHandler extends FileLoading, FileSaving {
     Optional<URI> getFileUri();
 
     /**
-     * Returns current filename.
+     * Returns title of the handled file.
      *
-     * @return filename file name with extension
+     * @return typically file filename name with extension or alternative title
      */
     @Nonnull
-    String getFileName();
+    String getTitle();
 
     /**
      * Returns currently used filetype.
@@ -77,9 +77,9 @@ public interface FileHandler extends FileLoading, FileSaving {
     void setFileType(@Nullable FileType fileType);
 
     /**
-     * Creates new file.
+     * Clears content of the file.
      */
-    void newFile();
+    void clearFile();
 
     /**
      * Returns flag if file in this panel was modified since last saving.

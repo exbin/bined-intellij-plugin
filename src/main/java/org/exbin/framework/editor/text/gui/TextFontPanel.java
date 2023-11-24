@@ -23,6 +23,9 @@ import java.awt.font.TextAttribute;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 
@@ -31,6 +34,7 @@ import org.exbin.framework.utils.WindowUtils;
  *
  * @author ExBin Project (https://exbin.org)
  */
+@ParametersAreNonnullByDefault
 public class TextFontPanel extends javax.swing.JPanel {
 
     private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(TextFontPanel.class);
@@ -70,6 +74,7 @@ public class TextFontPanel extends javax.swing.JPanel {
         superscriptCheckBox.setEnabled(!subscriptCheckBox.isSelected());
     }
 
+    @Nullable
     public Font getStoredFont() {
         String fontName = fontFamilyInputList.getSelectedValue();
         String fontSize = fontSizeInputList.getSelectedValue();
@@ -170,7 +175,7 @@ public class TextFontPanel extends javax.swing.JPanel {
 
         fontFamilyPanel.setName("fontFamilyPanel"); // NOI18N
 
-        fontFamilyLabel.setText(resourceBundle.getString("TextFontPanel.fontFamilyLabel.text")); // NOI18N
+        fontFamilyLabel.setText(resourceBundle.getString("fontFamilyLabel.text")); // NOI18N
         fontFamilyLabel.setName("fontFamilyLabel"); // NOI18N
 
         fontFamilyInputList.setName("fontFamilyInputList"); // NOI18N
@@ -198,7 +203,7 @@ public class TextFontPanel extends javax.swing.JPanel {
 
         fontSizePanel.setName("fontSizePanel"); // NOI18N
 
-        fontSizeLabel.setText(resourceBundle.getString("TextFontPanel.fontSizeLabel.text")); // NOI18N
+        fontSizeLabel.setText(resourceBundle.getString("fontSizeLabel.text")); // NOI18N
         fontSizeLabel.setName("fontSizeLabel"); // NOI18N
 
         fontSizeInputList.setName("fontSizeInputList"); // NOI18N
@@ -225,45 +230,45 @@ public class TextFontPanel extends javax.swing.JPanel {
 
         fontPanel.add(fontSizePanel, java.awt.BorderLayout.EAST);
 
-        fontStylePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceBundle.getString("TextFontPanel.fontStylePanel.border.title"))); // NOI18N
+        fontStylePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceBundle.getString("fontStylePanel.border.title"))); // NOI18N
         fontStylePanel.setName("fontStylePanel"); // NOI18N
         fontStylePanel.setLayout(new java.awt.GridLayout(2, 3));
 
         boldCheckBox.setMnemonic('b');
-        boldCheckBox.setText(resourceBundle.getString("TextFontPanel.boldCheckBox.text")); // NOI18N
+        boldCheckBox.setText(resourceBundle.getString("boldCheckBox.text")); // NOI18N
         boldCheckBox.setName("boldCheckBox"); // NOI18N
         fontStylePanel.add(boldCheckBox);
 
         italicCheckBox.setMnemonic('i');
-        italicCheckBox.setText(resourceBundle.getString("TextFontPanel.italicCheckBox.text")); // NOI18N
+        italicCheckBox.setText(resourceBundle.getString("italicCheckBox.text")); // NOI18N
         italicCheckBox.setName("italicCheckBox"); // NOI18N
         fontStylePanel.add(italicCheckBox);
 
         underlineCheckBox.setMnemonic('u');
-        underlineCheckBox.setText(resourceBundle.getString("TextFontPanel.underlineCheckBox.text")); // NOI18N
+        underlineCheckBox.setText(resourceBundle.getString("underlineCheckBox.text")); // NOI18N
         underlineCheckBox.setName("underlineCheckBox"); // NOI18N
         fontStylePanel.add(underlineCheckBox);
 
         strikethroughCheckBox.setMnemonic('s');
-        strikethroughCheckBox.setText(resourceBundle.getString("TextFontPanel.strikethroughCheckBox.text")); // NOI18N
+        strikethroughCheckBox.setText(resourceBundle.getString("strikethroughCheckBox.text")); // NOI18N
         strikethroughCheckBox.setName("strikethroughCheckBox"); // NOI18N
         fontStylePanel.add(strikethroughCheckBox);
 
         subscriptCheckBox.setMnemonic('t');
-        subscriptCheckBox.setText(resourceBundle.getString("TextFontPanel.subscriptCheckBox.text")); // NOI18N
+        subscriptCheckBox.setText(resourceBundle.getString("subscriptCheckBox.text")); // NOI18N
         subscriptCheckBox.setName("subscriptCheckBox"); // NOI18N
         fontStylePanel.add(subscriptCheckBox);
 
         superscriptCheckBox.setMnemonic('p');
-        superscriptCheckBox.setText(resourceBundle.getString("TextFontPanel.superscriptCheckBox.text")); // NOI18N
+        superscriptCheckBox.setText(resourceBundle.getString("superscriptCheckBox.text")); // NOI18N
         superscriptCheckBox.setName("superscriptCheckBox"); // NOI18N
         fontStylePanel.add(superscriptCheckBox);
 
-        previewPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceBundle.getString("TextFontPanel.previewPanel.border.title"))); // NOI18N
+        previewPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceBundle.getString("previewPanel.border.title"))); // NOI18N
         previewPanel.setName("previewPanel"); // NOI18N
 
         previewTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        previewTextField.setText(resourceBundle.getString("TextFontPanel.previewTextField.text")); // NOI18N
+        previewTextField.setText(resourceBundle.getString("previewTextField.text")); // NOI18N
         previewTextField.setName("previewTextField"); // NOI18N
 
         javax.swing.GroupLayout previewPanelLayout = new javax.swing.GroupLayout(previewPanel);
@@ -329,6 +334,7 @@ public class TextFontPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox underlineCheckBox;
     // End of variables declaration//GEN-END:variables
 
+    @Nonnull
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
     }

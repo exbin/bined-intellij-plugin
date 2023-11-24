@@ -80,7 +80,7 @@ public class SimpleFillDataMethod implements InsertDataMethod {
             DefaultControlPanel controlPanel = new DefaultControlPanel();
             JPanel dialogPanel1 = WindowUtils.createDialogPanel(multilinePanel, controlPanel);
 
-            final DialogWrapper multilineDialog = WindowUtils.createDialog(dialogPanel1, multilinePanel, "Clipboard Content", Dialog.ModalityType.APPLICATION_MODAL);
+            final DialogWrapper multilineDialog = WindowUtils.createDialog(dialogPanel1, multilinePanel, "Multiline Binary/Text", Dialog.ModalityType.APPLICATION_MODAL);
             controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
                 if (actionType == DefaultControlHandler.ControlActionType.OK) {
                     SearchCondition condition = multilinePanel.getCondition();
@@ -98,7 +98,7 @@ public class SimpleFillDataMethod implements InsertDataMethod {
                 multilineDialog.dispose();
             });
             multilineDialog.showCentered(component);
-            multilinePanel.detachMenu();
+//            multilinePanel.detachMenu();
         });
         return component;
     }

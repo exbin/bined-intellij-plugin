@@ -117,7 +117,7 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
 
     @Nonnull
     @Override
-    public String getFileName() {
+    public String getTitle() {
         return virtualFile.getDisplayName();
     }
 
@@ -133,7 +133,7 @@ public class BinEdFileHandler implements FileHandler, BinEdComponentFileApi, Dum
     }
 
     @Override
-    public void newFile() {
+    public void clearFile() {
         throw new UnsupportedOperationException("Not supported yet.");    }
 
     @Override

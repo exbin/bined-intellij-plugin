@@ -223,6 +223,7 @@ public class ObjectValueConvertor {
     }
 
     @Nonnull
+    @SuppressWarnings("unchecked")
     public static Optional<BinaryData> processListValue(Object instance) {
         List<?> listInstance = (List<?>) instance;
         if (listInstance.isEmpty()) {

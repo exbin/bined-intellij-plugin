@@ -66,7 +66,7 @@ public class UnsavedFilesPanel extends javax.swing.JPanel {
         this.fileHandlers = fileHandlers;
         DefaultListModel<String> listModel = new DefaultListModel<>();
         for (FileHandler fileHandler : fileHandlers) {
-            listModel.addElement(fileHandler.getFileName());
+            listModel.addElement(fileHandler.getTitle());
         }
         filesList.setModel(listModel);
         filesList.invalidate();

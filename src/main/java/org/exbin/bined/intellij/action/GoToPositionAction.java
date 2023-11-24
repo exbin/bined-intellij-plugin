@@ -17,7 +17,7 @@ package org.exbin.bined.intellij.action;
 
 import org.exbin.bined.basic.PositionScrollVisibility;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.gui.GoToBinaryPanel;
+import org.exbin.framework.bined.gui.GoToPositionPanel;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.WindowUtils.DialogWrapper;
@@ -40,7 +40,7 @@ import java.util.ResourceBundle;
 @ParametersAreNonnullByDefault
 public class GoToPositionAction implements ActionListener {
 
-    private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(GoToBinaryPanel.class);
+    private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(GoToPositionPanel.class);
     private final ExtCodeArea codeArea;
 
     public GoToPositionAction(ExtCodeArea codeArea) {
@@ -49,7 +49,7 @@ public class GoToPositionAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        final GoToBinaryPanel goToPanel = new GoToBinaryPanel();
+        final GoToPositionPanel goToPanel = new GoToPositionPanel();
         DefaultControlPanel goToControlPanel = new DefaultControlPanel(goToPanel.getResourceBundle());
         goToPanel.setCursorPosition(codeArea.getCaretPosition().getDataPosition());
         goToPanel.setMaxPosition(codeArea.getDataSize());

@@ -641,7 +641,7 @@ public class BinarySearchPanel extends JBPanel {
                 });
                 WindowUtils.assignGlobalKeyListener(multilineDialog.getWindow(), controlPanel.getOkCancelListener());
                 multilineDialog.showCentered((Component) evt.getSource());
-                multilinePanel.detachMenu();
+//                multilinePanel.detachMenu();
                 return result.searchCondition;
             }
 
@@ -662,7 +662,7 @@ public class BinarySearchPanel extends JBPanel {
                 switchReplaceMode(dialogReplaceParameters.isPerformReplace() ? SearchOperation.REPLACE : SearchOperation.FIND);
                 binarySearchPanelApi.performFind(dialogSearchParameters);
             }
-            findBinaryPanel.detachMenu();
+//            findBinaryPanel.detachMenu();
             dialog.close();
         });
         dialog.showCentered((Component) evt.getSource());

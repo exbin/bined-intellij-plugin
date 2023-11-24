@@ -107,7 +107,7 @@
                       <Component id="fromCursorRadioButton" max="32767" attributes="0"/>
                       <Component id="fromEndRadioButton" alignment="0" max="32767" attributes="0"/>
                       <Component id="fromStartRadioButton" alignment="0" max="32767" attributes="0"/>
-                      <Component id="baseSwitchableSpinnerPanel" alignment="0" max="32767" attributes="0"/>
+                      <Component id="startPositionBaseSwitchableSpinnerPanel" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="positionLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -128,7 +128,7 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="positionLabel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="baseSwitchableSpinnerPanel" min="-2" max="-2" attributes="0"/>
+                  <Component id="startPositionBaseSwitchableSpinnerPanel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -182,7 +182,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel" name="baseSwitchableSpinnerPanel">
+        <Component class="org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel" name="startPositionBaseSwitchableSpinnerPanel">
         </Component>
       </SubComponents>
     </Container>
@@ -206,7 +206,7 @@
                       <Component id="fromCursorRadioButton1" max="32767" attributes="0"/>
                       <Component id="fromEndRadioButton1" alignment="0" max="32767" attributes="0"/>
                       <Component id="fromStartRadioButton1" alignment="0" max="32767" attributes="0"/>
-                      <Component id="baseSwitchableSpinnerPanel1" alignment="0" max="32767" attributes="0"/>
+                      <Component id="endPositionBaseSwitchableSpinnerPanel" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="positionLabel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -227,7 +227,7 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="positionLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="baseSwitchableSpinnerPanel1" min="-2" max="-2" attributes="0"/>
+                  <Component id="endPositionBaseSwitchableSpinnerPanel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -281,7 +281,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel" name="baseSwitchableSpinnerPanel1">
+        <Component class="org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel" name="endPositionBaseSwitchableSpinnerPanel">
         </Component>
       </SubComponents>
     </Container>
@@ -301,7 +301,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="baseSwitchableSpinnerPanel2" max="32767" attributes="0"/>
+                  <Component id="lengthBaseSwitchableSpinnerPanel" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -310,14 +310,14 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="baseSwitchableSpinnerPanel2" min="-2" max="-2" attributes="0"/>
+                  <Component id="lengthBaseSwitchableSpinnerPanel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel" name="baseSwitchableSpinnerPanel2">
+        <Component class="org.exbin.framework.bined.gui.BaseSwitchableSpinnerPanel" name="lengthBaseSwitchableSpinnerPanel">
         </Component>
       </SubComponents>
     </Container>

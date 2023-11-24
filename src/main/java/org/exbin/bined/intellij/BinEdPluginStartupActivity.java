@@ -45,9 +45,11 @@ import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.bookmarks.BookmarksManager;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
+import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.inspector.BinEdInspectorManager;
 import org.exbin.bined.intellij.main.BinEdEditorComponent;
 import org.exbin.bined.intellij.main.BinEdFileHandler;
+import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.intellij.main.BinEdNativeFile;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
@@ -271,6 +273,9 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
 
             BinEdManager binEdManager = BinEdManager.getInstance();
             editorComponent = binEdManager.createBinEdEditor();
+            BinEdFileManager fileManager = binEdManager.getFileManager();
+            BinEdComponentPanel componentPanel = editorComponent.getComponentPanel();
+            fileManager.initComponentPanel(componentPanel);
             editorComponent.setFileApi(new BinEdComponentFileApi() {
                 @Override
                 public boolean isSaveSupported() {

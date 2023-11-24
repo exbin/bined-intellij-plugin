@@ -183,7 +183,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyO
                 fontPanel.setStoredFont(currentFont);
                 DefaultControlPanel controlPanel = new DefaultControlPanel();
                 JPanel dialogPanel = WindowUtils.createDialogPanel(fontPanel, controlPanel);
-                final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, BinEdOptionsPanel.this, "Set font", java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+                final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, BinEdOptionsPanel.this, "Select Font", java.awt.Dialog.ModalityType.APPLICATION_MODAL);
                 controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
                     if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
                         result.font = fontPanel.getStoredFont();
