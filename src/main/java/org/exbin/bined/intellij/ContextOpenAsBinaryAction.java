@@ -38,7 +38,6 @@ public class ContextOpenAsBinaryAction extends OpenAsBinaryAction {
 
     @Override
     public void update(AnActionEvent event) {
-        super.update(event);
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
         event.getPresentation()
                 .setEnabledAndVisible(actionVisible && virtualFile != null && virtualFile.isValid() && !(virtualFile.isDirectory()

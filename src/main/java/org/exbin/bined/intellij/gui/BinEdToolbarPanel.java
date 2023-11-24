@@ -247,7 +247,6 @@ public class BinEdToolbarPanel extends JBPanel {
 
             @Override
             public void update(@NotNull AnActionEvent e) {
-                super.update(e);
                 Presentation presentation = e.getPresentation();
                 presentation.setVisible(saveAction != null);
                 presentation.setEnabled(modified);
@@ -269,7 +268,6 @@ public class BinEdToolbarPanel extends JBPanel {
 
             @Override
             public void update(@NotNull AnActionEvent e) {
-                super.update(e);
                 Presentation presentation = e.getPresentation();
                 presentation.setVisible(undoHandler != null);
                 presentation.setEnabled(undoHandler != null && undoHandler.canUndo());
@@ -290,7 +288,6 @@ public class BinEdToolbarPanel extends JBPanel {
 
             @Override
             public void update(@NotNull AnActionEvent e) {
-                super.update(e);
                 Presentation presentation = e.getPresentation();
                 presentation.setVisible(undoHandler != null);
                 presentation.setEnabled(undoHandler != null && undoHandler.canRedo());

@@ -44,7 +44,6 @@ public class FileMenuOpenAsBinaryAction extends AnAction implements DumbAware {
 
     @Override
     public void update(AnActionEvent event) {
-        super.update(event);
         event.getPresentation().setEnabledAndVisible(actionVisible);
     }
 

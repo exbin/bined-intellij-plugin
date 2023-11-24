@@ -59,7 +59,7 @@ import java.util.logging.Logger;
 import static com.intellij.openapi.actionSystem.ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE;
 
 /**
- * Split button action derived from {com.intellij.openapi.actionSystem.SplitButtonAction}.
+ * Split button action derived from {@link com.intellij.openapi.actionSystem.SplitButtonAction}.
  *
  * @author ExBin Project (https://exbin.org)
  */

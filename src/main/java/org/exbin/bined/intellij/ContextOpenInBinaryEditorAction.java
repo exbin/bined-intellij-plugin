@@ -40,7 +40,6 @@ public class ContextOpenInBinaryEditorAction extends OpenAsBinaryAction {
 
     @Override
     public void update(AnActionEvent event) {
-        super.update(event);
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
         Presentation presentation = event.getPresentation();
         if (actionVisible) {

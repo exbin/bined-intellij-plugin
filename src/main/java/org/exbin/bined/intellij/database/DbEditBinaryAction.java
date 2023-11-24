@@ -122,7 +122,6 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
 
     @Override
     public void update(AnActionEvent event) {
-        super.update(event);
         Presentation presentation = event.getPresentation();
         presentation.setVisible(actionVisible);
         if (actionVisible) {
