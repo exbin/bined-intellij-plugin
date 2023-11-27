@@ -19,7 +19,6 @@ import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.inspector.action.ShowParsingPanelAction;
 import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
-import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.api.Preferences;
 import org.exbin.framework.bined.inspector.BasicValuesPositionColorModifier;
 import org.exbin.framework.bined.inspector.options.impl.DataInspectorOptionsImpl;
@@ -28,7 +27,6 @@ import org.exbin.framework.utils.LanguageUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.JPopupMenu;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -62,11 +60,6 @@ public class BinEdInspectorManager {
                 BinEdComponentInspector binEdComponentInspector = new BinEdComponentInspector();
                 binEdComponentInspector.setBasicValuesColorModifier(basicValuesColorModifier);
                 return Optional.of(binEdComponentInspector);
-            }
-
-            @Override
-            public void onPopupMenuCreation(JPopupMenu popupMenu,
-                    ExtCodeArea codeArea, String menuPostfix, int x, int y) {
             }
         });
 

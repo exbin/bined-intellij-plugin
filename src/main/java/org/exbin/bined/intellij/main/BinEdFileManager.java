@@ -125,8 +125,6 @@ public class BinEdFileManager {
 
         @Nonnull
         Optional<BinEdComponentPanel.BinEdComponentExtension> createComponentExtension(BinEdComponentPanel component);
-
-        void onPopupMenuCreation(final JPopupMenu popupMenu, final ExtCodeArea codeArea, String menuPostfix, int x, int y);
     }
 
     @ParametersAreNonnullByDefault

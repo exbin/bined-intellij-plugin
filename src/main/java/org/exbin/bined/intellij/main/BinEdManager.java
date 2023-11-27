@@ -25,17 +25,17 @@ import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.action.EditSelectionAction;
 import org.exbin.bined.intellij.action.GoToPositionAction;
 import org.exbin.bined.intellij.action.OptionsAction;
-import org.exbin.bined.intellij.operation.action.ConvertDataAction;
-import org.exbin.bined.intellij.operation.action.InsertDataAction;
 import org.exbin.bined.intellij.bookmarks.BookmarksManager;
-import org.exbin.bined.intellij.tool.content.action.ClipboardContentAction;
 import org.exbin.bined.intellij.compare.action.CompareFilesAction;
 import org.exbin.bined.intellij.gui.BinEdComponentPanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.inspector.BinEdInspectorManager;
-import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
 import org.exbin.bined.intellij.inspector.action.ShowParsingPanelAction;
+import org.exbin.bined.intellij.operation.action.ConvertDataAction;
+import org.exbin.bined.intellij.operation.action.InsertDataAction;
 import org.exbin.bined.intellij.search.action.SearchAction;
+import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
+import org.exbin.bined.intellij.tool.content.action.ClipboardContentAction;
 import org.exbin.bined.intellij.tool.content.action.DragDropContentAction;
 import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.extended.ExtCodeArea;
@@ -68,8 +68,6 @@ import javax.swing.KeyStroke;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -585,18 +583,21 @@ public class BinEdManager {
         return menu;
     }
 
+    @Nonnull
     public JMenuItem createClipboardContentMenuItem() {
         JMenuItem clipboardContentMenuItem = new JMenuItem("Clipboard Content...");
         clipboardContentMenuItem.addActionListener(new ClipboardContentAction());
         return clipboardContentMenuItem;
     }
 
+    @Nonnull
     public JMenuItem createDragDropContentMenuItem() {
         JMenuItem dragDropContentMenuItem = new JMenuItem("Drag&Drop Content...");
         dragDropContentMenuItem.addActionListener(new DragDropContentAction());
         return dragDropContentMenuItem;
     }
 
+    @Nonnull
     public JMenuItem createShowInspectorPanel(BinEdComponentPanel binEdComponentPanel) {
         JCheckBoxMenuItem clipboardContentMenuItem = new JCheckBoxMenuItem("Inspector Panel");
         clipboardContentMenuItem.setSelected(inspectorSupport.isShowParsingPanel(binEdComponentPanel));
