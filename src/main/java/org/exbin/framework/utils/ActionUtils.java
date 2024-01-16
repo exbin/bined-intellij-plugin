@@ -15,19 +15,23 @@
  */
 package org.exbin.framework.utils;
 
-import org.intellij.lang.annotations.MagicConstant;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.*;
-import javax.swing.text.JTextComponent;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.ResourceBundle;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.text.JTextComponent;
 
 /**
  * Some simple static methods usable for actions, menus and toolbars.
@@ -57,6 +61,12 @@ public class ActionUtils {
      * Value is Boolean.
      */
     public static final String ACTION_DIALOG_MODE = "dialogMode";
+    /**
+     * Menu creation handler.
+     *
+     * Value is MenuCreation.
+     */
+    public static final String ACTION_MENU_CREATION = "menu_creation";
 
     public static final String ACTION_ID = "actionId";
     public static final String ACTION_NAME_POSTFIX = ".text";
@@ -109,7 +119,6 @@ public class ActionUtils {
      * @return down mask for meta keys
      */
     @SuppressWarnings("deprecation")
-    @MagicConstant(flagsFromClass = java.awt.event.InputEvent.class)
     public static int getMetaMask() {
         try {
             switch (java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) {
@@ -199,6 +208,26 @@ public class ActionUtils {
             modifiers = ((ActionEvent) currentEvent).getModifiers();
         }
         return modifiers;
+    }
+
+    @ParametersAreNonnullByDefault
+    public static interface MenuCreation {
+
+        /**
+         * Checks whether menu item should be created.
+         *
+         * @param menuId menu ID
+         * @return true if menu item should be created
+         */
+        boolean shouldCreate(String menuId);
+
+        /**
+         * Called when new menu item is created.
+         *
+         * @param menuItem new menu item instance
+         * @param menuId menu ID
+         */
+        void onCreate(JMenuItem menuItem, String menuId);
     }
 
     /**

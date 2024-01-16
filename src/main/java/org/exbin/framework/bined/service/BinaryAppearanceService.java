@@ -38,11 +38,4 @@ public interface BinaryAppearanceService {
      * @param mode word wrapping mode
      */
     void setWordWrapMode(boolean mode);
-
-    /**
-     * Sets content parsing panel visibility.
-     *
-     * @param showParsingPanel show panel
-     */
-    void setShowParsingPanel(boolean showParsingPanel);
 }

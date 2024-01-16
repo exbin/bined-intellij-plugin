@@ -61,8 +61,4 @@ public class ReplaceParameters {
     public void setReplaceAll(boolean replaceAll) {
         this.replaceAll = replaceAll;
     }
-
-    public enum ReplaceMode {
-        TEXT, BINARY
-    }
 }

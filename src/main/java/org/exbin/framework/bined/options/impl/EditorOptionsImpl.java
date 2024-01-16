@@ -19,6 +19,7 @@ import org.exbin.framework.bined.options.EditorOptions;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.EnterKeyHandlingMode;
+import org.exbin.bined.basic.TabKeyHandlingMode;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.preferences.EditorPreferences;
 import org.exbin.framework.options.api.OptionsData;
@@ -33,6 +34,7 @@ public class EditorOptionsImpl implements OptionsData, EditorOptions {
 
     private FileHandlingMode fileHandlingMode = FileHandlingMode.DELTA;
     private EnterKeyHandlingMode enterKeyHandlingMode = EnterKeyHandlingMode.PLATFORM_SPECIFIC;
+    private TabKeyHandlingMode tabKeyHandlingMode = TabKeyHandlingMode.PLATFORM_SPECIFIC;
 
     @Nonnull
     @Override
@@ -56,18 +58,32 @@ public class EditorOptionsImpl implements OptionsData, EditorOptions {
         this.enterKeyHandlingMode = enterKeyHandlingMode;
     }
 
+    @Nonnull
+    @Override
+    public TabKeyHandlingMode getTabKeyHandlingMode() {
+        return tabKeyHandlingMode;
+    }
+
+    @Override
+    public void setTabKeyHandlingMode(TabKeyHandlingMode tabKeyHandlingMode) {
+        this.tabKeyHandlingMode = tabKeyHandlingMode;
+    }
+
     public void loadFromPreferences(EditorPreferences preferences) {
         fileHandlingMode = preferences.getFileHandlingMode();
         enterKeyHandlingMode = preferences.getEnterKeyHandlingMode();
+        tabKeyHandlingMode = preferences.getTabKeyHandlingMode();
     }
 
     public void saveToPreferences(EditorPreferences preferences) {
         preferences.setFileHandlingMode(fileHandlingMode);
         preferences.setEnterKeyHandlingMode(enterKeyHandlingMode);
+        preferences.setTabKeyHandlingMode(tabKeyHandlingMode);
     }
 
     public void setOptions(EditorOptionsImpl editorOptions) {
         fileHandlingMode = editorOptions.fileHandlingMode;
         enterKeyHandlingMode = editorOptions.enterKeyHandlingMode;
+        tabKeyHandlingMode = editorOptions.tabKeyHandlingMode;
     }
 }

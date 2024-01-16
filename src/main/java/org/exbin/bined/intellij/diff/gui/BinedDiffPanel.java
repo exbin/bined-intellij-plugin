@@ -25,16 +25,15 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBPanel;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.ByteArrayData;
-import org.exbin.auxiliary.paged_data.PagedData;
+import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.ByteArrayData;
+import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.intellij.main.BinEdApplyOptions;
-import org.exbin.bined.intellij.main.BinEdEditorComponent;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
@@ -114,7 +113,7 @@ public class BinedDiffPanel extends JBPanel {
     private EncodingsHandler encodingsHandler;
     private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi encodingStatus;
-    private BinEdEditorComponent.CharsetChangeListener charsetChangeListener = null;
+    private CharsetChangeListener charsetChangeListener = null;
 
     public BinedDiffPanel() {
         setLayout(new java.awt.BorderLayout());
@@ -197,7 +196,7 @@ public class BinedDiffPanel extends JBPanel {
                 diffPanel.getRightCodeArea().setCharset(Charset.forName(encodingName));
                 encodingStatus.setEncoding(encodingName);
                 preferences.getEncodingPreferences().setSelectedEncoding(encodingName);
-                charsetChangeListener.charsetChanged();
+                // TODO charsetChangeListener.charsetChanged();
             }
         });
 
@@ -473,13 +472,14 @@ public class BinedDiffPanel extends JBPanel {
 
     public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi) {
         this.encodingStatus = encodingStatusApi;
-        setCharsetChangeListener(() -> {
-            String selectedEncoding = diffPanel.getLeftCodeArea().getCharset().name();
-            encodingStatus.setEncoding(selectedEncoding);
-        });
+        // TODO
+//        setCharsetChangeListener(() -> {
+//            String selectedEncoding = diffPanel.getLeftCodeArea().getCharset().name();
+//            encodingStatus.setEncoding(selectedEncoding);
+//        });
     }
 
-    public void setCharsetChangeListener(BinEdEditorComponent.CharsetChangeListener charsetChangeListener) {
+    public void setCharsetChangeListener(CharsetChangeListener charsetChangeListener) {
         this.charsetChangeListener = charsetChangeListener;
     }
 
@@ -570,5 +570,9 @@ public class BinedDiffPanel extends JBPanel {
 
     private Icon load(String path) {
         return IconLoader.getIcon(path, getClass());
+    }
+
+    public static interface CharsetChangeListener {
+
     }
 }

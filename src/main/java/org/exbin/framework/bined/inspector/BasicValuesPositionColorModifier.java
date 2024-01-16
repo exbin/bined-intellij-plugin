@@ -32,9 +32,10 @@ public class BasicValuesPositionColorModifier implements BinEdCodeAreaPainter.Po
 
     private long position = -1;
     private long length;
-    private Color color = Color.YELLOW;
+    private Color color;
 
     public BasicValuesPositionColorModifier() {
+        resetColors();
     }
 
     @Nullable
@@ -71,7 +72,9 @@ public class BasicValuesPositionColorModifier implements BinEdCodeAreaPainter.Po
         this.length = 0;
     }
 
+    /* TODO
     public void setColor(Color color) {
         this.color = color;
     }
+    */
 }

@@ -37,8 +37,9 @@ import org.exbin.bined.extended.theme.ExtendedBackgroundPaintMode;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
-import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.binary_data.EditableBinaryData;
+import org.exbin.framework.utils.WindowUtils;
 
 /**
  * Combo box panel supporting both binary and text values.
@@ -184,10 +185,6 @@ public class BinarySearchComboBoxPanel extends JPanel {
         this.valueChangedListener = valueChangedListener;
     }
 
-    public void setRunningUpdate(boolean runningUpdate) {
-        this.runningUpdate = runningUpdate;
-    }
-
     @Override
     public void requestFocus() {
         super.requestFocus();
@@ -201,6 +198,15 @@ public class BinarySearchComboBoxPanel extends JPanel {
                 break;
             }
         }
+    }
+
+    /**
+     * Test method for this panel.
+     *
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        WindowUtils.invokeDialog(new BinarySearchComboBoxPanel());
     }
 
     public void setCodeAreaPopupMenuHandler(CodeAreaPopupMenuHandler codeAreaPopupMenuHandler, String postfix) {
@@ -218,6 +224,31 @@ public class BinarySearchComboBoxPanel extends JPanel {
                 codeAreaPopupMenuHandler.dropPopupMenu(".search" + postfix);
             }
         });
+    }
+
+    public void exclusiveUpdate(Runnable runnable) {
+        runningUpdate = true;
+        runnable.run();
+        runningUpdate = false;
+    }
+
+    public void clear() {
+        switch (item.getSearchMode()) {
+            case TEXT: {
+                String text = textField.getText();
+                if (!"".equals(text)) {
+                    textField.setText("");
+                }
+                break;
+            }
+            case BINARY: {
+                EditableBinaryData contentData = (EditableBinaryData) codeArea.getContentData();
+                if (!contentData.isEmpty()) {
+                    contentData.clear();
+                }
+                break;
+            }
+        }
     }
 
     /**

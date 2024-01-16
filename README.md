@@ -37,7 +37,7 @@ Compiling
 
 Java Development Kit (JDK) version 11 or later is required to build this project.
 
-IntelliJ Idea platform is necessary to build this plugin. See. http://jetbrains.org  
+IntelliJ Idea platform is necessary to build this plugin. See. https://jetbrains.org  
 
 Use buildPlugin gradle task to build distribution build.
 

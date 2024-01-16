@@ -91,28 +91,11 @@
   </Layout>
   <SubComponents>
     <Component class="javax.swing.JComboBox" name="codeCharactersModeComboBox">
-      <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="2">
-            <StringItem index="0" value="LOWER"/>
-            <StringItem index="1" value="UPPER"/>
-          </StringArray>
-        </Property>
-      </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JComboBox" name="viewModeComboBox">
-      <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="3">
-            <StringItem index="0" value="DUAL"/>
-            <StringItem index="1" value="CODE_MATRIX"/>
-            <StringItem index="2" value="TEXT_PREVIEW"/>
-          </StringArray>
-        </Property>
-      </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
@@ -146,16 +129,6 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="positionCodeTypeComboBox">
-      <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="3">
-            <StringItem index="0" value="OCTAL"/>
-            <StringItem index="1" value="DECIMAL"/>
-            <StringItem index="2" value="HEXADECIMAL"/>
-          </StringArray>
-        </Property>
-        <Property name="selectedIndex" type="int" value="2"/>
-      </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
@@ -175,17 +148,6 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="codeTypeComboBox">
-      <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="4">
-            <StringItem index="0" value="BINARY"/>
-            <StringItem index="1" value="OCTAL"/>
-            <StringItem index="2" value="DECIMAL"/>
-            <StringItem index="3" value="HEXADECIMAL"/>
-          </StringArray>
-        </Property>
-        <Property name="selectedIndex" type="int" value="3"/>
-      </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>

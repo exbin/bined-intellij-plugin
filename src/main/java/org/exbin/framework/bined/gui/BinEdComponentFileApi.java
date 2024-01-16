@@ -15,7 +15,11 @@
  */
 package org.exbin.framework.bined.gui;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.FileHandlingMode;
 
 /**
@@ -33,4 +37,12 @@ public interface BinEdComponentFileApi {
     void switchFileHandlingMode(FileHandlingMode fileHandlingMode);
 
     void closeData();
+
+    @Nonnull
+    BinEdEditorComponent getEditorComponent();
+
+    @Nonnull
+    ExtCodeArea getCodeArea();
+
+    long getDocumentOriginalSize();
 }

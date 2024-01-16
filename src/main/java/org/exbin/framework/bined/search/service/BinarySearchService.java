@@ -15,6 +15,7 @@
  */
 package org.exbin.framework.bined.search.service;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.bined.search.ReplaceParameters;
 import org.exbin.framework.bined.search.SearchParameters;
@@ -31,14 +32,19 @@ public interface BinarySearchService {
 
     void setMatchPosition(int matchPosition);
 
+    void performFindAgain(SearchStatusListener searchStatusListener);
+
     void performReplace(SearchParameters searchParameters, ReplaceParameters replaceParameters);
+
+    @Nonnull
+    SearchParameters getLastSearchParameters();
 
     void clearMatches();
 
     @ParametersAreNonnullByDefault
     public interface SearchStatusListener {
 
-        void setStatus(FoundMatches foundMatches);
+        void setStatus(FoundMatches foundMatches, SearchParameters.MatchMode matchMode);
 
         void clearStatus();
     }
@@ -80,7 +86,7 @@ public interface BinarySearchService {
 
         public void next() {
             if (matchPosition == matchesCount - 1) {
-                throw new IllegalStateException("Cannot step next on last match");
+                throw new IllegalStateException("Cannot find next on last match");
             }
 
             matchPosition++;
@@ -88,7 +94,7 @@ public interface BinarySearchService {
 
         public void prev() {
             if (matchPosition == 0) {
-                throw new IllegalStateException("Cannot step previous on first match");
+                throw new IllegalStateException("Cannot find previous on first match");
             }
 
             matchPosition--;

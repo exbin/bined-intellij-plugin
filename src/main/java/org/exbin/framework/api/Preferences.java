@@ -40,6 +40,7 @@ public interface Preferences {
 
     boolean getBoolean(String key, boolean def);
 
+    @Nonnull
     byte[] getByteArray(String key, byte[] def);
 
     double getDouble(String key, double def);

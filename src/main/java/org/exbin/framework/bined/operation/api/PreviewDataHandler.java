@@ -16,7 +16,7 @@
 package org.exbin.framework.bined.operation.api;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.binary_data.BinaryData;
 
 /**
  * Interface preview data handling.

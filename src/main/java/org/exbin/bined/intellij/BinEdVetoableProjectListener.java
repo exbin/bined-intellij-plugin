@@ -19,7 +19,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.exbin.bined.intellij.main.BinEdFileHandler;
 import org.exbin.framework.editor.gui.UnsavedFilesPanel;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.utils.WindowUtils;

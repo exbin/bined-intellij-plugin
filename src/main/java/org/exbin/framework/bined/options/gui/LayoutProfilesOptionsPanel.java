@@ -22,8 +22,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.bined.options.impl.CodeAreaLayoutOptionsImpl;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.options.api.OptionsCapable;
 import org.exbin.framework.options.api.OptionsModifiedListener;
+import org.exbin.framework.options.api.OptionsComponent;
 
 /**
  * Layout profiles options panel.
@@ -31,7 +31,7 @@ import org.exbin.framework.options.api.OptionsModifiedListener;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class LayoutProfilesOptionsPanel extends javax.swing.JPanel implements OptionsCapable<CodeAreaLayoutOptionsImpl> {
+public class LayoutProfilesOptionsPanel extends javax.swing.JPanel implements OptionsComponent<CodeAreaLayoutOptionsImpl> {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(LayoutProfilesOptionsPanel.class);
 

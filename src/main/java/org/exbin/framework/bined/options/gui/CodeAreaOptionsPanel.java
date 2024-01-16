@@ -15,6 +15,7 @@
  */
 package org.exbin.framework.bined.options.gui;
 
+import java.util.List;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -26,8 +27,8 @@ import org.exbin.bined.RowWrappingMode;
 import org.exbin.framework.bined.options.impl.CodeAreaOptionsImpl;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.options.api.OptionsCapable;
 import org.exbin.framework.options.api.OptionsModifiedListener;
+import org.exbin.framework.options.api.OptionsComponent;
 
 /**
  * Code area preference parameters panel.
@@ -35,7 +36,7 @@ import org.exbin.framework.options.api.OptionsModifiedListener;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class CodeAreaOptionsPanel extends javax.swing.JPanel implements OptionsCapable<CodeAreaOptionsImpl> {
+public class CodeAreaOptionsPanel extends javax.swing.JPanel implements OptionsComponent<CodeAreaOptionsImpl> {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(CodeAreaOptionsPanel.class);
 
@@ -49,13 +50,37 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel implements OptionsC
         return resourceBundle;
     }
 
+    public void setViewModes(List<String> viewModes) {
+        for (String viewMode : viewModes) {
+            viewModeComboBox.addItem(viewMode);
+        }
+    }
+
+    public void setCodeTypes(List<String> codeTypes) {
+        for (String codeType : codeTypes) {
+            codeTypeComboBox.addItem(codeType);
+        }
+    }
+
+    public void setPositionCodeTypes(List<String> positionCodeTypes) {
+        for (String positionCodeType : positionCodeTypes) {
+            positionCodeTypeComboBox.addItem(positionCodeType);
+        }
+    }
+
+    public void setCharactersCases(List<String> charactersCases) {
+        for (String charactersCase : charactersCases) {
+            codeCharactersModeComboBox.addItem(charactersCase);
+        }
+    }
+
     @Override
     public void saveToOptions(CodeAreaOptionsImpl options) {
-        options.setCodeType(CodeType.valueOf((String) codeTypeComboBox.getSelectedItem()));
+        options.setCodeType(CodeType.values()[codeTypeComboBox.getSelectedIndex()]);
         options.setShowUnprintables(showNonprintableCharactersCheckBox.isSelected());
-        options.setCodeCharactersCase(CodeCharactersCase.valueOf((String) codeCharactersModeComboBox.getSelectedItem()));
-        options.setPositionCodeType(PositionCodeType.valueOf((String) positionCodeTypeComboBox.getSelectedItem()));
-        options.setViewMode(CodeAreaViewMode.valueOf((String) viewModeComboBox.getSelectedItem()));
+        options.setCodeCharactersCase(CodeCharactersCase.values()[codeCharactersModeComboBox.getSelectedIndex()]);
+        options.setPositionCodeType(PositionCodeType.values()[positionCodeTypeComboBox.getSelectedIndex()]);
+        options.setViewMode(CodeAreaViewMode.values()[viewModeComboBox.getSelectedIndex()]);
         options.setCodeColorization(codeColorizationCheckBox.isSelected());
         options.setRowWrappingMode(rowWrappingModeCheckBox.isSelected() ? RowWrappingMode.WRAPPING : RowWrappingMode.NO_WRAPPING);
         options.setMaxBytesPerRow((Integer) maxBytesPerRowSpinner.getValue());
@@ -65,11 +90,11 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel implements OptionsC
 
     @Override
     public void loadFromOptions(CodeAreaOptionsImpl options) {
-        codeTypeComboBox.setSelectedItem(options.getCodeType().name());
+        codeTypeComboBox.setSelectedIndex(options.getCodeType().ordinal());
         showNonprintableCharactersCheckBox.setSelected(options.isShowUnprintables());
-        codeCharactersModeComboBox.setSelectedItem(options.getCodeCharactersCase().name());
-        positionCodeTypeComboBox.setSelectedItem(options.getPositionCodeType().name());
-        viewModeComboBox.setSelectedItem(options.getViewMode().name());
+        codeCharactersModeComboBox.setSelectedIndex(options.getCodeCharactersCase().ordinal());
+        positionCodeTypeComboBox.setSelectedIndex(options.getPositionCodeType().ordinal());
+        viewModeComboBox.setSelectedIndex(options.getViewMode().ordinal());
         codeColorizationCheckBox.setSelected(options.isCodeColorization());
         rowWrappingModeCheckBox.setSelected(options.getRowWrappingMode() == RowWrappingMode.WRAPPING);
         maxBytesPerRowSpinner.setValue(options.getMaxBytesPerRow());
@@ -104,10 +129,6 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel implements OptionsC
         maxRowPositionLengthSpinner = new javax.swing.JSpinner();
         rowWrappingModeCheckBox = new javax.swing.JCheckBox();
 
-        codeCharactersModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "LOWER", "UPPER" }));
-
-        viewModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "DUAL", "CODE_MATRIX", "TEXT_PREVIEW" }));
-
         showNonprintableCharactersCheckBox.setText(resourceBundle.getString("showNonprintableCharactersCheckBox.text")); // NOI18N
 
         viewModeScrollModeLabel.setText(resourceBundle.getString("viewModeScrollModeLabel.text")); // NOI18N
@@ -116,15 +137,9 @@ public class CodeAreaOptionsPanel extends javax.swing.JPanel implements OptionsC
 
         positionCodeTypeLabel.setText(resourceBundle.getString("positionCodeTypeLabel.text")); // NOI18N
 
-        positionCodeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "OCTAL", "DECIMAL", "HEXADECIMAL" }));
-        positionCodeTypeComboBox.setSelectedIndex(2);
-
         codeTypeScrollModeLabel.setText(resourceBundle.getString("codeTypeScrollModeLabel.text")); // NOI18N
 
         hexCharactersModeLabel.setText(resourceBundle.getString("hexCharactersModeLabel.text")); // NOI18N
-
-        codeTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BINARY", "OCTAL", "DECIMAL", "HEXADECIMAL" }));
-        codeTypeComboBox.setSelectedIndex(3);
 
         maxBytesPerRowLabel.setText(resourceBundle.getString("maxBytesPerRowLabel.text")); // NOI18N
 

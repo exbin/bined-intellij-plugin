@@ -36,9 +36,9 @@ import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.WindowUtils.DialogWrapper;
 import org.exbin.framework.utils.handler.DefaultControlHandler;
 import org.exbin.framework.utils.gui.DefaultControlPanel;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
-import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.binary_data.EditableBinaryData;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
@@ -681,7 +681,7 @@ public class BinarySearchPanel extends JBPanel {
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void multipleMatchesToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multipleMatchesToggleButtonActionPerformed
-        searchParameters.setMultipleMatches(multipleMatchesToggleButton.isSelected());
+        searchParameters.setMatchMode(multipleMatchesToggleButton.isSelected() ? SearchParameters.MatchMode.MULTIPLE : SearchParameters.MatchMode.SINGLE);
         performSearch();
     }//GEN-LAST:event_multipleMatchesToggleButtonActionPerformed
 

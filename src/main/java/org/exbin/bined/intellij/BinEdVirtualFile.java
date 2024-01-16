@@ -21,15 +21,18 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.exbin.bined.intellij.main.BinEdManager;
-import org.exbin.bined.intellij.main.BinEdFileHandler;
+import org.exbin.framework.bined.BinEdFileHandler;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Virtual file for binary editor.
@@ -204,6 +207,31 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     @Nonnull
     public JComponent getPreferredFocusedComponent() {
-        return getEditorFile().getPreferredFocusedComponent();
+        return getEditorFile().getCodeArea();
+    }
+
+    public void openFile(BinEdFileHandler fileHandler) {
+        if (!isDirectory() && isValid()) {
+            File file = extractFile(this);
+            if (file.isFile() && file.exists()) {
+                fileHandler.clearFile();
+                fileHandler.loadFromFile(file.toURI(), null);
+            } else {
+                try (InputStream stream = getInputStream()) {
+                    fileHandler.loadFromStream(stream);
+                } catch (IOException ex) {
+                    Logger.getLogger(BinEdFileHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
+    @Nonnull
+    private static File extractFile(BinEdVirtualFile virtualFile) {
+        String path = virtualFile.getPath();
+        if (path.startsWith("bined://")) {
+            path = path.substring(8);
+        }
+        return new File(path);
     }
 }

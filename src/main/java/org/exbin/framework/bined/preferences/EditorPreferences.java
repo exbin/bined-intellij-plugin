@@ -21,6 +21,7 @@ import org.exbin.framework.api.Preferences;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.EnterKeyHandlingMode;
+import org.exbin.bined.basic.TabKeyHandlingMode;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.options.EditorOptions;
 
@@ -34,6 +35,7 @@ public class EditorPreferences implements EditorOptions {
 
     public static final String PREFERENCES_FILE_HANDLING_MODE = "fileHandlingMode";
     public static final String PREFERENCES_ENTER_KEY_HANDLING_MODE = "enterKeyHandlingMode";
+    public static final String PREFERENCES_TAB_KEY_HANDLING_MODE = "tabKeyHandlingMode";
 
     private final Preferences preferences;
 
@@ -72,5 +74,21 @@ public class EditorPreferences implements EditorOptions {
     @Override
     public void setEnterKeyHandlingMode(EnterKeyHandlingMode enterKeyHandlingMode) {
         preferences.put(PREFERENCES_ENTER_KEY_HANDLING_MODE, enterKeyHandlingMode.name());
+    }
+
+    @Nonnull
+    @Override
+    public TabKeyHandlingMode getTabKeyHandlingMode() {
+        TabKeyHandlingMode defaultValue = TabKeyHandlingMode.PLATFORM_SPECIFIC;
+        try {
+            return TabKeyHandlingMode.valueOf(preferences.get(PREFERENCES_TAB_KEY_HANDLING_MODE, defaultValue.name()));
+        } catch (IllegalArgumentException ex) {
+            return defaultValue;
+        }
+    }
+
+    @Override
+    public void setTabKeyHandlingMode(TabKeyHandlingMode tabKeyHandlingMode) {
+        preferences.put(PREFERENCES_TAB_KEY_HANDLING_MODE, tabKeyHandlingMode.name());
     }
 }

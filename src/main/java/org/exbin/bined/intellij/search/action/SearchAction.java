@@ -25,8 +25,8 @@ import org.exbin.framework.bined.search.SearchCondition;
 import org.exbin.framework.bined.search.SearchParameters;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.utils.ActionUtils;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.EditableBinaryData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -237,7 +237,7 @@ public final class SearchAction implements ActionListener {
                 match.setLength(matchLength);
                 foundMatches.add(match);
 
-                if (foundMatches.size() == FIND_MATCHES_LIMIT || !searchParameters.isMultipleMatches()) {
+                if (foundMatches.size() == FIND_MATCHES_LIMIT || (searchParameters.getMatchMode() == SearchParameters.MatchMode.SINGLE)) {
                     break;
                 }
             }
@@ -305,7 +305,7 @@ public final class SearchAction implements ActionListener {
                 match.setLength(searchData.getDataSize());
                 foundMatches.add(match);
 
-                if (foundMatches.size() == FIND_MATCHES_LIMIT || !searchParameters.isMultipleMatches()) {
+                if (foundMatches.size() == FIND_MATCHES_LIMIT || (searchParameters.getMatchMode() == SearchParameters.MatchMode.SINGLE)) {
                     break;
                 }
             }

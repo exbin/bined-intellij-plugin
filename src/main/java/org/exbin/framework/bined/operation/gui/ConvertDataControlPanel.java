@@ -86,8 +86,6 @@ public class ConvertDataControlPanel extends javax.swing.JPanel implements OkCan
                 convertToNewFileButtonActionPerformed(evt);
             }
         });
-        // Not yet implemented
-        convertToNewFileButton.setEnabled(false);
 
         convertToClipboardButton.setText(resourceBundle.getString("convertToClipboardButton.text")); // NOI18N
         convertToClipboardButton.addActionListener(new java.awt.event.ActionListener() {

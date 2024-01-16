@@ -16,7 +16,7 @@
 package org.exbin.framework.bined.operation.operation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.auxiliary.binary_data.EditableBinaryData;
 
 /**
  * Data provider for insertion operation.

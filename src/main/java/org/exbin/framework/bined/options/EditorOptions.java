@@ -18,6 +18,7 @@ package org.exbin.framework.bined.options;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.basic.EnterKeyHandlingMode;
+import org.exbin.bined.basic.TabKeyHandlingMode;
 import org.exbin.framework.bined.FileHandlingMode;
 
 /**
@@ -29,12 +30,18 @@ import org.exbin.framework.bined.FileHandlingMode;
 public interface EditorOptions {
 
     @Nonnull
+    FileHandlingMode getFileHandlingMode();
+
+    @Nonnull
     EnterKeyHandlingMode getEnterKeyHandlingMode();
 
     @Nonnull
-    FileHandlingMode getFileHandlingMode();
+    TabKeyHandlingMode getTabKeyHandlingMode();
+
+    void setFileHandlingMode(FileHandlingMode fileHandlingMode);
 
     void setEnterKeyHandlingMode(EnterKeyHandlingMode enterKeyHandlingMode);
 
-    void setFileHandlingMode(FileHandlingMode fileHandlingMode);
+    void setTabKeyHandlingMode(TabKeyHandlingMode tabKeyHandlingMode);
+
 }

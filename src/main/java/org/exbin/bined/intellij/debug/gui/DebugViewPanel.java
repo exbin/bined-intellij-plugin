@@ -15,14 +15,14 @@
  */
 package org.exbin.bined.intellij.debug.gui;
 
-import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
-import org.exbin.bined.intellij.gui.BinEdComponentPanel;
-import org.exbin.bined.intellij.main.BinEdEditorComponent;
-import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.bined.BinEdEditorComponent;
+import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.gui.BinEdComponentPanel;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -44,8 +44,10 @@ public class DebugViewPanel extends javax.swing.JPanel {
     private final BinEdEditorComponent binEdEditorComponent;
 
     public DebugViewPanel() {
+        binEdEditorComponent = new BinEdEditorComponent();
         BinEdManager binEdManager = BinEdManager.getInstance();
-        binEdEditorComponent = binEdManager.createBinEdEditor();
+        BinEdFileManager fileManager = binEdManager.getFileManager();
+        fileManager.initComponentPanel(binEdEditorComponent.getComponentPanel());
 
         initComponents();
         init();

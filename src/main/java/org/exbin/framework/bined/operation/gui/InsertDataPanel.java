@@ -29,7 +29,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
+import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.extended.ExtCodeArea;
@@ -91,6 +91,7 @@ public class InsertDataPanel extends javax.swing.JPanel {
         });
         previewCodeArea.setContentData(new ByteArrayEditableData());
         previewCodeArea.setEditMode(EditMode.READ_ONLY);
+        previewCodeArea.setFocusTraversalKeysEnabled(false);
         previewPanel.add(previewCodeArea);
     }
 

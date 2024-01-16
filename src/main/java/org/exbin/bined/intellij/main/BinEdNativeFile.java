@@ -22,19 +22,28 @@ import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.LocalTimeCounter;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.PagedData;
+import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.delta.DeltaDocument;
+import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
+import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
+import org.exbin.framework.editor.text.TextFontApi;
+import org.exbin.framework.file.api.FileHandler;
+import org.exbin.framework.file.api.FileType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
+import java.awt.Font;
 import java.io.IOException;
+import java.net.URI;
+import java.util.Optional;
 
 /**
  * File editor wrapper using BinEd editor component.
@@ -42,44 +51,91 @@ import java.io.IOException;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdNativeFile implements BinEdComponentFileApi {
+public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, TextFontApi {
 
     private final BinEdEditorComponent componentPanel;
 
     private boolean opened = false;
     private VirtualFile virtualFile;
+    private Font defaultFont;
+    private long documentOriginalSize;
 
     public BinEdNativeFile(VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
         BinEdManager binEdManager = BinEdManager.getInstance();
-        componentPanel = binEdManager.createBinEdEditor();
+        componentPanel = new BinEdEditorComponent();
+        binEdManager.initFileHandler(this);
         binEdManager.getFileManager().initComponentPanel(componentPanel.getComponentPanel());
 
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
-        componentPanel.setFileApi(this);
-        componentPanel.setFileHandlingMode(FileHandlingMode.NATIVE);
         componentPanel.setUndoHandler(undoHandler);
         openFile(virtualFile);
 
         // TODO undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, this);
 
-        componentPanel.setModifiedChangeListener(() -> {
-            updateModified();
-        });
+//        componentPanel.setModifiedChangeListener(() -> {
+//            updateModified();
+//        });
+        defaultFont = codeArea.getCodeFont();
+        documentOriginalSize = virtualFile.getLength();
     }
 
     public boolean isModified() {
         return componentPanel.isModified();
     }
 
-    public boolean releaseFile() {
-        return componentPanel.releaseFile();
-    }
-
     @Nonnull
     public JComponent getComponent() {
         return componentPanel.getComponent();
+    }
+
+    @Nonnull
+    @Override
+    public BinEdEditorComponent getEditorComponent() {
+        return componentPanel;
+    }
+
+    @Nonnull
+    public ExtCodeArea getCodeArea() {
+        return componentPanel.getCodeArea();
+    }
+
+    @Override public long getDocumentOriginalSize() {
+        return documentOriginalSize;
+    }
+
+    @Override
+    public int getId() {
+        return -1;
+    }
+
+    @Nonnull
+    @Override
+    public Optional<URI> getFileUri() {
+        return Optional.empty();
+    }
+
+    @Nonnull
+    @Override
+    public String getTitle() {
+        return virtualFile.getName();
+    }
+
+    @Nonnull
+    @Override
+    public Optional<FileType> getFileType() {
+        return Optional.empty();
+    }
+
+    @Override
+    public void setFileType(@Nullable FileType fileType) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void clearFile() {
+
     }
 
     public void openFile(VirtualFile virtualFile) {
@@ -100,10 +156,17 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
         opened = true;
-//        documentOriginalSize = codeArea.getDataSize();
+        documentOriginalSize = codeArea.getDataSize();
         updateModified();
-//        updateCurrentMemoryMode();
-        componentPanel.getUndoHandler().clear();
+        Optional<BinaryDataUndoHandler> undoHandler = componentPanel.getUndoHandler();
+        if (undoHandler.isPresent()) {
+            undoHandler.get().clear();
+        }
+    }
+
+    @Override
+    public boolean isSaveSupported() {
+        return true;
     }
 
     @Override
@@ -124,16 +187,19 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
     }
 
     @Override
-    public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
-        throw new IllegalStateException("File handling change not supported");
+    public void switchFileHandlingMode(FileHandlingMode fileHandlingMode) {
+        // Ignore
+    }
+
+    @Nonnull
+    public FileHandlingMode getFileHandlingMode() {
+        return FileHandlingMode.NATIVE;
     }
 
     public void reloadFile() {
         openFile(virtualFile);
-
     }
 
-    @Override
     public void closeData() {
         PagedData contentData = (PagedData) componentPanel.getCodeArea().getContentData();
         if (contentData != null) {
@@ -164,14 +230,37 @@ public class BinEdNativeFile implements BinEdComponentFileApi {
         return virtualFile;
     }
 
-    @Override
-    public boolean isSaveSupported() {
-        // Automatic save
-        return false;
-    }
-
     @Nullable
     public JComponent getPreferredFocusedComponent() {
         return componentPanel.getCodeArea();
+    }
+
+    @Override public void loadFromFile(URI fileUri, @org.jetbrains.annotations.Nullable FileType fileType) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public void saveFile() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public void saveToFile(URI fileUri, @org.jetbrains.annotations.Nullable FileType fileType) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setCurrentFont(Font font) {
+        getCodeArea().setCodeFont(font);
+    }
+
+    @Nonnull
+    @Override
+    public Font getCurrentFont() {
+        return getCodeArea().getCodeFont();
+    }
+
+    @Nonnull
+    @Override
+    public Font getDefaultFont() {
+        return defaultFont;
     }
 }

@@ -44,14 +44,15 @@ import org.bouncycastle.crypto.digests.SHAKEDigest;
 import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.crypto.digests.TigerDigest;
 import org.bouncycastle.crypto.digests.WhirlpoolDigest;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
-import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.SelectionRange;
 import org.exbin.bined.capability.SelectionCapable;
 import org.exbin.bined.operation.swing.command.CodeAreaCommand;
 import org.exbin.bined.swing.CodeAreaCore;
+import org.exbin.framework.api.XBApplication;
 import org.exbin.framework.bined.operation.api.ConvertDataMethod;
 import org.exbin.framework.bined.operation.api.PreviewDataHandler;
 import org.exbin.framework.bined.operation.bouncycastle.component.gui.ComputeHashDataPanel;
@@ -69,10 +70,15 @@ public class ComputeHashDataMethod implements ConvertDataMethod {
 
     private java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ComputeHashDataPanel.class);
 
+    private XBApplication application;
     private PreviewDataHandler previewDataHandler;
     private long previewLengthLimit = 0;
     private HashType lastHashType = null;
     private static final int BUFFER_SIZE = 4096;
+
+    public void setApplication(XBApplication application) {
+        this.application = application;
+    }
 
     @Nonnull
     @Override

@@ -53,12 +53,12 @@ tasks {
     }
 }
 
-val binedVersion = "0.2.1-SNAPSHOT"
-val pagedDataVersion = "0.2.1-SNAPSHOT"
+val binedVersion = "0.2.1"
+val binaryDataVersion = "0.2.1"
 
-fun binedLibrary(libName: String): String = ":${libName}-${binedVersion}"
+fun binedLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binedVersion}" else "org.exbin.bined:${libName}:${binedVersion}"
 
-fun pagedDataLibrary(libName: String): String = ":${libName}-${pagedDataVersion}"
+fun binaryDataLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binaryDataVersion}" else "org.exbin.auxiliary:${libName}:${binaryDataVersion}"
 
 repositories {
     flatDir {
@@ -74,8 +74,9 @@ dependencies {
     implementation(binedLibrary("bined-operation-swing"))
     implementation(binedLibrary("bined-swing"))
     implementation(binedLibrary("bined-swing-extended"))
-    implementation(pagedDataLibrary("paged_data"))
-    implementation(pagedDataLibrary("paged_data-delta"))
+    implementation(binaryDataLibrary("binary_data"))
+    implementation(binaryDataLibrary("binary_data-paged"))
+    implementation(binaryDataLibrary("binary_data-delta"))
     compileOnly(":debugvalue-clion-2022.2.1")
     compileOnly(":debugvalue-goland-2022.2.1")
     compileOnly(":debugvalue-intellij-2022.2.1")

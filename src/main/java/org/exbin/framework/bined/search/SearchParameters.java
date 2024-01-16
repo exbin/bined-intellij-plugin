@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
- * Parameters for action to search for occurences of text or data.
+ * Parameters for action to search for occurrences of text or data.
  *
  * @author ExBin Project (https://exbin.org)
  */
@@ -30,7 +30,7 @@ public class SearchParameters {
     private long startPosition;
     private boolean searchFromCursor;
     private boolean matchCase = true;
-    private boolean multipleMatches = true;
+    private MatchMode matchMode = MatchMode.MULTIPLE;
     private SearchDirection searchDirection = SearchDirection.FORWARD;
 
     public SearchParameters() {
@@ -69,12 +69,13 @@ public class SearchParameters {
         this.matchCase = matchCase;
     }
 
-    public boolean isMultipleMatches() {
-        return multipleMatches;
+    @Nonnull
+    public MatchMode getMatchMode() {
+        return matchMode;
     }
 
-    public void setMultipleMatches(boolean multipleMatches) {
-        this.multipleMatches = multipleMatches;
+    public void setMatchMode(MatchMode matchMode) {
+        this.matchMode = matchMode;
     }
 
     @Nonnull
@@ -91,15 +92,20 @@ public class SearchParameters {
         startPosition = searchParameters.getStartPosition();
         searchFromCursor = searchParameters.isSearchFromCursor();
         matchCase = searchParameters.isMatchCase();
-        multipleMatches = searchParameters.isMultipleMatches();
+        matchMode = searchParameters.getMatchMode();
         searchDirection = searchParameters.getSearchDirection();
-    }
-
-    public enum SearchMode {
-        TEXT, BINARY
     }
 
     public enum SearchDirection {
         FORWARD, BACKWARD
+    }
+
+    public enum MatchMode {
+        SINGLE, MULTIPLE;
+        
+        @Nonnull
+        public static MatchMode fromBoolean(boolean multipleMatches) {
+            return multipleMatches ? MULTIPLE : SINGLE;
+        }
     }
 }

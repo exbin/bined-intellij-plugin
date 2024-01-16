@@ -18,7 +18,7 @@ package org.exbin.framework.bined.operation.component.gui;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.framework.bined.operation.component.SimpleFillDataMethod;
 import org.exbin.framework.utils.LanguageUtils;

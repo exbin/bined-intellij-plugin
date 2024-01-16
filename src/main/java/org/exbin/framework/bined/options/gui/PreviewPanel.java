@@ -23,7 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
+import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.RowWrappingMode;
 import org.exbin.bined.SelectionRange;
@@ -63,6 +63,7 @@ public class PreviewPanel extends javax.swing.JPanel {
 
     private void init() {
         codeArea = new ExtCodeArea();
+        codeArea.setFocusTraversalKeysEnabled(false);
         initPreviewCodeArea();
         this.add(codeArea, BorderLayout.CENTER);
     }

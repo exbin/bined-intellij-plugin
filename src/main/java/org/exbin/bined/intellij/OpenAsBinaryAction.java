@@ -96,7 +96,8 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
         fileEditorManager.setSelectedEditor(binEdVirtualFile, BinEdFileEditorProvider.BINED_EDITOR_TYPE_ID);
         for (FileEditor fileEditor : editors) {
             if (fileEditor instanceof BinEdFileEditor) {
-                binEdVirtualFile.getEditorFile().openFile(binEdVirtualFile);
+                binEdVirtualFile.openFile(binEdVirtualFile.getEditorFile());
+                break;
             } else {
                 // TODO: Drop other editors
                 fileEditor.dispose();

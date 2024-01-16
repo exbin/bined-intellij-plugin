@@ -20,23 +20,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.exbin.framework.editor.text.options.impl.TextEncodingOptionsImpl;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.options.api.OptionsCapable;
 import org.exbin.framework.options.api.OptionsModifiedListener;
 import org.exbin.framework.editor.text.service.TextEncodingService;
 import org.exbin.xbup.core.util.StringUtils;
+import org.exbin.framework.options.api.OptionsComponent;
 
 /**
  * Text encoding options panel.
  *
  * @author ExBin Project (https://exbin.org)
  */
-public class TextEncodingOptionsPanel extends javax.swing.JPanel implements OptionsCapable<TextEncodingOptionsImpl> {
+@ParametersAreNonnullByDefault
+public class TextEncodingOptionsPanel extends javax.swing.JPanel implements OptionsComponent<TextEncodingOptionsImpl> {
 
     private OptionsModifiedListener optionsModifiedListener;
     private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(TextEncodingOptionsPanel.class);
@@ -95,7 +98,7 @@ public class TextEncodingOptionsPanel extends javax.swing.JPanel implements Opti
     private void initComponents() {
 
         defaultEncodingPanel = new javax.swing.JPanel();
-        defaultEncodingComboBox = new javax.swing.JComboBox();
+        defaultEncodingComboBox = new javax.swing.JComboBox<>();
         defaultEncodingLabel = new javax.swing.JLabel();
         fillCurrentEncodingButton = new javax.swing.JButton();
         encodingsControlPanel = new javax.swing.JPanel();
@@ -210,7 +213,7 @@ public class TextEncodingOptionsPanel extends javax.swing.JPanel implements Opti
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox defaultEncodingComboBox;
+    private javax.swing.JComboBox<String> defaultEncodingComboBox;
     private javax.swing.JLabel defaultEncodingLabel;
     private javax.swing.JPanel defaultEncodingPanel;
     private javax.swing.JPanel encodingsControlPanel;
@@ -238,6 +241,7 @@ public class TextEncodingOptionsPanel extends javax.swing.JPanel implements Opti
         encodingPanel.setAddEncodingsOperation(addEncodingsOperation);
     }
 
+    @ParametersAreNonnullByDefault
     public class DefaultEncodingComboBoxModel implements ComboBoxModel<String> {
 
         private List<String> availableEncodings = new ArrayList<>();
@@ -252,6 +256,7 @@ public class TextEncodingOptionsPanel extends javax.swing.JPanel implements Opti
             selectedEncoding = (String) anItem;
         }
 
+        @Nullable
         @Override
         public Object getSelectedItem() {
             return selectedEncoding;
@@ -262,6 +267,7 @@ public class TextEncodingOptionsPanel extends javax.swing.JPanel implements Opti
             return availableEncodings.size();
         }
 
+        @Nonnull
         @Override
         public String getElementAt(int index) {
             return availableEncodings.get(index);
@@ -277,6 +283,7 @@ public class TextEncodingOptionsPanel extends javax.swing.JPanel implements Opti
             dataListeners.remove(listener);
         }
 
+        @Nonnull
         public List<String> getAvailableEncodings() {
             return availableEncodings;
         }
@@ -297,6 +304,7 @@ public class TextEncodingOptionsPanel extends javax.swing.JPanel implements Opti
             }
         }
 
+        @Nonnull
         public String getSelectedEncoding() {
             return selectedEncoding;
         }

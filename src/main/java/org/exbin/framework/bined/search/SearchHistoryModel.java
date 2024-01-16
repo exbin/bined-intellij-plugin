@@ -86,17 +86,23 @@ public class SearchHistoryModel implements ComboBoxModel<SearchCondition> {
                 }
 
                 searchHistory.remove(i);
+                for (ListDataListener listDataListener : listDataListeners) {
+                    listDataListener.intervalRemoved(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, i, i));
+                }
                 replaced = true;
             }
         }
         if (searchHistory.size() == HISTORY_LIMIT && !replaced) {
             int removePosition = searchHistory.size() - 1;
             searchHistory.remove(removePosition);
+            for (ListDataListener listDataListener : listDataListeners) {
+                listDataListener.intervalRemoved(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, removePosition, removePosition));
+            }
         }
 
         searchHistory.add(0, new SearchCondition(condition));
         for (ListDataListener listDataListener : listDataListeners) {
-            listDataListener.contentsChanged(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, 0));
+            listDataListener.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, 0));
         }
     }
 }

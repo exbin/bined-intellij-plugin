@@ -16,6 +16,7 @@
 package org.exbin.framework.bined.options.gui;
 
 import java.awt.BorderLayout;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
@@ -51,6 +52,12 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
     @Nonnull
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
+    }
+
+    public void setBackgroundModes(List<String> backgroundModes) {
+        for (String backgroundMode : backgroundModes) {
+            backgroundModeComboBox.addItem(backgroundMode);
+        }
     }
 
     @Nonnull
@@ -97,8 +104,6 @@ public class ThemeProfilePanel extends javax.swing.JPanel {
 
         backgroundModeLabel.setText(resourceBundle.getString("backgroundModeLabel.text")); // NOI18N
 
-        backgroundModeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "NONE", "PLAIN", "STRIPED", "GRIDDED", "CHESSBOARD" }));
-        backgroundModeComboBox.setSelectedIndex(2);
         backgroundModeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 backgroundModeComboBoxActionPerformed(evt);

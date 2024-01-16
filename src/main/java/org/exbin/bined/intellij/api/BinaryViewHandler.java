@@ -17,7 +17,7 @@ package org.exbin.bined.intellij.api;
 
 import com.intellij.openapi.extensions.PluginAware;
 import com.intellij.openapi.ui.DialogWrapper;
-import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.binary_data.BinaryData;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;

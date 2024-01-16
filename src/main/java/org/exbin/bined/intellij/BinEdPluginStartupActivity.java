@@ -39,22 +39,22 @@ import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
-import org.exbin.auxiliary.paged_data.BinaryData;
+import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
-import org.exbin.bined.intellij.gui.BinEdComponentPanel;
-import org.exbin.bined.intellij.main.BinEdEditorComponent;
-import org.exbin.bined.intellij.main.BinEdFileHandler;
-import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.intellij.main.BinEdNativeFile;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
+import org.exbin.framework.bined.BinEdEditorComponent;
+import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
+import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 
 import javax.annotation.Nonnull;
@@ -137,7 +137,8 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
                         && !((BinEdVirtualFile) file).isClosing()) {
                     ((BinEdVirtualFile) file).setClosing(true);
                     BinEdFileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
-                    if (!fileHandler.releaseFile()) {
+                    BinEdManager binedManager = BinEdManager.getInstance();
+                    if (!binedManager.releaseFile(fileHandler)) {
                         ((BinEdVirtualFile) file).setClosing(false);
                         throw new ProcessCanceledException();
                     }
@@ -270,31 +271,11 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             setCrossClosesWindow(true);
 
             BinEdManager binEdManager = BinEdManager.getInstance();
-            editorComponent = binEdManager.createBinEdEditor();
+            editorComponent = new BinEdEditorComponent();
             BinEdFileManager fileManager = binEdManager.getFileManager();
+            fileManager.initComponentPanel(editorComponent.getComponentPanel());
             BinEdComponentPanel componentPanel = editorComponent.getComponentPanel();
             fileManager.initComponentPanel(componentPanel);
-            editorComponent.setFileApi(new BinEdComponentFileApi() {
-                @Override
-                public boolean isSaveSupported() {
-                    return false;
-                }
-
-                @Override
-                public void saveDocument() {
-                    throw new IllegalStateException("Save not supported");
-                }
-
-                @Override
-                public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
-                    throw new IllegalStateException("Save not supported");
-                }
-
-                @Override
-                public void closeData() {
-                    // Ignore
-                }
-            });
             editorComponent.setContentData(binaryData);
             init();
         }
@@ -325,7 +306,7 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
         @Nullable
         @Override
         protected JComponent createCenterPanel() {
-            BorderLayoutPanel panel = JBUI.Panels.simplePanel(editorComponent.getBinaryStatusPanel());
+            BorderLayoutPanel panel = JBUI.Panels.simplePanel(editorComponent.getStatusPanel());
             panel.setPreferredSize(JBUI.size(600, 400));
             return panel;
         }

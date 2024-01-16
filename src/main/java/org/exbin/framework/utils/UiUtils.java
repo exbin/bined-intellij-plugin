@@ -15,16 +15,16 @@
  */
 package org.exbin.framework.utils;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.Window;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Frame;
-import java.awt.Window;
 
 /**
  * Utility static methods usable for UI.
@@ -35,6 +35,7 @@ import java.awt.Window;
 public class UiUtils {
 
     private static final int BUTTON_CLICK_TIME = 150;
+
 
     private UiUtils() {
     }

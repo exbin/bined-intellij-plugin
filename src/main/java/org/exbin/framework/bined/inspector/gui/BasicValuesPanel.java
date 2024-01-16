@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.InputMismatchException;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
@@ -42,13 +41,12 @@ import org.exbin.bined.operation.swing.command.ModifyDataCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.operation.undo.BinaryDataUndoUpdateListener;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.inspector.BasicValuesPositionColorModifier;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
-import org.exbin.auxiliary.paged_data.EditableBinaryData;
-import org.exbin.bined.capability.EditModeCapable;
+import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.binary_data.EditableBinaryData;
+import org.exbin.framework.bined.inspector.BasicValuesPositionColorModifier;
 
 /**
  * Values side panel.
@@ -56,13 +54,13 @@ import org.exbin.bined.capability.EditModeCapable;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BasicValuesPanel extends com.intellij.ui.components.JBPanel {
+public class BasicValuesPanel extends javax.swing.JPanel {
 
     public static final int UBYTE_MAX_VALUE = 255;
     public static final int SWORD_MIN_VALUE = -32768;
     public static final int SWORD_MAX_VALUE = 32767;
     public static final int UWORD_MAX_VALUE = 65535;
-    public static final long UINT_MAX_VALUE = 4294967295l;
+    public static final long UINT_MAX_VALUE = 4294967295L;
     public static final BigInteger ULONG_MAX_VALUE = new BigInteger("4294967295");
     public static final BigInteger BIG_INTEGER_BYTE_MASK = BigInteger.valueOf(255);
     public static final String VALUE_OUT_OF_RANGE = "Value is out of range";
@@ -95,36 +93,36 @@ public class BasicValuesPanel extends com.intellij.ui.components.JBPanel {
 
         endianButtonGroup = new javax.swing.ButtonGroup();
         integerSignButtonGroup = new javax.swing.ButtonGroup();
-        binaryLabel = new com.intellij.ui.components.JBLabel();
-        binaryCheckBox0 = new com.intellij.ui.components.JBCheckBox();
-        binaryCheckBox1 = new com.intellij.ui.components.JBCheckBox();
-        binaryCheckBox2 = new com.intellij.ui.components.JBCheckBox();
-        binaryCheckBox3 = new com.intellij.ui.components.JBCheckBox();
-        binaryCheckBox4 = new com.intellij.ui.components.JBCheckBox();
-        binaryCheckBox5 = new com.intellij.ui.components.JBCheckBox();
-        binaryCheckBox6 = new com.intellij.ui.components.JBCheckBox();
-        binaryCheckBox7 = new com.intellij.ui.components.JBCheckBox();
-        byteLabel = new com.intellij.ui.components.JBLabel();
-        byteTextField = new com.intellij.ui.components.JBTextField();
-        wordLabel = new com.intellij.ui.components.JBLabel();
-        wordTextField = new com.intellij.ui.components.JBTextField();
-        intLabel = new com.intellij.ui.components.JBLabel();
-        intTextField = new com.intellij.ui.components.JBTextField();
-        longLabel = new com.intellij.ui.components.JBLabel();
-        longTextField = new com.intellij.ui.components.JBTextField();
-        floatLabel = new com.intellij.ui.components.JBLabel();
-        floatTextField = new com.intellij.ui.components.JBTextField();
-        doubleLabel = new com.intellij.ui.components.JBLabel();
-        doubleTextField = new com.intellij.ui.components.JBTextField();
-        characterLabel = new com.intellij.ui.components.JBLabel();
-        characterTextField = new com.intellij.ui.components.JBTextField();
-        stringLabel = new com.intellij.ui.components.JBLabel();
-        stringTextField = new com.intellij.ui.components.JBTextField();
+        binaryLabel = new javax.swing.JLabel();
+        binaryCheckBox0 = new javax.swing.JCheckBox();
+        binaryCheckBox1 = new javax.swing.JCheckBox();
+        binaryCheckBox2 = new javax.swing.JCheckBox();
+        binaryCheckBox3 = new javax.swing.JCheckBox();
+        binaryCheckBox4 = new javax.swing.JCheckBox();
+        binaryCheckBox5 = new javax.swing.JCheckBox();
+        binaryCheckBox6 = new javax.swing.JCheckBox();
+        binaryCheckBox7 = new javax.swing.JCheckBox();
+        byteLabel = new javax.swing.JLabel();
+        byteTextField = new javax.swing.JTextField();
+        wordLabel = new javax.swing.JLabel();
+        wordTextField = new javax.swing.JTextField();
+        intLabel = new javax.swing.JLabel();
+        intTextField = new javax.swing.JTextField();
+        longLabel = new javax.swing.JLabel();
+        longTextField = new javax.swing.JTextField();
+        floatLabel = new javax.swing.JLabel();
+        floatTextField = new javax.swing.JTextField();
+        doubleLabel = new javax.swing.JLabel();
+        doubleTextField = new javax.swing.JTextField();
+        characterLabel = new javax.swing.JLabel();
+        characterTextField = new javax.swing.JTextField();
+        stringLabel = new javax.swing.JLabel();
+        stringTextField = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
-        bigEndianRadioButton = new com.intellij.ui.components.JBRadioButton();
-        littleEndianRadioButton = new com.intellij.ui.components.JBRadioButton();
-        signedRadioButton = new com.intellij.ui.components.JBRadioButton();
-        unsignedRadioButton = new com.intellij.ui.components.JBRadioButton();
+        bigEndianRadioButton = new javax.swing.JRadioButton();
+        littleEndianRadioButton = new javax.swing.JRadioButton();
+        signedRadioButton = new javax.swing.JRadioButton();
+        unsignedRadioButton = new javax.swing.JRadioButton();
 
         setMaximumSize(new java.awt.Dimension(246, 447));
         setMinimumSize(new java.awt.Dimension(246, 447));
@@ -703,38 +701,38 @@ public class BasicValuesPanel extends com.intellij.ui.components.JBPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private com.intellij.ui.components.JBRadioButton bigEndianRadioButton;
-    private com.intellij.ui.components.JBCheckBox binaryCheckBox0;
-    private com.intellij.ui.components.JBCheckBox binaryCheckBox1;
-    private com.intellij.ui.components.JBCheckBox binaryCheckBox2;
-    private com.intellij.ui.components.JBCheckBox binaryCheckBox3;
-    private com.intellij.ui.components.JBCheckBox binaryCheckBox4;
-    private com.intellij.ui.components.JBCheckBox binaryCheckBox5;
-    private com.intellij.ui.components.JBCheckBox binaryCheckBox6;
-    private com.intellij.ui.components.JBCheckBox binaryCheckBox7;
-    private com.intellij.ui.components.JBLabel binaryLabel;
-    private com.intellij.ui.components.JBLabel byteLabel;
-    private com.intellij.ui.components.JBTextField byteTextField;
-    private com.intellij.ui.components.JBLabel characterLabel;
-    private com.intellij.ui.components.JBTextField characterTextField;
-    private com.intellij.ui.components.JBLabel doubleLabel;
-    private com.intellij.ui.components.JBTextField doubleTextField;
+    private javax.swing.JRadioButton bigEndianRadioButton;
+    private javax.swing.JCheckBox binaryCheckBox0;
+    private javax.swing.JCheckBox binaryCheckBox1;
+    private javax.swing.JCheckBox binaryCheckBox2;
+    private javax.swing.JCheckBox binaryCheckBox3;
+    private javax.swing.JCheckBox binaryCheckBox4;
+    private javax.swing.JCheckBox binaryCheckBox5;
+    private javax.swing.JCheckBox binaryCheckBox6;
+    private javax.swing.JCheckBox binaryCheckBox7;
+    private javax.swing.JLabel binaryLabel;
+    private javax.swing.JLabel byteLabel;
+    private javax.swing.JTextField byteTextField;
+    private javax.swing.JLabel characterLabel;
+    private javax.swing.JTextField characterTextField;
+    private javax.swing.JLabel doubleLabel;
+    private javax.swing.JTextField doubleTextField;
     private javax.swing.ButtonGroup endianButtonGroup;
-    private com.intellij.ui.components.JBLabel floatLabel;
-    private com.intellij.ui.components.JBTextField floatTextField;
-    private com.intellij.ui.components.JBLabel intLabel;
-    private com.intellij.ui.components.JBTextField intTextField;
+    private javax.swing.JLabel floatLabel;
+    private javax.swing.JTextField floatTextField;
+    private javax.swing.JLabel intLabel;
+    private javax.swing.JTextField intTextField;
     private javax.swing.ButtonGroup integerSignButtonGroup;
     private javax.swing.JSeparator jSeparator1;
-    private com.intellij.ui.components.JBRadioButton littleEndianRadioButton;
-    private com.intellij.ui.components.JBLabel longLabel;
-    private com.intellij.ui.components.JBTextField longTextField;
-    private com.intellij.ui.components.JBRadioButton signedRadioButton;
-    private com.intellij.ui.components.JBLabel stringLabel;
-    private com.intellij.ui.components.JBTextField stringTextField;
-    private com.intellij.ui.components.JBRadioButton unsignedRadioButton;
-    private com.intellij.ui.components.JBLabel wordLabel;
-    private com.intellij.ui.components.JBTextField wordTextField;
+    private javax.swing.JRadioButton littleEndianRadioButton;
+    private javax.swing.JLabel longLabel;
+    private javax.swing.JTextField longTextField;
+    private javax.swing.JRadioButton signedRadioButton;
+    private javax.swing.JLabel stringLabel;
+    private javax.swing.JTextField stringTextField;
+    private javax.swing.JRadioButton unsignedRadioButton;
+    private javax.swing.JLabel wordLabel;
+    private javax.swing.JTextField wordTextField;
     // End of variables declaration//GEN-END:variables
 
     public void setCodeArea(ExtCodeArea codeArea, @Nullable BinaryDataUndoHandler undoHandler) {
@@ -748,9 +746,7 @@ public class BasicValuesPanel extends com.intellij.ui.components.JBPanel {
             updateValues();
         };
         codeArea.addDataChangedListener(dataChangedListener);
-        caretMovedListener = (CodeAreaCaretPosition caretPosition) -> {
-            updateValues();
-        };
+        caretMovedListener = (CodeAreaCaretPosition caretPosition) -> updateValues();
         codeArea.addCaretMovedListener(caretMovedListener);
         undoUpdateListener = new BinaryDataUndoUpdateListener() {
             @Override
@@ -805,7 +801,7 @@ public class BasicValuesPanel extends com.intellij.ui.components.JBPanel {
 
         if (dataPosition < dataSize) {
             int availableData = dataSize - dataPosition >= CACHE_SIZE ? CACHE_SIZE : (int) (dataSize - dataPosition);
-            BinaryData contentData = Objects.requireNonNull(codeArea.getContentData());
+            BinaryData contentData = codeArea.getContentData();
             contentData.copyToArray(dataPosition, valuesCache, 0, availableData);
             if (availableData < CACHE_SIZE) {
                 Arrays.fill(valuesCache, availableData, CACHE_SIZE, (byte) 0);
@@ -858,7 +854,7 @@ public class BasicValuesPanel extends com.intellij.ui.components.JBPanel {
     }
 
     private boolean isEditable() {
-        return ((EditModeCapable) codeArea).isEditable();
+        return codeArea.isEditable();
     }
 
     @Nonnull
@@ -923,9 +919,7 @@ public class BasicValuesPanel extends com.intellij.ui.components.JBPanel {
         }
 
         private void scheduleNextStep(final ValuesPanelField valuesPanelField) {
-            SwingUtilities.invokeLater(() -> {
-                updateValue(valuesPanelField);
-            });
+            SwingUtilities.invokeLater(() -> updateValue(valuesPanelField));
         }
 
         public boolean isUpdateInProgress() {
@@ -1021,11 +1015,11 @@ public class BasicValuesPanel extends com.intellij.ui.components.JBPanel {
                 case INTEGER: {
                     long intValue = signed
                             ? (byteOrder == ByteOrder.LITTLE_ENDIAN
-                                    ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | (values[3] << 24)
-                                    : (values[3] & 0xffl) | ((values[2] & 0xffl) << 8) | ((values[1] & 0xffl) << 16) | (values[0] << 24))
+                                    ? (values[0] & 0xffL) | ((values[1] & 0xffL) << 8) | ((values[2] & 0xffL) << 16) | (values[3] << 24)
+                                    : (values[3] & 0xffL) | ((values[2] & 0xffL) << 8) | ((values[1] & 0xffL) << 16) | (values[0] << 24))
                             : (byteOrder == ByteOrder.LITTLE_ENDIAN
-                                    ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | ((values[3] & 0xffl) << 24)
-                                    : (values[3] & 0xffl) | ((values[2] & 0xffl) << 8) | ((values[1] & 0xffl) << 16) | ((values[0] & 0xffl) << 24));
+                                    ? (values[0] & 0xffL) | ((values[1] & 0xffL) << 8) | ((values[2] & 0xffL) << 16) | ((values[3] & 0xffL) << 24)
+                                    : (values[3] & 0xffL) | ((values[2] & 0xffL) << 8) | ((values[1] & 0xffL) << 16) | ((values[0] & 0xffL) << 24));
                     intTextField.setText(String.valueOf(intValue));
                     break;
                 }
@@ -1039,11 +1033,11 @@ public class BasicValuesPanel extends com.intellij.ui.components.JBPanel {
                         longTextField.setText(String.valueOf(byteBuffer.getLong()));
                     } else {
                         long longValue = byteOrder == ByteOrder.LITTLE_ENDIAN
-                                ? (values[0] & 0xffl) | ((values[1] & 0xffl) << 8) | ((values[2] & 0xffl) << 16) | ((values[3] & 0xffl) << 24)
-                                | ((values[4] & 0xffl) << 32) | ((values[5] & 0xffl) << 40) | ((values[6] & 0xffl) << 48)
-                                : (values[7] & 0xffl) | ((values[6] & 0xffl) << 8) | ((values[5] & 0xffl) << 16) | ((values[4] & 0xffl) << 24)
-                                | ((values[3] & 0xffl) << 32) | ((values[2] & 0xffl) << 40) | ((values[1] & 0xffl) << 48);
-                        BigInteger bigInt1 = BigInteger.valueOf(values[byteOrder == ByteOrder.LITTLE_ENDIAN ? 7 : 0] & 0xffl);
+                                ? (values[0] & 0xffL) | ((values[1] & 0xffL) << 8) | ((values[2] & 0xffL) << 16) | ((values[3] & 0xffL) << 24)
+                                | ((values[4] & 0xffL) << 32) | ((values[5] & 0xffL) << 40) | ((values[6] & 0xffL) << 48)
+                                : (values[7] & 0xffL) | ((values[6] & 0xffL) << 8) | ((values[5] & 0xffL) << 16) | ((values[4] & 0xffL) << 24)
+                                | ((values[3] & 0xffL) << 32) | ((values[2] & 0xffL) << 40) | ((values[1] & 0xffL) << 48);
+                        BigInteger bigInt1 = BigInteger.valueOf(values[byteOrder == ByteOrder.LITTLE_ENDIAN ? 7 : 0] & 0xffL);
                         BigInteger bigInt2 = bigInt1.shiftLeft(56);
                         BigInteger bigInt3 = bigInt2.add(BigInteger.valueOf(longValue));
                         longTextField.setText(bigInt3.toString());

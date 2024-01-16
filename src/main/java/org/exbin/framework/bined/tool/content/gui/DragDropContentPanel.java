@@ -47,8 +47,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
 import javax.swing.TransferHandler;
 import javax.swing.border.BevelBorder;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.EmptyBinaryData;
+import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.EmptyBinaryData;
 import org.exbin.framework.bined.tool.content.source.ClipboardFlavorBinaryData;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 import org.exbin.framework.bined.objectdata.PageProviderBinaryData;
@@ -259,11 +259,6 @@ public class DragDropContentPanel extends javax.swing.JPanel {
     public void setSaveAsFileAction(@Nullable AbstractAction saveAsFileAction) {
         this.saveAsFileAction = saveAsFileAction;
         saveAsFileButton.setEnabled(saveAsFileAction != null);
-    }
-
-    @Nonnull
-    public org.exbin.bined.swing.extended.ExtCodeArea getDataCodeArea() {
-        return dataCodeArea;
     }
 
     @Nonnull

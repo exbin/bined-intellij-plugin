@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.PagedData;
+import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.framework.utils.ClipboardUtils;
 import org.exbin.xbup.core.util.StreamUtils;
 

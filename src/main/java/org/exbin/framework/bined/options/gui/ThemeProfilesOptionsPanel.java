@@ -22,8 +22,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.framework.bined.options.impl.CodeAreaThemeOptionsImpl;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.options.api.OptionsCapable;
 import org.exbin.framework.options.api.OptionsModifiedListener;
+import org.exbin.framework.options.api.OptionsComponent;
 
 /**
  * Theme profiles options panel.
@@ -31,7 +31,7 @@ import org.exbin.framework.options.api.OptionsModifiedListener;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class ThemeProfilesOptionsPanel extends javax.swing.JPanel implements OptionsCapable<CodeAreaThemeOptionsImpl> {
+public class ThemeProfilesOptionsPanel extends javax.swing.JPanel implements OptionsComponent<CodeAreaThemeOptionsImpl> {
 
     private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(ThemeProfilesOptionsPanel.class);
 

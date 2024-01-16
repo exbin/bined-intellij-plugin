@@ -34,18 +34,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
-import org.exbin.auxiliary.paged_data.BinaryData;
-import org.exbin.auxiliary.paged_data.ByteArrayData;
-import org.exbin.auxiliary.paged_data.ByteArrayEditableData;
-import org.exbin.auxiliary.paged_data.EditableBinaryData;
+import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.ByteArrayData;
+import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
-import org.exbin.bined.intellij.gui.BinEdComponentPanel;
-import org.exbin.bined.intellij.main.BinEdEditorComponent;
-import org.exbin.bined.intellij.main.BinEdFileManager;
 import org.exbin.bined.intellij.main.BinEdManager;
-import org.exbin.framework.bined.FileHandlingMode;
-import org.exbin.framework.bined.gui.BinEdComponentFileApi;
+import org.exbin.framework.bined.BinEdEditorComponent;
+import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 
 import javax.annotation.Nonnull;
@@ -153,33 +151,11 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
             setOKActionEnabled(editable);
             setCrossClosesWindow(true);
 
+            binEdEditorComponent = new BinEdEditorComponent();
             BinEdManager binEdManager = BinEdManager.getInstance();
-            binEdEditorComponent = binEdManager.createBinEdEditor();
             BinEdFileManager fileManager = binEdManager.getFileManager();
-            BinEdComponentPanel componentPanel = binEdEditorComponent.getComponentPanel();
-            fileManager.initComponentPanel(componentPanel);
+            fileManager.initComponentPanel(binEdEditorComponent.getComponentPanel());
 
-            binEdEditorComponent.setFileApi(new BinEdComponentFileApi() {
-                @Override
-                public boolean isSaveSupported() {
-                    return false;
-                }
-
-                @Override
-                public void saveDocument() {
-                    throw new IllegalStateException("Save not supported");
-                }
-
-                @Override
-                public void switchFileHandlingMode(FileHandlingMode newHandlingMode) {
-                    // Ignore
-                }
-
-                @Override
-                public void closeData() {
-                    // Ignore
-                }
-            });
             binEdEditorComponent.setContentData(binaryData);
             if (!editable) {
                 binEdEditorComponent.getCodeArea().setEditMode(EditMode.READ_ONLY);

@@ -29,7 +29,7 @@ import org.exbin.framework.api.Preferences;
 public interface OptionsPage<T extends OptionsData> {
 
     @Nonnull
-    OptionsCapable<T> createPanel();
+    OptionsComponent<T> createPanel();
 
     @Nonnull
     T createOptions();
