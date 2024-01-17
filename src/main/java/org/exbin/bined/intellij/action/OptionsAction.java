@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij.action;
 
+import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.main.BinEdManager;
@@ -106,6 +107,7 @@ public class OptionsAction extends AbstractAction {
                                 .getFileHandlingMode());
                     }
                 }
+                BinEdPluginStartupActivity.applyIntegrationOptions(optionsPanel.getIntegrationOptions());
                 codeArea.repaint();
             }
 

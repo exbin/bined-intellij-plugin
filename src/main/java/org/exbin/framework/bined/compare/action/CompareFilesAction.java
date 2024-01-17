@@ -84,6 +84,7 @@ public class CompareFilesAction extends AbstractAction {
     public void setCodeArea(ExtCodeArea codeArea) {
         this.codeArea = codeArea;
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         final CompareFilesPanel compareFilesPanel = new CompareFilesPanel();
@@ -118,6 +119,7 @@ public class CompareFilesAction extends AbstractAction {
         //            compareFilesPanel.setAvailableFiles(availableFiles);
         //        }
         List<String> availableFiles = new ArrayList<>();
+        availableFiles.add("Current File");
         compareFilesPanel.setAvailableFiles(availableFiles);
 
         BinedModule binedModule = application.getModuleRepository().getModuleByInterface(BinedModule.class);

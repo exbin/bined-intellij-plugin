@@ -20,7 +20,6 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,9 +67,6 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     public BinEdFileHandler getEditorFile() {
         if (editorFile == null) {
             editorFile = new BinEdFileHandler();
-            BinEdManager binEdManager = BinEdManager.getInstance();
-            binEdManager.getFileManager().initFileHandler(editorFile);
-            binEdManager.initFileHandler(editorFile);
         }
 
         return editorFile;

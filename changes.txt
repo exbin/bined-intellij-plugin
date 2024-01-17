@@ -1,4 +1,5 @@
 0.2.10
+- Added support for basic macro
 
 0.2.9 (2023-11-24)
 - Added convert data action

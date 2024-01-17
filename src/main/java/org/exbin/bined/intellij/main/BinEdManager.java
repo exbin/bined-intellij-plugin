@@ -352,7 +352,6 @@ public class BinEdManager {
             });
         }
 
-        BinEdManager binedManager = BinEdManager.getInstance();
         editorComponent.applyOptions(new BinEdApplyOptions() {
             @Nonnull
             @Override
@@ -413,7 +412,7 @@ public class BinEdManager {
             public CodeAreaThemeOptions getThemeOptions() {
                 return preferences.getThemePreferences();
             }
-        }, binedManager.getEncodingsHandler(), fileHandler == null ? new JTextField().getFont() : ((TextFontApi) fileHandler).getDefaultFont());
+        }, encodingsHandler, fileHandler == null ? new JTextField().getFont() : ((TextFontApi) fileHandler).getDefaultFont());
     }
 
     @Nonnull
