@@ -156,14 +156,7 @@ public class BinedDiffPanel extends JBPanel {
                     }
                 }
         );
-        toolbarPanel.setOptionsAction(
-                new AnAction() {
-                    @Override
-                    public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
-                        createOptionsAction().actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, "COMMAND", 0));
-                    }
-                }
-        );
+        toolbarPanel.setOptionsAction(createOptionsAction());
         toolbarPanel.setOnlineHelpAction(
                 new AnAction() {
                     @Override

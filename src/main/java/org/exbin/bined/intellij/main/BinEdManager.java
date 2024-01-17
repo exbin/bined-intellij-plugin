@@ -29,8 +29,6 @@ import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.intellij.action.OptionsAction;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.options.IntegrationOptions;
-import org.exbin.bined.intellij.search.action.SearchAction;
-import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.about.gui.AboutPanel;
 import org.exbin.framework.bined.BinEdEditorComponent;
@@ -50,7 +48,6 @@ import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.inspector.BasicValuesPositionColorModifier;
 import org.exbin.framework.bined.inspector.BinEdComponentInspector;
 import org.exbin.framework.bined.inspector.options.DataInspectorOptions;
-import org.exbin.framework.bined.inspector.options.impl.DataInspectorOptionsImpl;
 import org.exbin.framework.bined.macro.MacroManager;
 import org.exbin.framework.bined.macro.action.ManageMacrosAction;
 import org.exbin.framework.bined.macro.operation.CodeAreaMacroCommandHandler;
@@ -86,7 +83,6 @@ import org.exbin.framework.utils.DesktopUtils;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.gui.CloseControlPanel;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -103,9 +99,9 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -213,8 +209,16 @@ public class BinEdManager {
 
     @Nonnull
     public void initFileHandler(FileHandler fileHandler) {
-        BinEdComponentPanel componentPanel = (BinEdComponentPanel) fileHandler.getComponent();
         BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
+        initEditorComponent(editorComponent, fileHandler);
+    }
+
+    public void initEditorComponent(BinEdEditorComponent editorComponent) {
+        initEditorComponent(editorComponent, null);
+    }
+
+    public void initEditorComponent(BinEdEditorComponent editorComponent, @Nullable FileHandler fileHandler) {
+        BinEdComponentPanel componentPanel = editorComponent.getComponentPanel();
         ExtCodeArea codeArea = componentPanel.getCodeArea();
 
         codeArea.setComponentPopupMenu(new JPopupMenu() {
@@ -227,7 +231,7 @@ public class BinEdManager {
                     clickedY += invoker.getParent().getY();
                 }
                 removeAll();
-                createContextMenu(componentPanel.getCodeArea(), fileHandler, this, PopupMenuVariant.EDITOR, clickedX, clickedY);
+                createContextMenu(editorComponent, fileHandler, this, PopupMenuVariant.EDITOR, clickedX, clickedY);
                 super.show(invoker, x, y);
             }
         });
@@ -317,14 +321,36 @@ public class BinEdManager {
                     if (newHandlingMode != fileHandlingMode) {
                         binEdFileHandler.switchFileHandlingMode(newHandlingMode);
                         preferences.getEditorPreferences().setFileHandlingMode(newHandlingMode);
-                        updateCurrentMemoryMode(binEdFileHandler);
+                        updateCurrentMemoryMode(editorComponent);
                     }
                 }
             }
         });
-        registerBinaryStatus(fileHandler);
-        registerEncodingStatus(statusPanel, fileHandler);
+        registerBinaryStatus(editorComponent, (BinEdComponentFileApi) fileHandler);
+        registerEncodingStatus(statusPanel, editorComponent);
         bookmarksManager.registerBookmarksComponentActions(editorComponent.getComponentPanel());
+
+        BinEdToolbarPanel toolbarPanel = editorComponent.getToolbarPanel();
+        toolbarPanel.setOptionsAction(createOptionsAction(editorComponent, fileHandler));
+        toolbarPanel.setOnlineHelpAction(new AnAction() {
+            @Override
+            public void actionPerformed(@Nonnull AnActionEvent e) {
+                createOnlineHelpAction().actionPerformed(null);
+            }
+        });
+        if (fileHandler != null) {
+            if (fileHandler instanceof BinEdFileHandler) {
+                toolbarPanel.setSaveAction(new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        fileHandler.saveFile();
+                    }
+                });
+            }
+            codeArea.addDataChangedListener(() -> {
+                toolbarPanel.updateUndoState();
+            });
+        }
 
         BinEdManager binedManager = BinEdManager.getInstance();
         editorComponent.applyOptions(new BinEdApplyOptions() {
@@ -387,7 +413,7 @@ public class BinEdManager {
             public CodeAreaThemeOptions getThemeOptions() {
                 return preferences.getThemePreferences();
             }
-        }, binedManager.getEncodingsHandler(), ((TextFontApi) fileHandler).getDefaultFont());
+        }, binedManager.getEncodingsHandler(), fileHandler == null ? new JTextField().getFont() : ((TextFontApi) fileHandler).getDefaultFont());
     }
 
     @Nonnull
@@ -405,10 +431,10 @@ public class BinEdManager {
         return encodingsHandler;
     }
 
-    public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi, FileHandler fileHandler) {
-        ExtCodeArea codeArea = ((BinEdComponentFileApi) fileHandler).getCodeArea();
+    public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi, BinEdEditorComponent editorComponent) {
+        ExtCodeArea codeArea = editorComponent.getCodeArea();
         encodingsHandler.setSelectedEncoding(codeArea.getCharset().name());
-        encodingsHandler.setParentComponent(fileHandler.getComponent());
+        encodingsHandler.setParentComponent(editorComponent.getComponent());
         encodingsHandler.setTextEncodingStatus(new TextEncodingStatusApi() {
             @Nonnull
             @Override
@@ -426,9 +452,9 @@ public class BinEdManager {
         });
     }
 
-    public void createContextMenu(ExtCodeArea codeArea, FileHandler fileHandler, final JPopupMenu menu, PopupMenuVariant variant, int x, int y) {
+    public void createContextMenu(BinEdEditorComponent editorComponent, @Nullable FileHandler fileHandler, final JPopupMenu menu, PopupMenuVariant variant, int x, int y) {
+        ExtCodeArea codeArea = editorComponent.getCodeArea();
         BasicCodeAreaZone positionZone = codeArea.getPainter().getPositionZone(x, y);
-        BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
         EditorProvider editorProvider = new EditorProviderImpl(fileHandler);
         findReplaceActions.setup(application, editorProvider, resourceBundle);
         findReplaceActions.updateForActiveFile();
@@ -592,7 +618,7 @@ public class BinEdManager {
             final JMenuItem optionsMenuItem = new JMenuItem("Options...");
             optionsMenuItem.setIcon(new ImageIcon(getClass().getResource(
                     "/org/exbin/framework/options/gui/resources/icons/Preferences16.gif")));
-            optionsMenuItem.addActionListener(createOptionsAction(fileHandler));
+            optionsMenuItem.addActionListener(createOptionsAction(editorComponent, fileHandler));
             menu.add(optionsMenuItem);
         }
 
@@ -628,8 +654,8 @@ public class BinEdManager {
     }
 
     @Nonnull
-    private AbstractAction createOptionsAction(FileHandler fileHandler) {
-        return new OptionsAction(fileHandler, preferences);
+    private OptionsAction createOptionsAction(BinEdEditorComponent editorComponent, FileHandler fileHandler) {
+        return new OptionsAction(editorComponent.getComponentPanel(), fileHandler, preferences);
     }
 
     @Nonnull
@@ -819,16 +845,16 @@ public class BinEdManager {
         fileManager.setCommandHandlerProvider(commandHandlerProvider);
     }
 
-    public void registerBinaryStatus(FileHandler fileHandler) {
-        BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
+    public void registerBinaryStatus(BinEdEditorComponent editorComponent, @Nullable BinEdComponentFileApi fileHandler) {
         BinaryStatusPanel statusPanel = editorComponent.getStatusPanel();
-        ExtCodeArea codeArea = ((BinEdComponentFileApi) fileHandler).getCodeArea();
+        ExtCodeArea codeArea = editorComponent.getCodeArea();
         codeArea.addDataChangedListener(() -> {
             //fileHandler.getComponent().notifyDataChanged();
             //            if (editorModificationListener != null) {
             //                editorModificationListener.modified();
             //            }
-            updateCurrentDocumentSize(fileHandler);
+            long documentOriginalSize = fileHandler == null ? 0 : fileHandler.getDocumentOriginalSize();
+            updateCurrentDocumentSize(editorComponent, documentOriginalSize);
         });
 
         codeArea.addSelectionChangedListener(() -> {
@@ -844,44 +870,40 @@ public class BinEdManager {
             statusPanel.setEditMode(mode, operation);
         });
 
-        updateStatus(fileHandler);
+        long documentOriginalSize = fileHandler == null ? 0 : fileHandler.getDocumentOriginalSize();
+        updateStatus(editorComponent, documentOriginalSize);
     }
 
-    public void updateStatus(FileHandler fileHandler) {
-        updateCurrentDocumentSize(fileHandler);
-        updateCurrentCaretPosition(fileHandler);
-        updateCurrentSelectionRange(fileHandler);
-        updateCurrentMemoryMode(fileHandler);
-        updateCurrentEditMode(fileHandler);
+    public void updateStatus(BinEdEditorComponent editorComponent, long documentOriginalSize) {
+        updateCurrentDocumentSize(editorComponent, documentOriginalSize);
+        updateCurrentCaretPosition(editorComponent);
+        updateCurrentSelectionRange(editorComponent);
+        updateCurrentMemoryMode(editorComponent);
+        updateCurrentEditMode(editorComponent);
     }
 
-    private void updateCurrentDocumentSize(FileHandler fileHandler) {
-        BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
+    private void updateCurrentDocumentSize(BinEdEditorComponent editorComponent, long documentOriginalSize) {
         BinaryStatusPanel statusPanel = editorComponent.getStatusPanel();
         ExtCodeArea codeArea = editorComponent.getCodeArea();
-        long documentOriginalSize = ((BinEdComponentFileApi) fileHandler).getDocumentOriginalSize();
         long dataSize = codeArea.getDataSize();
         statusPanel.setCurrentDocumentSize(dataSize, documentOriginalSize);
     }
 
-    private void updateCurrentCaretPosition(FileHandler fileHandler) {
-        BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
+    private void updateCurrentCaretPosition(BinEdEditorComponent editorComponent) {
         BinaryStatusPanel statusPanel = editorComponent.getStatusPanel();
         ExtCodeArea codeArea = editorComponent.getCodeArea();
         CodeAreaCaretPosition caretPosition = codeArea.getCaretPosition();
         statusPanel.setCursorPosition(caretPosition);
     }
 
-    private void updateCurrentSelectionRange(FileHandler fileHandler) {
-        BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
+    private void updateCurrentSelectionRange(BinEdEditorComponent editorComponent) {
         BinaryStatusPanel statusPanel = editorComponent.getStatusPanel();
         ExtCodeArea codeArea = editorComponent.getCodeArea();
         SelectionRange selectionRange = codeArea.getSelection();
         statusPanel.setSelectionRange(selectionRange);
     }
 
-    private void updateCurrentMemoryMode(FileHandler fileHandler) {
-        BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
+    private void updateCurrentMemoryMode(BinEdEditorComponent editorComponent) {
         BinaryStatusPanel statusPanel = editorComponent.getStatusPanel();
         ExtCodeArea codeArea = editorComponent.getCodeArea();
         BinaryStatusApi.MemoryMode newMemoryMode = BinaryStatusApi.MemoryMode.RAM_MEMORY;
@@ -894,8 +916,7 @@ public class BinEdManager {
         statusPanel.setMemoryMode(newMemoryMode);
     }
 
-    private void updateCurrentEditMode(FileHandler fileHandler) {
-        BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
+    private void updateCurrentEditMode(BinEdEditorComponent editorComponent) {
         BinaryStatusPanel statusPanel = editorComponent.getStatusPanel();
         ExtCodeArea codeArea = editorComponent.getCodeArea();
         statusPanel.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());

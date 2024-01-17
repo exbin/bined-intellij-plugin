@@ -64,8 +64,8 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
         this.virtualFile = virtualFile;
         BinEdManager binEdManager = BinEdManager.getInstance();
         componentPanel = new BinEdEditorComponent();
-        binEdManager.initFileHandler(this);
         binEdManager.getFileManager().initComponentPanel(componentPanel.getComponentPanel());
+        binEdManager.initFileHandler(this);
 
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);

@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
@@ -40,6 +41,7 @@ import org.exbin.auxiliary.binary_data.delta.DeltaDocument;
 import org.exbin.auxiliary.binary_data.delta.FileDataSource;
 import org.exbin.auxiliary.binary_data.delta.SegmentsRepository;
 import org.exbin.auxiliary.binary_data.paged.PagedData;
+import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
@@ -89,11 +91,20 @@ public class BinEdFileHandler implements FileHandler, UndoFileHandler, BinEdComp
     }
 
     private void init() {
+        BinEdManager binEdManager = BinEdManager.getInstance();
+        binEdManager.getFileManager().initFileHandler(this);
+        binEdManager.initFileHandler(this);
+
         final ExtCodeArea codeArea = getCodeArea();
         CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(editorComponent.getCodeArea());
         editorComponent.setUndoHandler(undoHandler);
         defaultFont = codeArea.getCodeFont();
         defaultColors = (ExtendedCodeAreaColorProfile) codeArea.getColorsProfile();
+
+        if (undoHandlerWrapper == null) {
+            undoHandlerWrapper = new UndoHandlerWrapper();
+            ((UndoHandlerWrapper) undoHandlerWrapper).setHandler(editorComponent.getUndoHandler().orElse(null));
+        }
     }
 
     public void setApplication(XBApplication application) {
@@ -420,10 +431,6 @@ public class BinEdFileHandler implements FileHandler, UndoFileHandler, BinEdComp
     @Nonnull
     @Override
     public XBUndoHandler getUndoHandler() {
-        if (undoHandlerWrapper == null) {
-            undoHandlerWrapper = new UndoHandlerWrapper();
-            ((UndoHandlerWrapper) undoHandlerWrapper).setHandler(editorComponent.getUndoHandler().orElse(null));
-        }
         return undoHandlerWrapper;
     }
 

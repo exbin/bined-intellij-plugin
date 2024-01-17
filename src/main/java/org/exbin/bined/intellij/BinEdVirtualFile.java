@@ -70,6 +70,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             editorFile = new BinEdFileHandler();
             BinEdManager binEdManager = BinEdManager.getInstance();
             binEdManager.getFileManager().initFileHandler(editorFile);
+            binEdManager.initFileHandler(editorFile);
         }
 
         return editorFile;
@@ -77,7 +78,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     @Nonnull
     public JComponent getEditorComponent() {
-        return getEditorFile().getComponent();
+        return getEditorFile().getEditorComponent().getComponent();
     }
 
     @Nonnull

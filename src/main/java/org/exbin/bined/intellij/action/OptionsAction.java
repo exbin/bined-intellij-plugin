@@ -19,7 +19,6 @@ import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
@@ -32,9 +31,11 @@ import org.exbin.framework.utils.gui.OptionsControlPanel;
 import org.exbin.framework.utils.handler.OptionsControlHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -48,17 +49,19 @@ import java.awt.event.ActionEvent;
 @ParametersAreNonnullByDefault
 public class OptionsAction extends AbstractAction {
 
+    private final BinEdComponentPanel componentPanel;
     private final FileHandler fileHandler;
     private final BinaryEditorPreferences preferences;
 
-    public OptionsAction(FileHandler fileHandler, BinaryEditorPreferences preferences) {
+    public OptionsAction(BinEdComponentPanel componentPanel, @Nullable FileHandler fileHandler, BinaryEditorPreferences preferences) {
+        this.componentPanel = componentPanel;
         this.fileHandler = fileHandler;
         this.preferences = preferences;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ExtCodeArea codeArea = ((BinEdComponentFileApi) fileHandler).getCodeArea();
+        ExtCodeArea codeArea = componentPanel.getCodeArea();
         final BinEdOptionsPanelBorder optionsPanelWrapper = new BinEdOptionsPanelBorder();
         optionsPanelWrapper.setPreferredSize(new Dimension(700, 460));
         BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
@@ -73,7 +76,7 @@ public class OptionsAction extends AbstractAction {
             @Nonnull
             @Override
             public Font getDefaultFont() {
-                return ((TextFontApi) fileHandler).getDefaultFont();
+                return fileHandler == null ? new JTextField().getFont() : ((TextFontApi) fileHandler).getDefaultFont();
             }
 
             @Override
@@ -81,7 +84,6 @@ public class OptionsAction extends AbstractAction {
                 codeArea.setCodeFont(font);
             }
         });
-        BinEdComponentPanel componentPanel = (BinEdComponentPanel) fileHandler.getComponent();
         optionsPanel.loadFromPreferences();
 //        editorComponent.updateApplyOptions(optionsPanel);
         OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
@@ -94,9 +96,15 @@ public class OptionsAction extends AbstractAction {
                     optionsPanel.saveToPreferences();
                 }
                 BinEdManager binedManager = BinEdManager.getInstance();
-                ((BinEdComponentFileApi) fileHandler).getEditorComponent().applyOptions(optionsPanel, binedManager.getEncodingsHandler(), ((TextFontApi) fileHandler).getDefaultFont());
-                if (fileHandler instanceof BinEdFileHandler) {
-                    ((BinEdFileHandler) fileHandler).switchFileHandlingMode(optionsPanel.getEditorOptions().getFileHandlingMode());
+                if (fileHandler != null) {
+                    ((BinEdComponentFileApi) fileHandler).getEditorComponent()
+                            .applyOptions(optionsPanel,
+                                    binedManager.getEncodingsHandler(),
+                                    ((TextFontApi) fileHandler).getDefaultFont());
+                    if (fileHandler instanceof BinEdFileHandler) {
+                        ((BinEdFileHandler) fileHandler).switchFileHandlingMode(optionsPanel.getEditorOptions()
+                                .getFileHandlingMode());
+                    }
                 }
                 codeArea.repaint();
             }

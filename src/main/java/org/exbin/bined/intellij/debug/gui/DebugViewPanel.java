@@ -48,6 +48,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
         BinEdManager binEdManager = BinEdManager.getInstance();
         BinEdFileManager fileManager = binEdManager.getFileManager();
         fileManager.initComponentPanel(binEdEditorComponent.getComponentPanel());
+        binEdManager.initEditorComponent(binEdEditorComponent);
 
         initComponents();
         init();
@@ -58,11 +59,12 @@ public class DebugViewPanel extends javax.swing.JPanel {
         BinEdFileManager fileManager = binEdManager.getFileManager();
         BinEdComponentPanel componentPanel = binEdEditorComponent.getComponentPanel();
         fileManager.initComponentPanel(componentPanel);
+        binEdManager.initEditorComponent(binEdEditorComponent);
 
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         codeArea.setEditMode(EditMode.READ_ONLY);
 
-        this.add(componentPanel, BorderLayout.CENTER);
+        this.add(binEdEditorComponent.getComponent(), BorderLayout.CENTER);
     }
 
     /**

@@ -273,9 +273,9 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
             BinEdManager binEdManager = BinEdManager.getInstance();
             editorComponent = new BinEdEditorComponent();
             BinEdFileManager fileManager = binEdManager.getFileManager();
-            fileManager.initComponentPanel(editorComponent.getComponentPanel());
             BinEdComponentPanel componentPanel = editorComponent.getComponentPanel();
             fileManager.initComponentPanel(componentPanel);
+            binEdManager.initEditorComponent(editorComponent);
             editorComponent.setContentData(binaryData);
             init();
         }

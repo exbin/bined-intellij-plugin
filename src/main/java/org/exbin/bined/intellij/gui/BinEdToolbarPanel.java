@@ -29,6 +29,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
+import org.exbin.bined.intellij.action.OptionsAction;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.utils.LanguageUtils;
@@ -37,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
@@ -56,7 +58,7 @@ public class BinEdToolbarPanel extends JBPanel {
     private static final Key<Boolean> SELECTED_PROPERTY_KEY = Key.create(Toggleable.SELECTED_PROPERTY);
 
     private final Control codeAreaControl;
-    private AnAction optionsAction;
+    private AbstractAction optionsAction;
     private AnAction onlineHelpAction;
     private BinaryDataUndoHandler undoHandler;
 
@@ -70,7 +72,6 @@ public class BinEdToolbarPanel extends JBPanel {
     private final AnAction octalCodeTypeAction;
     private final AnAction decimalCodeTypeAction;
     private final AnAction hexadecimalCodeTypeAction;
-    private boolean modified = false;
 
     public BinEdToolbarPanel(JComponent targetComponent, Control codeAreaControl) {
         this.codeAreaControl = codeAreaControl;
@@ -159,7 +160,7 @@ public class BinEdToolbarPanel extends JBPanel {
         setActionVisible(redoEditButton, true);
     }
 
-    public void setOptionsAction(AnAction optionsAction) {
+    public void setOptionsAction(AbstractAction optionsAction) {
         this.optionsAction = optionsAction;
     }
 
@@ -213,6 +214,10 @@ public class BinEdToolbarPanel extends JBPanel {
     public void updateUndoState() {
         toolbar.getPresentation(undoEditButton).setEnabled(undoHandler != null && undoHandler.canUndo());
         toolbar.getPresentation(redoEditButton).setEnabled(undoHandler != null && undoHandler.canRedo());
+        if (saveAction != null) {
+            boolean modified = undoHandler != null && undoHandler.getCommandPosition() != undoHandler.getSyncPoint();
+            toolbar.getPresentation(saveFileButton).setEnabled(modified);
+        }
     }
 
     public void updateUnprintables() {
@@ -220,15 +225,10 @@ public class BinEdToolbarPanel extends JBPanel {
         setActionSelection(showUnprintablesToggleButton, showUnprintables);
     }
 
-    public void updateModified(boolean modified) {
-        this.modified = modified;
-        toolbar.getPresentation(saveFileButton).setEnabled(modified);
-        updateUndoState();
-    }
-
     public void setSaveAction(ActionListener saveAction) {
         this.saveAction = saveAction;
         setActionVisible(saveFileButton, true);
+        updateUndoState();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -249,6 +249,7 @@ public class BinEdToolbarPanel extends JBPanel {
             public void update(@NotNull AnActionEvent e) {
                 Presentation presentation = e.getPresentation();
                 presentation.setVisible(saveAction != null);
+                boolean modified = undoHandler != null && undoHandler.getCommandPosition() != undoHandler.getSyncPoint();
                 presentation.setEnabled(modified);
             }
         };
@@ -325,7 +326,7 @@ public class BinEdToolbarPanel extends JBPanel {
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                optionsAction.actionPerformed(anActionEvent);
+                optionsAction.actionPerformed(null);
             }
         };
         actionGroup.addAction(settingsAction);

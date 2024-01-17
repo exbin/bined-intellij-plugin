@@ -43,7 +43,6 @@ import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileManager;
-import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 
 import javax.annotation.Nonnull;
@@ -136,7 +135,7 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
     @ParametersAreNonnullByDefault
     private static class DataDialog extends DialogWrapper {
 
-        private final BinEdEditorComponent binEdEditorComponent;
+        private final BinEdEditorComponent editorComponent;
         private final DataGrid grid;
         private final boolean editable;
 
@@ -151,14 +150,15 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
             setOKActionEnabled(editable);
             setCrossClosesWindow(true);
 
-            binEdEditorComponent = new BinEdEditorComponent();
+            editorComponent = new BinEdEditorComponent();
             BinEdManager binEdManager = BinEdManager.getInstance();
             BinEdFileManager fileManager = binEdManager.getFileManager();
-            fileManager.initComponentPanel(binEdEditorComponent.getComponentPanel());
+            fileManager.initComponentPanel(editorComponent.getComponentPanel());
+            binEdManager.initEditorComponent(editorComponent);
 
-            binEdEditorComponent.setContentData(binaryData);
+            editorComponent.setContentData(binaryData);
             if (!editable) {
-                binEdEditorComponent.getCodeArea().setEditMode(EditMode.READ_ONLY);
+                editorComponent.getCodeArea().setEditMode(EditMode.READ_ONLY);
             }
             init();
         }
@@ -170,7 +170,7 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
             try {
                 SelectionModel<GridRow, GridColumn> selectionModel = grid.getSelectionModel();
                 grid.cancelEditing();
-                BinaryData contentData = binEdEditorComponent.getContentData();
+                BinaryData contentData = editorComponent.getContentData();
                 int size = contentData != null ? (int) contentData.getDataSize() : 0;
                 byte[] resultData = new byte[size];
                 if (size > 0) {
@@ -199,7 +199,7 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
         @Nullable
         @Override
         public JComponent getPreferredFocusedComponent() {
-            return binEdEditorComponent.getComponentPanel();
+            return editorComponent.getComponentPanel();
         }
 
         @Nullable
@@ -211,7 +211,7 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
         @Nullable
         @Override
         protected JComponent createCenterPanel() {
-            BorderLayoutPanel panel = JBUI.Panels.simplePanel(binEdEditorComponent.getComponentPanel());
+            BorderLayoutPanel panel = JBUI.Panels.simplePanel(editorComponent.getComponentPanel());
             panel.setPreferredSize(JBUI.size(600, 400));
             return panel;
         }

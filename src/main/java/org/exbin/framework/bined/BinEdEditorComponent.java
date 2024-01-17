@@ -26,8 +26,10 @@ import javax.swing.JComponent;
 
 import com.intellij.ui.components.JBPanel;
 import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.bined.CodeType;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
+import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.main.BinEdApplyOptions;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
@@ -61,6 +63,7 @@ public class BinEdEditorComponent {
 
     private BinEdComponentPanel componentPanel = new BinEdComponentPanel();
     private JBPanel wrapperPanel = new JBPanel(new BorderLayout());
+    private final BinEdToolbarPanel toolbarPanel;
     private final BinaryStatusPanel statusPanel = new BinaryStatusPanel();
 
     public BinEdEditorComponent() {
@@ -68,6 +71,40 @@ public class BinEdEditorComponent {
         defaultLayoutProfile = codeArea.getLayoutProfile();
         defaultThemeProfile = codeArea.getThemeProfile();
         defaultColorProfile = codeArea.getColorsProfile();
+
+        toolbarPanel = new BinEdToolbarPanel(codeArea,
+            new BinEdToolbarPanel.Control() {
+                @Nonnull
+                @Override
+                public CodeType getCodeType() {
+                    return codeArea.getCodeType();
+                }
+
+                @Override
+                public void setCodeType(CodeType codeType) {
+                    codeArea.setCodeType(codeType);
+                }
+
+                @Override
+                public boolean isShowUnprintables() {
+                    return codeArea.isShowUnprintables();
+                }
+
+                @Override
+                public void setShowUnprintables(boolean showUnprintables) {
+                    codeArea.setShowUnprintables(showUnprintables);
+                }
+
+                @Override
+                public void repaint() {
+                    codeArea.repaint();
+                }
+            }
+        );
+        wrapperPanel.add(componentPanel, BorderLayout.CENTER);
+        wrapperPanel.add(toolbarPanel, BorderLayout.NORTH);
+        wrapperPanel.add(statusPanel, BorderLayout.SOUTH);
+        wrapperPanel.revalidate();
     }
 
     public void setApplication(XBApplication application) {
@@ -90,6 +127,11 @@ public class BinEdEditorComponent {
     }
 
     @Nonnull
+    public BinEdToolbarPanel getToolbarPanel() {
+        return toolbarPanel;
+    }
+
+    @Nonnull
     public ExtCodeArea getCodeArea() {
         return componentPanel.getCodeArea();
     }
@@ -101,6 +143,7 @@ public class BinEdEditorComponent {
 
     public void setUndoHandler(BinaryDataUndoHandler undoHandler) {
         componentPanel.setUndoHandler(undoHandler);
+        toolbarPanel.setUndoHandler(undoHandler);
     }
 
     public void onInitFromPreferences(BinaryEditorPreferences preferences) {
