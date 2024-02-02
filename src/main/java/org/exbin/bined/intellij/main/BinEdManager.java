@@ -961,7 +961,7 @@ public class BinEdManager {
 
         private FileHandler fileHandler;
 
-        public EditorProviderImpl(FileHandler fileHandler) {
+        public EditorProviderImpl(@Nullable FileHandler fileHandler) {
             this.fileHandler = fileHandler;
         }
 
@@ -972,7 +972,7 @@ public class BinEdManager {
 
         @Override
         public Optional<FileHandler> getActiveFile() {
-            return Optional.of(fileHandler);
+            return Optional.ofNullable(fileHandler);
         }
 
         @Override
