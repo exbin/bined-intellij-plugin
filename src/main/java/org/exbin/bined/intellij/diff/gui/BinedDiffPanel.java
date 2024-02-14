@@ -20,6 +20,7 @@ import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.contents.FileContent;
 import com.intellij.diff.requests.ContentDiffRequest;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Document;
@@ -68,6 +69,7 @@ import org.exbin.framework.utils.DesktopUtils;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.gui.OptionsControlPanel;
 import org.exbin.framework.utils.handler.OptionsControlHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -162,6 +164,12 @@ public class BinedDiffPanel extends JBPanel {
                     @Override
                     public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
                         createOnlineHelpAction().actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, "COMMAND", 0));
+                    }
+
+                    @Nonnull
+                    @Override
+                    public ActionUpdateThread getActionUpdateThread() {
+                        return ActionUpdateThread.BGT;
                     }
                 }
         );

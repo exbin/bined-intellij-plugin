@@ -95,7 +95,7 @@ public class CompareFilesAction extends AbstractAction {
         final WindowUtils.DialogWrapper dialog = frameModule.createDialog(editorProvider.getEditorComponent(), Dialog.ModalityType.APPLICATION_MODAL, compareFilesPanel, controlPanel);
         frameModule.setDialogTitle(dialog, panelResourceBundle);
         Dimension preferredSize = dialog.getWindow().getPreferredSize();
-        dialog.getWindow().setSize(new Dimension(preferredSize.width, preferredSize.height + 450));
+        dialog.getWindow().setPreferredSize(new Dimension(preferredSize.width, preferredSize.height + 450));
         controlPanel.setHandler(dialog::close);
         Optional<FileHandler> activeFile = editorProvider.getActiveFile();
         if (activeFile.isPresent()) {

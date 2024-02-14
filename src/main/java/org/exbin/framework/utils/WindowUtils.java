@@ -50,33 +50,12 @@ public class WindowUtils {
     private WindowUtils() {
     }
 
-    @Nonnull
-    public static WindowHeaderPanel addHeaderPanel(Window window, Class<?> resourceClass, ResourceBundle resourceBundle) {
-        URL iconUrl = resourceClass.getResource(resourceBundle.getString("header.icon"));
-        Icon headerIcon = iconUrl != null ? new ImageIcon(iconUrl) : null;
-        return addHeaderPanel(window, resourceBundle.getString("header.title"), resourceBundle.getString("header.description"), headerIcon);
+    public static void addHeaderPanel(Window window, Class<?> resourceClass, ResourceBundle resourceBundle) {
+        // ignore for IntelliJ plugin
     }
 
-    @Nonnull
-    public static WindowHeaderPanel addHeaderPanel(Window window, String headerTitle, String headerDescription, @Nullable Icon headerIcon) {
-        WindowHeaderPanel headerPanel = new WindowHeaderPanel();
-        headerPanel.setTitle(headerTitle);
-        headerPanel.setDescription(headerDescription);
-        if (headerIcon != null) {
-            headerPanel.setIcon(headerIcon);
-        }
-        if (window instanceof WindowHeaderPanel.WindowHeaderDecorationProvider) {
-            ((WindowHeaderPanel.WindowHeaderDecorationProvider) window).setHeaderDecoration(headerPanel);
-        } else {
-            Frame frame = UiUtils.getFrame(window);
-            if (frame instanceof WindowHeaderPanel.WindowHeaderDecorationProvider) {
-                ((WindowHeaderPanel.WindowHeaderDecorationProvider) frame).setHeaderDecoration(headerPanel);
-            }
-        }
-        int height = window.getHeight() + headerPanel.getPreferredSize().height;
-        ((JDialog) window).getContentPane().add(headerPanel, java.awt.BorderLayout.PAGE_START);
-        window.setSize(window.getWidth(), height);
-        return headerPanel;
+    public static void addHeaderPanel(Window window, String headerTitle, String headerDescription, @Nullable Icon headerIcon) {
+        // ignore for IntelliJ plugin
     }
 
     public static void invokeWindow(final Window window) {
