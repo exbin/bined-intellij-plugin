@@ -1,6 +1,7 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.13.3"
+//    id("org.jetbrains.kotlin.jvm") version "1.9.0"
+    id("org.jetbrains.intellij") version "1.15.0"
 }
 
 group = "org.exbin.deltahex.intellij"
@@ -19,7 +20,7 @@ intellij {
 
 if (ideLocalPath.isEmpty()) {
     intellij {
-        version.set("2022.2.1")
+        version.set("2023.2.1")
         plugins.set(listOf("java"))
     }
 } else {
@@ -33,12 +34,15 @@ if (ideLocalPath.isEmpty()) {
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
+//    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+//        kotlinOptions.jvmTarget = "17"
+//    }
 
     patchPluginXml {
-        sinceBuild.set("222.1")
+        sinceBuild.set("232.1")
         untilBuild.set("")
     }
 
@@ -52,6 +56,7 @@ tasks {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
 }
+
 
 val binedVersion = "0.2.1"
 val binaryDataVersion = "0.2.1"

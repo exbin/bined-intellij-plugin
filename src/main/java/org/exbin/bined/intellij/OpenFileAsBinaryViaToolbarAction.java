@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -27,6 +28,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -45,6 +47,12 @@ public class OpenFileAsBinaryViaToolbarAction extends AnAction implements DumbAw
         super("Open As Binary");
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible =
                 integrationOptions.isRegisterOpenFileAsBinaryViaToolbar());
+    }
+
+    @Nonnull
+    @Override
+    public ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override

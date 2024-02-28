@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij.debug;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
@@ -42,6 +43,12 @@ public class DebugViewAsBinaryAction extends XFetchValueActionBase implements Du
 
     public DebugViewAsBinaryAction() {
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterDebugViewAsBinary());
+    }
+
+    @Nonnull
+    @Override
+    public ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij.main;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.exbin.auxiliary.binary_data.delta.DeltaDocument;
@@ -333,6 +334,12 @@ public class BinEdManager {
         BinEdToolbarPanel toolbarPanel = editorComponent.getToolbarPanel();
         toolbarPanel.setOptionsAction(createOptionsAction(editorComponent, fileHandler));
         toolbarPanel.setOnlineHelpAction(new AnAction() {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@Nonnull AnActionEvent e) {
                 createOnlineHelpAction().actionPerformed(null);

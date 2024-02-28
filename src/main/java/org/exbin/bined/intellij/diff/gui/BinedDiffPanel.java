@@ -161,15 +161,15 @@ public class BinedDiffPanel extends JBPanel {
         toolbarPanel.setOptionsAction(createOptionsAction());
         toolbarPanel.setOnlineHelpAction(
                 new AnAction() {
-                    @Override
-                    public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
-                        createOnlineHelpAction().actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, "COMMAND", 0));
-                    }
-
                     @Nonnull
                     @Override
                     public ActionUpdateThread getActionUpdateThread() {
                         return ActionUpdateThread.BGT;
+                    }
+
+                    @Override
+                    public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
+                        createOnlineHelpAction().actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, "COMMAND", 0));
                     }
                 }
         );

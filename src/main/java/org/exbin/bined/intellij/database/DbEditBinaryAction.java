@@ -25,6 +25,7 @@ import com.intellij.database.extractors.ExtractorsUtil;
 import com.intellij.database.extractors.TextInfo;
 import com.intellij.database.run.actions.GridAction;
 import com.intellij.database.run.ui.DataAccessType;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -68,6 +69,12 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
     public DbEditBinaryAction() {
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible =
                 integrationOptions.isRegisterEditAsBinaryForDbColumn());
+    }
+
+    @Nonnull
+    @Override
+    public ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     public void actionPerformed(AnActionEvent event) {

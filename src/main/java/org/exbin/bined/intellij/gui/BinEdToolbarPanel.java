@@ -17,6 +17,7 @@ package org.exbin.bined.intellij.gui;
 
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -29,7 +30,6 @@ import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
-import org.exbin.bined.intellij.action.OptionsAction;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.utils.LanguageUtils;
@@ -87,6 +87,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 load("/org/exbin/bined/intellij/resources/icons/codetype-bin.png")
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 codeAreaControl.setCodeType(CodeType.BINARY);
@@ -99,6 +105,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 load("/org/exbin/bined/intellij/resources/icons/codetype-oct.png")
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 codeAreaControl.setCodeType(CodeType.OCTAL);
@@ -110,6 +122,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 load("/org/exbin/bined/intellij/resources/icons/codetype-dec.png")
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 codeAreaControl.setCodeType(CodeType.DECIMAL);
@@ -121,6 +139,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 load("/org/exbin/bined/intellij/resources/icons/codetype-hex.png")
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 codeAreaControl.setCodeType(CodeType.HEXADECIMAL);
@@ -240,6 +264,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/document-save.png"))
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 if (saveAction != null) saveAction.actionPerformed(new ActionEvent(BinEdToolbarPanel.this, 0, ""));
@@ -262,6 +292,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-undo.png"))
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 undoEditButtonActionPerformed();
@@ -282,6 +318,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-redo.png"))
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 redoEditButtonActionPerformed();
@@ -302,6 +344,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png"))
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
                 return codeAreaControl.isShowUnprintables();
@@ -324,6 +372,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/options/gui/resources/icons/Preferences16.gif"))
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 optionsAction.actionPerformed(null);
@@ -336,6 +390,12 @@ public class BinEdToolbarPanel extends JBPanel {
                 null,
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/help.png"))
         ) {
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 onlineHelpAction.actionPerformed(anActionEvent);

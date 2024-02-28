@@ -15,6 +15,7 @@
  */
 package org.exbin.bined.intellij;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileChooser.FileChooser;
@@ -25,6 +26,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.exbin.framework.utils.ActionUtils;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -40,6 +42,12 @@ public class FileMenuOpenAsBinaryAction extends AnAction implements DumbAware {
     public FileMenuOpenAsBinaryAction() {
         super("Open As Binary" + ActionUtils.DIALOG_MENUITEM_EXT);
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterFileMenuOpenAsBinary());
+    }
+
+    @Nonnull
+    @Override
+    public ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override

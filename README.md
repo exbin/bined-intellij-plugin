@@ -41,7 +41,7 @@ IntelliJ Idea platform is necessary to build this plugin. See. https://jetbrains
 
 Use buildPlugin gradle task to build distribution build.
 
-Assign SDK using 2022.2.1 IntelliJ platform / add and use "Other/Plugin" run configuration to execute.
+Assign SDK using 2023.2.1 IntelliJ platform / add and use "Other/Plugin" run configuration to execute.
 
 License
 -------

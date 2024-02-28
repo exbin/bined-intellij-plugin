@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.ide.highlighter.ArchiveFileType;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -50,6 +51,12 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
 
     public OpenAsBinaryAction(@Nullable @NlsActions.ActionText String text) {
         super(text);
+    }
+
+    @Nonnull
+    @Override
+    public ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override
