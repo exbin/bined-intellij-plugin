@@ -57,13 +57,11 @@ tasks {
     }
 }
 
+val binedLibraryVersion = "0.2.1"
+val binaryDataLibraryVersion = "0.2.1"
 
-val binedVersion = "0.2.1"
-val binaryDataVersion = "0.2.1"
-
-fun binedLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binedVersion}" else "org.exbin.bined:${libName}:${binedVersion}"
-
-fun binaryDataLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binaryDataVersion}" else "org.exbin.auxiliary:${libName}:${binaryDataVersion}"
+fun binedLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binedLibraryVersion}" else "org.exbin.bined:${libName}:${binedLibraryVersion}"
+fun binaryDataLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binaryDataLibraryVersion}" else "org.exbin.auxiliary:${libName}:${binaryDataLibraryVersion}"
 
 repositories {
     flatDir {

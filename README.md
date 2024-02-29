@@ -1,5 +1,5 @@
 BinEd - Binary/Hex Editor - Plugin for IntelliJ Platform
-================================================================
+========================================================
 
 Hex viewer/editor plugin module for IntelliJ platform.
 
@@ -35,13 +35,13 @@ Features
 Compiling
 ---------
 
-Java Development Kit (JDK) version 11 or later is required to build this project.
+Java Development Kit (JDK) version 17 or later is required to build this project.
 
 IntelliJ Idea platform is necessary to build this plugin. See. https://jetbrains.org  
 
-Use buildPlugin gradle task to build distribution build.
+Use "buildPlugin" gradle task to build distribution build.
 
-Assign SDK using 2023.2.1 IntelliJ platform / add and use "Other/Plugin" run configuration to execute.
+Use "runIde" gradle task to run.
 
 License
 -------
