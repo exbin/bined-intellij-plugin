@@ -147,6 +147,7 @@ public final class SearchAction implements ActionListener {
                 }
             });
             binarySearchPanel.setBinaryCodePopupMenuHandler(new CodeAreaPopupMenuHandler() {
+                @Nonnull
                 @Override
                 public JPopupMenu createPopupMenu(ExtCodeArea codeArea, String menuPostfix, int x, int y) {
                     return createCodeAreaPopupMenu(codeArea, menuPostfix);

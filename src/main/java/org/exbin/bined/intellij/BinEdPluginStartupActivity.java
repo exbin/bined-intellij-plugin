@@ -29,6 +29,7 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -39,6 +40,8 @@ import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
@@ -56,6 +59,7 @@ import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -74,7 +78,7 @@ import java.util.logging.Logger;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public final class BinEdPluginStartupActivity implements StartupActivity, DumbAware {
+public final class BinEdPluginStartupActivity implements ProjectActivity, StartupActivity, DumbAware {
 
     private static final ExtensionPointName<BinaryViewData> BINED_VIEW_DATA =
             ExtensionPointName.create("org.exbin.deltahex.intellij.viewBinaryData");
@@ -86,6 +90,13 @@ public final class BinEdPluginStartupActivity implements StartupActivity, DumbAw
     private final List<BinaryViewData> initialized = new ArrayList<>();
 
     BinEdPluginStartupActivity() {
+    }
+
+    @Nullable
+    @Override
+    public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
+        runActivity(project);
+        return null;
     }
 
     @Override

@@ -130,7 +130,6 @@ public class BinEdManager {
     private static BinEdManager instance;
 
     private static final String FRAMEWORK_TANGO_ICON_THEME_PREFIX = "/org/exbin/framework/action/resources/icons/tango-icon-theme/16x16/actions/";
-    private static final FileHandlingMode DEFAULT_FILE_HANDLING_MODE = FileHandlingMode.DELTA;
     private static final String ONLINE_HELP_URL = "https://bined.exbin.org/intellij-plugin/?manual";
 
     private final Application application = new Application();
@@ -208,7 +207,6 @@ public class BinEdManager {
         encodingsHandler.init();
     }
 
-    @Nonnull
     public void initFileHandler(FileHandler fileHandler) {
         BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
         initEditorComponent(editorComponent, fileHandler);
@@ -478,7 +476,7 @@ public class BinEdManager {
                 JMenu showMenu = new JMenu("Show");
                 showMenu.add(createShowHeaderMenuItem(codeArea));
                 showMenu.add(createShowRowPositionMenuItem(codeArea));
-                showMenu.add(createShowInspectorPanel(editorComponent.getComponentPanel()));
+                showMenu.add(createShowInspectorPanel(editorProvider, editorComponent.getComponentPanel()));
                 menu.add(showMenu);
                 menu.addSeparator();
             }
@@ -830,12 +828,13 @@ public class BinEdManager {
     }
 
     @Nonnull
-    public JMenuItem createShowInspectorPanel(BinEdComponentPanel binEdComponentPanel) {
+    public JMenuItem createShowInspectorPanel(EditorProvider editorProvider, BinEdComponentPanel binEdComponentPanel) {
         JCheckBoxMenuItem clipboardContentMenuItem = new JCheckBoxMenuItem("Inspector Panel");
-//        clipboardContentMenuItem.setSelected(inspectorSupport.isShowParsingPanel(binEdComponentPanel));
-//        clipboardContentMenuItem.addActionListener(event -> {
-//            inspectorSupport.showParsingPanelAction(binEdComponentPanel).actionPerformed(event);
-//        });
+        BinEdComponentInspector componentExtension = binEdComponentPanel.getComponentExtension(BinEdComponentInspector.class);
+        clipboardContentMenuItem.setSelected(componentExtension.isShowParsingPanel());
+        clipboardContentMenuItem.addActionListener(event -> {
+            componentExtension.setShowParsingPanel(!componentExtension.isShowParsingPanel());;
+        });
         return clipboardContentMenuItem;
     }
 

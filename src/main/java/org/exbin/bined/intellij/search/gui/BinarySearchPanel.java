@@ -40,6 +40,7 @@ import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.*;
 import java.awt.*;
@@ -184,6 +185,7 @@ public class BinarySearchPanel extends JBPanel {
                 }
             }
 
+            @Nonnull
             @Override
             public Object getItem() {
                 return findComboBoxEditorComponent.getItem();
