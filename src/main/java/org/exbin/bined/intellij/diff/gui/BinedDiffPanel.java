@@ -38,11 +38,11 @@ import org.exbin.bined.intellij.main.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
-import org.exbin.bined.intellij.search.action.SearchAction;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.options.IntegrationOptions;
+import org.exbin.bined.intellij.search.action.FindReplaceActions;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
 import org.exbin.bined.swing.capability.FontCapable;
@@ -69,7 +69,6 @@ import org.exbin.framework.utils.DesktopUtils;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.gui.OptionsControlPanel;
 import org.exbin.framework.utils.handler.OptionsControlHandler;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -221,7 +220,7 @@ public class BinedDiffPanel extends JBPanel {
             leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
-                    JPopupMenu popupMenu = SearchAction.createCodeAreaPopupMenu(leftCodeArea, "left");
+                    JPopupMenu popupMenu = FindReplaceActions.createCodeAreaPopupMenu(leftCodeArea, "left");
                     popupMenu.show(invoker, x, y);
                 }
             });
@@ -233,7 +232,7 @@ public class BinedDiffPanel extends JBPanel {
             rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
-                    JPopupMenu popupMenu = SearchAction.createCodeAreaPopupMenu(rightCodeArea, "right");
+                    JPopupMenu popupMenu = FindReplaceActions.createCodeAreaPopupMenu(rightCodeArea, "right");
                     popupMenu.show(invoker, x, y);
                 }
             });

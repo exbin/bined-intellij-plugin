@@ -30,6 +30,8 @@ import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
 import org.exbin.bined.intellij.action.OptionsAction;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.options.IntegrationOptions;
+import org.exbin.bined.intellij.search.BinEdComponentSearch;
+import org.exbin.bined.intellij.search.action.FindReplaceActions;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.about.gui.AboutPanel;
 import org.exbin.framework.bined.BinEdEditorComponent;
@@ -67,8 +69,6 @@ import org.exbin.framework.bined.options.CodeAreaThemeOptions;
 import org.exbin.framework.bined.options.EditorOptions;
 import org.exbin.framework.bined.options.StatusOptions;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
-import org.exbin.framework.bined.search.BinEdComponentSearch;
-import org.exbin.framework.bined.search.action.FindReplaceActions;
 import org.exbin.framework.bined.tool.content.action.ClipboardContentAction;
 import org.exbin.framework.bined.tool.content.action.DragDropContentAction;
 import org.exbin.framework.editor.api.EditorProvider;
@@ -140,6 +140,7 @@ public class BinEdManager {
     private BookmarksManager bookmarksManager;
     private MacroManager macroManager;
     private EncodingsHandler encodingsHandler = new EncodingsHandler();
+    private final EditorProviderImpl editorProvider = new EditorProviderImpl();
 
     private final List<InsertDataMethod> insertDataComponents = new ArrayList<>();
     private final List<ConvertDataMethod> convertDataComponents = new ArrayList<>();
@@ -150,12 +151,14 @@ public class BinEdManager {
         fileManager.setApplication(application);
         bookmarksManager = new BookmarksManager();
         bookmarksManager.setApplication(application);
+        bookmarksManager.setEditorProvider(editorProvider);
         ((ManageBookmarksAction) bookmarksManager.getManageBookmarksAction()).setBookmarksManager(bookmarksManager);
         macroManager = new MacroManager();
         macroManager.setApplication(application);
+        macroManager.setEditorProvider(editorProvider);
         ((ManageMacrosAction) macroManager.getManageMacrosAction()).setMacroManager(macroManager);
         findReplaceActions = new FindReplaceActions();
-        findReplaceActions.setup(application, null, resourceBundle);
+        findReplaceActions.setup(application, editorProvider, resourceBundle);
         encodingsHandler.setApplication(application);
 
         SimpleFillDataMethod simpleFillDataMethod = new SimpleFillDataMethod();
@@ -182,12 +185,10 @@ public class BinEdManager {
             }
         });
 
-        fileManager.addActionStatusUpdateListener((codeArea) -> {
-            findReplaceActions.updateForActiveFile();
-        });
+        fileManager.addActionStatusUpdateListener(codeArea -> findReplaceActions.updateForActiveFile());
         fileManager.addBinEdComponentExtension((BinEdComponentPanel component) -> Optional.of(new BinEdComponentSearch()));
 
-        fileManager.setCommandHandlerProvider((codeArea, undoHandler) -> new CodeAreaMacroCommandHandler(codeArea, undoHandler));
+        fileManager.setCommandHandlerProvider(CodeAreaMacroCommandHandler::new);
         findReplaceActions.addFindAgainListener();
     }
 
@@ -208,6 +209,7 @@ public class BinEdManager {
     }
 
     public void initFileHandler(FileHandler fileHandler) {
+        editorProvider.setFileHandler(fileHandler);
         BinEdEditorComponent editorComponent = ((BinEdComponentFileApi) fileHandler).getEditorComponent();
         initEditorComponent(editorComponent, fileHandler);
     }
@@ -243,6 +245,10 @@ public class BinEdManager {
                     switch (keyCode) {
                     case KeyEvent.VK_F: {
                         findReplaceActions.getEditFindAction().actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
+                        break;
+                    }
+                    case KeyEvent.VK_H: {
+                        findReplaceActions.getEditReplaceAction().actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
                         break;
                     }
                     case KeyEvent.VK_G: {
@@ -459,11 +465,8 @@ public class BinEdManager {
     public void createContextMenu(BinEdEditorComponent editorComponent, @Nullable FileHandler fileHandler, final JPopupMenu menu, PopupMenuVariant variant, int x, int y) {
         ExtCodeArea codeArea = editorComponent.getCodeArea();
         BasicCodeAreaZone positionZone = codeArea.getPainter().getPositionZone(x, y);
-        EditorProvider editorProvider = new EditorProviderImpl(fileHandler);
-        findReplaceActions.setup(application, editorProvider, resourceBundle);
+        editorProvider.setFileHandler(fileHandler);
         findReplaceActions.updateForActiveFile();
-        bookmarksManager.setEditorProvider(editorProvider);
-        macroManager.setEditorProvider(editorProvider);
 
         if (variant == PopupMenuVariant.EDITOR) {
             switch (positionZone) {
@@ -476,7 +479,7 @@ public class BinEdManager {
                 JMenu showMenu = new JMenu("Show");
                 showMenu.add(createShowHeaderMenuItem(codeArea));
                 showMenu.add(createShowRowPositionMenuItem(codeArea));
-                showMenu.add(createShowInspectorPanel(editorProvider, editorComponent.getComponentPanel()));
+                showMenu.add(createShowInspectorPanel(editorComponent.getComponentPanel()));
                 menu.add(showMenu);
                 menu.addSeparator();
             }
@@ -606,14 +609,14 @@ public class BinEdManager {
         menu.addSeparator();
 
         JMenu toolsMenu = new JMenu("Tools");
-        toolsMenu.add(ActionUtils.actionToMenuItem(createCompareFilesAction(codeArea, editorProvider)));
-        toolsMenu.add(ActionUtils.actionToMenuItem(createClipboardContentAction(editorProvider)));
-        toolsMenu.add(ActionUtils.actionToMenuItem(createDragDropContentAction(editorProvider)));
+        toolsMenu.add(ActionUtils.actionToMenuItem(createCompareFilesAction(codeArea)));
+        toolsMenu.add(ActionUtils.actionToMenuItem(createClipboardContentAction()));
+        toolsMenu.add(ActionUtils.actionToMenuItem(createDragDropContentAction()));
         menu.add(toolsMenu);
 
         if (editorComponent != null) {
             if (fileHandler instanceof BinEdFileHandler || fileHandler instanceof BinEdNativeFile) {
-                JMenuItem reloadFileMenuItem = createReloadFileMenuItem(fileHandler, editorProvider);
+                JMenuItem reloadFileMenuItem = createReloadFileMenuItem(fileHandler);
                 menu.add(reloadFileMenuItem);
             }
         }
@@ -707,7 +710,7 @@ public class BinEdManager {
     }
 
     @Nonnull
-    private CompareFilesAction createCompareFilesAction(ExtCodeArea codeArea, EditorProvider editorProvider) {
+    private CompareFilesAction createCompareFilesAction(ExtCodeArea codeArea) {
         CompareFilesAction compareFilesAction = new CompareFilesAction();
         compareFilesAction.setup(application, editorProvider, resourceBundle);
         compareFilesAction.setCodeArea(codeArea);
@@ -715,7 +718,7 @@ public class BinEdManager {
     }
 
     @Nonnull
-    private JMenuItem createReloadFileMenuItem(FileHandler fileHandler, EditorProvider editorProvider) {
+    private JMenuItem createReloadFileMenuItem(FileHandler fileHandler) {
         final JMenuItem reloadFileMenuItem = new JMenuItem("Reload File");
         reloadFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionUtils.getMetaMask() + KeyEvent.ALT_DOWN_MASK));
         // TODO Replace with ReloadFileAction
@@ -814,21 +817,21 @@ public class BinEdManager {
     }
 
     @Nonnull
-    public ClipboardContentAction createClipboardContentAction(EditorProvider editorProvider) {
+    public ClipboardContentAction createClipboardContentAction() {
         ClipboardContentAction clipboardContentAction = new ClipboardContentAction();
         clipboardContentAction.setup(application, resourceBundle);
         return clipboardContentAction;
     }
 
     @Nonnull
-    public DragDropContentAction createDragDropContentAction(EditorProvider editorProvider) {
+    public DragDropContentAction createDragDropContentAction() {
         DragDropContentAction dragDropContentAction = new DragDropContentAction();
         dragDropContentAction.setup(application, resourceBundle);
         return dragDropContentAction;
     }
 
     @Nonnull
-    public JMenuItem createShowInspectorPanel(EditorProvider editorProvider, BinEdComponentPanel binEdComponentPanel) {
+    public JMenuItem createShowInspectorPanel(BinEdComponentPanel binEdComponentPanel) {
         JCheckBoxMenuItem clipboardContentMenuItem = new JCheckBoxMenuItem("Inspector Panel");
         BinEdComponentInspector componentExtension = binEdComponentPanel.getComponentExtension(BinEdComponentInspector.class);
         clipboardContentMenuItem.setSelected(componentExtension.isShowParsingPanel());
@@ -965,9 +968,12 @@ public class BinEdManager {
     @ParametersAreNonnullByDefault
     private static class EditorProviderImpl implements EditorProvider {
 
-        private FileHandler fileHandler;
+        private FileHandler fileHandler = null;
 
-        public EditorProviderImpl(@Nullable FileHandler fileHandler) {
+        public EditorProviderImpl() {
+        }
+
+        public void setFileHandler(@Nullable FileHandler fileHandler) {
             this.fileHandler = fileHandler;
         }
 

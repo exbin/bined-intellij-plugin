@@ -26,7 +26,6 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.progress.ProcessCanceledException;
-import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -78,7 +77,7 @@ import java.util.logging.Logger;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public final class BinEdPluginStartupActivity implements ProjectActivity, StartupActivity, DumbAware {
+public final class BinEdPluginStartupActivity implements ProjectActivity, StartupActivity, StartupActivity.DumbAware {
 
     private static final ExtensionPointName<BinaryViewData> BINED_VIEW_DATA =
             ExtensionPointName.create("org.exbin.deltahex.intellij.viewBinaryData");

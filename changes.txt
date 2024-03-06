@@ -1,6 +1,7 @@
 0.2.10
 - Added support for basic macro
-- Updates for IDE API changes
+- Updates for IntelliJ API changes
+- 
 
 0.2.9 (2023-11-24)
 - Added convert data action
