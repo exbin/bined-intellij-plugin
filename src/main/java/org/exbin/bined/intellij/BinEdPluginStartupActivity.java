@@ -54,10 +54,10 @@ import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
-import org.exbin.framework.bined.FileHandlingMode;
-import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
+import org.exbin.framework.options.model.LanguageRecord;
+import org.exbin.framework.utils.LanguageUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -67,6 +67,7 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -210,6 +211,28 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
     }
 
     public static void applyIntegrationOptions(IntegrationOptions integrationOptions) {
+        Locale languageLocale = integrationOptions.getLanguageLocale();
+        if (languageLocale.equals(Locale.ROOT)) {
+            // Try to match to IDE locale
+            Locale ideLocale = com.intellij.DynamicBundle.getLocale();
+            List<Locale> locales = new ArrayList<>();
+            for (LanguageRecord languageRecord : LanguageUtils.getLanguageRecords()) {
+                locales.add(languageRecord.getLocale());
+            }
+            List<Locale.LanguageRange> localeRange = new ArrayList<>();
+            String languageTag = ideLocale.toLanguageTag();
+            if ("zh-CN".equals(languageTag)) {
+                // TODO detect match to zh_Hans somehow
+                languageTag = "zh";
+            }
+            localeRange.add(new Locale.LanguageRange(languageTag));
+            List<Locale> match = Locale.filter(localeRange, locales);
+            if (!match.isEmpty()) {
+                LanguageUtils.setLanguageLocale(match.get(0));
+            }
+        } else {
+            LanguageUtils.setLanguageLocale(languageLocale);
+        }
         for (IntegrationOptionsListener listener : INTEGRATION_OPTIONS_LISTENERS) {
             listener.integrationInit(integrationOptions);
         }

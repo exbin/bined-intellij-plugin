@@ -15,15 +15,22 @@
  */
 package org.exbin.framework.utils;
 
+import org.exbin.framework.api.LanguageProvider;
+import org.exbin.framework.options.model.LanguageRecord;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.ImageIcon;
 
 /**
  * Static utility methods for central language support.
@@ -34,22 +41,33 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class LanguageUtils {
 
     private static ClassLoader languageClassLoader = null;
+    private static Locale languageLocale = null;
+    private static final List<LanguageRecord> languageRecords = new ArrayList<>();
 
     private LanguageUtils() {
     }
 
-    @Nullable
-    public static ClassLoader getLanguageClassLoader() {
-        return languageClassLoader;
+    @Nonnull
+    public Optional<ClassLoader> getLanguageClassLoader() {
+        return Optional.ofNullable(languageClassLoader);
     }
 
-    public static void setLanguageClassLoader(ClassLoader languageClassLoader) {
-        LanguageUtils.languageClassLoader = languageClassLoader;
+    public void setLanguageClassLoader(@Nullable ClassLoader languageClassLoader) {
+        this.languageClassLoader = languageClassLoader;
+    }
+
+    @Nonnull
+    public static Optional<Locale> getLanguageLocale() {
+        return Optional.ofNullable(languageLocale);
+    }
+
+    public static void setLanguageLocale(@Nullable Locale languageLocale) {
+        LanguageUtils.languageLocale = languageLocale;
     }
 
     /**
      * Returns class name path.
-     *
+     * <br>
      * Result is canonical name with dots replaced with slashes.
      *
      * @param targetClass target class
@@ -70,7 +88,7 @@ public class LanguageUtils {
     @Nonnull
     public static ResourceBundle getResourceBundleByClass(Class<?> targetClass) {
         if (languageClassLoader == null) {
-            return ResourceBundle.getBundle(getResourceBaseNameBundleByClass(targetClass));
+            return ResourceBundle.getBundle(getResourceBaseNameBundleByClass(targetClass), getLanguageBundleLocale());
         } else {
             return new LanguageResourceBundle(getResourceBaseNameBundleByClass(targetClass));
         }
@@ -90,6 +108,26 @@ public class LanguageUtils {
         return classNamePath.substring(0, classNamePos + 1) + "resources" + classNamePath.substring(classNamePos);
     }
 
+    public static void registerLanguageRecord(LanguageRecord languageRecord) {
+        languageRecords.add(languageRecord);
+    }
+
+    @Nonnull
+    public static List<LanguageRecord> getLanguageRecords() {
+        if (languageRecords.isEmpty()) {
+            languageRecords.add(new LanguageRecord(new Locale("ja", "JP"), new ImageIcon(LanguageUtils.class.getResource("/images/flags/jp.png"))));
+            languageRecords.add(new LanguageRecord(Locale.forLanguageTag("zh-Hans"), new ImageIcon(LanguageUtils.class.getResource("/images/flags/cn.png"))));
+            languageRecords.add(new LanguageRecord(new Locale("ko", "KR"), new ImageIcon(LanguageUtils.class.getResource("/images/flags/kr.png"))));
+        }
+
+        return languageRecords;
+    }
+
+    @Nonnull
+    public static Locale getLanguageBundleLocale() {
+        return languageLocale == null ? Locale.getDefault() : languageLocale;
+    }
+
     /**
      * Resource bundle which looks for language resources first and main
      * resources as fallback.
@@ -101,8 +139,8 @@ public class LanguageUtils {
         private final ResourceBundle languageResourceBundle;
 
         public LanguageResourceBundle(String baseName) {
-            mainResourceBundle = ResourceBundle.getBundle(baseName);
-            languageResourceBundle = ResourceBundle.getBundle(baseName, Locale.getDefault(), languageClassLoader);
+            mainResourceBundle = ResourceBundle.getBundle(baseName, Locale.ROOT);
+            languageResourceBundle = ResourceBundle.getBundle(baseName, getLanguageBundleLocale(), languageClassLoader);
         }
 
         @Nullable

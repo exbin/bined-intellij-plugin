@@ -61,6 +61,7 @@ import org.exbin.framework.editor.text.options.gui.TextFontOptionsPanel;
 import org.exbin.framework.editor.text.options.impl.TextEncodingOptionsImpl;
 import org.exbin.framework.editor.text.options.impl.TextFontOptionsImpl;
 import org.exbin.framework.editor.text.service.TextFontService;
+import org.exbin.framework.options.model.LanguageRecord;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.WindowUtils.DialogWrapper;
@@ -72,6 +73,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -82,6 +84,7 @@ import java.awt.Dialog;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Binary editor options panel.
@@ -126,6 +129,12 @@ public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyO
     public BinEdOptionsPanel() {
         initComponents();
 
+        integrationOptionsPanel.setDefaultLocaleName("<" + resourceBundle.getString("locale.defaultLanguage") + ">");
+        List<LanguageRecord> languageLocales = new ArrayList<>();
+        languageLocales.add(new LanguageRecord(Locale.ROOT, null));
+        languageLocales.add(new LanguageRecord(new Locale("en", "US"), new ImageIcon(getClass().getResource(resourceBundle.getString("locale.englishFlag")))));
+        languageLocales.addAll(LanguageUtils.getLanguageRecords());
+        integrationOptionsPanel.setLanguageLocales(languageLocales);
         List<String> fileHandlingModes = new ArrayList<>();
         fileHandlingModes.add(resourceBundle.getString("fileHandlingMode.memory"));
         fileHandlingModes.add(resourceBundle.getString("fileHandlingMode.delta"));

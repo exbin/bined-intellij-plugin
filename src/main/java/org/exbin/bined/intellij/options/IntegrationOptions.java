@@ -15,7 +15,9 @@
  */
 package org.exbin.bined.intellij.options;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Locale;
 
 /**
  * Binary editor preferences.
@@ -24,6 +26,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 public interface IntegrationOptions {
+
+    @Nonnull
+    Locale getLanguageLocale();
+
+    void setLanguageLocale(Locale languageLocale);
 
     boolean isRegisterFileMenuOpenAsBinary();
 

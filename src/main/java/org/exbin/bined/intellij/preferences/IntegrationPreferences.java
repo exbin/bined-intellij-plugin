@@ -16,8 +16,12 @@
 package org.exbin.bined.intellij.preferences;
 
 import org.exbin.framework.api.Preferences;
+
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.intellij.options.IntegrationOptions;
+
+import java.util.Locale;
 
 /**
  * Integration preferences.
@@ -27,6 +31,10 @@ import org.exbin.bined.intellij.options.IntegrationOptions;
 @ParametersAreNonnullByDefault
 public class IntegrationPreferences implements IntegrationOptions {
 
+    public static final String PREFERENCES_LOCALE_LANGUAGE = "locale.language";
+    public static final String PREFERENCES_LOCALE_COUNTRY = "locale.country";
+    public static final String PREFERENCES_LOCALE_VARIANT = "locale.variant";
+    public static final String PREFERENCES_LOCALE_TAG = "locale.tag";
     public static final String PREFERENCES_REGISTER_FILE_MENU_OPEN_AS_BINARY = "registerFileMenuOpenAsBinary";
     public static final String PREFERENCES_REGISTER_OPEN_FILE_AS_BINARY_VIA_TOOLBAR = "registerOpenFileAsBinaryViaToolbar";
     public static final String PREFERENCES_REGISTER_CONTEXT_OPEN_AS_BINARY = "registerContextOpenAsBinary";
@@ -40,6 +48,74 @@ public class IntegrationPreferences implements IntegrationOptions {
 
     public IntegrationPreferences(Preferences preferences) {
         this.preferences = preferences;
+    }
+
+    @Nonnull
+    public String getLocaleLanguage() {
+        return preferences.get(PREFERENCES_LOCALE_LANGUAGE, "");
+    }
+
+    @Nonnull
+    public String getLocaleCountry() {
+        return preferences.get(PREFERENCES_LOCALE_COUNTRY, "");
+    }
+
+    @Nonnull
+    public String getLocaleVariant() {
+        return preferences.get(PREFERENCES_LOCALE_VARIANT, "");
+    }
+
+    @Nonnull
+    public String getLocaleTag() {
+        return preferences.get(PREFERENCES_LOCALE_TAG, "");
+    }
+
+    @Nonnull
+    @Override
+    public Locale getLanguageLocale() {
+        String localeTag = getLocaleTag();
+        if (!localeTag.trim().isEmpty()) {
+            try {
+                return Locale.forLanguageTag(localeTag);
+            } catch (SecurityException ex) {
+                // Ignore it in java webstart
+            }
+        }
+
+        String localeLanguage = getLocaleLanguage();
+        String localeCountry = getLocaleCountry();
+        String localeVariant = getLocaleVariant();
+        try {
+            return new Locale(localeLanguage, localeCountry, localeVariant);
+        } catch (SecurityException ex) {
+            // Ignore it in java webstart
+        }
+
+        return Locale.ROOT;
+    }
+
+    public void setLocaleLanguage(String language) {
+        preferences.put(PREFERENCES_LOCALE_LANGUAGE, language);
+    }
+
+    public void setLocaleCountry(String country) {
+        preferences.put(PREFERENCES_LOCALE_COUNTRY, country);
+    }
+
+    public void setLocaleVariant(String variant) {
+        preferences.put(PREFERENCES_LOCALE_VARIANT, variant);
+    }
+
+    public void setLocaleTag(String variant) {
+        preferences.put(PREFERENCES_LOCALE_TAG, variant);
+    }
+
+    @Override
+    public void setLanguageLocale(Locale locale) {
+        setLocaleTag(locale.toLanguageTag());
+        setLocaleLanguage(locale.getLanguage());
+        setLocaleCountry(locale.getCountry());
+        setLocaleVariant(locale.getVariant());
     }
 
     @Override

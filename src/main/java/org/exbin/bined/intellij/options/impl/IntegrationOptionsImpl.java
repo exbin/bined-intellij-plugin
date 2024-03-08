@@ -15,10 +15,13 @@
  */
 package org.exbin.bined.intellij.options.impl;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.framework.options.api.OptionsData;
+
+import java.util.Locale;
 
 /**
  * Binary integration preferences.
@@ -28,6 +31,7 @@ import org.exbin.framework.options.api.OptionsData;
 @ParametersAreNonnullByDefault
 public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
 
+    private Locale languageLocale;
     private boolean registerFileMenuOpenAsBinary = false;
     private boolean registerOpenFileAsBinaryViaToolbar = true;
     private boolean registerContextOpenAsBinary = false;
@@ -36,6 +40,17 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
     private boolean registerByteToByteDiffTool = true;
 
     private boolean registerEditAsBinaryForDbColumn = true;
+
+    @Nonnull
+    @Override
+    public Locale getLanguageLocale() {
+        return languageLocale;
+    }
+
+    @Override
+    public void setLanguageLocale(Locale languageLocale) {
+        this.languageLocale = languageLocale;
+    }
 
     @Override
     public boolean isRegisterFileMenuOpenAsBinary() {
@@ -100,6 +115,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
     }
 
     public void loadFromPreferences(IntegrationPreferences preferences) {
+        languageLocale = preferences.getLanguageLocale();
         registerFileMenuOpenAsBinary = preferences.isRegisterFileMenuOpenAsBinary();
         registerOpenFileAsBinaryViaToolbar = preferences.isRegisterOpenFileAsBinaryViaToolbar();
         registerContextOpenAsBinary = preferences.isRegisterContextOpenAsBinary();
@@ -110,6 +126,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
     }
 
     public void saveToPreferences(IntegrationPreferences preferences) {
+        preferences.setLanguageLocale(languageLocale);
         preferences.setRegisterFileMenuOpenAsBinary(registerFileMenuOpenAsBinary);
         preferences.setRegisterOpenFileAsBinaryViaToolbar(registerOpenFileAsBinaryViaToolbar);
         preferences.setRegisterContextOpenAsBinary(registerContextOpenAsBinary);
@@ -120,6 +137,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
     }
 
     public void setOptions(IntegrationOptionsImpl options) {
+        languageLocale = options.getLanguageLocale();
         registerFileMenuOpenAsBinary = options.isRegisterFileMenuOpenAsBinary();
         registerOpenFileAsBinaryViaToolbar = options.isRegisterOpenFileAsBinaryViaToolbar();
         registerContextOpenAsBinary = options.isRegisterContextOpenAsBinary();

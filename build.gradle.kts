@@ -31,6 +31,14 @@ if (ideLocalPath.isEmpty()) {
     }
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDirs("${rootDir}/src/main/languages")
+        }
+    }
+}
+
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
