@@ -79,6 +79,7 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 //        });
         defaultFont = codeArea.getCodeFont();
         documentOriginalSize = virtualFile.getLength();
+        binEdManager.getFileManager().initCommandHandler(componentPanel.getComponentPanel());
     }
 
     public boolean isModified() {

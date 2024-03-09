@@ -53,7 +53,12 @@ import java.awt.event.ActionListener;
 @ParametersAreNonnullByDefault
 public class BinEdToolbarPanel extends JBPanel {
 
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinEdToolbarPanel.class);
+    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedModule");
+    private final java.util.ResourceBundle fileResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/file/resources/FileModule");
+    private final java.util.ResourceBundle optionsResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/options/resources/OptionsModule");
+    private final java.util.ResourceBundle onlineHelpResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/help/online/action/resources/OnlineHelpAction");
+    private final java.util.ResourceBundle operationUndoResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/operation/undo/resources/OperationUndoModule");
+
     private static final String TOOLBAR_PLACE = "BinEdPluginMainToolbar";
     private static final Key<Boolean> SELECTED_PROPERTY_KEY = Key.create(Toggleable.SELECTED_PROPERTY);
 
@@ -83,8 +88,8 @@ public class BinEdToolbarPanel extends JBPanel {
         add(toolbar, BorderLayout.CENTER);
 
         binaryCodeTypeAction = new AnAction(
-                "Binary",
-                null,
+                resourceBundle.getString("binaryCodeTypeAction.text"),
+                resourceBundle.getString("binaryCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-bin.png")
         ) {
             @Nonnull
@@ -101,8 +106,8 @@ public class BinEdToolbarPanel extends JBPanel {
         };
 
         octalCodeTypeAction = new AnAction(
-                "Octal",
-                null,
+                resourceBundle.getString("octalCodeTypeAction.text"),
+                resourceBundle.getString("octalCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-oct.png")
         ) {
             @Nonnull
@@ -118,8 +123,8 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
         decimalCodeTypeAction = new AnAction(
-                "Decimal",
-                null,
+                resourceBundle.getString("decimalCodeTypeAction.text"),
+                resourceBundle.getString("decimalCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-dec.png")
         ) {
             @Nonnull
@@ -135,8 +140,8 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
         hexadecimalCodeTypeAction = new AnAction(
-                "Hexadecimal",
-                null,
+                resourceBundle.getString("hexadecimalCodeTypeAction.text"),
+                resourceBundle.getString("hexadecimalCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-hex.png")
         ) {
             @Nonnull
@@ -152,7 +157,7 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
 
-        cycleActionGroup = new ActionGroup("Cycle thru code types", false) {
+        cycleActionGroup = new ActionGroup(resourceBundle.getString("cycleCodeTypesAction.shortDescription"), false) {
             @NotNull
             @Override
             public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
@@ -260,8 +265,8 @@ public class BinEdToolbarPanel extends JBPanel {
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         saveFileButton = new AnAction(
-                "Save current file",
-                null,
+                fileResourceBundle.getString("saveFileAction.text"),
+                fileResourceBundle.getString("saveFileAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/document-save.png"))
         ) {
             @Nonnull
@@ -288,8 +293,8 @@ public class BinEdToolbarPanel extends JBPanel {
         actionGroup.addSeparator();
 
         undoEditButton = new AnAction(
-                "Undo last operation",
-                null,
+                operationUndoResourceBundle.getString("editUndoAction.text"),
+                operationUndoResourceBundle.getString("editUndoAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-undo.png"))
         ) {
             @Nonnull
@@ -314,8 +319,8 @@ public class BinEdToolbarPanel extends JBPanel {
         setActionVisible(undoEditButton, false);
 
         redoEditButton = new AnAction(
-                "Redo last undid operation",
-                null,
+                operationUndoResourceBundle.getString("editRedoAction.text"),
+                operationUndoResourceBundle.getString("editRedoAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-redo.png"))
         ) {
             @Nonnull
@@ -340,8 +345,8 @@ public class BinEdToolbarPanel extends JBPanel {
         setActionVisible(redoEditButton, false);
 
         showUnprintablesToggleButton = new ToggleAction(
-                resourceBundle.getString("showUnprintablesToggleButton.toolTipText"),
-                null,
+                resourceBundle.getString("viewUnprintablesAction.text"),
+                resourceBundle.getString("viewUnprintablesAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png"))
         ) {
             @Nonnull
@@ -368,8 +373,8 @@ public class BinEdToolbarPanel extends JBPanel {
 
         actionGroup.addSeparator();
         AnAction settingsAction = new AnAction(
-                "Options",
-                null,
+                optionsResourceBundle.getString("optionsAction.text"),
+                optionsResourceBundle.getString("optionsAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/options/gui/resources/icons/Preferences16.gif"))
         ) {
             @Nonnull
@@ -386,8 +391,8 @@ public class BinEdToolbarPanel extends JBPanel {
         actionGroup.addAction(settingsAction);
 
         AnAction onlineHelpToolbarAction = new AnAction(
-                "Online Help",
-                null,
+                onlineHelpResourceBundle.getString("onlineHelpAction.text"),
+                onlineHelpResourceBundle.getString("onlineHelpAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/help.png"))
         ) {
             @Nonnull

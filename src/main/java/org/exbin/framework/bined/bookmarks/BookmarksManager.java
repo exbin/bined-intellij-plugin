@@ -252,6 +252,11 @@ public class BookmarksManager {
         return bookmarksMenu;
     }
 
+    public void resetBookmarksMenu() {
+        // Temporary workaround for language resetting
+        bookmarksMenu = null;
+    }
+
     public void registerBookmarksPopupMenuActions() {
 /*        ActionModuleApi actionModule = application.getModuleRepository().getModuleByInterface(ActionModuleApi.class);
         Action bookmarksPopupMenuAction = new AbstractAction(resourceBundle.getString("bookmarksMenu.text")) {

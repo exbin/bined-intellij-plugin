@@ -15,6 +15,38 @@
  */
 package org.exbin.framework.bined.macro;
 
+import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.api.Preferences;
+import org.exbin.framework.api.XBApplication;
+import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.BinedModule;
+import org.exbin.framework.bined.gui.BinEdComponentPanel;
+import org.exbin.framework.bined.macro.action.AddMacroAction;
+import org.exbin.framework.bined.macro.action.EditMacroAction;
+import org.exbin.framework.bined.macro.action.ExecuteLastMacroAction;
+import org.exbin.framework.bined.macro.action.ManageMacrosAction;
+import org.exbin.framework.bined.macro.action.StartMacroRecordingAction;
+import org.exbin.framework.bined.macro.action.StopMacroRecordingAction;
+import org.exbin.framework.bined.macro.gui.MacrosManagerPanel;
+import org.exbin.framework.bined.macro.model.MacroRecord;
+import org.exbin.framework.bined.macro.operation.CodeAreaMacroCommandHandler;
+import org.exbin.framework.bined.macro.operation.MacroOperation;
+import org.exbin.framework.bined.macro.operation.MacroStep;
+import org.exbin.framework.bined.macro.preferences.MacroPreferences;
+import org.exbin.framework.bined.search.BinEdComponentSearch;
+import org.exbin.framework.editor.api.EditorProvider;
+import org.exbin.framework.file.api.FileHandler;
+import org.exbin.framework.utils.ActionUtils;
+import org.exbin.framework.utils.LanguageUtils;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JMenu;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
@@ -24,43 +56,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.api.Preferences;
-import org.exbin.framework.api.XBApplication;
-import org.exbin.framework.bined.BinEdFileHandler;
-import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.gui.BinEdComponentPanel;
-import org.exbin.framework.bined.macro.action.AddMacroAction;
-import org.exbin.framework.bined.macro.action.EditMacroAction;
-import org.exbin.framework.bined.macro.action.ManageMacrosAction;
-import org.exbin.framework.bined.macro.action.ExecuteLastMacroAction;
-import org.exbin.framework.bined.macro.action.StartMacroRecordingAction;
-import org.exbin.framework.bined.macro.action.StopMacroRecordingAction;
-import org.exbin.framework.bined.macro.gui.MacrosManagerPanel;
-import org.exbin.framework.bined.macro.model.MacroRecord;
-import org.exbin.framework.bined.macro.operation.CodeAreaMacroCommandHandler;
-import org.exbin.framework.bined.macro.operation.MacroOperation;
-import org.exbin.framework.bined.macro.operation.MacroStep;
-import static org.exbin.framework.bined.macro.operation.MacroStep.FIND_TEXT;
-import org.exbin.framework.bined.macro.preferences.MacroPreferences;
-import org.exbin.framework.bined.search.BinEdComponentSearch;
-import org.exbin.framework.editor.api.EditorProvider;
-import org.exbin.framework.file.api.FileHandler;
-import org.exbin.framework.utils.ActionUtils;
-import org.exbin.framework.utils.LanguageUtils;
 
 /**
  * Macros manager.
@@ -251,6 +246,11 @@ public class MacroManager {
             updateMacrosMenu();
         }
         return macrosMenu;
+    }
+
+    public void resetMacrosMenu() {
+        // Temporary workaround for language resetting
+        macrosMenu = null;
     }
 
     public void registerMacrosPopupMenuActions() {

@@ -100,6 +100,7 @@ public class BinEdFileHandler implements FileHandler, UndoFileHandler, BinEdComp
         editorComponent.setUndoHandler(undoHandler);
         defaultFont = codeArea.getCodeFont();
         defaultColors = (ExtendedCodeAreaColorProfile) codeArea.getColorsProfile();
+        binEdManager.getFileManager().initCommandHandler(editorComponent.getComponentPanel());
 
         if (undoHandlerWrapper == null) {
             undoHandlerWrapper = new UndoHandlerWrapper();

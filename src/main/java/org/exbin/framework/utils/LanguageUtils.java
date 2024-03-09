@@ -15,6 +15,7 @@
  */
 package org.exbin.framework.utils;
 
+import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.framework.api.LanguageProvider;
 import org.exbin.framework.options.model.LanguageRecord;
 
@@ -63,6 +64,7 @@ public class LanguageUtils {
 
     public static void setLanguageLocale(@Nullable Locale languageLocale) {
         LanguageUtils.languageLocale = languageLocale;
+        BinEdManager.getInstance().languageChanged();
     }
 
     /**

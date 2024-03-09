@@ -94,6 +94,13 @@ public class FindReplaceActions implements FileDependentAction {
         }
     }
 
+    public void resetActions() {
+        // Temporary workaround for language resetting
+        editFindAction = null;
+        editFindAgainAction = null;
+        editReplaceAction = null;
+    }
+
     @Nonnull
     public Action getEditFindAction() {
         if (editFindAction == null) {

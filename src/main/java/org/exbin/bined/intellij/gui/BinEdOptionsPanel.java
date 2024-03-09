@@ -231,7 +231,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyO
             addEncodingPanel.setUsedEncodings(usedEncodings);
             DefaultControlPanel encodingsControlPanel = new DefaultControlPanel(addEncodingPanel.getResourceBundle());
             JPanel dialogPanel = WindowUtils.createDialogPanel(addEncodingPanel, encodingsControlPanel);
-            final DialogWrapper addEncodingDialog = WindowUtils.createDialog(dialogPanel, this, "Add Encodings", Dialog.ModalityType.APPLICATION_MODAL);
+            final DialogWrapper addEncodingDialog = WindowUtils.createDialog(dialogPanel, this, addEncodingPanel.getResourceBundle().getString("dialog.title"), Dialog.ModalityType.APPLICATION_MODAL);
             encodingsControlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
                 if (actionType == DefaultControlHandler.ControlActionType.OK) {
                     result.addAll(addEncodingPanel.getEncodings());
@@ -251,7 +251,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyO
                 fontPanel.setStoredFont(currentFont);
                 DefaultControlPanel controlPanel = new DefaultControlPanel();
                 JPanel dialogPanel = WindowUtils.createDialogPanel(fontPanel, controlPanel);
-                final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, BinEdOptionsPanel.this, "Select Font", java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+                final DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, BinEdOptionsPanel.this, fontPanel.getResourceBundle().getString("dialog.title"), java.awt.Dialog.ModalityType.APPLICATION_MODAL);
                 controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
                     if (actionType != DefaultControlHandler.ControlActionType.CANCEL) {
                         result.font = fontPanel.getStoredFont();
