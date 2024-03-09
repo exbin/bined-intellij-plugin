@@ -195,7 +195,7 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
             }
         });
 
-        languageLabel.setText(resourceBundle.getString("languageLabel.text") + " *"); // NOI18N
+        languageLabel.setText(resourceBundle.getString("languageLabel.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

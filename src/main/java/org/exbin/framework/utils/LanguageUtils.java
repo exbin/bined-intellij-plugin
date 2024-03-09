@@ -95,6 +95,22 @@ public class LanguageUtils {
     }
 
     /**
+     * Returns resource bundle for properties file with path derived from bundle
+     * name.
+     *
+     * @param bundleName bundle name
+     * @return resource bundle
+     */
+    @Nonnull
+    public static ResourceBundle getResourceBundleByBundleName(String bundleName) {
+        if (languageClassLoader == null) {
+            return ResourceBundle.getBundle(bundleName, getLanguageBundleLocale());
+        } else {
+            return new LanguageResourceBundle(bundleName);
+        }
+    }
+
+    /**
      * Returns resource bundle base name for properties file with path derived
      * from class name.
      *

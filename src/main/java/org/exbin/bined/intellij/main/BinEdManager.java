@@ -125,7 +125,11 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 public class BinEdManager {
 
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinEdManager.class);
+    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedModule");
+    private final java.util.ResourceBundle operationResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/operation/resources/BinedOperationModule");
+    private final java.util.ResourceBundle searchResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/search/resources/BinedSearchModule");
+    private final java.util.ResourceBundle compareResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/compare/resources/BinedCompareModule");
+    private final java.util.ResourceBundle toolContentResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/tool/content/resources/BinedToolContentModule");
 
     private static BinEdManager instance;
 
@@ -158,7 +162,7 @@ public class BinEdManager {
         macroManager.setEditorProvider(editorProvider);
         ((ManageMacrosAction) macroManager.getManageMacrosAction()).setMacroManager(macroManager);
         findReplaceActions = new FindReplaceActions();
-        findReplaceActions.setup(application, editorProvider, resourceBundle);
+        findReplaceActions.setup(application, editorProvider, searchResourceBundle);
         encodingsHandler.setApplication(application);
 
         SimpleFillDataMethod simpleFillDataMethod = new SimpleFillDataMethod();
@@ -263,7 +267,7 @@ public class BinEdManager {
                     case KeyEvent.VK_I: {
                         if (codeArea.isEditable()) {
                             InsertDataAction insertDataAction = new InsertDataAction();
-                            insertDataAction.setup(application, resourceBundle);
+                            insertDataAction.setup(application, operationResourceBundle);
                             insertDataAction.updateForActiveCodeArea(codeArea);
                             insertDataAction.setInsertDataComponents(insertDataComponents);
                             insertDataAction.actionPerformed(new ActionEvent(keyEvent.getSource(),
@@ -275,7 +279,7 @@ public class BinEdManager {
                     case KeyEvent.VK_M: {
                         if (codeArea.isEditable()) {
                             ConvertDataAction convertDataAction = new ConvertDataAction();
-                            convertDataAction.setup(application, resourceBundle);
+                            convertDataAction.setup(application, operationResourceBundle);
                             convertDataAction.updateForActiveCodeArea(codeArea);
                             convertDataAction.setConvertDataComponents(convertDataComponents);
                             convertDataAction.actionPerformed(new ActionEvent(keyEvent.getSource(),
@@ -694,7 +698,7 @@ public class BinEdManager {
     @Nonnull
     private InsertDataAction createInsertDataAction(BinEdEditorComponent editorComponent) {
         InsertDataAction insertDataAction = new InsertDataAction();
-        insertDataAction.setup(application, resourceBundle);
+        insertDataAction.setup(application, operationResourceBundle);
         insertDataAction.updateForActiveCodeArea(editorComponent.getCodeArea());
         insertDataAction.setInsertDataComponents(insertDataComponents);
         return insertDataAction;
@@ -703,7 +707,7 @@ public class BinEdManager {
     @Nonnull
     private ConvertDataAction createConvertDataAction(BinEdEditorComponent editorComponent) {
         ConvertDataAction convertDataAction = new ConvertDataAction();
-        convertDataAction.setup(application, resourceBundle);
+        convertDataAction.setup(application, operationResourceBundle);
         convertDataAction.updateForActiveCodeArea(editorComponent.getCodeArea());
         convertDataAction.setConvertDataComponents(convertDataComponents);
         return convertDataAction;
@@ -712,7 +716,7 @@ public class BinEdManager {
     @Nonnull
     private CompareFilesAction createCompareFilesAction(ExtCodeArea codeArea) {
         CompareFilesAction compareFilesAction = new CompareFilesAction();
-        compareFilesAction.setup(application, editorProvider, resourceBundle);
+        compareFilesAction.setup(application, editorProvider, compareResourceBundle);
         compareFilesAction.setCodeArea(codeArea);
         return compareFilesAction;
     }
@@ -819,14 +823,14 @@ public class BinEdManager {
     @Nonnull
     public ClipboardContentAction createClipboardContentAction() {
         ClipboardContentAction clipboardContentAction = new ClipboardContentAction();
-        clipboardContentAction.setup(application, resourceBundle);
+        clipboardContentAction.setup(application, toolContentResourceBundle);
         return clipboardContentAction;
     }
 
     @Nonnull
     public DragDropContentAction createDragDropContentAction() {
         DragDropContentAction dragDropContentAction = new DragDropContentAction();
-        dragDropContentAction.setup(application, resourceBundle);
+        dragDropContentAction.setup(application, toolContentResourceBundle);
         return dragDropContentAction;
     }
 
