@@ -96,7 +96,7 @@ public class BinEdOptionsPanel extends javax.swing.JPanel implements BinEdApplyO
 
     private BinaryEditorPreferences preferences;
 //    private final org.exbin.bined.intellij.panel.BinEdOptionsPanelController controller;
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinEdOptionsPanel.class);
+    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/options/resources/MainOptionsManager");
     private final java.util.ResourceBundle managerResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedOptionsManager");
 
     private DefaultListModel<CategoryItem> categoryModel = new DefaultListModel<>();

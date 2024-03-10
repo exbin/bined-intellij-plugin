@@ -40,6 +40,8 @@ public interface IntegrationOptions {
 
     boolean isRegisterContextOpenInBinaryEditor();
 
+    boolean isRegisterNativeBinaryFile();
+
     boolean isRegisterDebugViewAsBinary();
 
     boolean isRegisterByteToByteDiffTool();

@@ -16,7 +16,7 @@
 <p>Binary/hex editor plugin based on BinEd library.</p>
 <ul><li>Use "Open as Binary" action in toolbar of "File/Open" dialog or "Open In/Binary Editor" in project files context menu</li>
 <li>Use "View as Binary" action in context menu in variables/debug window</li>
-<li>Associate file extension with Binary File file type in Options/Editor/File Types</li>
+<li>Associate file extension with "Binary File" file type in Options/Editor/File Types</li>
 <li>Use "Byte-to-byte compare" in Compare files dialog</li>
 <li>Use "Edit as Binary" in column context menu in DB view</li></ul>
 

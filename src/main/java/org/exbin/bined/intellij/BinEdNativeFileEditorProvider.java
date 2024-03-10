@@ -37,6 +37,14 @@ public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAw
 
     public static final String NATIVE_BINED_EDITOR_TYPE_ID = "org.exbin.bined.native";
 
+    private boolean active = true;
+
+    public BinEdNativeFileEditorProvider() {
+        BinEdPluginStartupActivity.addIntegrationOptionsListener(
+                integrationOptions -> active = integrationOptions.isRegisterNativeBinaryFile()
+        );
+    }
+
     @Override
     public void disposeEditor(FileEditor editor) {
         if (editor instanceof BinEdNativeFileEditor) {
@@ -46,7 +54,7 @@ public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAw
 
     @Override
     public boolean accept(Project project, VirtualFile file) {
-        return file.getFileType() == BinaryFileType.INSTANCE && !(file instanceof BinEdVirtualFile);
+        return active && file.getFileType() == BinaryFileType.INSTANCE && !(file instanceof BinEdVirtualFile);
     }
 
     @Nonnull
@@ -67,7 +75,7 @@ public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAw
     @Nonnull
     @Override
     public FileEditorPolicy getPolicy() {
-        return FileEditorPolicy.HIDE_DEFAULT_EDITOR;
+        return active ? FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR : FileEditorPolicy.NONE;
     }
 
     @Nonnull

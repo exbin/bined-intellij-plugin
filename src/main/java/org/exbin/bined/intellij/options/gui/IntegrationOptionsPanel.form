@@ -32,6 +32,7 @@
                       <Component id="languageLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
+                  <Component id="nativeBinaryFileCheckBox" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -55,6 +56,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="openAsBinaryInDebugViewCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="nativeBinaryFileCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="byteToByteDiffToolCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="editAsBinaryForDbColumnCheckBox" min="-2" max="-2" attributes="0"/>
@@ -64,6 +67,22 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
+    <Component class="javax.swing.JComboBox" name="languageComboBox">
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="languageComboBoxItemStateChanged"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;();"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;LanguageRecord&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="languageLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/exbin/bined/intellij/options/gui/resources/IntegrationOptionsPanel.properties" key="languageLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;) + &quot; *&quot;"/>
+        </Property>
+      </Properties>
+    </Component>
     <Component class="javax.swing.JCheckBox" name="openFileAsBinaryCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
@@ -117,6 +136,17 @@
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="openAsBinaryInDebugViewCheckBoxStateChanged"/>
       </Events>
     </Component>
+    <Component class="javax.swing.JCheckBox" name="nativeBinaryFileCheckBox">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/exbin/bined/intellij/options/gui/resources/IntegrationOptionsPanel.properties" key="nativeBinaryFileCheckBox.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="nativeBinaryFileCheckBoxStateChanged"/>
+      </Events>
+    </Component>
     <Component class="javax.swing.JCheckBox" name="byteToByteDiffToolCheckBox">
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
@@ -138,22 +168,6 @@
       <Events>
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="editAsBinaryForDbColumnCheckBoxStateChanged"/>
       </Events>
-    </Component>
-    <Component class="javax.swing.JComboBox" name="languageComboBox">
-      <Events>
-        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="languageComboBoxItemStateChanged"/>
-      </Events>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;();"/>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;LanguageRecord&gt;"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.swing.JLabel" name="languageLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/exbin/bined/intellij/options/gui/resources/IntegrationOptionsPanel.properties" key="IntegrationOptionsPanel.languageLabel.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;) + &quot; *&quot;"/>
-        </Property>
-      </Properties>
     </Component>
   </SubComponents>
 </Form>

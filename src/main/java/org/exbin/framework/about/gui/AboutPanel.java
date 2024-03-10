@@ -403,7 +403,7 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
     }
 
     public void setupFields() {
-        appBundle = ResourceBundle.getBundle("org.exbin.bined.intellij.resources.Bundle");
+        appBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/bined/intellij/resources/Bundle");
 
         // Load license
         try {

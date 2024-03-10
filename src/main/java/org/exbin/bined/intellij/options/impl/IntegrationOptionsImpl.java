@@ -15,12 +15,12 @@
  */
 package org.exbin.bined.intellij.options.impl;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.framework.options.api.OptionsData;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Locale;
 
 /**
@@ -36,6 +36,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
     private boolean registerOpenFileAsBinaryViaToolbar = true;
     private boolean registerContextOpenAsBinary = false;
     private boolean registerContextOpenInBinaryEditor = true;
+    private boolean registerNativeBinaryFile = true;
     private boolean registerDebugViewAsBinary = true;
     private boolean registerByteToByteDiffTool = true;
 
@@ -89,6 +90,15 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
     }
 
     @Override
+    public boolean isRegisterNativeBinaryFile() {
+        return registerNativeBinaryFile;
+    }
+
+    public void setRegisterNativeBinaryFile(boolean registerNativeBinaryFile) {
+        this.registerNativeBinaryFile = registerNativeBinaryFile;
+    }
+
+    @Override
     public boolean isRegisterDebugViewAsBinary() {
         return registerDebugViewAsBinary;
     }
@@ -120,6 +130,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
         registerOpenFileAsBinaryViaToolbar = preferences.isRegisterOpenFileAsBinaryViaToolbar();
         registerContextOpenAsBinary = preferences.isRegisterContextOpenAsBinary();
         registerContextOpenInBinaryEditor = preferences.isRegisterContextOpenInBinaryEditor();
+        registerNativeBinaryFile = preferences.isRegisterNativeBinaryFile();
         registerDebugViewAsBinary = preferences.isRegisterDebugViewAsBinary();
         registerByteToByteDiffTool = preferences.isRegisterByteToByteDiffTool();
         registerEditAsBinaryForDbColumn = preferences.isRegisterEditAsBinaryForDbColumn();
@@ -131,6 +142,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
         preferences.setRegisterOpenFileAsBinaryViaToolbar(registerOpenFileAsBinaryViaToolbar);
         preferences.setRegisterContextOpenAsBinary(registerContextOpenAsBinary);
         preferences.setRegisterContextOpenInBinaryEditor(registerContextOpenInBinaryEditor);
+        preferences.setRegisterNativeBinaryFile(registerNativeBinaryFile);
         preferences.setRegisterDebugViewAsBinary(registerDebugViewAsBinary);
         preferences.setRegisterByteToByteDiffTool(registerByteToByteDiffTool);
         preferences.setRegisterEditAsBinaryForDbColumn(registerEditAsBinaryForDbColumn);
@@ -142,6 +154,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
         registerOpenFileAsBinaryViaToolbar = options.isRegisterOpenFileAsBinaryViaToolbar();
         registerContextOpenAsBinary = options.isRegisterContextOpenAsBinary();
         registerContextOpenInBinaryEditor = options.isRegisterContextOpenInBinaryEditor();
+        registerNativeBinaryFile = options.isRegisterNativeBinaryFile();
         registerDebugViewAsBinary = options.isRegisterDebugViewAsBinary();
         registerByteToByteDiffTool = options.isRegisterByteToByteDiffTool();
         registerEditAsBinaryForDbColumn = options.isRegisterEditAsBinaryForDbColumn();

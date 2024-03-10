@@ -39,6 +39,7 @@ public class IntegrationPreferences implements IntegrationOptions {
     public static final String PREFERENCES_REGISTER_OPEN_FILE_AS_BINARY_VIA_TOOLBAR = "registerOpenFileAsBinaryViaToolbar";
     public static final String PREFERENCES_REGISTER_CONTEXT_OPEN_AS_BINARY = "registerContextOpenAsBinary";
     public static final String PREFERENCES_REGISTER_CONTEXT_OPEN_IN_BINARY_EDITOR = "registerContextOpenInBinaryEditor";
+    public static final String PREFERENCES_REGISTER_NATIVE_BINARY_FILE = "registerNativeBinaryFile";
     public static final String PREFERENCES_REGISTER_DEBUG_VIEW_AS_BINARY = "registerDebugVariablesAsBinary";
     public static final String PREFERENCES_REGISTER_BYTE_TO_BYTE_DIFF_TOOL = "registerByteToByteDiffTool";
 
@@ -152,6 +153,15 @@ public class IntegrationPreferences implements IntegrationOptions {
 
     public void setRegisterContextOpenInBinaryEditor(boolean registerContextOpenInBinaryEditor) {
         preferences.putBoolean(PREFERENCES_REGISTER_CONTEXT_OPEN_IN_BINARY_EDITOR, registerContextOpenInBinaryEditor);
+    }
+
+    @Override
+    public boolean isRegisterNativeBinaryFile() {
+        return preferences.getBoolean(PREFERENCES_REGISTER_NATIVE_BINARY_FILE, true);
+    }
+
+    public void setRegisterNativeBinaryFile(boolean registerNativeBinaryFile) {
+        preferences.putBoolean(PREFERENCES_REGISTER_NATIVE_BINARY_FILE, registerNativeBinaryFile);
     }
 
     @Override
