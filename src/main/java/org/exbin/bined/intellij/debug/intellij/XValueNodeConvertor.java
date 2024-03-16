@@ -278,7 +278,13 @@ public class XValueNodeConvertor {
                     } catch (Exception ex) {
                     }
                 }
-            }
+            } /* else if (container instanceof CidrLocalValue) {
+                Long address = ((CidrLocalValue) container).getVar().getAddress();
+                if (address != null) {
+                    // CidrMemoryDoc<?> cidrMemoryDoc =
+                }
+                //((CidrLocalValue) container).getVarData()
+            } */
 //        LLValueData varData = cidrValue.getVarData();
 
 //            byte[] data = cidrValue.getPreparedVarData().splitNumberAndData().second.getBytes(StandardCharsets.UTF_8);

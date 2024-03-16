@@ -68,7 +68,7 @@ public class DebugViewAsBinaryAction extends XFetchValueActionBase implements Du
                 if (dialog == null) {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         dialog = new DebugViewDataDialog(project, text, node);
-                        dialog.setTitle("View as Binary");
+                        dialog.setTitle(dialog.getResourceBundle().getString("dialog.title"));
                         dialog.setText(text);
                         dialog.show();
                     });

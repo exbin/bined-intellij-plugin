@@ -22,6 +22,7 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.debug.intellij.XValueNodeConvertor;
+import org.exbin.framework.utils.LanguageUtils;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -29,6 +30,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * Debugger value dual page data source.
@@ -39,6 +41,7 @@ import java.util.List;
 public class DebugViewDataDialog extends DialogWrapper {
 
     private final Project project;
+    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(DebugViewDataDialog.class);
 
     private final DebugViewPanel viewPanel;
     private final XValueNodeImpl myDataNode;
@@ -49,8 +52,8 @@ public class DebugViewDataDialog extends DialogWrapper {
         this.project = project;
         myDataNode = dataNode;
         setModal(false);
-        setCancelButtonText("Close");
-        setOKButtonText("Set");
+        setCancelButtonText(resourceBundle.getString("cancelButton.text"));
+        setOKButtonText(resourceBundle.getString("setButton.text"));
         getOKAction().setEnabled(false);
         setCrossClosesWindow(true);
 
@@ -62,6 +65,11 @@ public class DebugViewDataDialog extends DialogWrapper {
         }
 
         init();
+    }
+
+    @Nonnull
+    public ResourceBundle getResourceBundle() {
+        return resourceBundle;
     }
 
     public void setText(String text) {
