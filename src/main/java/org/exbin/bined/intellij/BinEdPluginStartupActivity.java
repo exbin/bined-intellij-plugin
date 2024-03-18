@@ -19,6 +19,7 @@ import com.intellij.diff.impl.DiffSettingsHolder;
 import com.intellij.diff.tools.fragmented.UnifiedDiffTool;
 import com.intellij.diff.tools.simple.SimpleDiffTool;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.ExtensionPointAdapter;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.extensions.PluginDescriptor;
@@ -54,6 +55,7 @@ import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
 import org.exbin.framework.options.model.LanguageRecord;
@@ -142,18 +144,32 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         MessageBus messageBus = project.getMessageBus();
         MessageBusConnection connect = messageBus.connect();
         connect.subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, new FileEditorManagerListener.Before() {
+
+            private boolean passNext = false;
+
             @Override
             public void beforeFileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile file) {
+                if (passNext) {
+                    passNext = false;
+                    return;
+                }
+
                 if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isMoved()
                         && !((BinEdVirtualFile) file).isClosing()) {
                     ((BinEdVirtualFile) file).setClosing(true);
                     BinEdFileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
-                    BinEdManager binedManager = BinEdManager.getInstance();
-                    if (!binedManager.releaseFile(fileHandler)) {
-                        ((BinEdVirtualFile) file).setClosing(false);
+                    if (fileHandler.isModified() && ((BinEdComponentFileApi) fileHandler).isSaveSupported()) {
+                        ApplicationManager.getApplication().invokeLater(() -> {
+                            BinEdManager binedManager = BinEdManager.getInstance();
+                            boolean released = binedManager.releaseFile(fileHandler);
+                            ((BinEdVirtualFile) file).setClosing(false);
+                            if (released) {
+                                passNext = true;
+                                FileEditorManager.getInstance(project).closeFile(file);
+                            }
+                        });
                         throw new ProcessCanceledException();
                     }
-                    ((BinEdVirtualFile) file).setClosing(false);
                 }
             }
         });

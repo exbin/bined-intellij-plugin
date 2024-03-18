@@ -260,6 +260,12 @@ public class BinEdToolbarPanel extends JBPanel {
         updateUndoState();
     }
 
+    public void saveFile() {
+        if (saveAction != null) {
+            saveAction.actionPerformed(new ActionEvent(BinEdToolbarPanel.this, 0, ""));
+        }
+    }
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));

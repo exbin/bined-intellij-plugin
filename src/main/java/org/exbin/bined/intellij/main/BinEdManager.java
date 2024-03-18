@@ -18,6 +18,8 @@ package org.exbin.bined.intellij.main;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
 import org.exbin.auxiliary.binary_data.delta.DeltaDocument;
 import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.EditMode;
@@ -292,6 +294,11 @@ public class BinEdManager {
                 if (keyEvent.getModifiersEx() == ActionUtils.getMetaMask()) {
                     int keyCode = keyEvent.getKeyCode();
                     switch (keyCode) {
+                    case KeyEvent.VK_S: {
+                        BinEdToolbarPanel toolbarPanel = editorComponent.getToolbarPanel();
+                        toolbarPanel.saveFile();
+                        break;
+                    }
                     case KeyEvent.VK_F: {
                         findReplaceActions.getEditFindAction().actionPerformed(new ActionEvent(keyEvent.getSource(), keyEvent.getID(), ""));
                         break;
@@ -1003,23 +1010,30 @@ public class BinEdManager {
 
     public boolean releaseFile(FileHandler fileHandler) {
         while (fileHandler.isModified() && ((BinEdComponentFileApi) fileHandler).isSaveSupported()) {
-            Object[] options = {
-                    "Save",
-                    "Discard",
-                    "Cancel"
-            };
-            int result = JOptionPane.showOptionDialog(fileHandler.getComponent(),
-                    "Document was modified! Do you wish to save it?",
-                    "Save File?",
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[0]);
-            if (result == JOptionPane.NO_OPTION) {
+//            Object[] options = {
+//                    "Save",
+//                    "Discard",
+//                    "Cancel"
+//            };
+            int result = Messages.showYesNoCancelDialog("Document was modified! Do you wish to save it?", "Save File?", "Save", "Discard", "Cancel", Messages.getQuestionIcon());
+            if (result == Messages.NO) {
                 return true;
             }
-            if (result == JOptionPane.CANCEL_OPTION || result == JOptionPane.CLOSED_OPTION) {
+            if (result == Messages.CANCEL) {
                 return false;
             }
+//            int result = JOptionPane.showOptionDialog(fileHandler.getComponent(),
+//                    "Document was modified! Do you wish to save it?",
+//                    "Save File?",
+//                    JOptionPane.YES_NO_CANCEL_OPTION,
+//                    JOptionPane.QUESTION_MESSAGE,
+//                    null, options, options[0]);
+//            if (result == JOptionPane.NO_OPTION) {
+//                return true;
+//            }
+//            if (result == JOptionPane.CANCEL_OPTION || result == JOptionPane.CLOSED_OPTION) {
+//                return false;
+//            }
 
             fileHandler.saveFile();
         }

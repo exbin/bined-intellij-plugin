@@ -314,6 +314,7 @@ public class BinEdFileHandler implements FileHandler, UndoFileHandler, BinEdComp
                 Logger.getLogger(BinEdFileHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        fileSync();
     }
 
     public void reloadFile() {
