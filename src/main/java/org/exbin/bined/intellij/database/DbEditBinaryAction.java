@@ -32,26 +32,19 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.ByteArrayData;
 import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
-import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
-import org.exbin.bined.intellij.main.BinEdManager;
-import org.exbin.framework.bined.BinEdEditorComponent;
-import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.bined.intellij.objectdata.gui.DataDialog;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.Action;
-import javax.swing.JComponent;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -115,9 +108,31 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
             if (binaryData != null) {
                 Project project = grid.getProject();
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    DataDialog dialog = new DataDialog(project, grid, binaryData);
+                    DataDialog.SetDataListener setDataListener = new DataDialog.SetDataListener() {
+                        @Override
+                        public void setData(@Nullable BinaryData contentData) {
+                            try {
+                                SelectionModel<GridRow, GridColumn> selectionModel = grid.getSelectionModel();
+                                grid.cancelEditing();
+                                int size = contentData != null ? (int) contentData.getDataSize() : 0;
+                                byte[] resultData = new byte[size];
+                                if (size > 0) {
+                                    contentData.copyToArray(0, resultData, 0, size);
+                                }
+                                grid.setCells(
+                                        selectionModel.getSelectedRows(),
+                                        selectionModel.getSelectedColumns(),
+                                        resultData
+                                );
+                            } catch (Exception ex) {
+                                Logger.getLogger(DbEditBinaryAction.class.getName()).log(Level.SEVERE, "Unable to set value", ex);
+                            }
+                        }
+                    };
+                    DataDialog dialog = new DataDialog(project, setDataListener, binaryData);
                     boolean editable = binaryData instanceof EditableBinaryData;
-                    dialog.setTitle(editable ? "Edit Binary Data" : "View Binary Data");
+                    ResourceBundle resourceBundle = dialog.getResourceBundle();
+                    dialog.setTitle(editable ? resourceBundle.getString("dialog.title.edit") : resourceBundle.getString("dialog.title"));
                     dialog.show();
                 });
             }
@@ -136,91 +151,6 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
                 enabled = selectionModel.getSelectedColumnCount() == 1 && selectionModel.getSelectedRowCount() == 1;
             }
             presentation.setEnabled(enabled);
-        }
-    }
-
-    @ParametersAreNonnullByDefault
-    private static class DataDialog extends DialogWrapper {
-
-        private final BinEdEditorComponent editorComponent;
-        private final DataGrid grid;
-        private final boolean editable;
-
-        private DataDialog(Project project, DataGrid grid, @Nullable BinaryData binaryData) {
-            super(project, false);
-            this.grid = grid;
-            editable = binaryData instanceof EditableBinaryData;
-
-            setModal(false);
-            setCancelButtonText("Close");
-            setOKButtonText("Set");
-            setOKActionEnabled(editable);
-            setCrossClosesWindow(true);
-
-            editorComponent = new BinEdEditorComponent();
-            BinEdManager binEdManager = BinEdManager.getInstance();
-            BinEdFileManager fileManager = binEdManager.getFileManager();
-            fileManager.initComponentPanel(editorComponent.getComponentPanel());
-            binEdManager.initEditorComponent(editorComponent);
-
-            editorComponent.setContentData(binaryData);
-            if (!editable) {
-                editorComponent.getCodeArea().setEditMode(EditMode.READ_ONLY);
-            }
-            init();
-        }
-
-        @Override
-        protected void doOKAction() {
-            super.doOKAction();
-
-            try {
-                SelectionModel<GridRow, GridColumn> selectionModel = grid.getSelectionModel();
-                grid.cancelEditing();
-                BinaryData contentData = editorComponent.getContentData();
-                int size = contentData != null ? (int) contentData.getDataSize() : 0;
-                byte[] resultData = new byte[size];
-                if (size > 0) {
-                    contentData.copyToArray(0, resultData, 0, size);
-                }
-                grid.setCells(
-                        selectionModel.getSelectedRows(),
-                        selectionModel.getSelectedColumns(),
-                        resultData
-                );
-            } catch (Exception ex) {
-                Logger.getLogger(DbEditBinaryAction.class.getName()).log(Level.SEVERE, "Unable to set value", ex);
-            }
-        }
-
-        @Nonnull
-        @Override
-        protected Action[] createActions() {
-            if (editable) {
-                return new Action[] { getOKAction(), getCancelAction() };
-            }
-
-            return new Action[] { getCancelAction() };
-        }
-
-        @Nullable
-        @Override
-        public JComponent getPreferredFocusedComponent() {
-            return editorComponent.getComponentPanel();
-        }
-
-        @Nullable
-        @Override
-        protected String getDimensionServiceKey() {
-            return "#org.exbin.bined.intellij.database.ViewBinaryAction";
-        }
-
-        @Nullable
-        @Override
-        protected JComponent createCenterPanel() {
-            BorderLayoutPanel panel = JBUI.Panels.simplePanel(editorComponent.getComponentPanel());
-            panel.setPreferredSize(JBUI.size(600, 400));
-            return panel;
         }
     }
 }

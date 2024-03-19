@@ -50,6 +50,7 @@ import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.intellij.main.BinEdNativeFile;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
+import org.exbin.bined.intellij.objectdata.MainBinaryViewHandler;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.framework.bined.BinEdEditorComponent;
@@ -251,113 +252,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         }
         for (IntegrationOptionsListener listener : INTEGRATION_OPTIONS_LISTENERS) {
             listener.integrationInit(integrationOptions);
-        }
-    }
-
-    @ParametersAreNonnullByDefault
-    private static class MainBinaryViewHandler implements BinaryViewHandler {
-        private final ObjectValueConvertor valueConvertor = new ObjectValueConvertor();
-
-        @Nonnull
-        @Override
-        public Optional<BinaryData> instanceToBinaryData(Object instance) {
-            return valueConvertor.process(instance);
-        }
-
-        @Nonnull
-        @Override
-        public JComponent createBinaryViewPanel(@Nullable BinaryData binaryData) {
-            DebugViewPanel viewPanel = new DebugViewPanel();
-            viewPanel.setContentData(binaryData);
-            return viewPanel;
-        }
-
-        @Nonnull
-        @Override
-        public Optional<JComponent> createBinaryViewPanel(Object instance) {
-            Optional<BinaryData> binaryData = valueConvertor.process(instance);
-            DebugViewPanel viewPanel = new DebugViewPanel();
-            if (binaryData.isPresent()) {
-                viewPanel.setContentData(binaryData.get());
-                return Optional.of(viewPanel);
-            }
-
-            return Optional.empty();
-        }
-
-        @Nonnull
-        @Override
-        public DialogWrapper createBinaryViewDialog(@Nullable BinaryData binaryData) {
-            Project project = ProjectManager.getInstance().getDefaultProject();
-            DataDialog dialog = new DataDialog(project, binaryData);
-            dialog.setTitle("View Binary Data");
-            return dialog;
-        }
-
-        @Nonnull
-        @Override
-        public DialogWrapper createBinaryViewDialog(Object instance) {
-            Optional<BinaryData> binaryData = valueConvertor.process(instance);
-            return createBinaryViewDialog(binaryData.orElse(null));
-        }
-
-        @Override
-        public void setPluginDescriptor(PluginDescriptor pluginDescriptor) {
-            // ignore
-        }
-    }
-
-    @ParametersAreNonnullByDefault
-    private static class DataDialog extends DialogWrapper {
-
-        private final BinEdEditorComponent editorComponent;
-
-        private DataDialog(Project project, @Nullable BinaryData binaryData) {
-            super(project, false);
-            setModal(false);
-            setCancelButtonText("Close");
-            getOKAction().setEnabled(false);
-            setCrossClosesWindow(true);
-
-            BinEdManager binEdManager = BinEdManager.getInstance();
-            editorComponent = new BinEdEditorComponent();
-            BinEdFileManager fileManager = binEdManager.getFileManager();
-            BinEdComponentPanel componentPanel = editorComponent.getComponentPanel();
-            fileManager.initComponentPanel(componentPanel);
-            binEdManager.initEditorComponent(editorComponent);
-            editorComponent.setContentData(binaryData);
-            init();
-        }
-
-        @Override
-        protected void doOKAction() {
-            super.doOKAction();
-        }
-
-        @Nonnull
-        @Override
-        protected Action[] createActions() {
-            return new Action[] { getCancelAction() };
-        }
-
-        @Nullable
-        @Override
-        public JComponent getPreferredFocusedComponent() {
-            return editorComponent.getComponentPanel();
-        }
-
-        @Nullable
-        @Override
-        protected String getDimensionServiceKey() {
-            return "#org.exbin.bined.intellij.debug.ViewBinaryAction";
-        }
-
-        @Nullable
-        @Override
-        protected JComponent createCenterPanel() {
-            BorderLayoutPanel panel = JBUI.Panels.simplePanel(editorComponent.getStatusPanel());
-            panel.setPreferredSize(JBUI.size(600, 400));
-            return panel;
         }
     }
 

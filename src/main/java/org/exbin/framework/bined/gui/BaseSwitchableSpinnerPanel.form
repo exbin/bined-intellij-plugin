@@ -10,8 +10,12 @@
       <SubComponents>
         <MenuItem class="javax.swing.JMenuItem" name="octalMenuItem">
           <Properties>
-            <Property name="text" type="java.lang.String" value="OCT - Octal"/>
-            <Property name="toolTipText" type="java.lang.String" value="Swith to octal numerical base"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/BaseSwitchableSpinnerPanel.properties" key="octalMenuItem.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/BaseSwitchableSpinnerPanel.properties" key="octalMenuItem.toolTipText" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="octalMenuItemActionPerformed"/>
@@ -19,8 +23,12 @@
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="decimalMenuItem">
           <Properties>
-            <Property name="text" type="java.lang.String" value="DEC - Decimal"/>
-            <Property name="toolTipText" type="java.lang.String" value="Switch to decimal numerical base"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/BaseSwitchableSpinnerPanel.properties" key="decimalMenuItem.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/BaseSwitchableSpinnerPanel.properties" key="decimalMenuItem.toolTipText" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="decimalMenuItemActionPerformed"/>
@@ -28,8 +36,12 @@
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="hexadecimalMenuItem">
           <Properties>
-            <Property name="text" type="java.lang.String" value="HEX - Hexadecimal"/>
-            <Property name="toolTipText" type="java.lang.String" value="Switch to hexadecimal numerical base"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/BaseSwitchableSpinnerPanel.properties" key="hexadecimalMenuItem.text" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="org/exbin/framework/bined/gui/resources/BaseSwitchableSpinnerPanel.properties" key="hexadecimalMenuItem.toolTipText" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hexadecimalMenuItemActionPerformed"/>
@@ -75,8 +87,12 @@
   <SubComponents>
     <Component class="javax.swing.JButton" name="baseSwitchButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="DEC"/>
-        <Property name="toolTipText" type="java.lang.String" value="Decimal"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/exbin/framework/bined/gui/resources/BaseSwitchableSpinnerPanel.properties" key="codeType.decimal" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/exbin/framework/bined/gui/resources/BaseSwitchableSpinnerPanel.properties" key="codeType.decimal.toolTipText" replaceFormat="resourceBundle.getString(&quot;{key}&quot;)"/>
+        </Property>
         <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="baseSwitchPopupMenu"/>
         </Property>

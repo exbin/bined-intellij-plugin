@@ -28,7 +28,6 @@ import java.text.ParseException;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -42,6 +41,7 @@ import javax.swing.text.JTextComponent;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeCharactersCase;
 import org.exbin.bined.PositionCodeType;
+import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 
 /**
@@ -51,6 +51,8 @@ import org.exbin.framework.utils.WindowUtils;
  */
 @ParametersAreNonnullByDefault
 public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
+
+    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BaseSwitchableSpinnerPanel.class);
 
     private boolean adjusting;
     private final PositionSpinnerEditor spinnerEditor;
@@ -95,8 +97,8 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         baseSwitchButton = new javax.swing.JButton();
         spinner = new javax.swing.JSpinner();
 
-        octalMenuItem.setText("OCT - Octal");
-        octalMenuItem.setToolTipText("Swith to octal numerical base");
+        octalMenuItem.setText(resourceBundle.getString("octalMenuItem.text")); // NOI18N
+        octalMenuItem.setToolTipText(resourceBundle.getString("octalMenuItem.toolTipText")); // NOI18N
         octalMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 octalMenuItemActionPerformed(evt);
@@ -104,8 +106,8 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         });
         baseSwitchPopupMenu.add(octalMenuItem);
 
-        decimalMenuItem.setText("DEC - Decimal");
-        decimalMenuItem.setToolTipText("Switch to decimal numerical base");
+        decimalMenuItem.setText(resourceBundle.getString("decimalMenuItem.text")); // NOI18N
+        decimalMenuItem.setToolTipText(resourceBundle.getString("decimalMenuItem.toolTipText")); // NOI18N
         decimalMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 decimalMenuItemActionPerformed(evt);
@@ -113,8 +115,8 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
         });
         baseSwitchPopupMenu.add(decimalMenuItem);
 
-        hexadecimalMenuItem.setText("HEX - Hexadecimal");
-        hexadecimalMenuItem.setToolTipText("Switch to hexadecimal numerical base");
+        hexadecimalMenuItem.setText(resourceBundle.getString("hexadecimalMenuItem.text")); // NOI18N
+        hexadecimalMenuItem.setToolTipText(resourceBundle.getString("hexadecimalMenuItem.toolTipText")); // NOI18N
         hexadecimalMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hexadecimalMenuItemActionPerformed(evt);
@@ -124,8 +126,8 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
 
         setPreferredSize(new java.awt.Dimension(400, 300));
 
-        baseSwitchButton.setText("DEC");
-        baseSwitchButton.setToolTipText("Decimal");
+        baseSwitchButton.setText(resourceBundle.getString("codeType.decimal")); // NOI18N
+        baseSwitchButton.setToolTipText(resourceBundle.getString("codeType.decimal.toolTipText")); // NOI18N
         baseSwitchButton.setComponentPopupMenu(baseSwitchPopupMenu);
         baseSwitchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -204,9 +206,9 @@ public class BaseSwitchableSpinnerPanel extends javax.swing.JPanel {
     private void switchNumBase(PositionCodeType codeType) {
         adjusting = true;
         long value = getValue();
-        int position = codeType.ordinal();
-        baseSwitchButton.setText(codeType.name().substring(0, 3));
-        baseSwitchButton.setToolTipText(((JMenuItem) baseSwitchPopupMenu.getComponent(position)).getToolTipText());
+        String codeTypeName = codeType.name().toLowerCase();
+        baseSwitchButton.setText(resourceBundle.getString("codeType." + codeTypeName));
+        baseSwitchButton.setToolTipText(resourceBundle.getString("codeType." + codeTypeName + ".toolTipText"));
         spinnerEditor.setPositionCodeType(codeType);
         setValue(value);
         adjusting = false;
