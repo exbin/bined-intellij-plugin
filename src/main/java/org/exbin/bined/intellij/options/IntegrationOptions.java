@@ -20,7 +20,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Locale;
 
 /**
- * Binary editor preferences.
+ * BinEd plugin preferences.
  *
  * @author ExBin Project (https://exbin.org)
  */

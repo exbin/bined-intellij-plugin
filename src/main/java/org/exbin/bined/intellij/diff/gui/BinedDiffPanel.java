@@ -50,6 +50,7 @@ import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.diff.ExtCodeAreaDiffPanel;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.BinaryStatusApi;
+import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.inspector.options.DataInspectorOptions;
 import org.exbin.framework.bined.options.CodeAreaColorOptions;
@@ -220,7 +221,7 @@ public class BinedDiffPanel extends JBPanel {
             leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
-                    JPopupMenu popupMenu = FindReplaceActions.createCodeAreaPopupMenu(leftCodeArea, "left");
+                    JPopupMenu popupMenu = BinedModule.createCodeAreaPopupMenu(leftCodeArea, "left");
                     popupMenu.show(invoker, x, y);
                 }
             });
@@ -232,7 +233,7 @@ public class BinedDiffPanel extends JBPanel {
             rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
-                    JPopupMenu popupMenu = FindReplaceActions.createCodeAreaPopupMenu(rightCodeArea, "right");
+                    JPopupMenu popupMenu = BinedModule.createCodeAreaPopupMenu(rightCodeArea, "right");
                     popupMenu.show(invoker, x, y);
                 }
             });

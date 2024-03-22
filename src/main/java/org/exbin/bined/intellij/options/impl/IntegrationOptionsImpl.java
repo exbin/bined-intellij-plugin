@@ -24,7 +24,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Locale;
 
 /**
- * Binary integration preferences.
+ * BinEd plugin integration preferences.
  *
  * @author ExBin Project (https://exbin.org)
  */

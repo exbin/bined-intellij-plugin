@@ -129,6 +129,7 @@ public class BinEdManager {
 
     private java.util.ResourceBundle resourceBundle;
     private java.util.ResourceBundle frameResourceBundle;
+    private java.util.ResourceBundle fileResourceBundle;
     private java.util.ResourceBundle optionsResourceBundle;
     private java.util.ResourceBundle operationResourceBundle;
     private java.util.ResourceBundle searchResourceBundle;
@@ -224,6 +225,7 @@ public class BinEdManager {
     public void languageChanged() {
         resourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedModule");
         frameResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/frame/resources/FrameModule");
+        fileResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/file/resources/FileModule");
         optionsResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/options/resources/OptionsModule");
         operationResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/operation/resources/BinedOperationModule");
         searchResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/search/resources/BinedSearchModule");
@@ -910,13 +912,13 @@ public class BinEdManager {
 
     @Nonnull
     public JMenuItem createShowInspectorPanel(BinEdComponentPanel binEdComponentPanel) {
-        JCheckBoxMenuItem clipboardContentMenuItem = new JCheckBoxMenuItem("Inspector Panel");
+        JCheckBoxMenuItem showInspectorPanelMenuItem = new JCheckBoxMenuItem("Inspector Panel");
         BinEdComponentInspector componentExtension = binEdComponentPanel.getComponentExtension(BinEdComponentInspector.class);
-        clipboardContentMenuItem.setSelected(componentExtension.isShowParsingPanel());
-        clipboardContentMenuItem.addActionListener(event -> {
-            componentExtension.setShowParsingPanel(!componentExtension.isShowParsingPanel());;
+        showInspectorPanelMenuItem.setSelected(componentExtension.isShowParsingPanel());
+        showInspectorPanelMenuItem.addActionListener(event -> {
+            componentExtension.setShowParsingPanel(!componentExtension.isShowParsingPanel());
         });
-        return clipboardContentMenuItem;
+        return showInspectorPanelMenuItem;
     }
 
     public void addInsertDataComponent(InsertDataMethod insertDataComponent) {
@@ -1010,20 +1012,20 @@ public class BinEdManager {
 
     public boolean releaseFile(FileHandler fileHandler) {
         while (fileHandler.isModified() && ((BinEdComponentFileApi) fileHandler).isSaveSupported()) {
-//            Object[] options = {
-//                    "Save",
-//                    "Discard",
-//                    "Cancel"
-//            };
-            int result = Messages.showYesNoCancelDialog("Document was modified! Do you wish to save it?", "Save File?", "Save", "Discard", "Cancel", Messages.getQuestionIcon());
+            int result = Messages.showYesNoCancelDialog(fileResourceBundle.getString("Question.modified"), fileResourceBundle.getString("Question.modified_title"), fileResourceBundle.getString("Question.modified_save"), fileResourceBundle.getString("Question.modified_discard"), fileResourceBundle.getString("Question.modified_cancel"), Messages.getQuestionIcon());
             if (result == Messages.NO) {
                 return true;
             }
             if (result == Messages.CANCEL) {
                 return false;
             }
+//            Object[] options = {
+//                    "Save",
+//                    "Discard",
+//                    "Cancel"
+//            };
 //            int result = JOptionPane.showOptionDialog(fileHandler.getComponent(),
-//                    "Document was modified! Do you wish to save it?",
+//                    fileResourceBundle.getString("Question.modified"),
 //                    "Save File?",
 //                    JOptionPane.YES_NO_CANCEL_OPTION,
 //                    JOptionPane.QUESTION_MESSAGE,

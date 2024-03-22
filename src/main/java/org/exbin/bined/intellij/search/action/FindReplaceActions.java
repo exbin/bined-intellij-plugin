@@ -36,10 +36,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -237,78 +234,5 @@ public class FindReplaceActions implements FileDependentAction {
     public static interface FindAgainListener {
 
         void performed();
-    }
-
-    @Nonnull
-    public static JPopupMenu createCodeAreaPopupMenu(final ExtCodeArea codeArea, String menuPostfix) {
-        JPopupMenu popupMenu = new JPopupMenu();
-
-        JMenuItem cutMenuItem = new JMenuItem(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.cut();
-            }
-
-            @Override
-            public boolean isEnabled() {
-                return codeArea.isEditable() && codeArea.hasSelection();
-            }
-        });
-        cutMenuItem.setText("Cut");
-        cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionUtils.getMetaMask()));
-        popupMenu.add(cutMenuItem);
-        JMenuItem copyMenuItem = new JMenuItem(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.copy();
-            }
-
-            @Override
-            public boolean isEnabled() {
-                return codeArea.hasSelection();
-            }
-        });
-        copyMenuItem.setText("Copy");
-        copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionUtils.getMetaMask()));
-        popupMenu.add(copyMenuItem);
-        JMenuItem pasteMenuItem = new JMenuItem(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.paste();
-            }
-
-            @Override
-            public boolean isEnabled() {
-                return codeArea.isEditable() && codeArea.canPaste();
-            }
-        });
-        pasteMenuItem.setText("Paste");
-        pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionUtils.getMetaMask()));
-        popupMenu.add(pasteMenuItem);
-        JMenuItem deleteMenuItem = new JMenuItem(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.delete();
-            }
-
-            @Override
-            public boolean isEnabled() {
-                return codeArea.isEditable() && codeArea.hasSelection();
-            }
-        });
-        deleteMenuItem.setText("Delete");
-        deleteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
-        popupMenu.add(deleteMenuItem);
-        JMenuItem selectAllMenuItem = new JMenuItem(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                codeArea.selectAll();
-            }
-        });
-        selectAllMenuItem.setText("Select All");
-        selectAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionUtils.getMetaMask()));
-        popupMenu.add(selectAllMenuItem);
-
-        return popupMenu;
     }
 }
