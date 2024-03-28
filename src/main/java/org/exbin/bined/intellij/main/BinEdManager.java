@@ -220,6 +220,7 @@ public class BinEdManager {
         bookmarksManager.init();
         macroManager.init();
         encodingsHandler.init();
+        encodingsHandler.loadFromPreferences(preferences.getEncodingPreferences());
     }
 
     public void languageChanged() {
@@ -258,6 +259,7 @@ public class BinEdManager {
             encodingsHandler = new EncodingsHandler();
             encodingsHandler.setApplication(application);
             encodingsHandler.init();
+            encodingsHandler.loadFromPreferences(preferences.getEncodingPreferences());
         }
     }
 
