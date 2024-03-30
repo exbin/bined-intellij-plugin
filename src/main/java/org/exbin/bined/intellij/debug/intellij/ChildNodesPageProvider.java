@@ -262,13 +262,13 @@ public class ChildNodesPageProvider implements BinaryData {
 
     @Override
     public void saveToStream(OutputStream outputStream) throws IOException {
-        throw new UnsupportedOperationException("Save to stream is not supported");
+        throw new UnsupportedOperationException();
     }
 
     @Nonnull
     @Override
     public InputStream getDataInputStream() {
-        throw new UnsupportedOperationException("Save to stream is not supported");
+        throw new UnsupportedOperationException();
     }
 
     @Override

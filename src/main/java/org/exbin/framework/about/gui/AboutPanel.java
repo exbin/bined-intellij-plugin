@@ -23,7 +23,6 @@ import org.exbin.framework.utils.WindowUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.table.DefaultTableModel;
@@ -360,7 +359,6 @@ public class AboutPanel extends javax.swing.JPanel implements HyperlinkListener 
     public static void main(String[] args) {
         WindowUtils.invokeDialog(new AboutPanel());
     }
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel aboutHeaderPanel;

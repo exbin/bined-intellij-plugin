@@ -89,7 +89,7 @@ public class OptionsAction extends AbstractAction {
 //        editorComponent.updateApplyOptions(optionsPanel);
         OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(optionsPanelWrapper, optionsControlPanel);
-        WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, componentPanel, "Options", Dialog.ModalityType.APPLICATION_MODAL);
+        WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, componentPanel, optionsPanel.getResourceBundle().getString("dialog.title"), Dialog.ModalityType.APPLICATION_MODAL);
         optionsControlPanel.setHandler((OptionsControlHandler.ControlActionType actionType) -> {
             if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
                 optionsPanel.applyToOptions();

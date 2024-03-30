@@ -144,7 +144,7 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
             }
         });
 
-        languageLabel.setText(resourceBundle.getString("languageLabel.text") + " *"); // NOI18N
+        languageLabel.setText(resourceBundle.getString("languageLabel.text")); // NOI18N
 
         openFileAsBinaryCheckBox.setText(resourceBundle.getString("openFileAsBinaryCheckBox.text")); // NOI18N
         openFileAsBinaryCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {

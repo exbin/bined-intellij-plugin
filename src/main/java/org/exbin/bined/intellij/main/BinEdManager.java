@@ -18,7 +18,6 @@ package org.exbin.bined.intellij.main;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import org.exbin.auxiliary.binary_data.delta.DeltaDocument;
 import org.exbin.bined.CodeAreaCaretPosition;
@@ -134,6 +133,7 @@ public class BinEdManager {
     private java.util.ResourceBundle operationResourceBundle;
     private java.util.ResourceBundle searchResourceBundle;
     private java.util.ResourceBundle compareResourceBundle;
+    private java.util.ResourceBundle inspectorResourceBundle;
     private java.util.ResourceBundle toolContentResourceBundle;
     private java.util.ResourceBundle actionPopupResourceBundle;
     private java.util.ResourceBundle aboutResourceBundle;
@@ -231,6 +231,7 @@ public class BinEdManager {
         operationResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/operation/resources/BinedOperationModule");
         searchResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/search/resources/BinedSearchModule");
         compareResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/compare/resources/BinedCompareModule");
+        inspectorResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/inspector/resources/BinedInspectorModule");
         toolContentResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/tool/content/resources/BinedToolContentModule");
         actionPopupResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/popup/resources/DefaultPopupMenu");
         aboutResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/about/action/resources/AboutAction");
@@ -914,8 +915,9 @@ public class BinEdManager {
 
     @Nonnull
     public JMenuItem createShowInspectorPanel(BinEdComponentPanel binEdComponentPanel) {
-        JCheckBoxMenuItem showInspectorPanelMenuItem = new JCheckBoxMenuItem("Inspector Panel");
         BinEdComponentInspector componentExtension = binEdComponentPanel.getComponentExtension(BinEdComponentInspector.class);
+        JCheckBoxMenuItem showInspectorPanelMenuItem = new JCheckBoxMenuItem(inspectorResourceBundle.getString("showParsingPanelAction.text"));
+        showInspectorPanelMenuItem.setToolTipText(inspectorResourceBundle.getString("showParsingPanelAction.shortDescription"));
         showInspectorPanelMenuItem.setSelected(componentExtension.isShowParsingPanel());
         showInspectorPanelMenuItem.addActionListener(event -> {
             componentExtension.setShowParsingPanel(!componentExtension.isShowParsingPanel());
