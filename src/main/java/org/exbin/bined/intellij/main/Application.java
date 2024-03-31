@@ -58,12 +58,12 @@ public class Application implements XBApplication {
     private FrameModuleApi frameModule = new FrameModuleApi() {
         @Override
         public void createMainMenu() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void notifyFrameUpdated() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Nonnull
@@ -124,47 +124,47 @@ public class Application implements XBApplication {
 
         @Override
         public Action getExitAction() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void registerExitAction() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void registerBarsVisibilityActions() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void registerToolBarVisibilityActions() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void registerStatusBarVisibilityActions() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void registerStatusBar(String moduleId, String statusBarId, JPanel panel) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void switchStatusBar(String statusBarId) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void loadFramePosition() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void saveFramePosition() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
     };
 

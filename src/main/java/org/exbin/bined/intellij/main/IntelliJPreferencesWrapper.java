@@ -129,21 +129,23 @@ public class IntelliJPreferencesWrapper implements Preferences {
 
     @Override
     public void putByteArray(String key, byte[] value) {
+        // preferences.setValue(prefix + key, value);
         throw new UnsupportedOperationException();
-        //preferences.setValue(prefix + key, value);
     }
 
     @Override
     public byte[] getByteArray(String key, byte[] def) {
-        throw new UnsupportedOperationException();
         // return preferences.getValue(prefix + key, def);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void flush() {
+        // empty
     }
 
     @Override
     public void sync() {
+        // empty
     }
 }

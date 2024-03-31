@@ -91,9 +91,7 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
 
     public void setLanguageLocales(List<LanguageRecord> languageLocales) {
         DefaultComboBoxModel<LanguageRecord> languageComboBoxModel = new DefaultComboBoxModel<>();
-        languageLocales.forEach((language) -> {
-            languageComboBoxModel.addElement(language);
-        });
+        languageLocales.forEach(languageComboBoxModel::addElement);
         languageComboBox.setModel(languageComboBoxModel);
         languageComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override

@@ -173,9 +173,10 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
     @Override
     public void saveDocument() {
         BinaryData contentData = componentPanel.getContentData();
-        final byte[] fileContent = contentData == null ? new byte[0] : new byte[(int) contentData.getDataSize()];
-        if (contentData != null) {
-            contentData.copyToArray(0L, fileContent, 0, (int) contentData.getDataSize());
+        long dataSize = contentData.getDataSize();
+        final byte[] fileContent = new byte[(int) dataSize];
+        if (dataSize > 0) {
+            contentData.copyToArray(0L, fileContent, 0, (int) dataSize);
         }
         Application application = ApplicationManager.getApplication();
         application.runWriteAction(() -> {
@@ -203,9 +204,7 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 
     public void closeData() {
         PagedData contentData = (PagedData) componentPanel.getCodeArea().getContentData();
-        if (contentData != null) {
-            contentData.clear();
-        }
+        contentData.clear();
         componentPanel.setContentData(null);
     }
 
@@ -236,15 +235,18 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
         return componentPanel.getCodeArea();
     }
 
-    @Override public void loadFromFile(URI fileUri, @org.jetbrains.annotations.Nullable FileType fileType) {
+    @Override
+    public void loadFromFile(URI fileUri, @org.jetbrains.annotations.Nullable FileType fileType) {
         throw new UnsupportedOperationException();
     }
 
-    @Override public void saveFile() {
+    @Override
+    public void saveFile() {
         throw new UnsupportedOperationException();
     }
 
-    @Override public void saveToFile(URI fileUri, @org.jetbrains.annotations.Nullable FileType fileType) {
+    @Override
+    public void saveToFile(URI fileUri, @org.jetbrains.annotations.Nullable FileType fileType) {
         throw new UnsupportedOperationException();
     }
 

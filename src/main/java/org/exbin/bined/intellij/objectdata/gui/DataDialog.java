@@ -15,9 +15,6 @@
  */
 package org.exbin.bined.intellij.objectdata.gui;
 
-import com.intellij.database.datagrid.GridColumn;
-import com.intellij.database.datagrid.GridRow;
-import com.intellij.database.datagrid.SelectionModel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.util.ui.JBUI;
@@ -25,7 +22,6 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.EditMode;
-import org.exbin.bined.intellij.database.DbEditBinaryAction;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileManager;
@@ -37,8 +33,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Data dialog for binary data.

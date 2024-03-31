@@ -39,7 +39,6 @@ import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryStatusApi;
-import org.exbin.framework.bined.CodeAreaCommandHandlerProvider;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.action.EditSelectionAction;
 import org.exbin.framework.bined.action.GoToPositionAction;
@@ -124,7 +123,7 @@ import java.util.Optional;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdManager {
+public final class BinEdManager {
 
     private java.util.ResourceBundle resourceBundle;
     private java.util.ResourceBundle frameResourceBundle;
@@ -138,8 +137,6 @@ public class BinEdManager {
     private java.util.ResourceBundle actionPopupResourceBundle;
     private java.util.ResourceBundle aboutResourceBundle;
     private java.util.ResourceBundle onlineHelpResourceBundle;
-
-    private static BinEdManager instance;
 
     private static final String FRAMEWORK_TANGO_ICON_THEME_PREFIX = "/org/exbin/framework/action/resources/icons/tango-icon-theme/16x16/actions/";
     private static final String ONLINE_HELP_URL = "https://bined.exbin.org/intellij-plugin/?manual";
@@ -206,14 +203,17 @@ public class BinEdManager {
         findReplaceActions.addFindAgainListener();
     }
 
-    @Nonnull
-    public static synchronized BinEdManager getInstance() {
-        if (instance == null) {
-            instance = new BinEdManager();
-            instance.init();
-        }
+    private static class SingletonHelper {
+        private static final BinEdManager INSTANCE = new BinEdManager();
 
-        return instance;
+        static {
+            INSTANCE.init();
+        }
+    }
+
+    @Nonnull
+    public static BinEdManager getInstance() {
+        return SingletonHelper.INSTANCE;
     }
 
     private void init() {
@@ -933,10 +933,6 @@ public class BinEdManager {
         convertDataComponents.add(convertDataComponent);
     }
 
-    private void registerCodeAreaCommandHandlerProvider(CodeAreaCommandHandlerProvider commandHandlerProvider) {
-        fileManager.setCommandHandlerProvider(commandHandlerProvider);
-    }
-
     public void registerBinaryStatus(BinEdEditorComponent editorComponent, @Nullable BinEdComponentFileApi fileHandler) {
         BinaryStatusPanel statusPanel = editorComponent.getStatusPanel();
         ExtCodeArea codeArea = editorComponent.getCodeArea();
@@ -1068,16 +1064,19 @@ public class BinEdManager {
             this.fileHandler = fileHandler;
         }
 
+        @Nonnull
         @Override
         public JComponent getEditorComponent() {
             return fileHandler.getComponent();
         }
 
+        @Nonnull
         @Override
         public Optional<FileHandler> getActiveFile() {
             return Optional.ofNullable(fileHandler);
         }
 
+        @Nonnull
         @Override
         public String getWindowTitle(String parentTitle) {
             throw new UnsupportedOperationException();
@@ -1139,6 +1138,7 @@ public class BinEdManager {
             throw new UnsupportedOperationException();
         }
 
+        @Nonnull
         @Override
         public Optional<File> getLastUsedDirectory() {
             throw new UnsupportedOperationException();

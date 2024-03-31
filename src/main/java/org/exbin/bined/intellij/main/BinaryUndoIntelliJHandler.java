@@ -35,6 +35,8 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * TODO: Undo handler for binary editor using IntelliJ Idea's undo.
@@ -98,7 +100,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
                 try {
                     command.undo();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    Logger.getLogger(BinaryUndoIntelliJHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 undoUpdated();
             }
@@ -109,7 +111,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
                 try {
                     command.redo();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    Logger.getLogger(BinaryUndoIntelliJHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 undoUpdated();
             }
@@ -229,7 +231,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
     }
 
     public void setUndoMaxCount(long maxUndo) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -238,7 +240,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
     }
 
     public void setUndoMaximumSize(long maxSize) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -263,7 +265,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
 
     @Override
     public List<BinaryDataCommand> getCommandList() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException();
     }
 
     /**

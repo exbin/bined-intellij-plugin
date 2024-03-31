@@ -37,12 +37,15 @@ public class BinEdFileSystem extends VirtualFileSystem implements DumbAware {
 
     private static final String PROTOCOL = "bined";
     private static final String ERROR_INVALID_OPERATION = "Invalid operation";
-    private static final BinEdFileSystem INSTANCE = new BinEdFileSystem();
     private List<VirtualFileListener> fileListeners = new ArrayList<>();
+
+    private static class SingletonHelper {
+        private static final BinEdFileSystem INSTANCE = new BinEdFileSystem();
+    }
 
     @Nonnull
     public static BinEdFileSystem getInstance() {
-        return INSTANCE;
+        return SingletonHelper.INSTANCE;
     }
 
     @Nonnull

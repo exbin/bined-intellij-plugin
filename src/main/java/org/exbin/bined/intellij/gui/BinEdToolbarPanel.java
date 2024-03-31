@@ -44,6 +44,8 @@ import javax.swing.JComponent;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Binary editor toolbar panel.
@@ -427,8 +429,8 @@ public class BinEdToolbarPanel extends JBPanel {
             undoHandler.performUndo();
             codeAreaControl.repaint();
             updateUndoState();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(BinEdToolbarPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -437,8 +439,8 @@ public class BinEdToolbarPanel extends JBPanel {
             undoHandler.performRedo();
             codeAreaControl.repaint();
             updateUndoState();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(BinEdToolbarPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
