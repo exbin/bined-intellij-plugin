@@ -787,10 +787,10 @@ public class BinarySearchPanel extends javax.swing.JPanel {
         void notifySearchChanged();
 
         /**
-         * Parameters of search are changing which migth not lead to immediate
+         * Parameters of search are changing which might not lead to immediate
          * search change.
          * <p>
-         * Typically text typing.
+         * Typically, text typing.
          */
         void notifySearchChanging();
 

@@ -36,7 +36,6 @@ import org.exbin.framework.utils.LanguageUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -94,7 +93,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 resourceBundle.getString("binaryCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-bin.png")
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -112,7 +111,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 resourceBundle.getString("octalCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-oct.png")
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -129,7 +128,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 resourceBundle.getString("decimalCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-dec.png")
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -146,7 +145,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 resourceBundle.getString("hexadecimalCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-hex.png")
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -169,19 +168,6 @@ public class BinEdToolbarPanel extends JBPanel {
         cycleCodeTypesSplitAction = new CodeTypeSplitAction(cycleActionGroup);
 
         initComponents();
-        init();
-    }
-
-    private void init() {
-// TODO        cycleCodeTypesAction.putValue(Action.SHORT_DESCRIPTION, "Cycle thru code types");
-//        JPopupMenu cycleCodeTypesPopupMenu = new JPopupMenu();
-//        cycleCodeTypesPopupMenu.add(binaryCodeTypeAction);
-//        cycleCodeTypesPopupMenu.add(octalCodeTypeAction);
-//        cycleCodeTypesPopupMenu.add(decimalCodeTypeAction);
-//        cycleCodeTypesPopupMenu.add(hexadecimalCodeTypeAction);
-// TODO        codeTypeDropDown = new DropDownButton(cycleCodeTypesAction, cycleCodeTypesPopupMenu);
-//        updateCycleButtonName();
-//        controlToolBar.add(codeTypeDropDown);
     }
 
     public void setUndoHandler(BinaryDataUndoHandler undoHandler) {
@@ -221,15 +207,6 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         }
     }
-
-//    private void changeCycleAction(AnAction action) {
-//        DataManager instance = DataManager.getInstance();
-//        DataContext context = instance != null ? instance.getDataContext((Component) cycleActionButton) : DataContext.EMPTY_CONTEXT;
-//        AnActionEvent event = AnActionEvent.createFromAnAction(binaryCodeTypeAction, null, ActionPlaces.UNKNOWN, context);
-//        toolbar.getPresentation(cycleCodeTypesAction).setIcon(toolbar.getPresentation(action).getIcon());
-//        cycleActionButton.afterActionPerformed(cycleCodeTypesSplitAction, context, event);
-//        cycleActionButton.afterActionPerformed(cycleCodeTypesAction, context, event);
-//    }
 
     public void applyFromCodeArea() {
         updateCycleButtonState();
@@ -277,7 +254,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 fileResourceBundle.getString("saveFileAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/document-save.png"))
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -305,7 +282,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 operationUndoResourceBundle.getString("editUndoAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-undo.png"))
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -331,7 +308,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 operationUndoResourceBundle.getString("editRedoAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-redo.png"))
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -357,7 +334,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 resourceBundle.getString("viewUnprintablesAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png"))
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -385,7 +362,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 optionsResourceBundle.getString("optionsAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/options/gui/resources/icons/Preferences16.gif"))
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -403,7 +380,7 @@ public class BinEdToolbarPanel extends JBPanel {
                 onlineHelpResourceBundle.getString("onlineHelpAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/help.png"))
         ) {
-            @Nonnull
+            @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -459,7 +436,7 @@ public class BinEdToolbarPanel extends JBPanel {
     @ParametersAreNonnullByDefault
     public interface Control {
 
-        @Nonnull
+        @NotNull
         CodeType getCodeType();
 
         void setCodeType(CodeType codeType);
