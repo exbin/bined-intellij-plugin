@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij.search.action;
 
 import org.exbin.bined.basic.BasicCodeAreaZone;
+import org.exbin.bined.intellij.main.BinEdNativeFile;
 import org.exbin.bined.intellij.search.BinEdComponentSearch;
 import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
 import org.exbin.bined.swing.CodeAreaCommandHandler;
@@ -109,7 +110,13 @@ public class FindReplaceActions implements FileDependentAction {
                         throw new IllegalStateException();
                     }
 
-                    BinEdComponentPanel activePanel = ((BinEdFileHandler) activeFile.get()).getComponent();
+                    FileHandler fileHandler = activeFile.get();
+                    BinEdComponentPanel activePanel;
+                    if (fileHandler instanceof BinEdNativeFile) {
+                        activePanel = ((BinEdNativeFile) fileHandler).getEditorComponent().getComponentPanel();
+                    } else {
+                        activePanel = ((BinEdFileHandler) activeFile.get()).getComponent();
+                    }
                     BinEdComponentSearch componentExtension = activePanel.getComponentExtension(BinEdComponentSearch.class);
                     componentExtension.showSearchPanel(BinarySearchPanel.PanelMode.FIND);
                 }
@@ -145,7 +152,13 @@ public class FindReplaceActions implements FileDependentAction {
                         throw new IllegalStateException();
                     }
 
-                    BinEdComponentPanel activePanel = ((BinEdFileHandler) activeFile.get()).getComponent();
+                    FileHandler fileHandler = activeFile.get();
+                    BinEdComponentPanel activePanel;
+                    if (fileHandler instanceof BinEdNativeFile) {
+                        activePanel = ((BinEdNativeFile) fileHandler).getEditorComponent().getComponentPanel();
+                    } else {
+                        activePanel = ((BinEdFileHandler) activeFile.get()).getComponent();
+                    }
                     BinEdComponentSearch componentExtension = activePanel.getComponentExtension(BinEdComponentSearch.class);
                     componentExtension.performFindAgain();
 
@@ -184,7 +197,13 @@ public class FindReplaceActions implements FileDependentAction {
                         throw new IllegalStateException();
                     }
 
-                    BinEdComponentPanel activePanel = ((BinEdFileHandler) activeFile.get()).getComponent();
+                    FileHandler fileHandler = activeFile.get();
+                    BinEdComponentPanel activePanel;
+                    if (fileHandler instanceof BinEdNativeFile) {
+                        activePanel = ((BinEdNativeFile) fileHandler).getEditorComponent().getComponentPanel();
+                    } else {
+                        activePanel = ((BinEdFileHandler) activeFile.get()).getComponent();
+                    }
                     BinEdComponentSearch componentExtension = activePanel.getComponentExtension(BinEdComponentSearch.class);
                     componentExtension.showSearchPanel(BinarySearchPanel.PanelMode.REPLACE);
                 }
@@ -217,8 +236,13 @@ public class FindReplaceActions implements FileDependentAction {
         addFindAgainListener(() -> {
             Optional<FileHandler> activeFile = editorProvider.getActiveFile();
             if (activeFile.isPresent()) {
-                BinEdFileHandler fileHandler = (BinEdFileHandler) activeFile.get();
-                ExtCodeArea codeArea = fileHandler.getCodeArea();
+                FileHandler fileHandler = activeFile.get();
+                ExtCodeArea codeArea;
+                if (fileHandler instanceof BinEdNativeFile) {
+                    codeArea = ((BinEdNativeFile) fileHandler).getCodeArea();
+                } else {
+                    codeArea = ((BinEdFileHandler) activeFile.get()).getCodeArea();
+                }
                 CodeAreaCommandHandler commandHandler = codeArea.getCommandHandler();
                 if (commandHandler instanceof CodeAreaMacroCommandHandler && ((CodeAreaMacroCommandHandler) commandHandler).isMacroRecording()) {
                     ((CodeAreaMacroCommandHandler) commandHandler).appendMacroOperationStep(MacroStep.FIND_AGAIN);

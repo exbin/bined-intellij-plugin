@@ -1,7 +1,8 @@
 0.2.10
 - Added support for language switching (zh, jp, ko)
 - Added support for basic macro
-- Updates for IntelliJ API changes (issue #55)
+- Reworked search toolbar UI
+- Updates for IntelliJ API changes (issue #55 #56)
 
 0.2.9 (2023-11-24)
 - Added convert data action

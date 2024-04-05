@@ -15,7 +15,16 @@
  */
 package org.exbin.bined.intellij.search.gui;
 
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
+import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
+import com.intellij.ui.AnActionButton;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.JButtonAction;
 import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.RowWrappingMode;
@@ -36,6 +45,7 @@ import org.exbin.framework.bined.search.SearchParameters;
 import org.exbin.framework.bined.search.gui.BinarySearchComboBoxPanel;
 import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -75,14 +85,80 @@ public class BinarySearchPanel extends JBPanel {
     private ComboBoxEditor replaceComboBoxEditor;
     private BinarySearchComboBoxPanel replaceComboBoxEditorComponent;
 
-    private XBApplication application;
+    private static final String TOOLBAR_PLACE = "BinEdBinarySearchPanel";
+    private final DefaultActionGroup closeToolbarActionGroup;
+    private final ActionToolbarImpl closeToolbar;
+    private final DefaultActionGroup findToolbarActionGroup;
+    private final ActionToolbarImpl findToolbar;
+
+    private final ComboBoxAction findComboBoxAction;
+    private final AnAction optionsAction;
 
     public BinarySearchPanel() {
+        findToolbarActionGroup = new DefaultActionGroup();
+        findToolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE,
+                findToolbarActionGroup, true);
+        closeToolbarActionGroup = new DefaultActionGroup();
+        closeToolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".close",
+                closeToolbarActionGroup, true);
+
+        findComboBoxAction = new ComboBoxAction() {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+
+            }
+        };
+
+        optionsAction = new AnActionButton(
+                resourceBundle.getString("optionsButton.text"),
+                null,
+                null
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                control.searchOptions();
+            }
+
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+        };
+
         initComponents();
         init();
     }
 
     private void init() {
+/*        Project project = ProjectManager.getInstance().getDefaultProject();
+        SearchReplaceComponent.Builder builder = SearchReplaceComponent.buildFor(project, new JBLabel("TEST"));
+        SearchReplaceComponent component = builder.build();
+        add(new JButton("TEST 2"), BorderLayout.EAST);
+        add(component, BorderLayout.WEST); */
+
+        findToolbarActionGroup.addAction(findComboBoxAction);
+        findToolbarActionGroup.addAction(optionsAction);
+        findPanel.add(findToolbar, BorderLayout.CENTER);
+
+        closeToolbarActionGroup.addAction(new AnAction(
+                resourceBundle.getString("closeButton.toolTipText"),
+                null,
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/dialog-cancel-3.png"))
+        ) {
+            @Override
+            public void actionPerformed(@Nonnull AnActionEvent e) {
+                control.close();
+            }
+
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+        });
+        add(closeToolbar, BorderLayout.EAST);
+
         ExtendedCodeAreaLayoutProfile layoutProfile = Objects.requireNonNull(searchCodeArea.getLayoutProfile());
         layoutProfile.setShowHeader(false);
         layoutProfile.setShowRowPosition(false);
@@ -113,7 +189,7 @@ public class BinarySearchPanel extends JBPanel {
         };
 
         findComboBoxEditorComponent = new BinarySearchComboBoxPanel();
-        findComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
+        findComboBox.setRenderer(new ListCellRenderer<>() {
             private final JPanel panel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
 
@@ -143,7 +219,7 @@ public class BinarySearchPanel extends JBPanel {
             }
         });
         findComboBoxEditor = new ComboBoxEditor() {
-
+            @Nonnull
             @Override
             public Component getEditorComponent() {
                 return findComboBoxEditorComponent;
@@ -193,7 +269,7 @@ public class BinarySearchPanel extends JBPanel {
         findComboBoxEditorComponent.addValueKeyListener(editorKeyListener);
 
         replaceComboBoxEditorComponent = new BinarySearchComboBoxPanel();
-        replaceComboBox.setRenderer(new ListCellRenderer<SearchCondition>() {
+        replaceComboBox.setRenderer(new ListCellRenderer<>() {
             private final JPanel panel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
 
@@ -270,6 +346,8 @@ public class BinarySearchPanel extends JBPanel {
         replaceComboBox.setEditor(replaceComboBoxEditor);
 
         replaceComboBoxEditorComponent.addValueKeyListener(editorKeyListener);
+//        toolbar.setTargetComponent(this);
+//        add(toolbar, BorderLayout.CENTER);
     }
 
     public void setControl(Control control) {
@@ -355,22 +433,23 @@ public class BinarySearchPanel extends JBPanel {
     private void initComponents() {
 
         topSeparator = new javax.swing.JSeparator();
-        findPanel = new javax.swing.JPanel();
+        findPanel = new JBPanel();
+        findPanel.setLayout(new BorderLayout());
         findLabel = new javax.swing.JLabel();
         findTypeToolBar = new javax.swing.JToolBar();
         findTypeButton = new javax.swing.JButton();
         findComboBox = new javax.swing.JComboBox<>();
-        findToolBar = new javax.swing.JToolBar();
+//        findToolBar = new javax.swing.JToolBar();
         prevMatchButton = new javax.swing.JButton();
         nextMatchButton = new javax.swing.JButton();
         matchCaseToggleButton = new javax.swing.JToggleButton();
         multipleMatchesToggleButton = new javax.swing.JToggleButton();
         separator1 = new javax.swing.JToolBar.Separator();
-        optionsButton = new javax.swing.JButton();
+//        optionsButton = new javax.swing.JButton();
         infoLabel = new javax.swing.JLabel();
-        closeToolBar = new javax.swing.JToolBar();
-        closeButton = new javax.swing.JButton();
-        replacePanel = new javax.swing.JPanel();
+//        closeToolBar = new javax.swing.JToolBar();
+//        closeButton = new javax.swing.JButton();
+        replacePanel = new JBPanel();
         replaceLabel = new javax.swing.JLabel();
         replaceTypeToolBar = new javax.swing.JToolBar();
         replaceTypeButton = new javax.swing.JButton();
@@ -383,7 +462,7 @@ public class BinarySearchPanel extends JBPanel {
         setLayout(new java.awt.BorderLayout());
 
         topSeparator.setName("topSeparator"); // NOI18N
-        add(topSeparator, java.awt.BorderLayout.NORTH);
+        // add(topSeparator, java.awt.BorderLayout.NORTH);
 
         findPanel.setName("findPanel"); // NOI18N
 
@@ -412,10 +491,10 @@ public class BinarySearchPanel extends JBPanel {
         findComboBox.setEditable(true);
         findComboBox.setName("findComboBox"); // NOI18N
 
-        findToolBar.setBorder(null);
-        findToolBar.setRollover(true);
-        findToolBar.setFocusable(false);
-        findToolBar.setName("findToolBar"); // NOI18N
+//        findToolBar.setBorder(null);
+//        findToolBar.setRollover(true);
+//        findToolBar.setFocusable(false);
+//        findToolBar.setName("findToolBar"); // NOI18N
 
         prevMatchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-left.png"))); // NOI18N
         prevMatchButton.setToolTipText(resourceBundle.getString("prevMatchButton.toolTipText")); // NOI18N
@@ -429,7 +508,7 @@ public class BinarySearchPanel extends JBPanel {
                 prevMatchButtonActionPerformed(evt);
             }
         });
-        findToolBar.add(prevMatchButton);
+//        findToolBar.add(prevMatchButton);
 
         nextMatchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-right.png"))); // NOI18N
         nextMatchButton.setToolTipText(resourceBundle.getString("nextMatchButton.toolTipText")); // NOI18N
@@ -443,7 +522,7 @@ public class BinarySearchPanel extends JBPanel {
                 nextMatchButtonActionPerformed(evt);
             }
         });
-        findToolBar.add(nextMatchButton);
+//        findToolBar.add(nextMatchButton);
 
         matchCaseToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/case_sensitive.gif"))); // NOI18N
         matchCaseToggleButton.setToolTipText(resourceBundle.getString("matchCaseToggleButton.toolTipText")); // NOI18N
@@ -456,7 +535,7 @@ public class BinarySearchPanel extends JBPanel {
                 matchCaseToggleButtonActionPerformed(evt);
             }
         });
-        findToolBar.add(matchCaseToggleButton);
+//        findToolBar.add(matchCaseToggleButton);
 
         multipleMatchesToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/mark_occurrences.png"))); // NOI18N
         multipleMatchesToggleButton.setSelected(true);
@@ -470,70 +549,70 @@ public class BinarySearchPanel extends JBPanel {
                 multipleMatchesToggleButtonActionPerformed(evt);
             }
         });
-        findToolBar.add(multipleMatchesToggleButton);
+//        findToolBar.add(multipleMatchesToggleButton);
 
         separator1.setName("separator1"); // NOI18N
-        findToolBar.add(separator1);
+//        findToolBar.add(separator1);
 
-        optionsButton.setText(resourceBundle.getString("optionsButton.text")); // NOI18N
-        optionsButton.setFocusable(false);
-        optionsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        optionsButton.setName("optionsButton"); // NOI18N
-        optionsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        optionsButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                optionsButtonActionPerformed(evt);
-            }
-        });
-        findToolBar.add(optionsButton);
+//        optionsButton.setText(resourceBundle.getString("optionsButton.text")); // NOI18N
+//        optionsButton.setFocusable(false);
+//        optionsButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+//        optionsButton.setName("optionsButton"); // NOI18N
+//        optionsButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+//        optionsButton.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                optionsButtonActionPerformed(evt);
+//            }
+//        });
+//        findToolBar.add(optionsButton);
 
         infoLabel.setEnabled(false);
         infoLabel.setName("infoLabel"); // NOI18N
 
-        closeToolBar.setBorder(null);
-        closeToolBar.setRollover(true);
-        closeToolBar.setName("closeToolBar"); // NOI18N
+//        closeToolBar.setBorder(null);
+//        closeToolBar.setRollover(true);
+//        closeToolBar.setName("closeToolBar"); // NOI18N
 
-        closeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/dialog-cancel-3.png"))); // NOI18N
-        closeButton.setToolTipText(resourceBundle.getString("closeButton.toolTipText")); // NOI18N
-        closeButton.setFocusable(false);
-        closeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        closeButton.setName("closeButton"); // NOI18N
-        closeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        closeButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                closeButtonActionPerformed(evt);
-            }
-        });
-        closeToolBar.add(closeButton);
+//        closeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/dialog-cancel-3.png"))); // NOI18N
+//        closeButton.setToolTipText(resourceBundle.getString("closeButton.toolTipText")); // NOI18N
+//        closeButton.setFocusable(false);
+//        closeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+//        closeButton.setName("closeButton"); // NOI18N
+//        closeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+//        closeButton.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                closeButtonActionPerformed(evt);
+//            }
+//        });
+//        closeToolBar.add(closeButton);
 
-        javax.swing.GroupLayout findPanelLayout = new javax.swing.GroupLayout(findPanel);
-        findPanel.setLayout(findPanelLayout);
-        findPanelLayout.setHorizontalGroup(
-            findPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, findPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(findLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(findTypeToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(findComboBox, 0, 519, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(findToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(infoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(closeToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        findPanelLayout.setVerticalGroup(
-            findPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(closeToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(infoLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(findToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(findTypeToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(findLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(findComboBox)
-        );
+//        javax.swing.GroupLayout findPanelLayout = new javax.swing.GroupLayout(findPanel);
+//        findPanel.setLayout(findPanelLayout);
+//        findPanelLayout.setHorizontalGroup(
+//            findPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, findPanelLayout.createSequentialGroup()
+//                .addContainerGap()
+//                .addComponent(findLabel)
+//                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+//                .addComponent(findTypeToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+//                .addComponent(findComboBox, 0, 519, Short.MAX_VALUE)
+//                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+//                .addComponent(findToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+//                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+//                .addComponent(infoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+//                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+//                .addComponent(closeToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+//        );
+//        findPanelLayout.setVerticalGroup(
+//            findPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//            .addComponent(closeToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+//            .addComponent(infoLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+//            .addComponent(findToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+//            .addComponent(findTypeToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+//            .addComponent(findLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+//            .addComponent(findComboBox)
+//        );
 
         add(findPanel, java.awt.BorderLayout.CENTER);
 
@@ -723,12 +802,12 @@ public class BinarySearchPanel extends JBPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton closeButton;
-    private javax.swing.JToolBar closeToolBar;
+//    private javax.swing.JButton closeButton;
+//    private javax.swing.JToolBar closeToolBar;
     private javax.swing.JComboBox<SearchCondition> findComboBox;
     private javax.swing.JLabel findLabel;
-    private javax.swing.JPanel findPanel;
-    private javax.swing.JToolBar findToolBar;
+    private JBPanel findPanel;
+//    private javax.swing.JToolBar findToolBar;
     private javax.swing.JButton findTypeButton;
     private javax.swing.JToolBar findTypeToolBar;
     private javax.swing.JLabel infoLabel;
@@ -754,7 +833,6 @@ public class BinarySearchPanel extends JBPanel {
     }
 
     public void setApplication(XBApplication application) {
-        this.application = application;
     }
 
     public void requestSearchFocus() {
@@ -790,10 +868,10 @@ public class BinarySearchPanel extends JBPanel {
         void notifySearchChanged();
 
         /**
-         * Parameters of search are changing which migth not lead to immediate
+         * Parameters of search are changing which might not lead to immediate
          * search change.
          * <p>
-         * Typically text typing.
+         * Typically, text typing.
          */
         void notifySearchChanging();
 

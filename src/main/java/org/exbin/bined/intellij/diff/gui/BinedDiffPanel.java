@@ -34,15 +34,16 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
+import org.exbin.bined.intellij.main.Application;
 import org.exbin.bined.intellij.main.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
+import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.options.IntegrationOptions;
-import org.exbin.bined.intellij.search.action.FindReplaceActions;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
 import org.exbin.bined.swing.capability.FontCapable;
@@ -51,6 +52,7 @@ import org.exbin.bined.swing.extended.diff.ExtCodeAreaDiffPanel;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
+import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.inspector.options.DataInspectorOptions;
 import org.exbin.framework.bined.options.CodeAreaColorOptions;
@@ -67,6 +69,7 @@ import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.options.TextFontOptions;
 import org.exbin.framework.editor.text.service.TextFontService;
 import org.exbin.framework.utils.DesktopUtils;
+import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.utils.gui.OptionsControlPanel;
 import org.exbin.framework.utils.handler.OptionsControlHandler;
@@ -116,6 +119,7 @@ public class BinedDiffPanel extends JBPanel {
     private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi encodingStatus;
     private CharsetChangeListener charsetChangeListener = null;
+    private GoToPositionAction goToPositionAction = new GoToPositionAction();
 
     public BinedDiffPanel() {
         setLayout(new java.awt.BorderLayout());
@@ -200,6 +204,9 @@ public class BinedDiffPanel extends JBPanel {
                 // TODO charsetChangeListener.charsetChanged();
             }
         });
+        Application application = BinEdManager.getInstance().getApplication();
+        encodingsHandler.setApplication(application);
+        goToPositionAction.setup(application, LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedModule"));
 
         registerBinaryStatus(statusPanel);
 
@@ -207,6 +214,11 @@ public class BinedDiffPanel extends JBPanel {
 
         this.add(statusPanel, BorderLayout.SOUTH);
         this.add(diffPanel, BorderLayout.CENTER);
+        diffPanel.revalidate();
+        diffPanel.repaint();
+        revalidate();
+        repaint();
+        diffPanel.updateUI();
     }
 
     public void setDiffContent(ContentDiffRequest request) {
@@ -308,7 +320,7 @@ public class BinedDiffPanel extends JBPanel {
 
             @Override
             public void changeCursorPosition() {
-                // TODO goToPositionAction.actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, ""));
+                goToPositionAction.actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, ""));
             }
 
             @Override
@@ -336,6 +348,9 @@ public class BinedDiffPanel extends JBPanel {
         binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
         binaryStatus.setCursorPosition(codeArea.getCaretPosition());
         binaryStatus.setSelectionRange(codeArea.getSelection());
+        long dataSize = codeArea.getDataSize();
+        binaryStatus.setCurrentDocumentSize(dataSize, dataSize);
+        goToPositionAction.updateForActiveCodeArea(codeArea);
     }
 
     private void initialLoadFromPreferences() {
@@ -449,8 +464,8 @@ public class BinedDiffPanel extends JBPanel {
                 OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
                 JPanel dialogPanel = WindowUtils.createDialogPanel(optionsPanelWrapper, optionsControlPanel);
                 WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel,
-                        (Component) e.getSource(),
-                        "Options",
+                        BinedDiffPanel.this,
+                        optionsPanel.getResourceBundle().getString("dialog.title"),
                         Dialog.ModalityType.APPLICATION_MODAL);
                 optionsControlPanel.setHandler((OptionsControlHandler.ControlActionType actionType) -> {
                     if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
@@ -465,7 +480,7 @@ public class BinedDiffPanel extends JBPanel {
 
                     dialog.close();
                 });
-                dialog.showCentered((Component) e.getSource());
+                dialog.showCentered(BinedDiffPanel.this);
                 dialog.dispose();
             }
         };

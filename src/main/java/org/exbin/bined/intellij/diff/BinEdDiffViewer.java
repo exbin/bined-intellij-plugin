@@ -20,7 +20,6 @@ import com.intellij.diff.requests.ContentDiffRequest;
 import com.intellij.diff.tools.util.base.DiffViewerBase;
 import com.intellij.openapi.progress.ProgressIndicator;
 import org.exbin.bined.intellij.diff.gui.BinedDiffPanel;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -56,7 +55,7 @@ public class BinEdDiffViewer extends DiffViewerBase {
         return diffPanel;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public JComponent getPreferredFocusedComponent() {
         return diffPanel;
