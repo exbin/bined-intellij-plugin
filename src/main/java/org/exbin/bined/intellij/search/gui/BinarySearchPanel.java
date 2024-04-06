@@ -20,11 +20,12 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
+import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.actionSystem.ex.DefaultCustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JButtonAction;
 import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.RowWrappingMode;
@@ -50,8 +51,13 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.AbstractAction;
 import javax.swing.ComboBoxEditor;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
@@ -59,6 +65,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -91,8 +98,15 @@ public class BinarySearchPanel extends JBPanel {
     private final DefaultActionGroup findToolbarActionGroup;
     private final ActionToolbarImpl findToolbar;
 
-    private final ComboBoxAction findComboBoxAction;
-    private final AnAction optionsAction;
+    private final DefaultCustomComponentAction optionsAction;
+    private final AnActionButton prevMatchAction;
+    private final AnActionButton nextMatchAction;
+    private final ToggleAction matchCaseToggleAction;
+    private boolean matchCase = false;
+    private final ToggleAction multipleMatchesToggle;
+    private boolean multipleMatches = true;
+    private final AnActionButton replaceAction;
+    private final AnActionButton replaceAllAction;
 
     public BinarySearchPanel() {
         findToolbarActionGroup = new DefaultActionGroup();
@@ -102,21 +116,29 @@ public class BinarySearchPanel extends JBPanel {
         closeToolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".close",
                 closeToolbarActionGroup, true);
 
-        findComboBoxAction = new ComboBoxAction() {
+        optionsAction = new DefaultCustomComponentAction(
+                () -> new JButton(new AbstractAction(resourceBundle.getString("optionsButton.text")) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        control.searchOptions();
+                    }
+                })
+        ) {
+            @Nonnull
             @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         };
 
-        optionsAction = new AnActionButton(
-                resourceBundle.getString("optionsButton.text"),
+        prevMatchAction = new AnActionButton(
+                resourceBundle.getString("prevMatchButton.toolTipText"),
                 null,
-                null
+                load("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-left.png")
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                control.searchOptions();
+                control.prevMatch();
             }
 
             @Nonnull
@@ -125,9 +147,114 @@ public class BinarySearchPanel extends JBPanel {
                 return ActionUpdateThread.BGT;
             }
         };
+        prevMatchAction.setEnabled(false);
+
+        nextMatchAction = new AnActionButton(
+                resourceBundle.getString("nextMatchButton.toolTipText"),
+                null,
+                load("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-right.png")
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                control.nextMatch();
+            }
+
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+        };
+        nextMatchAction.setEnabled(false);
+
+        replaceAction = new AnActionButton(
+                resourceBundle.getString("replaceButton.text"),
+                null,
+                load("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-right.png")
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                control.performReplace();
+            }
+
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+        };
+        replaceAction.setEnabled(false);
+
+        replaceAllAction = new AnActionButton(
+                resourceBundle.getString("replaceAllButton.text"),
+                null,
+                load("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-right.png")
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                control.performReplaceAll();
+            }
+
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+        };
+        replaceAllAction.setEnabled(false);
+
+        matchCaseToggleAction = new ToggleAction(
+                resourceBundle.getString("matchCaseToggleButton.toolTipText"),
+                null,
+                load("/org/exbin/framework/bined/search/resources/icons/case_sensitive.png")
+        ) {
+            @NotNull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
+            @Override
+            public boolean isSelected(@NotNull AnActionEvent e) {
+                return matchCase;
+            }
+
+            @Override
+            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean selected) {
+                matchCase = selected;
+                control.notifySearchChanged();
+            }
+        };
+
+        multipleMatchesToggle = new ToggleAction(
+                resourceBundle.getString("multipleMatchesToggleButton.toolTipText"),
+                null,
+                load("/org/exbin/framework/bined/search/resources/icons/mark_occurrences.png")
+        ) {
+            @NotNull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
+            @Override
+            public boolean isSelected(@NotNull AnActionEvent e) {
+                return multipleMatches;
+            }
+
+            @Override
+            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean selected) {
+                multipleMatches = selected;
+                control.notifySearchChanged();
+            }
+        };
 
         initComponents();
         init();
+    }
+
+    public void setTargetComponent(JComponent targetComponent) {
+        findToolbar.setTargetComponent(targetComponent);
     }
 
     private void init() {
@@ -137,7 +264,7 @@ public class BinarySearchPanel extends JBPanel {
         add(new JButton("TEST 2"), BorderLayout.EAST);
         add(component, BorderLayout.WEST); */
 
-        findToolbarActionGroup.addAction(findComboBoxAction);
+        findToolbarActionGroup.addSeparator();
         findToolbarActionGroup.addAction(optionsAction);
         findPanel.add(findToolbar, BorderLayout.CENTER);
 
@@ -174,7 +301,7 @@ public class BinarySearchPanel extends JBPanel {
         searchCodeArea.setWrappingBytesGroupSize(0);
         searchCodeArea.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
         searchCodeArea.setHorizontalScrollBarVisibility(ScrollBarVisibility.NEVER);
-        searchCodeArea.setContentData(new ByteArrayEditableData(new byte[]{1, 2, 3}));
+        searchCodeArea.setContentData(new ByteArrayEditableData(new byte[0]));
 
         final KeyAdapter editorKeyListener = new KeyAdapter() {
             @Override
@@ -361,8 +488,8 @@ public class BinarySearchPanel extends JBPanel {
     @Nonnull
     public SearchParameters getSearchParameters() {
         SearchParameters searchParameters = new SearchParameters();
-        searchParameters.setMatchCase(matchCaseToggleButton.isSelected());
-        searchParameters.setMatchMode(SearchParameters.MatchMode.fromBoolean(multipleMatchesToggleButton.isSelected()));
+        searchParameters.setMatchCase(matchCase);
+        searchParameters.setMatchMode(SearchParameters.MatchMode.fromBoolean(multipleMatches));
         SearchParameters.SearchDirection searchDirection = control.getSearchDirection();
         searchParameters.setSearchDirection(searchDirection);
 
@@ -397,10 +524,15 @@ public class BinarySearchPanel extends JBPanel {
     }
 
     public void updateMatchStatus(boolean hasMatches, boolean prevMatchAvailable, boolean nextMatchAvailable) {
-        prevMatchButton.setEnabled(prevMatchAvailable);
-        nextMatchButton.setEnabled(nextMatchAvailable);
-        replaceButton.setEnabled(hasMatches);
-        replaceAllButton.setEnabled(hasMatches);
+        prevMatchAction.setEnabled(prevMatchAvailable);
+        nextMatchAction.setEnabled(nextMatchAvailable);
+        replaceAction.setEnabled(hasMatches);
+        replaceAllAction.setEnabled(hasMatches);
+
+//        prevMatchButton.setEnabled(prevMatchAvailable);
+//        nextMatchButton.setEnabled(nextMatchAvailable);
+//        replaceButton.setEnabled(hasMatches);
+//        replaceAllButton.setEnabled(hasMatches);
     }
 
     public void setSearchHistory(List<SearchCondition> history) {
@@ -468,6 +600,7 @@ public class BinarySearchPanel extends JBPanel {
 
         findLabel.setText(resourceBundle.getString("findLabel.text")); // NOI18N
         findLabel.setName("findLabel"); // NOI18N
+        findToolbarActionGroup.addAction(new DefaultCustomComponentAction(() -> findLabel));
 
         findTypeToolBar.setBorder(null);
         findTypeToolBar.setRollover(true);
@@ -486,15 +619,21 @@ public class BinarySearchPanel extends JBPanel {
                 findTypeButtonActionPerformed(evt);
             }
         });
-        findTypeToolBar.add(findTypeButton);
+        findToolbarActionGroup.addAction(new DefaultCustomComponentAction(() -> findTypeButton));
+//        findTypeToolBar.add(findTypeButton);
 
         findComboBox.setEditable(true);
         findComboBox.setName("findComboBox"); // NOI18N
+        findToolbarActionGroup.addAction(new DefaultCustomComponentAction(() -> findComboBox));
 
 //        findToolBar.setBorder(null);
 //        findToolBar.setRollover(true);
 //        findToolBar.setFocusable(false);
 //        findToolBar.setName("findToolBar"); // NOI18N
+        findToolbarActionGroup.addAction(prevMatchAction);
+        findToolbarActionGroup.addAction(nextMatchAction);
+        findToolbarActionGroup.addAction(matchCaseToggleAction);
+        findToolbarActionGroup.addAction(multipleMatchesToggle);
 
         prevMatchButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-left.png"))); // NOI18N
         prevMatchButton.setToolTipText(resourceBundle.getString("prevMatchButton.toolTipText")); // NOI18N
@@ -568,6 +707,7 @@ public class BinarySearchPanel extends JBPanel {
 
         infoLabel.setEnabled(false);
         infoLabel.setName("infoLabel"); // NOI18N
+        findToolbarActionGroup.addAction(new DefaultCustomComponentAction(() -> infoLabel));
 
 //        closeToolBar.setBorder(null);
 //        closeToolBar.setRollover(true);
@@ -846,6 +986,10 @@ public class BinarySearchPanel extends JBPanel {
 
     public void updateSearchHistory(SearchCondition condition) {
         findComboBoxEditorComponent.exclusiveUpdate(() -> ((SearchHistoryModel) findComboBox.getModel()).addSearchCondition(condition));
+    }
+
+    private Icon load(String path) {
+        return IconLoader.getIcon(path, getClass());
     }
 
     public interface Control {

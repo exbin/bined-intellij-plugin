@@ -118,7 +118,6 @@ public class BinedDiffPanel extends JBPanel {
     private EncodingsHandler encodingsHandler;
     private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi encodingStatus;
-    private CharsetChangeListener charsetChangeListener = null;
     private GoToPositionAction goToPositionAction = new GoToPositionAction();
 
     public BinedDiffPanel() {
@@ -201,7 +200,6 @@ public class BinedDiffPanel extends JBPanel {
                 diffPanel.getRightCodeArea().setCharset(Charset.forName(encodingName));
                 encodingStatus.setEncoding(encodingName);
                 preferences.getEncodingPreferences().setSelectedEncoding(encodingName);
-                // TODO charsetChangeListener.charsetChanged();
             }
         });
         Application application = BinEdManager.getInstance().getApplication();
@@ -218,7 +216,6 @@ public class BinedDiffPanel extends JBPanel {
         diffPanel.repaint();
         revalidate();
         repaint();
-        diffPanel.updateUI();
     }
 
     public void setDiffContent(ContentDiffRequest request) {
@@ -495,10 +492,6 @@ public class BinedDiffPanel extends JBPanel {
 //        });
     }
 
-    public void setCharsetChangeListener(CharsetChangeListener charsetChangeListener) {
-        this.charsetChangeListener = charsetChangeListener;
-    }
-
     private void updateApplyOptions(BinEdApplyOptions applyOptions) {
         ExtCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
         ExtCodeArea rightCodeArea = diffPanel.getRightCodeArea();
@@ -586,9 +579,5 @@ public class BinedDiffPanel extends JBPanel {
 
     private Icon load(String path) {
         return IconLoader.getIcon(path, getClass());
-    }
-
-    public static interface CharsetChangeListener {
-
     }
 }
