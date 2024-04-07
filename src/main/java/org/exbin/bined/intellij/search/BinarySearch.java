@@ -36,6 +36,7 @@ import org.exbin.framework.utils.handler.DefaultControlHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.Dialog;
 import java.util.ArrayList;
@@ -295,6 +296,10 @@ public class BinarySearch {
 
     public void setBinarySearchService(BinarySearchService binarySearchService) {
         this.binarySearchService = binarySearchService;
+    }
+
+    public void setTargetComponent(JComponent targetComponent) {
+        binarySearchPanel.setTargetComponent(targetComponent);
     }
 
     public void setPanelClosingListener(PanelClosingListener panelClosingListener) {

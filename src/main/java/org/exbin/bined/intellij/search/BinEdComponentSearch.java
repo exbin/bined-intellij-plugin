@@ -52,6 +52,7 @@ public class BinEdComponentSearch implements BinEdComponentPanel.BinEdComponentE
         binarySearchService = new BinarySearchServiceImpl(codeArea);
         binarySearch.setBinarySearchService(binarySearchService);
         binarySearch.setPanelClosingListener(this::hideSearchPanel);
+        binarySearch.setTargetComponent(componentPanel);
 
         BinedModule binedModule = application.getModuleRepository().getModuleByInterface(BinedModule.class);
 
