@@ -70,7 +70,7 @@ public class BinEdFileManager {
         
         for (BinEdFileExtension fileExtension : binEdComponentExtensions) {
             Optional<BinEdComponentPanel.BinEdComponentExtension> componentExtension = fileExtension.createComponentExtension(componentPanel);
-            componentExtension.ifPresent((extension) -> {
+            componentExtension.ifPresent(extension -> {
                 extension.setApplication(application);
                 extension.onCreate(componentPanel);
                 componentPanel.addComponentExtension(extension);

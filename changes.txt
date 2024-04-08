@@ -1,4 +1,4 @@
-0.2.10
+0.2.10 (2024-04-08)
 - Added support for language switching (zh, jp, ko)
 - Added support for basic macro
 - Reworked search toolbar UI

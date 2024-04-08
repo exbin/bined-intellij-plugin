@@ -45,10 +45,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
     public DebugViewPanel() {
         binEdEditorComponent = new BinEdEditorComponent();
-        BinEdManager binEdManager = BinEdManager.getInstance();
-        BinEdFileManager fileManager = binEdManager.getFileManager();
-        fileManager.initComponentPanel(binEdEditorComponent.getComponentPanel());
-        binEdManager.initEditorComponent(binEdEditorComponent);
 
         initComponents();
         init();

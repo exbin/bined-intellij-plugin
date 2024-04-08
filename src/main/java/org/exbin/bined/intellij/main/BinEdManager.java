@@ -654,47 +654,52 @@ public final class BinEdManager {
 
             menu.add(ActionUtils.actionToMenuItem(createEditSelectionAction(codeArea)));
 
-            menu.add(ActionUtils.actionToMenuItem(createInsertDataAction(editorComponent)));
-            menu.add(ActionUtils.actionToMenuItem(createConvertDataAction(editorComponent)));
+            if (fileHandler != null) {
+                menu.add(ActionUtils.actionToMenuItem(createInsertDataAction(editorComponent)));
+                menu.add(ActionUtils.actionToMenuItem(createConvertDataAction(editorComponent)));
+            }
 
             menu.addSeparator();
 
             menu.add(ActionUtils.actionToMenuItem(createGoToAction(codeArea)));
 
-            findReplaceActions.resetActions();
-            menu.add(ActionUtils.actionToMenuItem(findReplaceActions.getEditFindAction()));
-            menu.add(ActionUtils.actionToMenuItem(findReplaceActions.getEditReplaceAction()));
+            if (fileHandler != null) {
+                // TODO Make available in next version
+                findReplaceActions.resetActions();
+                menu.add(ActionUtils.actionToMenuItem(findReplaceActions.getEditFindAction()));
+                menu.add(ActionUtils.actionToMenuItem(findReplaceActions.getEditReplaceAction()));
 
-            bookmarksManager.resetBookmarksMenu();
-            JMenu bookmarksMenu = bookmarksManager.getBookmarksMenu();
-            bookmarksManager.updateBookmarksMenu();
-            menu.add(bookmarksMenu);
+                bookmarksManager.resetBookmarksMenu();
+                JMenu bookmarksMenu = bookmarksManager.getBookmarksMenu();
+                bookmarksManager.updateBookmarksMenu();
+                menu.add(bookmarksMenu);
 
-            macroManager.resetMacrosMenu();
-            macroManager.setEditorProvider(editorProvider);
-            JMenu macrosMenu = macroManager.getMacrosMenu();
-            macroManager.updateMacrosMenu();
-            macroManager.notifyMacroRecordingChange(codeArea);
-            menu.add(macrosMenu);
+                macroManager.resetMacrosMenu();
+                macroManager.setEditorProvider(editorProvider);
+                JMenu macrosMenu = macroManager.getMacrosMenu();
+                macroManager.updateMacrosMenu();
+                macroManager.notifyMacroRecordingChange(codeArea);
+                menu.add(macrosMenu);
+            }
         }
         }
 
         menu.addSeparator();
 
         JMenu toolsMenu = new JMenu(frameResourceBundle.getString("toolsMenu.text"));
-        toolsMenu.add(ActionUtils.actionToMenuItem(createCompareFilesAction(codeArea)));
+        if (fileHandler != null) {
+            toolsMenu.add(ActionUtils.actionToMenuItem(createCompareFilesAction(codeArea)));
+        }
         toolsMenu.add(ActionUtils.actionToMenuItem(createClipboardContentAction()));
         toolsMenu.add(ActionUtils.actionToMenuItem(createDragDropContentAction()));
         menu.add(toolsMenu);
 
-        if (editorComponent != null) {
-            if (fileHandler instanceof BinEdFileHandler || fileHandler instanceof BinEdNativeFile) {
-                JMenuItem reloadFileMenuItem = createReloadFileMenuItem(fileHandler);
-                menu.add(reloadFileMenuItem);
-            }
+        if (fileHandler instanceof BinEdFileHandler || fileHandler instanceof BinEdNativeFile) {
+            JMenuItem reloadFileMenuItem = createReloadFileMenuItem(fileHandler);
+            menu.add(reloadFileMenuItem);
         }
 
-        if (editorComponent != null) {
+        if (fileHandler != null) {
             final JMenuItem optionsMenuItem = new JMenuItem(optionsResourceBundle.getString("optionsAction.text") + "...");
             optionsMenuItem.setToolTipText(optionsResourceBundle.getString("optionsAction.shortDescription"));
             optionsMenuItem.setIcon(new ImageIcon(getClass().getResource(

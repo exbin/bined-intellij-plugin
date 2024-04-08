@@ -541,7 +541,7 @@ public class BinarySearchPanel extends JBPanel {
         prevMatchAction.setEnabled(prevMatchAvailable);
         nextMatchAction.setEnabled(nextMatchAvailable);
         replaceButton.setEnabled(hasMatches);
-        replaceAllButton.setEnabled(hasMatches);
+//        replaceAllButton.setEnabled(hasMatches);
     }
 
     public void setSearchHistory(List<SearchCondition> history) {

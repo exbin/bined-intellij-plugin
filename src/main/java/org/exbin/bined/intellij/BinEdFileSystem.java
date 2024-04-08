@@ -40,7 +40,7 @@ public class BinEdFileSystem extends VirtualFileSystem implements DumbAware {
     private List<VirtualFileListener> fileListeners = new ArrayList<>();
 
     private static class SingletonHelper {
-        private static final BinEdFileSystem INSTANCE = new BinEdFileSystem();
+        static final BinEdFileSystem INSTANCE = new BinEdFileSystem();
     }
 
     @Nonnull
