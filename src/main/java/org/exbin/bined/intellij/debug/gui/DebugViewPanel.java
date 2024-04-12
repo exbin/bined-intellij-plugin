@@ -81,7 +81,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
                 providerComboBoxItemStateChanged(evt);
             }
         });
-        add(providerComboBox, java.awt.BorderLayout.PAGE_START);
     }// </editor-fold>
 
     private void providerComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {
@@ -99,6 +98,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
     public void addProvider(DebugViewDataProvider provider) {
         if (providers.isEmpty()) {
             setContentData(provider.getData());
+            add(providerComboBox, java.awt.BorderLayout.PAGE_START);
         }
 
         providers.add(provider);
@@ -107,5 +107,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
     public void setContentData(@Nullable BinaryData data) {
         binEdEditorComponent.setContentData(data);
+        long dataSize = data == null ? 0 : data.getDataSize();
+        binEdEditorComponent.getStatusPanel().setCurrentDocumentSize(dataSize, dataSize);
     }
 }

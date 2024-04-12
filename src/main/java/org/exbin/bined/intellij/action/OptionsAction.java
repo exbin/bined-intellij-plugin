@@ -98,10 +98,14 @@ public class OptionsAction extends AbstractAction {
                 }
                 BinEdManager binedManager = BinEdManager.getInstance();
                 if (fileHandler != null) {
+                    Font defaultFont = ((TextFontApi) fileHandler).getDefaultFont();
+                    if (defaultFont == null) {
+                        defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+                    }
                     ((BinEdComponentFileApi) fileHandler).getEditorComponent()
                             .applyOptions(optionsPanel,
                                     binedManager.getEncodingsHandler(),
-                                    ((TextFontApi) fileHandler).getDefaultFont());
+                                    defaultFont);
                     if (fileHandler instanceof BinEdFileHandler) {
                         ((BinEdFileHandler) fileHandler).switchFileHandlingMode(optionsPanel.getEditorOptions()
                                 .getFileHandlingMode());

@@ -105,6 +105,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -424,6 +425,14 @@ public final class BinEdManager {
             });
         }
 
+        Font defaultFont = null;
+        if (fileHandler != null ) {
+            // TODO FIX uses codeArea.getFont() which can return null on some systems / LaFs
+            defaultFont = ((TextFontApi) fileHandler).getDefaultFont();
+        }
+        if (defaultFont == null) {
+            defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+        }
         editorComponent.applyOptions(new BinEdApplyOptions() {
             @Nonnull
             @Override
@@ -484,7 +493,7 @@ public final class BinEdManager {
             public CodeAreaThemeOptions getThemeOptions() {
                 return preferences.getThemePreferences();
             }
-        }, encodingsHandler, fileHandler == null ? new JTextField().getFont() : ((TextFontApi) fileHandler).getDefaultFont());
+        }, encodingsHandler, defaultFont);
     }
 
     @Nonnull
