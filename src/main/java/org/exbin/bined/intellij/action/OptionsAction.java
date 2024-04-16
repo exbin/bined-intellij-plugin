@@ -16,8 +16,7 @@
 package org.exbin.bined.intellij.action;
 
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
-import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
-import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
+import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.BinEdFileHandler;
@@ -28,8 +27,8 @@ import org.exbin.framework.editor.text.TextFontApi;
 import org.exbin.framework.editor.text.service.TextFontService;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.utils.gui.OptionsControlPanel;
-import org.exbin.framework.utils.handler.OptionsControlHandler;
+import org.exbin.framework.window.api.gui.OptionsControlPanel;
+import org.exbin.framework.window.api.handler.OptionsControlHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,7 +42,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 
 /**
- * Options action.
+ * TODO: Options action.
  *
  * @author ExBin Project (https://exbin.org)
  */
@@ -65,29 +64,30 @@ public class OptionsAction extends AbstractAction {
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         final BinEdOptionsPanelBorder optionsPanelWrapper = new BinEdOptionsPanelBorder();
         optionsPanelWrapper.setPreferredSize(new Dimension(700, 460));
-        BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
-        optionsPanel.setPreferences(preferences);
-        optionsPanel.setTextFontService(new TextFontService() {
-            @Nonnull
-            @Override
-            public Font getCurrentFont() {
-                return codeArea.getCodeFont();
-            }
-
-            @Nonnull
-            @Override
-            public Font getDefaultFont() {
-                return fileHandler == null ? new JTextField().getFont() : ((TextFontApi) fileHandler).getDefaultFont();
-            }
-
-            @Override
-            public void setCurrentFont(Font font) {
-                codeArea.setCodeFont(font);
-            }
-        });
-        optionsPanel.loadFromPreferences();
+        JPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
+//        BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
+//        optionsPanel.setPreferences(preferences);
+//        optionsPanel.setTextFontService(new TextFontService() {
+//            @Nonnull
+//            @Override
+//            public Font getCurrentFont() {
+//                return codeArea.getCodeFont();
+//            }
+//
+//            @Nonnull
+//            @Override
+//            public Font getDefaultFont() {
+//                return fileHandler == null ? new JTextField().getFont() : ((TextFontApi) fileHandler).getDefaultFont();
+//            }
+//
+//            @Override
+//            public void setCurrentFont(Font font) {
+//                codeArea.setCodeFont(font);
+//            }
+//        });
+//        optionsPanel.loadFromPreferences();
 //        editorComponent.updateApplyOptions(optionsPanel);
-        OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
+        /* OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
         JPanel dialogPanel = WindowUtils.createDialogPanel(optionsPanelWrapper, optionsControlPanel);
         WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel, componentPanel, optionsPanel.getResourceBundle().getString("dialog.title"), Dialog.ModalityType.APPLICATION_MODAL);
         optionsControlPanel.setHandler((OptionsControlHandler.ControlActionType actionType) -> {
@@ -118,6 +118,6 @@ public class OptionsAction extends AbstractAction {
             dialog.close();
         });
         dialog.showCentered(componentPanel);
-        dialog.dispose();
+        dialog.dispose(); */
     }
 }

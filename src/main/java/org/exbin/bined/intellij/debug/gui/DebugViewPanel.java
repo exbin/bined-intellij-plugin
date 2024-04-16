@@ -51,16 +51,17 @@ public class DebugViewPanel extends javax.swing.JPanel {
     }
 
     private void init() {
-        BinEdManager binEdManager = BinEdManager.getInstance();
-        BinEdFileManager fileManager = binEdManager.getFileManager();
+        // TODO
+//        BinEdManager binEdManager = BinEdManager.getInstance();
+//        BinEdFileManager fileManager = binEdManager.getFileManager();
         BinEdComponentPanel componentPanel = binEdEditorComponent.getComponentPanel();
-        fileManager.initComponentPanel(componentPanel);
-        binEdManager.initEditorComponent(binEdEditorComponent);
+//        fileManager.initComponentPanel(componentPanel);
+//        binEdManager.initEditorComponent(binEdEditorComponent);
 
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         codeArea.setEditMode(EditMode.READ_ONLY);
 
-        this.add(binEdEditorComponent.getComponent(), BorderLayout.CENTER);
+        this.add(binEdEditorComponent.getComponentPanel(), BorderLayout.CENTER);
     }
 
     /**
@@ -108,6 +109,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
     public void setContentData(@Nullable BinaryData data) {
         binEdEditorComponent.setContentData(data);
         long dataSize = data == null ? 0 : data.getDataSize();
-        binEdEditorComponent.getStatusPanel().setCurrentDocumentSize(dataSize, dataSize);
+        // TODO binEdEditorComponent.getStatusPanel().setCurrentDocumentSize(dataSize, dataSize);
     }
 }

@@ -27,8 +27,10 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import org.exbin.bined.intellij.options.impl.IntegrationOptionsImpl;
+import org.exbin.framework.App;
+import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.model.LanguageRecord;
-import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.utils.TestApplication;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.options.api.OptionsComponent;
 import org.exbin.framework.options.api.OptionsModifiedListener;
@@ -41,7 +43,7 @@ import org.exbin.framework.options.api.OptionsModifiedListener;
 @ParametersAreNonnullByDefault
 public class IntegrationOptionsPanel extends javax.swing.JPanel implements OptionsComponent<IntegrationOptionsImpl> {
 
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(IntegrationOptionsPanel.class);
+    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(IntegrationOptionsPanel.class);
     private OptionsModifiedListener optionsModifiedListener;
     private String defaultLocaleName = "";
 
@@ -296,7 +298,7 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        WindowUtils.invokeDialog(new IntegrationOptionsPanel());
+        TestApplication.run(() -> WindowUtils.invokeWindow(new IntegrationOptionsPanel()));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

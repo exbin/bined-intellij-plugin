@@ -1,3 +1,8 @@
+0.3.0
+
+0.2.10.1 (2024-04-13)
+- Fixed issue with null default font (issue #58)
+
 0.2.10 (2024-04-08)
 - Added support for language switching (zh, jp, ko)
 - Added support for basic macro

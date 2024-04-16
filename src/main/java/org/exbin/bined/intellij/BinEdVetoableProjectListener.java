@@ -47,9 +47,10 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         for (VirtualFile file : openFiles) {
             if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isClosing()) {
                 FileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
-                if (fileHandler.isModified()) {
-                    fileHandlers.add(fileHandler);
-                }
+                // TODO
+//                if (fileHandler.isModified()) {
+//                    fileHandlers.add(fileHandler);
+//                }
             }
         }
 
@@ -74,6 +75,9 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
 
     public static boolean showAskForSaveDialog(@Nonnull List<FileHandler> fileHandlers,
             @Nonnull Component parentComponent) {
+        return false;
+        // TODO
+        /*
         UnsavedFilesPanel unsavedFilesPanel = new UnsavedFilesPanel();
         unsavedFilesPanel.setUnsavedFiles(fileHandlers);
         ResourceBundle resourceBundle = unsavedFilesPanel.getResourceBundle();
@@ -105,6 +109,6 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         unsavedFilesPanel.assignGlobalKeys();
         dialog.show();
 
-        return result[0];
+        return result[0]; */
     }
 }

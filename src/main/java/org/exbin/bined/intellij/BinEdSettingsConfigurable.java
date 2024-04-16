@@ -18,8 +18,8 @@ package org.exbin.bined.intellij;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
-import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
-import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
+//import org.exbin.bined.intellij.options.gui.BinEdOptionsPanel;
+import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
 import javax.swing.JComponent;
 
 /**
- * Settings component.
+ * TODO: Settings component.
  *
  * @author ExBin Project (https://exbin.org)
  */
@@ -49,10 +49,10 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
     @Override
     public JComponent createComponent() {
         optionsPanelWrapper = new BinEdOptionsPanelBorder();
-        BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
-        BinEdManager binEdManager = BinEdManager.getInstance();
-        optionsPanel.setPreferences(binEdManager.getPreferences());
-        optionsPanel.loadFromPreferences();
+//        BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
+//        BinEdManager binEdManager = BinEdManager.getInstance();
+//        optionsPanel.setPreferences(binEdManager.getPreferences());
+//        optionsPanel.loadFromPreferences();
 //        optionsPanelWrapper.addFocusListener(new FocusAdapter() {
 //            @Override
 //            public void focusGained(FocusEvent e) {
@@ -70,7 +70,7 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
     @Override
     public void apply() throws ConfigurationException {
-        BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
-        optionsPanel.saveToPreferences();
+//        BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
+//        optionsPanel.saveToPreferences();
     }
 }

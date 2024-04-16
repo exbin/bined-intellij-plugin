@@ -31,8 +31,9 @@ import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
+import org.exbin.framework.App;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
-import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.language.api.LanguageModuleApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,11 +55,11 @@ import java.util.logging.Logger;
 @ParametersAreNonnullByDefault
 public class BinEdToolbarPanel extends JBPanel {
 
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedModule");
-    private final java.util.ResourceBundle fileResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/file/resources/FileModule");
-    private final java.util.ResourceBundle optionsResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/options/resources/OptionsModule");
-    private final java.util.ResourceBundle onlineHelpResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/help/online/action/resources/OnlineHelpAction");
-    private final java.util.ResourceBundle operationUndoResourceBundle = LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/operation/undo/resources/OperationUndoModule");
+    private final java.util.ResourceBundle resourceBundle;
+    private final java.util.ResourceBundle fileResourceBundle;
+    private final java.util.ResourceBundle optionsResourceBundle;
+    private final java.util.ResourceBundle onlineHelpResourceBundle;
+    private final java.util.ResourceBundle operationUndoResourceBundle;
 
     private static final String TOOLBAR_PLACE = "BinEdPluginMainToolbar";
     private static final Key<Boolean> SELECTED_PROPERTY_KEY = Key.create(Toggleable.SELECTED_PROPERTY);
@@ -81,6 +82,13 @@ public class BinEdToolbarPanel extends JBPanel {
 
     public BinEdToolbarPanel(JComponent targetComponent, Control codeAreaControl) {
         this.codeAreaControl = codeAreaControl;
+
+        LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
+        resourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedModule");
+        fileResourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/file/resources/FileModule");
+        optionsResourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/options/resources/OptionsModule");
+        onlineHelpResourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/help/online/action/resources/OnlineHelpAction");
+        operationUndoResourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/operation/undo/resources/OperationUndoModule");
 
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();

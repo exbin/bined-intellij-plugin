@@ -40,7 +40,7 @@ public class FileMenuOpenAsBinaryAction extends AnAction implements DumbAware {
     private boolean actionVisible = true;
 
     public FileMenuOpenAsBinaryAction() {
-        super("Open As Binary" + ActionUtils.DIALOG_MENUITEM_EXT);
+        super("Open As Binary" + "...");
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterFileMenuOpenAsBinary());
     }
 

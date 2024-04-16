@@ -65,9 +65,13 @@ tasks {
     }
 }
 
+val exbinFrameworkLibraryVersion = "0.3.0-SNAPSHOT"
+val binedAppLibraryVersion = "0.3.0-SNAPSHOT"
 val binedLibraryVersion = "0.2.1"
 val binaryDataLibraryVersion = "0.2.1"
 
+fun exbinFrameworkLibrary(libName: String): String = if (exbinFrameworkLibraryVersion.endsWith("-SNAPSHOTX")) ":${libName}-${exbinFrameworkLibraryVersion}" else "org.exbin.framework:${libName}:${exbinFrameworkLibraryVersion}"
+fun binedAppLibrary(libName: String): String = if (binedAppLibraryVersion.endsWith("-SNAPSHOTX")) ":${libName}-${binedAppLibraryVersion}" else "org.exbin.framework:${libName}:${binedAppLibraryVersion}"
 fun binedLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binedLibraryVersion}" else "org.exbin.bined:${libName}:${binedLibraryVersion}"
 fun binaryDataLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binaryDataLibraryVersion}" else "org.exbin.auxiliary:${libName}:${binaryDataLibraryVersion}"
 
@@ -75,9 +79,42 @@ repositories {
     flatDir {
         dirs("lib", "lib/jetbrains")
     }
+    mavenLocal()
 }
 
 dependencies {
+    implementation(exbinFrameworkLibrary("exbin-framework"))
+    implementation(exbinFrameworkLibrary("exbin-framework-basic"))
+    implementation(exbinFrameworkLibrary("exbin-framework-frame"))
+    implementation(exbinFrameworkLibrary("exbin-framework-ui"))
+    implementation(exbinFrameworkLibrary("exbin-framework-component"))
+//    implementation(exbinFrameworkLibrary("exbin-framework-data"))
+    implementation(exbinFrameworkLibrary("exbin-framework-window"))
+    implementation(exbinFrameworkLibrary("exbin-framework-action"))
+    implementation(exbinFrameworkLibrary("exbin-framework-file"))
+    implementation(exbinFrameworkLibrary("exbin-framework-editor"))
+    implementation(exbinFrameworkLibrary("exbin-framework-about-api"))
+    implementation(exbinFrameworkLibrary("exbin-framework-about"))
+    implementation(exbinFrameworkLibrary("exbin-framework-operation-undo"))
+    implementation(exbinFrameworkLibrary("exbin-framework-action-popup"))
+    implementation(exbinFrameworkLibrary("exbin-framework-help-online"))
+    implementation(exbinFrameworkLibrary("exbin-framework-options"))
+    implementation(exbinFrameworkLibrary("exbin-framework-options-api"))
+    implementation(exbinFrameworkLibrary("exbin-framework-preferences-api"))
+    implementation(exbinFrameworkLibrary("exbin-framework-preferences"))
+    implementation(exbinFrameworkLibrary("exbin-framework-language-api"))
+    implementation(exbinFrameworkLibrary("exbin-framework-language"))
+    implementation(exbinFrameworkLibrary("exbin-framework-editor-text"))
+    implementation(binedAppLibrary("exbin-framework-bined"))
+    implementation(binedAppLibrary("exbin-framework-bined-bookmarks"))
+    implementation(binedAppLibrary("exbin-framework-bined-compare"))
+    implementation(binedAppLibrary("exbin-framework-bined-inspector"))
+    implementation(binedAppLibrary("exbin-framework-bined-macro"))
+    implementation(binedAppLibrary("exbin-framework-bined-objectdata"))
+    implementation(binedAppLibrary("exbin-framework-bined-operation"))
+    implementation(binedAppLibrary("exbin-framework-bined-operation-bouncycastle"))
+    implementation(binedAppLibrary("exbin-framework-bined-search"))
+    implementation(binedAppLibrary("exbin-framework-bined-tool-content"))
     implementation(binedLibrary("bined-core"))
     implementation(binedLibrary("bined-extended"))
     implementation(binedLibrary("bined-highlight-swing"))
@@ -88,6 +125,7 @@ dependencies {
     implementation(binaryDataLibrary("binary_data"))
     implementation(binaryDataLibrary("binary_data-paged"))
     implementation(binaryDataLibrary("binary_data-delta"))
+    implementation(":flatlaf-desktop-3.2")
     compileOnly(":debugvalue-clion-2022.2.1")
     compileOnly(":debugvalue-goland-2022.2.1")
     compileOnly(":debugvalue-intellij-2022.2.1")

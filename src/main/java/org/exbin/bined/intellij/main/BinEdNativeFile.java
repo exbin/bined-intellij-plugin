@@ -29,7 +29,9 @@ import org.exbin.bined.EditMode;
 import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
 import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
 import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdEditorComponent;
+import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.editor.text.TextFontApi;
@@ -62,10 +64,10 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 
     public BinEdNativeFile(VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
-        BinEdManager binEdManager = BinEdManager.getInstance();
         componentPanel = new BinEdEditorComponent();
-        binEdManager.getFileManager().initComponentPanel(componentPanel.getComponentPanel());
-        binEdManager.initFileHandler(this);
+        BinedModule binedModule = App.getModule(BinedModule.class);
+        binedModule.getFileManager().initComponentPanel(componentPanel.getComponentPanel());
+        // TODO binedModule.getFileManager().initFileHandler(this);
 
         ExtCodeArea codeArea = componentPanel.getCodeArea();
         CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
@@ -79,31 +81,21 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 //        });
         defaultFont = codeArea.getCodeFont();
         documentOriginalSize = virtualFile.getLength();
-        binEdManager.getFileManager().initCommandHandler(componentPanel.getComponentPanel());
+        binedModule.getFileManager().initCommandHandler(componentPanel.getComponentPanel());
     }
 
     public boolean isModified() {
-        return componentPanel.isModified();
+        return false; // TODO componentPanel.isModified();
     }
 
     @Nonnull
     public JComponent getComponent() {
-        return componentPanel.getComponent();
-    }
-
-    @Nonnull
-    @Override
-    public BinEdEditorComponent getEditorComponent() {
-        return componentPanel;
+        return componentPanel.getComponentPanel();
     }
 
     @Nonnull
     public ExtCodeArea getCodeArea() {
         return componentPanel.getCodeArea();
-    }
-
-    @Override public long getDocumentOriginalSize() {
-        return documentOriginalSize;
     }
 
     @Override
@@ -132,11 +124,6 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
     @Override
     public void setFileType(@Nullable FileType fileType) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void clearFile() {
-
     }
 
     public void openFile(VirtualFile virtualFile) {
@@ -195,7 +182,7 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 
     @Nonnull
     public FileHandlingMode getFileHandlingMode() {
-        return FileHandlingMode.NATIVE;
+        return FileHandlingMode.DIRECT;
     }
 
     public void reloadFile() {
@@ -209,7 +196,7 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
     }
 
     private void updateModified() {
-        boolean modified = componentPanel.isModified();
+        boolean modified = false; // componentPanel.isModified();
 //        // TODO: Trying to force "modified behavior"
         Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
         if (document instanceof DocumentEx) {
@@ -237,16 +224,6 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 
     @Override
     public void loadFromFile(URI fileUri, @org.jetbrains.annotations.Nullable FileType fileType) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void saveFile() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void saveToFile(URI fileUri, @org.jetbrains.annotations.Nullable FileType fileType) {
         throw new UnsupportedOperationException();
     }
 

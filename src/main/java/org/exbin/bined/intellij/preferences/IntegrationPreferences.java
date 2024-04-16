@@ -15,7 +15,7 @@
  */
 package org.exbin.bined.intellij.preferences;
 
-import org.exbin.framework.api.Preferences;
+import org.exbin.framework.preferences.api.Preferences;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -22,7 +22,8 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.debug.intellij.XValueNodeConvertor;
-import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.App;
+import org.exbin.framework.language.api.LanguageModuleApi;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -41,7 +42,7 @@ import java.util.ResourceBundle;
 public class DebugViewDataDialog extends DialogWrapper {
 
     private final Project project;
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(DebugViewDataDialog.class);
+    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(DebugViewDataDialog.class);
 
     private final DebugViewPanel viewPanel;
     private final XValueNodeImpl myDataNode;

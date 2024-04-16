@@ -23,9 +23,10 @@ import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.main.BinEdManager;
+import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileManager;
-import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.language.api.LanguageModuleApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,7 +43,7 @@ import java.util.ResourceBundle;
 @ParametersAreNonnullByDefault
 public final class DataDialog extends DialogWrapper {
 
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(DataDialog.class);
+    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(DataDialog.class);
 
     private final BinEdEditorComponent editorComponent;
     private final SetDataListener setDataListener;
@@ -64,10 +65,10 @@ public final class DataDialog extends DialogWrapper {
         setCrossClosesWindow(true);
 
         editorComponent = new BinEdEditorComponent();
-        BinEdManager binEdManager = BinEdManager.getInstance();
-        BinEdFileManager fileManager = binEdManager.getFileManager();
-        fileManager.initComponentPanel(editorComponent.getComponentPanel());
-        binEdManager.initEditorComponent(editorComponent);
+//        BinEdManager binEdManager = BinEdManager.getInstance();
+//        BinEdFileManager fileManager = binEdManager.getFileManager();
+//        fileManager.initComponentPanel(editorComponent.getComponentPanel());
+//        binEdManager.initEditorComponent(editorComponent);
 
         editorComponent.setContentData(binaryData);
         if (!editable) {
@@ -115,7 +116,7 @@ public final class DataDialog extends DialogWrapper {
     @Nonnull
     @Override
     protected JComponent createCenterPanel() {
-        BorderLayoutPanel panel = JBUI.Panels.simplePanel(editorComponent.getStatusPanel());
+        BorderLayoutPanel panel = JBUI.Panels.simplePanel(); // TODO editorComponent.getStatusPanel()
         panel.setPreferredSize(JBUI.size(600, 400));
         return panel;
     }

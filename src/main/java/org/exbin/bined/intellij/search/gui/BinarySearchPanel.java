@@ -37,14 +37,15 @@ import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.ExtendedCodeAreaPainter;
 import org.exbin.bined.swing.extended.color.ExtendedCodeAreaColorProfile;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
-import org.exbin.framework.api.XBApplication;
+import org.exbin.framework.App;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.search.ReplaceParameters;
 import org.exbin.framework.bined.search.SearchCondition;
 import org.exbin.framework.bined.search.SearchHistoryModel;
 import org.exbin.framework.bined.search.SearchParameters;
 import org.exbin.framework.bined.search.gui.BinarySearchComboBoxPanel;
-import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.language.api.LanguageModuleApi;
+import org.exbin.framework.utils.TestApplication;
 import org.exbin.framework.utils.WindowUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -80,7 +81,7 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 public class BinarySearchPanel extends JBPanel {
 
-    private final java.util.ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinarySearchPanel.class);
+    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(BinarySearchPanel.class);
 
     private Control control = null;
 
@@ -725,7 +726,7 @@ public class BinarySearchPanel extends JBPanel {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        WindowUtils.invokeDialog(new BinarySearchPanel());
+        TestApplication.run(() -> WindowUtils.invokeWindow(new BinarySearchPanel()));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -743,9 +744,6 @@ public class BinarySearchPanel extends JBPanel {
 
     private void comboBoxValueChanged() {
         control.notifySearchChanging();
-    }
-
-    public void setApplication(XBApplication application) {
     }
 
     public void requestSearchFocus() {

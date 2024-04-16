@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij.main;
 
 import com.intellij.ide.util.PropertiesComponent;
-import org.exbin.framework.api.Preferences;
+import org.exbin.framework.preferences.api.Preferences;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

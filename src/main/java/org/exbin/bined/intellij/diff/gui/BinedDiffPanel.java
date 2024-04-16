@@ -34,14 +34,12 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
-import org.exbin.bined.intellij.main.Application;
 import org.exbin.bined.intellij.main.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
-import org.exbin.bined.intellij.gui.BinEdOptionsPanel;
-import org.exbin.bined.intellij.gui.BinEdOptionsPanelBorder;
+import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
@@ -50,6 +48,7 @@ import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.bined.swing.extended.diff.ExtCodeAreaDiffPanel;
 import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
+import org.exbin.framework.App;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.action.GoToPositionAction;
@@ -68,11 +67,11 @@ import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.options.TextFontOptions;
 import org.exbin.framework.editor.text.service.TextFontService;
+import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.utils.DesktopUtils;
-import org.exbin.framework.utils.LanguageUtils;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.utils.gui.OptionsControlPanel;
-import org.exbin.framework.utils.handler.OptionsControlHandler;
+import org.exbin.framework.window.api.gui.OptionsControlPanel;
+import org.exbin.framework.window.api.handler.OptionsControlHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -202,9 +201,7 @@ public class BinedDiffPanel extends JBPanel {
                 preferences.getEncodingPreferences().setSelectedEncoding(encodingName);
             }
         });
-        Application application = BinEdManager.getInstance().getApplication();
-        encodingsHandler.setApplication(application);
-        goToPositionAction.setup(application, LanguageUtils.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedModule"));
+        goToPositionAction.setup(App.getModule(LanguageModuleApi.class).getBundle(BinedModule.class));
 
         registerBinaryStatus(statusPanel);
 
@@ -230,7 +227,7 @@ public class BinedDiffPanel extends JBPanel {
             leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
-                    JPopupMenu popupMenu = BinedModule.createCodeAreaPopupMenu(leftCodeArea, "left");
+                    JPopupMenu popupMenu = new JPopupMenu(); // TODO BinedModule.createCodeAreaPopupMenu(leftCodeArea, "left");
                     popupMenu.show(invoker, x, y);
                 }
             });
@@ -242,7 +239,7 @@ public class BinedDiffPanel extends JBPanel {
             rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
-                    JPopupMenu popupMenu = BinedModule.createCodeAreaPopupMenu(rightCodeArea, "right");
+                    JPopupMenu popupMenu = new JPopupMenu(); // TODO BinedModule.createCodeAreaPopupMenu(rightCodeArea, "right");
                     popupMenu.show(invoker, x, y);
                 }
             });
@@ -347,7 +344,7 @@ public class BinedDiffPanel extends JBPanel {
         binaryStatus.setSelectionRange(codeArea.getSelection());
         long dataSize = codeArea.getDataSize();
         binaryStatus.setCurrentDocumentSize(dataSize, dataSize);
-        goToPositionAction.updateForActiveCodeArea(codeArea);
+        goToPositionAction.setCodeArea(codeArea);
     }
 
     private void initialLoadFromPreferences() {
@@ -373,7 +370,7 @@ public class BinedDiffPanel extends JBPanel {
             @Nonnull
             @Override
             public IntegrationOptions getIntegrationOptions() {
-                return preferences.getIntegrationPreferences();
+                return null; // TODO preferences.getIntegrationPreferences();
             }
 
             @Nonnull
@@ -391,7 +388,7 @@ public class BinedDiffPanel extends JBPanel {
             @Nonnull
             @Override
             public DataInspectorOptions getDataInspectorOptions() {
-                return preferences.getDataInspectorPreferences();
+                return null; // TODO preferences.getDataInspectorPreferences();
             }
 
             @Nonnull
@@ -435,7 +432,7 @@ public class BinedDiffPanel extends JBPanel {
             public void actionPerformed(ActionEvent e) {
                 final BinEdOptionsPanelBorder optionsPanelWrapper = new BinEdOptionsPanelBorder();
                 optionsPanelWrapper.setPreferredSize(new Dimension(700, 460));
-                BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
+                /*BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
                 optionsPanel.setPreferences(preferences);
                 optionsPanel.setTextFontService(new TextFontService() {
                     @Nonnull
@@ -478,7 +475,7 @@ public class BinedDiffPanel extends JBPanel {
                     dialog.close();
                 });
                 dialog.showCentered(BinedDiffPanel.this);
-                dialog.dispose();
+                dialog.dispose(); */
             }
         };
     }

@@ -47,31 +47,61 @@ import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
+import org.exbin.bined.intellij.main.BinEdIntelliJEditorProvider;
 import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.intellij.main.BinEdNativeFile;
 import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.objectdata.MainBinaryViewHandler;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
+import org.exbin.framework.App;
+import org.exbin.framework.Module;
+import org.exbin.framework.ModuleProvider;
+import org.exbin.framework.about.AboutModule;
+import org.exbin.framework.about.api.AboutModuleApi;
+import org.exbin.framework.action.ActionModule;
+import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
+import org.exbin.framework.component.ComponentModule;
+import org.exbin.framework.component.api.ComponentModuleApi;
+import org.exbin.framework.editor.EditorModule;
+import org.exbin.framework.editor.api.EditorModuleApi;
+import org.exbin.framework.file.FileModule;
+import org.exbin.framework.file.api.FileModuleApi;
+import org.exbin.framework.frame.FrameModule;
+import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.framework.language.LanguageModule;
+import org.exbin.framework.language.api.LanguageModuleApi;
+import org.exbin.framework.language.api.LanguageProvider;
+import org.exbin.framework.operation.undo.OperationUndoModule;
+import org.exbin.framework.operation.undo.api.OperationUndoModuleApi;
+import org.exbin.framework.options.OptionsModule;
+import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.options.model.LanguageRecord;
-import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.preferences.PreferencesModule;
+import org.exbin.framework.preferences.api.Preferences;
+import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.ui.UiModule;
+import org.exbin.framework.ui.api.UiModuleApi;
+import org.exbin.framework.window.WindowModule;
+import org.exbin.framework.window.api.WindowModuleApi;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.Action;
-import javax.swing.JComponent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,8 +119,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
     private static final List<IntegrationOptionsListener> INTEGRATION_OPTIONS_LISTENERS = new ArrayList<>();
     private static IntegrationOptions initialIntegrationOptions = null;
 
+    private boolean initialized = false;
     private final BinaryViewHandler viewHandler = new MainBinaryViewHandler();
-    private final List<BinaryViewData> initialized = new ArrayList<>();
+    private final List<BinaryViewData> initializedExtensions = new ArrayList<>();
 
     BinEdPluginStartupActivity() {
     }
@@ -104,6 +135,35 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
     @Override
     public void runActivity(Project project) {
+        projectOpened(project);
+    }
+
+    private void initExtensions() {
+        BINED_VIEW_DATA.getExtensionList()
+                .stream()
+                .filter(binaryViewData -> !initializedExtensions.contains(binaryViewData))
+                .forEach(binaryViewData -> {
+                    binaryViewData.passHandler(viewHandler);
+                    initializedExtensions.add(binaryViewData);
+                });
+    }
+
+    private static void initIntegration() {
+        initialIntegrationOptions = new IntegrationPreferences(
+                new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX)
+        );
+        applyIntegrationOptions(initialIntegrationOptions);
+    }
+
+    private void projectOpened(Project project) {
+        if (!initialized) {
+            initialized = true;
+            AppModuleProvider appModuleProvider = new AppModuleProvider();
+            appModuleProvider.createModules();
+            App.setModuleProvider(appModuleProvider);
+            appModuleProvider.init();
+        }
+
         if (initialIntegrationOptions == null) {
             ProjectManager.getInstance().addProjectManagerListener(new BinEdVetoableProjectListener());
 
@@ -121,27 +181,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             initIntegration();
         }
 
-        projectOpened(project);
-    }
-
-    private void initExtensions() {
-        BINED_VIEW_DATA.getExtensionList()
-                .stream()
-                .filter(binaryViewData -> !initialized.contains(binaryViewData))
-                .forEach(binaryViewData -> {
-                    binaryViewData.passHandler(viewHandler);
-                    initialized.add(binaryViewData);
-                });
-    }
-
-    private static void initIntegration() {
-        initialIntegrationOptions = new IntegrationPreferences(
-                new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX)
-        );
-        applyIntegrationOptions(initialIntegrationOptions);
-    }
-
-    private static void projectOpened(Project project) {
         MessageBus messageBus = project.getMessageBus();
         MessageBusConnection connect = messageBus.connect();
         connect.subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, new FileEditorManagerListener.Before() {
@@ -161,8 +200,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     BinEdFileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
                     if (fileHandler.isModified() && ((BinEdComponentFileApi) fileHandler).isSaveSupported()) {
                         ApplicationManager.getApplication().invokeLater(() -> {
-                            BinEdManager binedManager = BinEdManager.getInstance();
-                            boolean released = binedManager.releaseFile(fileHandler);
+                            boolean released = false; // TODO editorProvider.releaseFile(fileHandler);
                             ((BinEdVirtualFile) file).setClosing(false);
                             if (released) {
                                 passNext = true;
@@ -228,12 +266,13 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
     }
 
     public static void applyIntegrationOptions(IntegrationOptions integrationOptions) {
+        LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
         Locale languageLocale = integrationOptions.getLanguageLocale();
         if (languageLocale.equals(Locale.ROOT)) {
             // Try to match to IDE locale
             Locale ideLocale = com.intellij.DynamicBundle.getLocale();
             List<Locale> locales = new ArrayList<>();
-            for (LanguageRecord languageRecord : LanguageUtils.getLanguageRecords()) {
+            for (LanguageProvider languageRecord : languageModule.getLanguagePlugins()) {
                 locales.add(languageRecord.getLocale());
             }
             List<Locale.LanguageRange> localeRange = new ArrayList<>();
@@ -245,10 +284,10 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             localeRange.add(new Locale.LanguageRange(languageTag));
             List<Locale> match = Locale.filter(localeRange, locales);
             if (!match.isEmpty()) {
-                LanguageUtils.setLanguageLocale(match.get(0));
+                languageModule.switchToLanguage(match.get(0));
             }
         } else {
-            LanguageUtils.setLanguageLocale(languageLocale);
+            languageModule.switchToLanguage(languageLocale);
         }
         for (IntegrationOptionsListener listener : INTEGRATION_OPTIONS_LISTENERS) {
             listener.integrationInit(integrationOptions);
@@ -258,5 +297,63 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
     @ParametersAreNonnullByDefault
     public interface IntegrationOptionsListener {
         void integrationInit(IntegrationOptions integrationOptions);
+    }
+
+    @ParametersAreNonnullByDefault
+    private static class AppModuleProvider implements ModuleProvider {
+
+        private final Map<Class<?>, Module> modules = new HashMap<>();
+
+        private void createModules() {
+            modules.put(LanguageModuleApi.class, new LanguageModule());
+            modules.put(ActionModuleApi.class, new ActionModule());
+            modules.put(OperationUndoModuleApi.class, new OperationUndoModule());
+            modules.put(OptionsModuleApi.class, new OptionsModule());
+            modules.put(PreferencesModuleApi.class, new PreferencesModule());
+            modules.put(UiModuleApi.class, new UiModule());
+            modules.put(ComponentModuleApi.class, new ComponentModule());
+            modules.put(WindowModuleApi.class, new WindowModule());
+            modules.put(FrameModuleApi.class, new FrameModule());
+            modules.put(FileModuleApi.class, new FileModule());
+            modules.put(EditorModuleApi.class, new EditorModule());
+            modules.put(BinedModule.class, new BinedModule());
+            modules.put(AboutModuleApi.class, new AboutModule());
+        }
+
+        private void init() {
+            PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
+            preferencesModule.setupAppPreferences(BinEdIntelliJPlugin.class);
+            Preferences preferences = preferencesModule.getAppPreferences();
+
+            FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+            frameModule.createMainMenu();
+            ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+            actionModule.registerMenuClipboardActions();
+            actionModule.registerToolBarClipboardActions();
+
+            LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
+            ResourceBundle bundle = languageModule.getBundle(BinEdIntelliJPlugin.class);
+            languageModule.setAppBundle(bundle);
+
+            AboutModuleApi aboutModule = App.getModule(AboutModuleApi.class);
+            aboutModule.registerDefaultMenuItem();
+            OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+            optionsModule.registerMenuAction();
+
+            BinEdIntelliJEditorProvider editorProvider = new BinEdIntelliJEditorProvider();
+            BinedModule binaryModule = App.getModule(BinedModule.class);
+            binaryModule.setEditorProvider(editorProvider);
+            binaryModule.registerCodeAreaPopupMenu();
+        }
+
+        @Override
+        public void launch(Runnable runnable) {
+        }
+
+        @Nonnull
+        @Override
+        public <T extends Module> T getModule(Class<T> moduleClass) {
+            return (T) modules.get(moduleClass);
+        }
     }
 }

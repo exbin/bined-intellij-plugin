@@ -18,7 +18,7 @@ package org.exbin.bined.intellij.search;
 import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
-import org.exbin.framework.api.XBApplication;
+import org.exbin.framework.App;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.search.ReplaceParameters;
 import org.exbin.framework.bined.search.SearchCondition;
@@ -27,11 +27,12 @@ import org.exbin.framework.bined.search.gui.BinaryMultilinePanel;
 import org.exbin.framework.bined.search.gui.FindBinaryPanel;
 import org.exbin.framework.bined.search.service.BinarySearchService;
 import org.exbin.framework.bined.search.service.BinarySearchService.FoundMatches;
-import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.utils.LanguageUtils;
+import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.utils.gui.DefaultControlPanel;
-import org.exbin.framework.utils.handler.DefaultControlHandler;
+import org.exbin.framework.window.api.WindowHandler;
+import org.exbin.framework.window.api.WindowModuleApi;
+import org.exbin.framework.window.api.gui.DefaultControlPanel;
+import org.exbin.framework.window.api.handler.DefaultControlHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -51,7 +52,7 @@ import java.util.ResourceBundle;
 @ParametersAreNonnullByDefault
 public class BinarySearch {
 
-    private final ResourceBundle resourceBundle = LanguageUtils.getResourceBundleByClass(BinarySearch.class);
+    private final ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(BinarySearch.class);
     private static final int DEFAULT_DELAY = 500;
 
     private InvokeSearchThread invokeSearchThread;
@@ -71,8 +72,6 @@ public class BinarySearch {
     private BinarySearchService binarySearchService;
     private final BinarySearchService.SearchStatusListener searchStatusListener;
     private final BinarySearchPanel binarySearchPanel = new BinarySearchPanel();
-
-    private XBApplication application;
 
     public BinarySearch() {
         searchStatusListener = new BinarySearchService.SearchStatusListener() {
@@ -209,7 +208,7 @@ public class BinarySearch {
             @Override
             public void searchOptions() {
                 cancelSearch();
-                FrameModuleApi frameModule = application.getModuleRepository().getModuleByInterface(FrameModuleApi.class);
+                WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
                 final FindBinaryPanel findBinaryPanel = new FindBinaryPanel();
                 findBinaryPanel.setSelected();
                 findBinaryPanel.setSearchHistory(searchHistory);
@@ -217,9 +216,9 @@ public class BinarySearch {
                 findBinaryPanel.setReplaceParameters(currentReplaceParameters);
                 findBinaryPanel.setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler);
                 DefaultControlPanel controlPanel = new DefaultControlPanel(findBinaryPanel.getResourceBundle());
-                final WindowUtils.DialogWrapper dialog = frameModule.createDialog(findBinaryPanel, controlPanel);
-                frameModule.setDialogTitle(dialog, findBinaryPanel.getResourceBundle());
-                WindowUtils.addHeaderPanel(dialog.getWindow(), findBinaryPanel.getClass(), findBinaryPanel.getResourceBundle());
+                final WindowHandler dialog = windowModule.createDialog(findBinaryPanel, controlPanel);
+                windowModule.setWindowTitle(dialog, findBinaryPanel.getResourceBundle());
+                windowModule.addHeaderPanel(dialog.getWindow(), findBinaryPanel.getClass(), findBinaryPanel.getResourceBundle());
                 findBinaryPanel.setMultilineEditorListener(new FindBinaryPanel.MultilineEditorListener() {
                     @Override
                     public SearchCondition multilineEdit(SearchCondition condition) {
@@ -227,11 +226,11 @@ public class BinarySearch {
                         multilinePanel.setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler);
                         multilinePanel.setCondition(condition);
                         DefaultControlPanel controlPanel = new DefaultControlPanel();
-                        JPanel dialogPanel = WindowUtils.createDialogPanel(multilinePanel, controlPanel);
-                        FrameModuleApi frameModule = application.getModuleRepository().getModuleByInterface(FrameModuleApi.class);
-                        final WindowUtils.DialogWrapper multilineDialog = frameModule.createDialog(dialog.getWindow(), Dialog.ModalityType.APPLICATION_MODAL, dialogPanel);
-                        WindowUtils.addHeaderPanel(multilineDialog.getWindow(), multilinePanel.getClass(), multilinePanel.getResourceBundle());
-                        frameModule.setDialogTitle(multilineDialog, multilinePanel.getResourceBundle());
+                        JPanel dialogPanel = windowModule.createDialogPanel(multilinePanel, controlPanel);
+                        WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
+                        final WindowHandler multilineDialog = windowModule.createDialog(dialog.getWindow(), Dialog.ModalityType.APPLICATION_MODAL, dialogPanel);
+                        windowModule.addHeaderPanel(multilineDialog.getWindow(), multilinePanel.getClass(), multilinePanel.getResourceBundle());
+                        windowModule.setWindowTitle(multilineDialog, multilinePanel.getResourceBundle());
                         final SearchConditionResult result = new SearchConditionResult();
                         controlPanel.setHandler((DefaultControlHandler.ControlActionType actionType) -> {
                             if (actionType == DefaultControlHandler.ControlActionType.OK) {
@@ -287,11 +286,6 @@ public class BinarySearch {
         });
         binarySearchPanel.setSearchHistory(searchHistory);
         binarySearchPanel.setReplaceHistory(replaceHistory);
-    }
-
-    public void setApplication(XBApplication application) {
-        this.application = application;
-        binarySearchPanel.setApplication(application);
     }
 
     public void setBinarySearchService(BinarySearchService binarySearchService) {
