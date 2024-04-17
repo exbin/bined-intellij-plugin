@@ -64,7 +64,7 @@ public class BinEdToolbarPanel extends JBPanel {
     private static final String TOOLBAR_PLACE = "BinEdPluginMainToolbar";
     private static final Key<Boolean> SELECTED_PROPERTY_KEY = Key.create(Toggleable.SELECTED_PROPERTY);
 
-    private final Control codeAreaControl;
+    private Control codeAreaControl;
     private AbstractAction optionsAction;
     private AnAction onlineHelpAction;
     private BinaryDataUndoHandler undoHandler;
@@ -80,9 +80,7 @@ public class BinEdToolbarPanel extends JBPanel {
     private final AnAction decimalCodeTypeAction;
     private final AnAction hexadecimalCodeTypeAction;
 
-    public BinEdToolbarPanel(JComponent targetComponent, Control codeAreaControl) {
-        this.codeAreaControl = codeAreaControl;
-
+    public BinEdToolbarPanel() {
         LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
         resourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedModule");
         fileResourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/file/resources/FileModule");
@@ -93,7 +91,6 @@ public class BinEdToolbarPanel extends JBPanel {
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
         toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE, actionGroup, true);
-        toolbar.setTargetComponent(targetComponent);
         add(toolbar, BorderLayout.CENTER);
 
         binaryCodeTypeAction = new AnAction(
@@ -176,6 +173,15 @@ public class BinEdToolbarPanel extends JBPanel {
         cycleCodeTypesSplitAction = new CodeTypeSplitAction(cycleActionGroup);
 
         initComponents();
+    }
+
+    public void setTargetComponent(JComponent targetComponent) {
+        toolbar.setTargetComponent(targetComponent);
+    }
+
+    public void setCodeAreaControl(Control codeAreaControl) {
+        this.codeAreaControl = codeAreaControl;
+        updateCycleButtonState();
     }
 
     public void setUndoHandler(BinaryDataUndoHandler undoHandler) {
@@ -362,7 +368,6 @@ public class BinEdToolbarPanel extends JBPanel {
         actionGroup.addAction(showUnprintablesToggleButton);
 
         actionGroup.addAction(cycleCodeTypesSplitAction);
-        updateCycleButtonState();
 
         actionGroup.addSeparator();
         AnAction settingsAction = new AnAction(

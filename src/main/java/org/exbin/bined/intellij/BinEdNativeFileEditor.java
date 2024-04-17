@@ -26,7 +26,6 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.exbin.bined.intellij.main.BinEdNativeFile;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

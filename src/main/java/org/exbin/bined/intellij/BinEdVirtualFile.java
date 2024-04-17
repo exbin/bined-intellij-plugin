@@ -20,6 +20,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
+import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +46,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     private final VirtualFile parentFile;
     private String displayName;
-    private BinEdFileHandler editorFile;
+    private final BinEdFilePanel filePanel = new BinEdFilePanel();
+    private final BinEdFileHandler editorFile = new BinEdFileHandler();
     private boolean closing = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
@@ -61,20 +63,17 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         } else {
             this.displayName = "";
         }
+        filePanel.setFileHandler(editorFile);
     }
 
     @Nonnull
     public BinEdFileHandler getEditorFile() {
-        if (editorFile == null) {
-            editorFile = new BinEdFileHandler();
-        }
-
         return editorFile;
     }
 
     @Nonnull
     public JComponent getEditorComponent() {
-        return getEditorFile().getComponent();
+        return filePanel;
     }
 
     @Nonnull

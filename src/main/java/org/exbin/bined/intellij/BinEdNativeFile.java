@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.main;
+package org.exbin.bined.intellij;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
@@ -23,20 +23,12 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.LocalTimeCounter;
 import org.exbin.auxiliary.binary_data.BinaryData;
-import org.exbin.auxiliary.binary_data.delta.DeltaDocument;
 import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
-import org.exbin.bined.operation.swing.CodeAreaUndoHandler;
-import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
+import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.framework.App;
-import org.exbin.framework.bined.BinEdEditorComponent;
-import org.exbin.framework.bined.BinedModule;
+import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.FileHandlingMode;
-import org.exbin.framework.bined.gui.BinEdComponentFileApi;
-import org.exbin.framework.editor.text.TextFontApi;
-import org.exbin.framework.file.api.FileHandler;
-import org.exbin.framework.file.api.FileType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,8 +36,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
 import java.awt.Font;
 import java.io.IOException;
-import java.net.URI;
-import java.util.Optional;
 
 /**
  * File editor wrapper using BinEd editor component.
@@ -53,9 +43,10 @@ import java.util.Optional;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, TextFontApi {
+public class BinEdNativeFile {
 
-    private final BinEdEditorComponent componentPanel;
+    private final BinEdFilePanel filePanel = new BinEdFilePanel();
+    private final BinEdFileHandler editorFile = new BinEdFileHandler();
 
     private boolean opened = false;
     private VirtualFile virtualFile;
@@ -64,14 +55,14 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 
     public BinEdNativeFile(VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
-        componentPanel = new BinEdEditorComponent();
-        BinedModule binedModule = App.getModule(BinedModule.class);
-        binedModule.getFileManager().initComponentPanel(componentPanel.getComponentPanel());
+        filePanel.setFileHandler(editorFile);
+//        BinedModule binedModule = App.getModule(BinedModule.class);
+//        binedModule.getFileManager().initComponentPanel(componentPanel.getComponentPanel());
         // TODO binedModule.getFileManager().initFileHandler(this);
 
-        ExtCodeArea codeArea = componentPanel.getCodeArea();
-        CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
-        componentPanel.setUndoHandler(undoHandler);
+//        ExtCodeArea codeArea = componentPanel.getCodeArea();
+//        CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
+//        editorFile.setUndoHandler(undoHandler);
         openFile(virtualFile);
 
         // TODO undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, this);
@@ -79,9 +70,9 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 //        componentPanel.setModifiedChangeListener(() -> {
 //            updateModified();
 //        });
-        defaultFont = codeArea.getCodeFont();
+//        defaultFont = codeArea.getCodeFont();
         documentOriginalSize = virtualFile.getLength();
-        binedModule.getFileManager().initCommandHandler(componentPanel.getComponentPanel());
+//        binedModule.getFileManager().initCommandHandler(componentPanel.getComponentPanel());
     }
 
     public boolean isModified() {
@@ -90,40 +81,12 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 
     @Nonnull
     public JComponent getComponent() {
-        return componentPanel.getComponentPanel();
+        return filePanel;
     }
 
     @Nonnull
     public ExtCodeArea getCodeArea() {
-        return componentPanel.getCodeArea();
-    }
-
-    @Override
-    public int getId() {
-        return -1;
-    }
-
-    @Nonnull
-    @Override
-    public Optional<URI> getFileUri() {
-        return Optional.empty();
-    }
-
-    @Nonnull
-    @Override
-    public String getTitle() {
-        return virtualFile.getName();
-    }
-
-    @Nonnull
-    @Override
-    public Optional<FileType> getFileType() {
-        return Optional.empty();
-    }
-
-    @Override
-    public void setFileType(@Nullable FileType fileType) {
-        throw new UnsupportedOperationException();
+        return editorFile.getCodeArea();
     }
 
     public void openFile(VirtualFile virtualFile) {
@@ -134,32 +97,26 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
                 byte[] fileContent = virtualFile.contentsToByteArray();
                 PagedData binaryData = new PagedData();
                 binaryData.insert(0, fileContent);
-                componentPanel.setContentData(binaryData);
+                editorFile.getCodeArea().setContentData(binaryData);
             } catch (IOException e) {
                 throw createBrokenVirtualFileException(e);
             }
         });
-        ExtCodeArea codeArea = componentPanel.getCodeArea();
+        ExtCodeArea codeArea = editorFile.getCodeArea();
         codeArea.addDataChangedListener(this::saveDocument);
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
         opened = true;
         documentOriginalSize = codeArea.getDataSize();
         updateModified();
-        Optional<BinaryDataUndoHandler> undoHandler = componentPanel.getUndoHandler();
-        if (undoHandler.isPresent()) {
-            undoHandler.get().clear();
-        }
+//        Optional<BinaryDataUndoHandler> undoHandler = componentPanel.getUndoHandler();
+//        if (undoHandler.isPresent()) {
+//            undoHandler.get().clear();
+//        }
     }
 
-    @Override
-    public boolean isSaveSupported() {
-        return true;
-    }
-
-    @Override
     public void saveDocument() {
-        BinaryData contentData = componentPanel.getContentData();
+        BinaryData contentData = editorFile.getCodeArea().getContentData();
         long dataSize = contentData.getDataSize();
         final byte[] fileContent = new byte[(int) dataSize];
         if (dataSize > 0) {
@@ -175,11 +132,6 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
         });
     }
 
-    @Override
-    public void switchFileHandlingMode(FileHandlingMode fileHandlingMode) {
-        // Ignore
-    }
-
     @Nonnull
     public FileHandlingMode getFileHandlingMode() {
         return FileHandlingMode.DIRECT;
@@ -187,12 +139,6 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 
     public void reloadFile() {
         openFile(virtualFile);
-    }
-
-    public void closeData() {
-        PagedData contentData = (PagedData) componentPanel.getCodeArea().getContentData();
-        contentData.clear();
-        componentPanel.setContentData(null);
     }
 
     private void updateModified() {
@@ -219,28 +165,6 @@ public class BinEdNativeFile implements FileHandler, BinEdComponentFileApi, Text
 
     @Nullable
     public JComponent getPreferredFocusedComponent() {
-        return componentPanel.getCodeArea();
-    }
-
-    @Override
-    public void loadFromFile(URI fileUri, @org.jetbrains.annotations.Nullable FileType fileType) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setCurrentFont(Font font) {
-        getCodeArea().setCodeFont(font);
-    }
-
-    @Nonnull
-    @Override
-    public Font getCurrentFont() {
-        return getCodeArea().getCodeFont();
-    }
-
-    @Nonnull
-    @Override
-    public Font getDefaultFont() {
-        return defaultFont;
+        return filePanel;
     }
 }

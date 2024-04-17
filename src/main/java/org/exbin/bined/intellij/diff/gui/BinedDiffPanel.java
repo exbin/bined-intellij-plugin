@@ -34,11 +34,10 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
-import org.exbin.bined.intellij.main.BinEdApplyOptions;
+import org.exbin.bined.intellij.options.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
-import org.exbin.bined.intellij.main.BinEdManager;
-import org.exbin.bined.intellij.main.IntelliJPreferencesWrapper;
+import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.options.IntegrationOptions;
@@ -66,23 +65,17 @@ import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.options.TextFontOptions;
-import org.exbin.framework.editor.text.service.TextFontService;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.utils.DesktopUtils;
-import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.window.api.gui.OptionsControlPanel;
-import org.exbin.framework.window.api.handler.OptionsControlHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -130,36 +123,36 @@ public class BinedDiffPanel extends JBPanel {
         defaultLayoutProfile = leftCodeArea.getLayoutProfile();
         defaultThemeProfile = leftCodeArea.getThemeProfile();
         defaultColorProfile = leftCodeArea.getColorsProfile();
-        toolbarPanel = new BinEdToolbarPanel(diffPanel,
-                new BinEdToolbarPanel.Control() {
-                    @Nonnull
-                    @Override public CodeType getCodeType() {
-                        return leftCodeArea.getCodeType();
-                    }
+        toolbarPanel = new BinEdToolbarPanel();
+        toolbarPanel.setTargetComponent(diffPanel);
+        toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
+            @Nonnull
+            @Override public CodeType getCodeType() {
+                return leftCodeArea.getCodeType();
+            }
 
-                    @Override
-                    public void setCodeType(CodeType codeType) {
-                        leftCodeArea.setCodeType(codeType);
-                        rightCodeArea.setCodeType(codeType);
-                    }
+            @Override
+            public void setCodeType(CodeType codeType) {
+                leftCodeArea.setCodeType(codeType);
+                rightCodeArea.setCodeType(codeType);
+            }
 
-                    @Override
-                    public boolean isShowUnprintables() {
-                        return leftCodeArea.isShowUnprintables();
-                    }
+            @Override
+            public boolean isShowUnprintables() {
+                return leftCodeArea.isShowUnprintables();
+            }
 
-                    @Override
-                    public void setShowUnprintables(boolean showUnprintables) {
-                        leftCodeArea.setShowUnprintables(showUnprintables);
-                        rightCodeArea.setShowUnprintables(showUnprintables);
-                    }
+            @Override
+            public void setShowUnprintables(boolean showUnprintables) {
+                leftCodeArea.setShowUnprintables(showUnprintables);
+                rightCodeArea.setShowUnprintables(showUnprintables);
+            }
 
-                    @Override
-                    public void repaint() {
-                        diffPanel.repaint();
-                    }
-                }
-        );
+            @Override
+            public void repaint() {
+                diffPanel.repaint();
+            }
+        });
         toolbarPanel.setOptionsAction(createOptionsAction());
         toolbarPanel.setOnlineHelpAction(
                 new AnAction() {
