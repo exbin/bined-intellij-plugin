@@ -24,6 +24,7 @@ import com.intellij.openapi.extensions.ExtensionPointAdapter;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
@@ -41,10 +42,10 @@ import kotlin.coroutines.Continuation;
 import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
-import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.objectdata.MainBinaryViewHandler;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
+import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.framework.App;
 import org.exbin.framework.Module;
 import org.exbin.framework.ModuleProvider;
@@ -52,9 +53,22 @@ import org.exbin.framework.about.AboutModule;
 import org.exbin.framework.about.api.AboutModuleApi;
 import org.exbin.framework.action.ActionModule;
 import org.exbin.framework.action.api.ActionModuleApi;
+import org.exbin.framework.action.api.MenuGroup;
+import org.exbin.framework.action.api.MenuPosition;
+import org.exbin.framework.action.api.PositionMode;
+import org.exbin.framework.action.api.SeparationMode;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinedModule;
+import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
+import org.exbin.framework.bined.compare.BinedCompareModule;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
+import org.exbin.framework.bined.inspector.BinedInspectorModule;
+import org.exbin.framework.bined.macro.BinedMacroModule;
+import org.exbin.framework.bined.objectdata.BinedObjectDataModule;
+import org.exbin.framework.bined.operation.BinedOperationModule;
+import org.exbin.framework.bined.operation.bouncycastle.BinedOperationBouncycastleModule;
+import org.exbin.framework.bined.search.BinedSearchModule;
+import org.exbin.framework.bined.tool.content.BinedToolContentModule;
 import org.exbin.framework.component.ComponentModule;
 import org.exbin.framework.component.api.ComponentModuleApi;
 import org.exbin.framework.editor.EditorModule;
@@ -63,6 +77,7 @@ import org.exbin.framework.file.FileModule;
 import org.exbin.framework.file.api.FileModuleApi;
 import org.exbin.framework.frame.FrameModule;
 import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.framework.help.online.HelpOnlineModule;
 import org.exbin.framework.language.LanguageModule;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.language.api.LanguageProvider;
@@ -82,6 +97,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -169,6 +186,23 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
         MessageBus messageBus = project.getMessageBus();
         MessageBusConnection connect = messageBus.connect();
+        connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+            @Override
+            public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
+                final BinedModule binedModule = App.getModule(BinedModule.class);
+                BinEdIntelliJEditorProvider editorProvider =
+                        (BinEdIntelliJEditorProvider) binedModule.getEditorProvider();
+                BinEdFileHandler activeFile = null;
+                FileEditor fileEditor = event.getNewEditor();
+                if (fileEditor instanceof BinEdFileEditor) {
+                    activeFile = ((BinEdFileEditor) fileEditor).getVirtualFile().getEditorFile();
+                } else if (fileEditor instanceof BinEdNativeFileEditor) {
+                    activeFile = ((BinEdNativeFileEditor) fileEditor).getNativeFile().getEditorFile();
+                }
+                editorProvider.setActiveFile(activeFile);
+            }
+        });
+
         connect.subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, new FileEditorManagerListener.Before() {
 
             private boolean passNext = false;
@@ -302,7 +336,17 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(FrameModuleApi.class, new FrameModule());
             modules.put(FileModuleApi.class, new FileModule());
             modules.put(EditorModuleApi.class, new EditorModule());
+            modules.put(HelpOnlineModule.class, new HelpOnlineModule());
             modules.put(BinedModule.class, new BinedModule());
+            modules.put(BinedSearchModule.class, new BinedSearchModule());
+            modules.put(BinedOperationModule.class, new BinedOperationModule());
+            modules.put(BinedOperationBouncycastleModule.class, new BinedOperationBouncycastleModule());
+            modules.put(BinedObjectDataModule.class, new BinedObjectDataModule());
+            modules.put(BinedToolContentModule.class, new BinedToolContentModule());
+            modules.put(BinedCompareModule.class, new BinedCompareModule());
+            modules.put(BinedInspectorModule.class, new BinedInspectorModule());
+            modules.put(BinedBookmarksModule.class, new BinedBookmarksModule());
+            modules.put(BinedMacroModule.class, new BinedMacroModule());
             modules.put(AboutModuleApi.class, new AboutModule());
         }
 
@@ -322,14 +366,57 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             languageModule.setAppBundle(bundle);
 
             AboutModuleApi aboutModule = App.getModule(AboutModuleApi.class);
-            aboutModule.registerDefaultMenuItem();
             OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
             optionsModule.registerMenuAction();
 
+            HelpOnlineModule helpOnlineModule = App.getModule(HelpOnlineModule.class);
+            try {
+                helpOnlineModule.setOnlineHelpUrl(new URL(bundle.getString("online_help_url")));
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(BinEdPluginStartupActivity.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             BinEdIntelliJEditorProvider editorProvider = new BinEdIntelliJEditorProvider();
-            BinedModule binaryModule = App.getModule(BinedModule.class);
-            binaryModule.setEditorProvider(editorProvider);
-            binaryModule.registerCodeAreaPopupMenu();
+            BinedModule binedModule = App.getModule(BinedModule.class);
+            binedModule.setEditorProvider(editorProvider);
+
+            BinedSearchModule binedSearchModule = App.getModule(BinedSearchModule.class);
+            binedSearchModule.setEditorProvider(editorProvider);
+
+            BinedOperationModule binedOperationModule = App.getModule(BinedOperationModule.class);
+            binedOperationModule.setEditorProvider(editorProvider);
+
+            BinedOperationBouncycastleModule binedOperationBouncycastleModule = App.getModule(BinedOperationBouncycastleModule.class);
+            binedOperationBouncycastleModule.setEditorProvider(editorProvider);
+
+            BinedToolContentModule binedToolContentModule = App.getModule(BinedToolContentModule.class);
+
+            BinedInspectorModule binedInspectorModule = App.getModule(BinedInspectorModule.class);
+            binedInspectorModule.setEditorProvider(editorProvider);
+
+            BinedCompareModule binedCompareModule = App.getModule(BinedCompareModule.class);
+            binedCompareModule.registerToolsOptionsMenuActions();
+
+            BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
+            binedBookmarksModule.setEditorProvider(editorProvider);
+
+            BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
+            binedMacroModule.setEditorProvider(editorProvider);
+
+            binedModule.registerCodeAreaPopupMenu();
+            binedSearchModule.registerEditFindPopupMenuActions();
+            binedOperationModule.registerBlockEditPopupMenuActions();
+            binedToolContentModule.registerClipboardContentMenu();
+            binedToolContentModule.registerDragDropContentMenu();
+            binedInspectorModule.registerViewValuesPanelMenuActions();
+            binedInspectorModule.registerOptionsPanels();
+            binedMacroModule.registerMacrosPopupMenuActions();
+            binedBookmarksModule.registerBookmarksPopupMenuActions();
+
+            String aboutMenuGroup = BinEdIntelliJPlugin.PLUGIN_PREFIX + "helpAboutMenuGroup";
+            actionModule.registerMenuGroup(BinedModule.CODE_AREA_POPUP_MENU_ID, new MenuGroup(aboutMenuGroup, new MenuPosition(PositionMode.BOTTOM_LAST), SeparationMode.ABOVE));
+            actionModule.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, HelpOnlineModule.MODULE_ID, helpOnlineModule.getOnlineHelpAction(), new MenuPosition(aboutMenuGroup));
+            actionModule.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, AboutModule.MODULE_ID, aboutModule.createAboutAction(), new MenuPosition(aboutMenuGroup));
         }
 
         @Override

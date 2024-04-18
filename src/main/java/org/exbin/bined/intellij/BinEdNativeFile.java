@@ -89,6 +89,11 @@ public class BinEdNativeFile {
         return editorFile.getCodeArea();
     }
 
+    @Nonnull
+    public BinEdFileHandler getEditorFile() {
+        return editorFile;
+    }
+
     public void openFile(VirtualFile virtualFile) {
         boolean editable = virtualFile.isWritable();
 

@@ -34,13 +34,13 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
-import org.exbin.bined.intellij.options.BinEdApplyOptions;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
-import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
-import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.intellij.options.BinEdApplyOptions;
 import org.exbin.bined.intellij.options.IntegrationOptions;
+import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
+import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
 import org.exbin.bined.swing.capability.FontCapable;
@@ -52,6 +52,7 @@ import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
+import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.inspector.options.DataInspectorOptions;
 import org.exbin.framework.bined.options.CodeAreaColorOptions;
 import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
@@ -74,6 +75,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JPopupMenu;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -94,8 +97,6 @@ import java.util.List;
  */
 @ParametersAreNonnullByDefault
 public class BinedDiffPanel extends JBPanel {
-
-    private static final String ONLINE_HELP_URL = "https://bined.exbin.org/intellij-plugin/?manual";
 
     private final BinaryEditorPreferences preferences;
     private final ExtCodeAreaDiffPanel diffPanel = new ExtCodeAreaDiffPanel();
@@ -220,9 +221,29 @@ public class BinedDiffPanel extends JBPanel {
             leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
-                    JPopupMenu popupMenu = new JPopupMenu(); // TODO BinedModule.createCodeAreaPopupMenu(leftCodeArea, "left");
+                    String popupMenuId = "BinDiffPanel.left";
+                    BinedModule binedModule = App.getModule(BinedModule.class);
+                    CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
+                            binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
+                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(leftCodeArea, popupMenuId, x, y);
+                    popupMenu.addPopupMenuListener(new PopupMenuListener() {
+                        @Override
+                        public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                        }
+
+                        @Override
+                        public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                            codeAreaPopupMenuHandler.dropPopupMenu(popupMenuId);
+                        }
+
+                        @Override
+                        public void popupMenuCanceled(PopupMenuEvent e) {
+                        }
+                    });
                     popupMenu.show(invoker, x, y);
                 }
+
+
             });
             BinaryData rightData = getDiffBinaryData(request, 1);
             if (rightData != null) {
@@ -232,7 +253,25 @@ public class BinedDiffPanel extends JBPanel {
             rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
-                    JPopupMenu popupMenu = new JPopupMenu(); // TODO BinedModule.createCodeAreaPopupMenu(rightCodeArea, "right");
+                    String popupMenuId = "BinDiffPanel.right";
+                    BinedModule binedModule = App.getModule(BinedModule.class);
+                    CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
+                            binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
+                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(leftCodeArea, popupMenuId, x, y);
+                    popupMenu.addPopupMenuListener(new PopupMenuListener() {
+                        @Override
+                        public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                        }
+
+                        @Override
+                        public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                            codeAreaPopupMenuHandler.dropPopupMenu(popupMenuId);
+                        }
+
+                        @Override
+                        public void popupMenuCanceled(PopupMenuEvent e) {
+                        }
+                    });
                     popupMenu.show(invoker, x, y);
                 }
             });
@@ -562,7 +601,8 @@ public class BinedDiffPanel extends JBPanel {
         return new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DesktopUtils.openDesktopURL(ONLINE_HELP_URL);
+                LanguageModuleApi languageModuleApi = App.getModule(LanguageModuleApi.class);
+                DesktopUtils.openDesktopURL(languageModuleApi.getAppBundle().getString("online_help_url"));
             }
         };
     }

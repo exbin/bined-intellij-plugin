@@ -15,11 +15,20 @@
  */
 package org.exbin.bined.intellij;
 
+import org.exbin.bined.swing.CodeAreaCore;
+import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.framework.App;
+import org.exbin.framework.action.api.ActionModuleApi;
+import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.editor.api.MultiEditorProvider;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.file.api.FileType;
-import org.jetbrains.annotations.NotNull;
+import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.framework.utils.ClipboardActionsHandler;
+import org.exbin.xbup.operation.undo.XBUndoHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
@@ -37,122 +46,175 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 public class BinEdIntelliJEditorProvider implements MultiEditorProvider {
 
-    private FileHandler activeFileOverride = null;
+    @Nullable
+    protected FileHandler activeFile = null;
 
     public BinEdIntelliJEditorProvider() {
     }
 
+    @Nonnull
+    @Override
+    public List<FileHandler> getFileHandlers() {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public String getName(FileHandler fileHandler) {
+        return null;
+    }
+
+    @Override
+    public void saveFile(FileHandler fileHandler) {
+
+    }
+
+    @Override
+    public void saveAsFile(FileHandler fileHandler) {
+
+    }
+
+    @Override
+    public void closeFile() {
+
+    }
+
+    @Override
+    public void closeFile(FileHandler fileHandler) {
+
+    }
+
+    @Override
+    public void closeOtherFiles(FileHandler fileHandler) {
+
+    }
+
+    @Override
+    public void closeAllFiles() {
+
+    }
+
+    @Override
+    public void saveAllFiles() {
+
+    }
+
+    @Nonnull
+    @Override
+    public JComponent getEditorComponent() {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public Optional<FileHandler> getActiveFile() {
+        return Optional.ofNullable(activeFile);
+    }
+
     public void setActiveFile(@Nullable FileHandler fileHandler) {
-        activeFileOverride = fileHandler;
-        // activeFileChanged();
+        activeFile = fileHandler;
+        activeFileChanged();
     }
 
-    @NotNull @Override public List<FileHandler> getFileHandlers() {
+    public void activeFileChanged() {
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        ComponentActivationListener componentActivationListener =
+                frameModule.getFrameHandler().getComponentActivationListener();
+
+        ExtCodeArea extCodeArea = null;
+        ClipboardActionsHandler clipboardActionsHandler = null;
+        XBUndoHandler undoHandler = null;
+        if (activeFile instanceof BinEdFileHandler) {
+            BinEdFileHandler binEdFileHandler = (BinEdFileHandler) activeFile;
+            extCodeArea = binEdFileHandler.getCodeArea();
+            undoHandler = binEdFileHandler.getUndoHandler();
+            clipboardActionsHandler = binEdFileHandler;
+        }
+
+        componentActivationListener.updated(FileHandler.class, activeFile);
+        componentActivationListener.updated(CodeAreaCore.class, extCodeArea);
+        componentActivationListener.updated(XBUndoHandler.class, undoHandler);
+        componentActivationListener.updated(ClipboardActionsHandler.class, clipboardActionsHandler);
+
+        //        if (this.undoHandler != null) {
+//            this.undoHandler.setActiveFile(this.activeFile);
+//        }
+    }
+
+    @Nonnull
+    @Override
+    public String getWindowTitle(String s) {
         return null;
     }
 
-    @NotNull @Override public String getName(FileHandler fileHandler) {
-        return null;
-    }
-
-    @Override public void saveFile(FileHandler fileHandler) {
+    @Override
+    public void openFile(URI uri, FileType fileType) {
 
     }
 
-    @Override public void saveAsFile(FileHandler fileHandler) {
+    @Override
+    public void setModificationListener(EditorModificationListener editorModificationListener) {
 
     }
 
-    @Override public void closeFile() {
+    @Override
+    public void newFile() {
 
     }
 
-    @Override public void closeFile(FileHandler fileHandler) {
+    @Override
+    public void openFile() {
 
     }
 
-    @Override public void closeOtherFiles(FileHandler fileHandler) {
+    @Override
+    public void saveFile() {
 
     }
 
-    @Override public void closeAllFiles() {
+    @Override
+    public void saveAsFile() {
 
     }
 
-    @Override public void saveAllFiles() {
+    @Override
+    public boolean canSave() {
+        return false;
+    }
+
+    @Override
+    public boolean releaseFile(FileHandler fileHandler) {
+        return false;
+    }
+
+    @Override
+    public boolean releaseAllFiles() {
+        return false;
+    }
+
+    @Override
+    public void loadFromFile(String s) throws URISyntaxException {
 
     }
 
-    @NotNull @Override public JComponent getEditorComponent() {
-        return null;
+    @Override
+    public void loadFromFile(URI uri, @org.jetbrains.annotations.Nullable FileType fileType) {
+
     }
 
-    @NotNull @Override public Optional<FileHandler> getActiveFile() {
+    @Nonnull
+    @Override
+    public Optional<File> getLastUsedDirectory() {
         return Optional.empty();
     }
 
-    @NotNull @Override public String getWindowTitle(String s) {
-        return null;
-    }
-
-    @Override public void openFile(URI uri, FileType fileType) {
+    @Override
+    public void setLastUsedDirectory(@org.jetbrains.annotations.Nullable File file) {
 
     }
 
-    @Override public void setModificationListener(EditorModificationListener editorModificationListener) {
+    @Override
+    public void updateRecentFilesList(URI uri, FileType fileType) {
 
     }
-
-    @Override public void newFile() {
-
-    }
-
-    @Override public void openFile() {
-
-    }
-
-    @Override public void saveFile() {
-
-    }
-
-    @Override public void saveAsFile() {
-
-    }
-
-    @Override public boolean canSave() {
-        return false;
-    }
-
-    @Override public boolean releaseFile(FileHandler fileHandler) {
-        return false;
-    }
-
-    @Override public boolean releaseAllFiles() {
-        return false;
-    }
-
-    @Override public void loadFromFile(String s) throws URISyntaxException {
-
-    }
-
-    @Override public void loadFromFile(URI uri, @org.jetbrains.annotations.Nullable FileType fileType) {
-
-    }
-
-    @NotNull @Override public Optional<File> getLastUsedDirectory() {
-        return Optional.empty();
-    }
-
-    @Override public void setLastUsedDirectory(@org.jetbrains.annotations.Nullable File file) {
-
-    }
-
-    @Override public void updateRecentFilesList(URI uri, FileType fileType) {
-
-    }
-
-    //    @Override
-//    public void updateActiveFile() {
-//        activeFile = activeFileOverride;
-//    }
 }
