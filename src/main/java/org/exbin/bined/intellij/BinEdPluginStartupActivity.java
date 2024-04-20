@@ -53,6 +53,7 @@ import org.exbin.framework.about.AboutModule;
 import org.exbin.framework.about.api.AboutModuleApi;
 import org.exbin.framework.action.ActionModule;
 import org.exbin.framework.action.api.ActionModuleApi;
+import org.exbin.framework.action.api.ComponentActivationListener;
 import org.exbin.framework.action.api.MenuGroup;
 import org.exbin.framework.action.api.MenuPosition;
 import org.exbin.framework.action.api.PositionMode;
@@ -73,6 +74,7 @@ import org.exbin.framework.component.ComponentModule;
 import org.exbin.framework.component.api.ComponentModuleApi;
 import org.exbin.framework.editor.EditorModule;
 import org.exbin.framework.editor.api.EditorModuleApi;
+import org.exbin.framework.editor.api.EditorProvider;
 import org.exbin.framework.file.FileModule;
 import org.exbin.framework.file.api.FileModuleApi;
 import org.exbin.framework.frame.FrameModule;
@@ -97,6 +99,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -413,10 +418,27 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedMacroModule.registerMacrosPopupMenuActions();
             binedBookmarksModule.registerBookmarksPopupMenuActions();
 
+            String toolsSubMenuId = BinEdIntelliJPlugin.PLUGIN_PREFIX + "toolsMenu";
+            actionModule.registerMenu(toolsSubMenuId, BinedModule.MODULE_ID);
+            Action positionCodeTypeSubMenuAction = new AbstractAction("Tools") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                }
+            };
+            // positionCodeTypeSubMenuAction.putValue(Action.SHORT_DESCRIPTION, resourceBundle.getString("positionCodeTypeSubMenu.shortDescription"));
+            actionModule.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, BinedModule.MODULE_ID, toolsSubMenuId, positionCodeTypeSubMenuAction, new MenuPosition(PositionMode.BOTTOM_LAST));
+            actionModule.registerMenuItem(toolsSubMenuId, BinedModule.MODULE_ID, binedCompareModule.createCompareFilesAction(), new MenuPosition(PositionMode.TOP));
+            actionModule.registerMenuItem(toolsSubMenuId, BinedModule.MODULE_ID, binedToolContentModule.createClipboardContentAction(), new MenuPosition(PositionMode.TOP));
+            actionModule.registerMenuItem(toolsSubMenuId, BinedModule.MODULE_ID, binedToolContentModule.createDragDropContentAction(), new MenuPosition(PositionMode.TOP));
+
             String aboutMenuGroup = BinEdIntelliJPlugin.PLUGIN_PREFIX + "helpAboutMenuGroup";
             actionModule.registerMenuGroup(BinedModule.CODE_AREA_POPUP_MENU_ID, new MenuGroup(aboutMenuGroup, new MenuPosition(PositionMode.BOTTOM_LAST), SeparationMode.ABOVE));
             actionModule.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, HelpOnlineModule.MODULE_ID, helpOnlineModule.getOnlineHelpAction(), new MenuPosition(aboutMenuGroup));
             actionModule.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, AboutModule.MODULE_ID, aboutModule.createAboutAction(), new MenuPosition(aboutMenuGroup));
+
+            ComponentActivationListener componentActivationListener =
+                    frameModule.getFrameHandler().getComponentActivationListener();
+            componentActivationListener.updated(EditorProvider.class, editorProvider);
         }
 
         @Override
