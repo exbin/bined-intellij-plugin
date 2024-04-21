@@ -18,7 +18,6 @@ package org.exbin.bined.intellij.debug.gui;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
-import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileManager;

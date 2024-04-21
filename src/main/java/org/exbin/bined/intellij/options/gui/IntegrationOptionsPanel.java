@@ -29,7 +29,7 @@ import javax.swing.JList;
 import org.exbin.bined.intellij.options.impl.IntegrationOptionsImpl;
 import org.exbin.framework.App;
 import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.options.model.LanguageRecord;
+import org.exbin.framework.ui.model.LanguageRecord;
 import org.exbin.framework.utils.TestApplication;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.options.api.OptionsComponent;

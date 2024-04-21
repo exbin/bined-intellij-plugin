@@ -17,7 +17,6 @@ package org.exbin.bined.intellij.action;
 
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
-import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;

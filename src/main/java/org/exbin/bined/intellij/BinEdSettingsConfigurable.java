@@ -20,7 +20,6 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
 //import org.exbin.bined.intellij.options.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
-import org.exbin.bined.intellij.main.BinEdManager;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;

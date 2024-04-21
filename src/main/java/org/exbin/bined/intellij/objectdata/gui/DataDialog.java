@@ -22,7 +22,6 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.EditMode;
-import org.exbin.bined.intellij.main.BinEdManager;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileManager;
