@@ -67,12 +67,12 @@ tasks {
 
 val exbinFrameworkLibraryVersion = "0.3.0-SNAPSHOT"
 val binedAppLibraryVersion = "0.3.0-SNAPSHOT"
-val binedLibraryVersion = "0.2.1"
+val binedLibraryVersion = "0.3.0-SNAPSHOT"
 val binaryDataLibraryVersion = "0.2.1"
 
 fun exbinFrameworkLibrary(libName: String): String = if (exbinFrameworkLibraryVersion.endsWith("-SNAPSHOTX")) ":${libName}-${exbinFrameworkLibraryVersion}" else "org.exbin.framework:${libName}:${exbinFrameworkLibraryVersion}"
 fun binedAppLibrary(libName: String): String = if (binedAppLibraryVersion.endsWith("-SNAPSHOTX")) ":${libName}-${binedAppLibraryVersion}" else "org.exbin.framework:${libName}:${binedAppLibraryVersion}"
-fun binedLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binedLibraryVersion}" else "org.exbin.bined:${libName}:${binedLibraryVersion}"
+fun binedLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOTX")) ":${libName}-${binedLibraryVersion}" else "org.exbin.bined:${libName}:${binedLibraryVersion}"
 fun binaryDataLibrary(libName: String): String = if (libName.endsWith("-SNAPSHOT")) ":${libName}-${binaryDataLibraryVersion}" else "org.exbin.auxiliary:${libName}:${binaryDataLibraryVersion}"
 
 repositories {
@@ -95,6 +95,7 @@ dependencies {
     implementation(exbinFrameworkLibrary("exbin-framework-editor"))
     implementation(exbinFrameworkLibrary("exbin-framework-about-api"))
     implementation(exbinFrameworkLibrary("exbin-framework-about"))
+    implementation(exbinFrameworkLibrary("exbin-framework-operation"))
     implementation(exbinFrameworkLibrary("exbin-framework-operation-undo"))
     implementation(exbinFrameworkLibrary("exbin-framework-action-popup"))
     implementation(exbinFrameworkLibrary("exbin-framework-help-online"))

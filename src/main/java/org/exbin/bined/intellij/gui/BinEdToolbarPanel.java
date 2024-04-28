@@ -30,7 +30,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
-import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
+import org.exbin.bined.operation.undo.BinaryDataUndoableCommandSequence;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.language.api.LanguageModuleApi;
@@ -67,7 +67,7 @@ public class BinEdToolbarPanel extends JBPanel {
     private Control codeAreaControl;
     private AbstractAction optionsAction;
     private AnAction onlineHelpAction;
-    private BinaryDataUndoHandler undoHandler;
+    private BinaryDataUndoableCommandSequence undoHandler;
 
     private final DefaultActionGroup actionGroup;
     private final ActionGroup cycleActionGroup;
@@ -184,7 +184,7 @@ public class BinEdToolbarPanel extends JBPanel {
         updateCycleButtonState();
     }
 
-    public void setUndoHandler(BinaryDataUndoHandler undoHandler) {
+    public void setUndoHandler(BinaryDataUndoableCommandSequence undoHandler) {
         this.undoHandler = undoHandler;
 
         setActionVisible(undoEditButton, true);
@@ -237,7 +237,7 @@ public class BinEdToolbarPanel extends JBPanel {
         toolbar.getPresentation(undoEditButton).setEnabled(undoHandler != null && undoHandler.canUndo());
         toolbar.getPresentation(redoEditButton).setEnabled(undoHandler != null && undoHandler.canRedo());
         if (saveAction != null) {
-            boolean modified = undoHandler != null && undoHandler.getCommandPosition() != undoHandler.getSyncPoint();
+            boolean modified = undoHandler != null && undoHandler.getCommandPosition() != undoHandler.getSyncPosition();
             toolbar.getPresentation(saveFileButton).setEnabled(modified);
         }
     }
@@ -283,7 +283,7 @@ public class BinEdToolbarPanel extends JBPanel {
             public void update(@NotNull AnActionEvent e) {
                 Presentation presentation = e.getPresentation();
                 presentation.setVisible(saveAction != null);
-                boolean modified = undoHandler != null && undoHandler.getCommandPosition() != undoHandler.getSyncPoint();
+                boolean modified = undoHandler != null && undoHandler.getCommandPosition() != undoHandler.getSyncPosition();
                 presentation.setEnabled(modified);
             }
         };

@@ -26,8 +26,8 @@ import org.exbin.framework.editor.api.MultiEditorProvider;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.file.api.FileType;
 import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.framework.operation.undo.api.UndoRedoHandler;
 import org.exbin.framework.utils.ClipboardActionsHandler;
-import org.exbin.xbup.operation.undo.XBUndoHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -124,7 +124,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider {
 
         ExtCodeArea extCodeArea = null;
         ClipboardActionsHandler clipboardActionsHandler = null;
-        XBUndoHandler undoHandler = null;
+        UndoRedoHandler undoHandler = null;
         if (activeFile instanceof BinEdFileHandler) {
             BinEdFileHandler binEdFileHandler = (BinEdFileHandler) activeFile;
             extCodeArea = binEdFileHandler.getCodeArea();
@@ -134,7 +134,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider {
 
         componentActivationListener.updated(FileHandler.class, activeFile);
         componentActivationListener.updated(CodeAreaCore.class, extCodeArea);
-        componentActivationListener.updated(XBUndoHandler.class, undoHandler);
+        componentActivationListener.updated(UndoRedoHandler.class, undoHandler);
         componentActivationListener.updated(ClipboardActionsHandler.class, clipboardActionsHandler);
 
         //        if (this.undoHandler != null) {

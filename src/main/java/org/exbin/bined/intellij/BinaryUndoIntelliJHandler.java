@@ -23,9 +23,9 @@ import com.intellij.openapi.command.undo.UndoManager;
 import com.intellij.openapi.command.undo.UndoableAction;
 import com.intellij.openapi.project.Project;
 import org.exbin.bined.operation.BinaryDataCommand;
+import org.exbin.bined.operation.BinaryDataCommandSequenceListener;
 import org.exbin.bined.operation.BinaryDataOperationException;
-import org.exbin.bined.operation.undo.BinaryDataUndoHandler;
-import org.exbin.bined.operation.undo.BinaryDataUndoUpdateListener;
+import org.exbin.bined.operation.undo.BinaryDataUndoableCommandSequence;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,10 +43,10 @@ import java.util.logging.Logger;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
+public class BinaryUndoIntelliJHandler implements BinaryDataUndoableCommandSequence {
 
     private final ExtCodeArea codeArea;
-    private final List<BinaryDataUndoUpdateListener> listeners = new ArrayList<>();
+    private final List<BinaryDataCommandSequenceListener> listeners = new ArrayList<>();
     private final UndoManager undoManager;
     private final BinEdFileEditor fileEditor;
     private final Project project;
@@ -69,26 +69,23 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
 
     private void init() {
         commandPosition = 0;
-        setSyncPoint(0);
+        setSyncPosition(0);
     }
 
-    /**
-     * Adds new step into revert list.
-     *
-     * @param command command
-     * @throws BinaryDataOperationException if commands throws it
-     */
     @Override
-    public void execute(BinaryDataCommand command) throws BinaryDataOperationException {
+    public void execute(BinaryDataCommand command) {
         command.execute();
-
         commandAdded(command);
     }
 
     @Override
-    public void addCommand(BinaryDataCommand command) {
-        command.use();
+    public void schedule(BinaryDataCommand command) {
         commandAdded(command);
+    }
+
+    @Override
+    public void executeScheduled(int i) {
+        performRedo(i);
     }
 
     private void commandAdded(final BinaryDataCommand command) {
@@ -127,66 +124,44 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
             }
         };
         CommandProcessor commandProcessor = CommandProcessor.getInstance();
-        commandProcessor.executeCommand(project, () -> undoManager.undoableActionPerformed(action), command.getCaption(), "BinEd");
+        commandProcessor.executeCommand(project, () -> undoManager.undoableActionPerformed(action), command.getName(), "BinEd");
 
         commandPosition++;
         undoUpdated();
-        for (BinaryDataUndoUpdateListener listener : listeners) {
-            listener.undoCommandAdded(command);
+        for (BinaryDataCommandSequenceListener listener : listeners) {
+            listener.sequenceChanged();
         }
     }
 
-    /**
-     * Performs single undo step.
-     *
-     * @throws BinaryDataOperationException if commands throws it
-     */
     @Override
-    public void performUndo() throws BinaryDataOperationException {
+    public void performUndo() {
         performUndoInt();
         undoUpdated();
     }
 
-    private void performUndoInt() throws BinaryDataOperationException {
+    private void performUndoInt() {
         undoManager.undo(fileEditor);
     }
 
-    /**
-     * Performs single redo step.
-     *
-     * @throws BinaryDataOperationException if commands throws it
-     */
     @Override
-    public void performRedo() throws BinaryDataOperationException {
+    public void performRedo() {
         performRedoInt();
         undoUpdated();
     }
 
-    private void performRedoInt() throws BinaryDataOperationException {
+    private void performRedoInt() {
         undoManager.redo(fileEditor);
     }
 
-    /**
-     * Performs multiple undo step.
-     *
-     * @param count count of steps
-     * @throws BinaryDataOperationException if commands throws it
-     */
     @Override
-    public void performUndo(int count) throws BinaryDataOperationException {
+    public void performUndo(int count) {
         for (int i = 0; i < count; i++) {
             performUndo();
         }
     }
 
-    /**
-     * Performs multiple redo step.
-     *
-     * @param count count of steps
-     * @throws BinaryDataOperationException if commands throws it
-     */
     @Override
-    public void performRedo(int count) throws BinaryDataOperationException {
+    public void performRedo(int count) {
         for (int i = 0; i < count; i++) {
             performRedo();
         }
@@ -210,55 +185,27 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
     }
 
     @Override
-    public long getMaximumUndo() {
-        return 0;
-    }
-
-    @Override
     public long getCommandPosition() {
         return commandPosition;
     }
 
-    /**
-     * Performs revert to sync point.
-     *
-     * @throws BinaryDataOperationException if commands throws it
-     */
     @Override
-    public void doSync() throws BinaryDataOperationException {
+    public void performSync() {
         setCommandPosition(syncPointPosition);
     }
 
-    public void setUndoMaxCount(long maxUndo) {
-        throw new UnsupportedOperationException();
-    }
-
     @Override
-    public long getUndoMaximumSize() {
-        return 0;
-    }
-
-    public void setUndoMaximumSize(long maxSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public long getUsedSize() {
-        return 0;
-    }
-
-    @Override
-    public long getSyncPoint() {
+    public long getSyncPosition() {
         return syncPointPosition;
     }
 
     @Override
-    public void setSyncPoint(long syncPoint) {
+    public void setSyncPosition(long syncPoint) {
         this.syncPointPosition = syncPoint;
     }
 
     @Override
-    public void setSyncPoint() {
+    public void setSyncPosition() {
         this.syncPointPosition = commandPosition;
     }
 
@@ -273,8 +220,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
      * @param targetPosition desired position
      * @throws BinaryDataOperationException if commands throws it
      */
-    @Override
-    public void setCommandPosition(long targetPosition) throws BinaryDataOperationException {
+    public void setCommandPosition(long targetPosition) {
         if (targetPosition < commandPosition) {
             performUndo((int) (commandPosition - targetPosition));
         } else if (targetPosition > commandPosition) {
@@ -283,18 +229,18 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoHandler {
     }
 
     private void undoUpdated() {
-        for (BinaryDataUndoUpdateListener listener : listeners) {
-            listener.undoCommandPositionChanged();
+        for (BinaryDataCommandSequenceListener listener : listeners) {
+            listener.sequenceChanged();
         }
     }
 
     @Override
-    public void addUndoUpdateListener(BinaryDataUndoUpdateListener listener) {
+    public void addCommandSequenceListener(BinaryDataCommandSequenceListener listener) {
         listeners.add(listener);
     }
 
     @Override
-    public void removeUndoUpdateListener(BinaryDataUndoUpdateListener listener) {
+    public void removeCommandSequenceListener(BinaryDataCommandSequenceListener listener) {
         listeners.remove(listener);
     }
 }
