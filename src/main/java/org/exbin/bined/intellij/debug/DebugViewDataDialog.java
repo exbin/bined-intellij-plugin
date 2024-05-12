@@ -42,7 +42,7 @@ import java.util.ResourceBundle;
 public class DebugViewDataDialog extends DialogWrapper {
 
     private final Project project;
-    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(DebugViewDataDialog.class);
+    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(DebugViewPanel.class);
 
     private final DebugViewPanel viewPanel;
     private final XValueNodeImpl myDataNode;
