@@ -24,7 +24,6 @@ import com.intellij.openapi.command.undo.UndoableAction;
 import com.intellij.openapi.project.Project;
 import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.BinaryDataCommandSequenceListener;
-import org.exbin.bined.operation.BinaryDataOperationException;
 import org.exbin.bined.operation.undo.BinaryDataUndoableCommandSequence;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.jetbrains.annotations.Nullable;
@@ -218,7 +217,6 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoableCommandSeque
      * Performs undo or redo operation to reach given position.
      *
      * @param targetPosition desired position
-     * @throws BinaryDataOperationException if commands throws it
      */
     public void setCommandPosition(long targetPosition) {
         if (targetPosition < commandPosition) {

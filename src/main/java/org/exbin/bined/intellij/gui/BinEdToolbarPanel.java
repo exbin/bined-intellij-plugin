@@ -373,7 +373,7 @@ public class BinEdToolbarPanel extends JBPanel {
         AnAction settingsAction = new AnAction(
                 optionsResourceBundle.getString("optionsAction.text"),
                 optionsResourceBundle.getString("optionsAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/options/gui/resources/icons/Preferences16.gif"))
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/Preferences16.gif"))
         ) {
             @NotNull
             @Override
@@ -391,7 +391,7 @@ public class BinEdToolbarPanel extends JBPanel {
         AnAction onlineHelpToolbarAction = new AnAction(
                 onlineHelpResourceBundle.getString("onlineHelpAction.text"),
                 onlineHelpResourceBundle.getString("onlineHelpAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/resources/icons/open_icon_library/icons/png/16x16/actions/help.png"))
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/help.png"))
         ) {
             @NotNull
             @Override

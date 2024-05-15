@@ -62,7 +62,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider {
     @Nonnull
     @Override
     public String getName(FileHandler fileHandler) {
-        return null;
+        return "";
     }
 
     @Override
@@ -145,7 +145,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider {
     @Nonnull
     @Override
     public String getWindowTitle(String s) {
-        return null;
+        return "";
     }
 
     @Override
