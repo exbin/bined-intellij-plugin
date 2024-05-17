@@ -30,7 +30,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
-import org.exbin.bined.operation.undo.BinaryDataUndoableCommandSequence;
+import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.language.api.LanguageModuleApi;
@@ -67,7 +67,7 @@ public class BinEdToolbarPanel extends JBPanel {
     private Control codeAreaControl;
     private AbstractAction optionsAction;
     private AnAction onlineHelpAction;
-    private BinaryDataUndoableCommandSequence undoHandler;
+    private BinaryDataUndoRedo undoRedo;
 
     private final DefaultActionGroup actionGroup;
     private final ActionGroup cycleActionGroup;
@@ -184,8 +184,8 @@ public class BinEdToolbarPanel extends JBPanel {
         updateCycleButtonState();
     }
 
-    public void setUndoHandler(BinaryDataUndoableCommandSequence undoHandler) {
-        this.undoHandler = undoHandler;
+    public void setUndoHandler(BinaryDataUndoRedo undoRedo) {
+        this.undoRedo = undoRedo;
 
         setActionVisible(undoEditButton, true);
         setActionVisible(redoEditButton, true);
@@ -234,10 +234,10 @@ public class BinEdToolbarPanel extends JBPanel {
     }
 
     public void updateUndoState() {
-        toolbar.getPresentation(undoEditButton).setEnabled(undoHandler != null && undoHandler.canUndo());
-        toolbar.getPresentation(redoEditButton).setEnabled(undoHandler != null && undoHandler.canRedo());
+        toolbar.getPresentation(undoEditButton).setEnabled(undoRedo != null && undoRedo.canUndo());
+        toolbar.getPresentation(redoEditButton).setEnabled(undoRedo != null && undoRedo.canRedo());
         if (saveAction != null) {
-            boolean modified = undoHandler != null && undoHandler.getCommandPosition() != undoHandler.getSyncPosition();
+            boolean modified = undoRedo != null && undoRedo.getCommandPosition() != undoRedo.getSyncPosition();
             toolbar.getPresentation(saveFileButton).setEnabled(modified);
         }
     }
@@ -283,7 +283,7 @@ public class BinEdToolbarPanel extends JBPanel {
             public void update(@NotNull AnActionEvent e) {
                 Presentation presentation = e.getPresentation();
                 presentation.setVisible(saveAction != null);
-                boolean modified = undoHandler != null && undoHandler.getCommandPosition() != undoHandler.getSyncPosition();
+                boolean modified = undoRedo != null && undoRedo.getCommandPosition() != undoRedo.getSyncPosition();
                 presentation.setEnabled(modified);
             }
         };
@@ -310,8 +310,8 @@ public class BinEdToolbarPanel extends JBPanel {
             @Override
             public void update(@NotNull AnActionEvent e) {
                 Presentation presentation = e.getPresentation();
-                presentation.setVisible(undoHandler != null);
-                presentation.setEnabled(undoHandler != null && undoHandler.canUndo());
+                presentation.setVisible(undoRedo != null);
+                presentation.setEnabled(undoRedo != null && undoRedo.canUndo());
             }
         };
         actionGroup.addAction(undoEditButton);
@@ -336,8 +336,8 @@ public class BinEdToolbarPanel extends JBPanel {
             @Override
             public void update(@NotNull AnActionEvent e) {
                 Presentation presentation = e.getPresentation();
-                presentation.setVisible(undoHandler != null);
-                presentation.setEnabled(undoHandler != null && undoHandler.canRedo());
+                presentation.setVisible(undoRedo != null);
+                presentation.setEnabled(undoRedo != null && undoRedo.canRedo());
             }
         };
         actionGroup.addAction(redoEditButton);
@@ -416,7 +416,7 @@ public class BinEdToolbarPanel extends JBPanel {
 
     private void undoEditButtonActionPerformed() {
         try {
-            undoHandler.performUndo();
+            undoRedo.performUndo();
             codeAreaControl.repaint();
             updateUndoState();
         } catch (Exception ex) {
@@ -426,7 +426,7 @@ public class BinEdToolbarPanel extends JBPanel {
 
     private void redoEditButtonActionPerformed() {
         try {
-            undoHandler.performRedo();
+            undoRedo.performRedo();
             codeAreaControl.repaint();
             updateUndoState();
         } catch (Exception ex) {

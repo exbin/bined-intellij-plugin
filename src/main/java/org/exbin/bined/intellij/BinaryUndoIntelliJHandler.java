@@ -23,16 +23,18 @@ import com.intellij.openapi.command.undo.UndoManager;
 import com.intellij.openapi.command.undo.UndoableAction;
 import com.intellij.openapi.project.Project;
 import org.exbin.bined.operation.BinaryDataCommand;
-import org.exbin.bined.operation.BinaryDataCommandSequenceListener;
-import org.exbin.bined.operation.undo.BinaryDataUndoableCommandSequence;
+import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
+import org.exbin.bined.operation.undo.BinaryDataUndoRedoChangeListener;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,10 +44,10 @@ import java.util.logging.Logger;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinaryUndoIntelliJHandler implements BinaryDataUndoableCommandSequence {
+public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
 
     private final ExtCodeArea codeArea;
-    private final List<BinaryDataCommandSequenceListener> listeners = new ArrayList<>();
+    private final List<BinaryDataUndoRedoChangeListener> listeners = new ArrayList<>();
     private final UndoManager undoManager;
     private final BinEdFileEditor fileEditor;
     private final Project project;
@@ -77,14 +79,10 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoableCommandSeque
         commandAdded(command);
     }
 
+    @Nonnull
     @Override
-    public void schedule(BinaryDataCommand command) {
-        commandAdded(command);
-    }
-
-    @Override
-    public void executeScheduled(int i) {
-        performRedo(i);
+    public Optional<BinaryDataCommand> getTopUndoCommand() {
+        throw new UnsupportedOperationException();
     }
 
     private void commandAdded(final BinaryDataCommand command) {
@@ -127,8 +125,8 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoableCommandSeque
 
         commandPosition++;
         undoUpdated();
-        for (BinaryDataCommandSequenceListener listener : listeners) {
-            listener.sequenceChanged();
+        for (BinaryDataUndoRedoChangeListener listener : listeners) {
+            listener.undoChanged();
         }
     }
 
@@ -189,6 +187,11 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoableCommandSeque
     }
 
     @Override
+    public long getCommandsCount() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void performSync() {
         setCommandPosition(syncPointPosition);
     }
@@ -208,6 +211,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoableCommandSeque
         this.syncPointPosition = commandPosition;
     }
 
+    @Nonnull
     @Override
     public List<BinaryDataCommand> getCommandList() {
         throw new UnsupportedOperationException();
@@ -227,18 +231,23 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoableCommandSeque
     }
 
     private void undoUpdated() {
-        for (BinaryDataCommandSequenceListener listener : listeners) {
-            listener.sequenceChanged();
+        for (BinaryDataUndoRedoChangeListener listener : listeners) {
+            listener.undoChanged();
         }
     }
 
     @Override
-    public void addCommandSequenceListener(BinaryDataCommandSequenceListener listener) {
+    public void addChangeListener(BinaryDataUndoRedoChangeListener listener) {
         listeners.add(listener);
     }
 
     @Override
-    public void removeCommandSequenceListener(BinaryDataCommandSequenceListener listener) {
+    public void removeChangeListener(BinaryDataUndoRedoChangeListener listener) {
         listeners.remove(listener);
+    }
+
+    @Override
+    public boolean isModified() {
+        return commandPosition != syncPointPosition;
     }
 }

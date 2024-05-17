@@ -18,15 +18,14 @@ package org.exbin.bined.intellij;
 import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.exbin.framework.App;
-import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.action.api.ComponentActivationListener;
 import org.exbin.framework.bined.BinEdFileHandler;
-import org.exbin.framework.editor.api.EditorProvider;
 import org.exbin.framework.editor.api.MultiEditorProvider;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.file.api.FileType;
 import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.operation.undo.api.UndoRedoHandler;
+import org.exbin.framework.operation.undo.api.UndoRedoControl;
+import org.exbin.framework.operation.undo.api.UndoRedoState;
 import org.exbin.framework.utils.ClipboardActionsHandler;
 
 import javax.annotation.Nonnull;
@@ -124,17 +123,17 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider {
 
         ExtCodeArea extCodeArea = null;
         ClipboardActionsHandler clipboardActionsHandler = null;
-        UndoRedoHandler undoHandler = null;
+        UndoRedoControl undoHandler = null;
         if (activeFile instanceof BinEdFileHandler) {
             BinEdFileHandler binEdFileHandler = (BinEdFileHandler) activeFile;
             extCodeArea = binEdFileHandler.getCodeArea();
-            undoHandler = binEdFileHandler.getUndoHandler();
+            undoHandler = binEdFileHandler.getUndoRedo();
             clipboardActionsHandler = binEdFileHandler;
         }
 
         componentActivationListener.updated(FileHandler.class, activeFile);
         componentActivationListener.updated(CodeAreaCore.class, extCodeArea);
-        componentActivationListener.updated(UndoRedoHandler.class, undoHandler);
+        componentActivationListener.updated(UndoRedoState.class, undoHandler);
         componentActivationListener.updated(ClipboardActionsHandler.class, clipboardActionsHandler);
 
         //        if (this.undoHandler != null) {
