@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project;
 import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
 import org.exbin.bined.operation.undo.BinaryDataUndoRedoChangeListener;
+import org.exbin.bined.operation.undo.BinaryDataUndoableCommand;
 import org.exbin.bined.swing.extended.ExtCodeArea;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,7 +77,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
     @Override
     public void execute(BinaryDataCommand command) {
         command.execute();
-        commandAdded(command);
+        commandAdded((BinaryDataUndoableCommand) command);
     }
 
     @Nonnull
@@ -85,7 +86,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
         throw new UnsupportedOperationException();
     }
 
-    private void commandAdded(final BinaryDataCommand command) {
+    private void commandAdded(final BinaryDataUndoableCommand command) {
         UndoableAction action = new UndoableAction() {
             @Override
             public void undo() throws CannotUndoException {
