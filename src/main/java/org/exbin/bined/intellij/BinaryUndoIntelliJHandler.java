@@ -53,8 +53,8 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
     private final BinEdFileEditor fileEditor;
     private final Project project;
     private DocumentReference documentReference;
-    private long commandPosition;
-    private long syncPointPosition = -1;
+    private int commandPosition;
+    private int syncPointPosition = -1;
 
     /**
      * Creates a new instance.
@@ -183,12 +183,12 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
     }
 
     @Override
-    public long getCommandPosition() {
+    public int getCommandPosition() {
         return commandPosition;
     }
 
     @Override
-    public long getCommandsCount() {
+    public int getCommandsCount() {
         throw new UnsupportedOperationException();
     }
 
@@ -198,12 +198,12 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
     }
 
     @Override
-    public long getSyncPosition() {
+    public int getSyncPosition() {
         return syncPointPosition;
     }
 
     @Override
-    public void setSyncPosition(long syncPoint) {
+    public void setSyncPosition(int syncPoint) {
         this.syncPointPosition = syncPoint;
     }
 
@@ -223,11 +223,11 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
      *
      * @param targetPosition desired position
      */
-    public void setCommandPosition(long targetPosition) {
+    public void setCommandPosition(int targetPosition) {
         if (targetPosition < commandPosition) {
-            performUndo((int) (commandPosition - targetPosition));
+            performUndo(commandPosition - targetPosition);
         } else if (targetPosition > commandPosition) {
-            performRedo((int) (targetPosition - commandPosition));
+            performRedo(targetPosition - commandPosition);
         }
     }
 
