@@ -18,6 +18,7 @@ package org.exbin.bined.intellij.options.gui;
 import java.awt.Component;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -105,9 +106,9 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
                     languageText = defaultLocaleName;
                 }
                 renderer.setText(languageText);
-                ImageIcon flag = record.getFlag();
-                if (flag != null) {
-                    renderer.setIcon(flag);
+                Optional<ImageIcon> flag = record.getFlag();
+                if (flag.isPresent()) {
+                    renderer.setIcon(flag.get());
                 }
                 return renderer;
             }
