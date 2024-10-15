@@ -17,7 +17,7 @@ package org.exbin.bined.intellij.action;
 
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
-import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
@@ -60,7 +60,7 @@ public class OptionsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ExtCodeArea codeArea = componentPanel.getCodeArea();
+        SectCodeArea codeArea = componentPanel.getCodeArea();
         final BinEdOptionsPanelBorder optionsPanelWrapper = new BinEdOptionsPanelBorder();
         optionsPanelWrapper.setPreferredSize(new Dimension(700, 460));
         JPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();

@@ -30,10 +30,12 @@ import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.ByteArrayData;
 import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.CodeAreaCaretPosition;
+import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
-import org.exbin.bined.extended.layout.ExtendedCodeAreaLayoutProfile;
+import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
+import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
@@ -42,11 +44,13 @@ import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
+import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
+import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.capability.FontCapable;
-import org.exbin.bined.swing.extended.ExtCodeArea;
-import org.exbin.bined.swing.extended.diff.ExtCodeAreaDiffPanel;
-import org.exbin.bined.swing.extended.theme.ExtendedCodeAreaThemeProfile;
+import org.exbin.bined.swing.section.SectCodeArea;
+import org.exbin.bined.swing.section.diff.SectCodeAreaDiffPanel;
+import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
@@ -99,11 +103,11 @@ import java.util.List;
 public class BinedDiffPanel extends JBPanel {
 
     private final BinaryEditorPreferences preferences;
-    private final ExtCodeAreaDiffPanel diffPanel = new ExtCodeAreaDiffPanel();
+    private final SectCodeAreaDiffPanel diffPanel = new SectCodeAreaDiffPanel();
 
     private final Font defaultFont;
-    private final ExtendedCodeAreaLayoutProfile defaultLayoutProfile;
-    private final ExtendedCodeAreaThemeProfile defaultThemeProfile;
+    private final SectionCodeAreaLayoutProfile defaultLayoutProfile;
+    private final SectionCodeAreaThemeProfile defaultThemeProfile;
     private final CodeAreaColorsProfile defaultColorProfile;
 
     private final BinEdToolbarPanel toolbarPanel;
@@ -119,8 +123,8 @@ public class BinedDiffPanel extends JBPanel {
         preferences = new BinaryEditorPreferences(new IntelliJPreferencesWrapper(getPreferences(),
                 BinEdIntelliJPlugin.PLUGIN_PREFIX));
         defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
-        ExtCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
-        ExtCodeArea rightCodeArea = diffPanel.getRightCodeArea();
+        SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
+        SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
         defaultLayoutProfile = leftCodeArea.getLayoutProfile();
         defaultThemeProfile = leftCodeArea.getThemeProfile();
         defaultColorProfile = leftCodeArea.getColorsProfile();
@@ -139,14 +143,20 @@ public class BinedDiffPanel extends JBPanel {
             }
 
             @Override
-            public boolean isShowUnprintables() {
-                return leftCodeArea.isShowUnprintables();
+            public boolean isShowNonprintables() {
+                ColorAssessorPainterCapable painter = (ColorAssessorPainterCapable) leftCodeArea.getPainter();
+                NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
+                return CodeAreaUtils.requireNonNull(nonprintablesCodeAreaAssessor).isShowNonprintables();
             }
 
             @Override
-            public void setShowUnprintables(boolean showUnprintables) {
-                leftCodeArea.setShowUnprintables(showUnprintables);
-                rightCodeArea.setShowUnprintables(showUnprintables);
+            public void setShowNonprintables(boolean showNonprintables) {
+                ColorAssessorPainterCapable leftPainter = (ColorAssessorPainterCapable) leftCodeArea.getPainter();
+                NonprintablesCodeAreaAssessor leftNonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(leftPainter, NonprintablesCodeAreaAssessor.class);
+                CodeAreaUtils.requireNonNull(leftNonprintablesCodeAreaAssessor).setShowNonprintables(showNonprintables);
+                ColorAssessorPainterCapable rightPainter = (ColorAssessorPainterCapable) rightCodeArea.getPainter();
+                NonprintablesCodeAreaAssessor rightNonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(rightPainter, NonprintablesCodeAreaAssessor.class);
+                CodeAreaUtils.requireNonNull(rightNonprintablesCodeAreaAssessor).setShowNonprintables(showNonprintables);
             }
 
             @Override
@@ -217,7 +227,7 @@ public class BinedDiffPanel extends JBPanel {
                 return;
             }
             diffPanel.setLeftContentData(leftData);
-            ExtCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
+            SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
             leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
@@ -249,7 +259,7 @@ public class BinedDiffPanel extends JBPanel {
             if (rightData != null) {
                 diffPanel.setRightContentData(rightData);
             }
-            ExtCodeArea rightCodeArea = diffPanel.getRightCodeArea();
+            SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
             rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
@@ -304,8 +314,8 @@ public class BinedDiffPanel extends JBPanel {
 
     public void registerBinaryStatus(BinaryStatusApi binaryStatusApi) {
         this.binaryStatus = binaryStatusApi;
-        ExtCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
-        ExtCodeArea rightCodeArea = diffPanel.getRightCodeArea();
+        SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
+        SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
         leftCodeArea.addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
             binaryStatus.setCursorPosition(caretPosition);
         });
@@ -370,9 +380,9 @@ public class BinedDiffPanel extends JBPanel {
         });
     }
 
-    private void updateBinaryStatus(ExtCodeArea codeArea) {
+    private void updateBinaryStatus(SectCodeArea codeArea) {
         binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
-        binaryStatus.setCursorPosition(codeArea.getCaretPosition());
+        binaryStatus.setCursorPosition(codeArea.getActiveCaretPosition());
         binaryStatus.setSelectionRange(codeArea.getSelection());
         long dataSize = codeArea.getDataSize();
         binaryStatus.setCurrentDocumentSize(dataSize, dataSize);
@@ -522,8 +532,8 @@ public class BinedDiffPanel extends JBPanel {
     }
 
     private void updateApplyOptions(BinEdApplyOptions applyOptions) {
-        ExtCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
-        ExtCodeArea rightCodeArea = diffPanel.getRightCodeArea();
+        SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
+        SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
         CodeAreaOptionsImpl.applyFromCodeArea(applyOptions.getCodeAreaOptions(), leftCodeArea);
         CodeAreaOptionsImpl.applyFromCodeArea(applyOptions.getCodeAreaOptions(), rightCodeArea);
         applyOptions.getEncodingOptions().setSelectedEncoding(((CharsetCapable) leftCodeArea).getCharset().name());
@@ -545,7 +555,7 @@ public class BinedDiffPanel extends JBPanel {
         applyOptions(applyOptions, diffPanel.getRightCodeArea());
     }
 
-    private void applyOptions(BinEdApplyOptions applyOptions, ExtCodeArea codeArea) {
+    private void applyOptions(BinEdApplyOptions applyOptions, SectCodeArea codeArea) {
         BinEdPluginStartupActivity.applyIntegrationOptions(applyOptions.getIntegrationOptions());
         CodeAreaOptionsImpl.applyToCodeArea(applyOptions.getCodeAreaOptions(), codeArea);
 

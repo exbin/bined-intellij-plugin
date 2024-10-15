@@ -26,7 +26,7 @@ import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
 import org.exbin.bined.operation.undo.BinaryDataUndoRedoChangeListener;
 import org.exbin.bined.operation.undo.BinaryDataUndoableCommand;
-import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.section.SectCodeArea;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 @ParametersAreNonnullByDefault
 public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
 
-    private final ExtCodeArea codeArea;
+    private final SectCodeArea codeArea;
     private final List<BinaryDataUndoRedoChangeListener> listeners = new ArrayList<>();
     private final UndoManager undoManager;
     private final BinEdFileEditor fileEditor;
@@ -61,7 +61,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
      *
      * @param codeArea binary component
      */
-    public BinaryUndoIntelliJHandler(ExtCodeArea codeArea, Project project, BinEdFileEditor fileEditor) {
+    public BinaryUndoIntelliJHandler(SectCodeArea codeArea, Project project, BinEdFileEditor fileEditor) {
         this.codeArea = codeArea;
         this.fileEditor = fileEditor;
         this.project = project;
@@ -122,7 +122,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
             }
         };
         CommandProcessor commandProcessor = CommandProcessor.getInstance();
-        commandProcessor.executeCommand(project, () -> undoManager.undoableActionPerformed(action), command.getName(), "BinEd");
+        commandProcessor.executeCommand(project, () -> undoManager.undoableActionPerformed(action), command.getType().getClass().getTypeName(), "BinEd");
 
         commandPosition++;
         undoUpdated();

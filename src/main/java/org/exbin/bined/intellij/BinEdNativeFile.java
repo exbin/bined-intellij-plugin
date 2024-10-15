@@ -26,7 +26,7 @@ import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
-import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.FileHandlingMode;
 
@@ -60,9 +60,9 @@ public class BinEdNativeFile {
 //        binedModule.getFileManager().initComponentPanel(componentPanel.getComponentPanel());
         // TODO binedModule.getFileManager().initFileHandler(this);
 
-//        ExtCodeArea codeArea = componentPanel.getCodeArea();
+//        SectCodeArea codeArea = componentPanel.getCodeArea();
 //        CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
-//        editorFile.setUndoHandler(undoHandler);
+        editorFile.registerUndoHandler();
         openFile(virtualFile);
 
         // TODO undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, this);
@@ -85,7 +85,7 @@ public class BinEdNativeFile {
     }
 
     @Nonnull
-    public ExtCodeArea getCodeArea() {
+    public SectCodeArea getCodeArea() {
         return editorFile.getCodeArea();
     }
 
@@ -107,7 +107,7 @@ public class BinEdNativeFile {
                 throw createBrokenVirtualFileException(e);
             }
         });
-        ExtCodeArea codeArea = editorFile.getCodeArea();
+        SectCodeArea codeArea = editorFile.getCodeArea();
         codeArea.addDataChangedListener(this::saveDocument);
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 

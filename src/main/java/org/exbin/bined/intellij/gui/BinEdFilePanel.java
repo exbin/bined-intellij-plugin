@@ -18,8 +18,12 @@ package org.exbin.bined.intellij.gui;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeType;
-import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
+import org.exbin.bined.swing.CodeAreaSwingUtils;
+import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
+import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinedModule;
@@ -27,6 +31,7 @@ import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.language.api.LanguageModuleApi;
+import org.exbin.framework.options.action.OptionsAction;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -61,7 +66,7 @@ public class BinEdFilePanel extends JPanel {
     public void setFileHandler(BinEdFileHandler fileHandler) {
         this.fileHandler = fileHandler;
         BinEdComponentPanel componentPanel = fileHandler.getComponent();
-        ExtCodeArea codeArea = fileHandler.getCodeArea();
+        SectCodeArea codeArea = fileHandler.getCodeArea();
         toolbarPanel.setTargetComponent(componentPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
             @Nonnull
@@ -75,13 +80,17 @@ public class BinEdFilePanel extends JPanel {
             }
 
             @Override
-            public boolean isShowUnprintables() {
-                return codeArea.isShowUnprintables();
+            public boolean isShowNonprintables() {
+                ColorAssessorPainterCapable painter = (ColorAssessorPainterCapable) codeArea.getPainter();
+                NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
+                return CodeAreaUtils.requireNonNull(nonprintablesCodeAreaAssessor).isShowNonprintables();
             }
 
             @Override
-            public void setShowUnprintables(boolean showUnprintables) {
-                codeArea.setShowUnprintables(showUnprintables);
+            public void setShowNonprintables(boolean showNonprintables) {
+                ColorAssessorPainterCapable painter = (ColorAssessorPainterCapable) codeArea.getPainter();
+                NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
+                CodeAreaUtils.requireNonNull(nonprintablesCodeAreaAssessor).setShowNonprintables(showNonprintables);
             }
 
             @Override
@@ -89,6 +98,7 @@ public class BinEdFilePanel extends JPanel {
                 codeArea.repaint();
             }
         });
+        toolbarPanel.setOptionsAction(new OptionsAction());
         toolbarPanel.setOnlineHelpAction(
                 new AnAction() {
                     @Nonnull

@@ -64,6 +64,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             this.displayName = "";
         }
         filePanel.setFileHandler(editorFile);
+        editorFile.registerUndoHandler();
     }
 
     @Nonnull

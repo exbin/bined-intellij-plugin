@@ -224,13 +224,13 @@ public class BinEdToolbarPanel extends JBPanel {
 
     public void applyFromCodeArea() {
         updateCycleButtonState();
-        updateUnprintables();
+        updateNonprintables();
     }
 
     public void loadFromPreferences(BinaryEditorPreferences preferences) {
         codeAreaControl.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
         updateCycleButtonState();
-        updateUnprintables();
+        updateNonprintables();
     }
 
     public void updateUndoState() {
@@ -242,9 +242,9 @@ public class BinEdToolbarPanel extends JBPanel {
         }
     }
 
-    public void updateUnprintables() {
-        boolean showUnprintables = codeAreaControl.isShowUnprintables();
-        setActionSelection(showUnprintablesToggleButton, showUnprintables);
+    public void updateNonprintables() {
+        boolean showNonprintables = codeAreaControl.isShowNonprintables();
+        setActionSelection(showNonprintablesToggleButton, showNonprintables);
     }
 
     public void setSaveAction(ActionListener saveAction) {
@@ -343,9 +343,9 @@ public class BinEdToolbarPanel extends JBPanel {
         actionGroup.addAction(redoEditButton);
         setActionVisible(redoEditButton, false);
 
-        showUnprintablesToggleButton = new ToggleAction(
-                resourceBundle.getString("viewUnprintablesAction.text"),
-                resourceBundle.getString("viewUnprintablesAction.shortDescription"),
+        showNonprintablesToggleButton = new ToggleAction(
+                resourceBundle.getString("viewNonprintablesAction.text"),
+                resourceBundle.getString("viewNonprintablesAction.shortDescription"),
                 new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png"))
         ) {
             @NotNull
@@ -356,16 +356,16 @@ public class BinEdToolbarPanel extends JBPanel {
 
             @Override
             public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return codeAreaControl.isShowUnprintables();
+                return codeAreaControl.isShowNonprintables();
             }
 
             @Override
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean selected) {
-                codeAreaControl.setShowUnprintables(selected);
-                updateUnprintables();
+                codeAreaControl.setShowNonprintables(selected);
+                updateNonprintables();
             }
         };
-        actionGroup.addAction(showUnprintablesToggleButton);
+        actionGroup.addAction(showNonprintablesToggleButton);
 
         actionGroup.addAction(cycleCodeTypesSplitAction);
 
@@ -408,7 +408,7 @@ public class BinEdToolbarPanel extends JBPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private ToggleAction showUnprintablesToggleButton;
+    private ToggleAction showNonprintablesToggleButton;
     private AnAction saveFileButton;
     private AnAction undoEditButton;
     private AnAction redoEditButton;
@@ -454,9 +454,9 @@ public class BinEdToolbarPanel extends JBPanel {
 
         void setCodeType(CodeType codeType);
 
-        boolean isShowUnprintables();
+        boolean isShowNonprintables();
 
-        void setShowUnprintables(boolean showUnprintables);
+        void setShowNonprintables(boolean showNonprintables);
 
         void repaint();
     }

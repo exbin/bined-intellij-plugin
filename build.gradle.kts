@@ -44,6 +44,7 @@ tasks {
     withType<JavaCompile> {
         sourceCompatibility = "17"
         targetCompatibility = "17"
+        options.compilerArgs = options.compilerArgs + "-Xlint:unchecked" + "-Xlint:deprecation"
     }
 //    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 //        kotlinOptions.jvmTarget = "17"
@@ -117,12 +118,12 @@ dependencies {
     implementation(binedAppLibrary("exbin-framework-bined-search"))
     implementation(binedAppLibrary("exbin-framework-bined-tool-content"))
     implementation(binedLibrary("bined-core"))
-    implementation(binedLibrary("bined-extended"))
+    implementation(binedLibrary("bined-section"))
     implementation(binedLibrary("bined-highlight-swing"))
     implementation(binedLibrary("bined-operation"))
     implementation(binedLibrary("bined-operation-swing"))
     implementation(binedLibrary("bined-swing"))
-    implementation(binedLibrary("bined-swing-extended"))
+    implementation(binedLibrary("bined-swing-section"))
     implementation(binaryDataLibrary("binary_data"))
     implementation(binaryDataLibrary("binary_data-paged"))
     implementation(binaryDataLibrary("binary_data-delta"))

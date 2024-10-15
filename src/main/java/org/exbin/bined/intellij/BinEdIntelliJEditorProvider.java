@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij;
 
 import org.exbin.bined.swing.CodeAreaCore;
-import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ComponentActivationListener;
 import org.exbin.framework.bined.BinEdFileHandler;
@@ -121,7 +121,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider {
         ComponentActivationListener componentActivationListener =
                 frameModule.getFrameHandler().getComponentActivationListener();
 
-        ExtCodeArea extCodeArea = null;
+        SectCodeArea extCodeArea = null;
         ClipboardActionsHandler clipboardActionsHandler = null;
         UndoRedoControl undoHandler = null;
         if (activeFile instanceof BinEdFileHandler) {

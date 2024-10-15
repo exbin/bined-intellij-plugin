@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij.search;
 
 import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
-import org.exbin.bined.swing.extended.ExtCodeArea;
+import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
@@ -46,7 +46,7 @@ public class BinEdComponentSearch implements BinEdComponentPanel.BinEdComponentE
     @Override
     public void onCreate(BinEdComponentPanel componentPanel) {
         this.componentPanel = componentPanel;
-        ExtCodeArea codeArea = componentPanel.getCodeArea();
+        SectCodeArea codeArea = componentPanel.getCodeArea();
 
         binarySearchService = new BinarySearchServiceImpl(codeArea);
         binarySearch.setBinarySearchService(binarySearchService);
