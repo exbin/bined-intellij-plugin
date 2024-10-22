@@ -31,6 +31,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.startup.StartupActivity;
+import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
@@ -92,6 +93,7 @@ import org.exbin.framework.preferences.api.Preferences;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
 import org.exbin.framework.ui.UiModule;
 import org.exbin.framework.ui.api.UiModuleApi;
+import org.exbin.framework.utils.UiUtils;
 import org.exbin.framework.window.WindowModule;
 import org.exbin.framework.window.api.WindowModuleApi;
 import org.jetbrains.annotations.NotNull;
@@ -439,6 +441,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             ComponentActivationListener componentActivationListener =
                     frameModule.getFrameHandler().getComponentActivationListener();
             componentActivationListener.updated(EditorProvider.class, editorProvider);
+            UiUtils.setPopupMenuBuilder(JBPopupMenu::new);
         }
 
         @Override
