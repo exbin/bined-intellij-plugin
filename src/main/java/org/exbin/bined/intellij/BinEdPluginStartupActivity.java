@@ -31,11 +31,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.startup.StartupActivity;
+import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
+import com.intellij.ui.components.JBCheckBoxMenuItem;
+import com.intellij.ui.components.JBMenu;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import kotlin.Unit;
@@ -103,6 +106,11 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -411,6 +419,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedMacroModule.setEditorProvider(editorProvider);
 
             binedModule.registerCodeAreaPopupMenu();
+            binedModule.registerOptionsPanels();
             binedSearchModule.registerEditFindPopupMenuActions();
             binedOperationModule.registerBlockEditPopupMenuActions();
             binedToolContentModule.registerClipboardContentMenu();
@@ -441,7 +450,32 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             ComponentActivationListener componentActivationListener =
                     frameModule.getFrameHandler().getComponentActivationListener();
             componentActivationListener.updated(EditorProvider.class, editorProvider);
-            UiUtils.setPopupMenuBuilder(JBPopupMenu::new);
+            UiUtils.setMenuBuilder(new UiUtils.MenuBuilder() {
+                @Nonnull
+                public JMenu buildMenu() {
+                    return new JBMenu();
+                }
+
+                @Nonnull
+                public JPopupMenu buildPopupMenu() {
+                    return new JBPopupMenu();
+                }
+
+                @Nonnull
+                public JMenuItem buildMenuItem() {
+                    return new JBMenuItem("");
+                }
+
+                @Nonnull
+                public JCheckBoxMenuItem buildCheckBoxMenuItem() {
+                    return new JBCheckBoxMenuItem();
+                }
+
+                @Nonnull
+                public JRadioButtonMenuItem buildRadioButtonMenuItem() {
+                    return new JRadioButtonMenuItem();
+                }
+            });
         }
 
         @Override

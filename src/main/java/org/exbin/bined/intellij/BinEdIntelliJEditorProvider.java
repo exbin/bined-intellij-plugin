@@ -20,6 +20,7 @@ import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ComponentActivationListener;
 import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.BinaryMultiEditorProvider;
 import org.exbin.framework.editor.api.MultiEditorProvider;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.file.api.FileType;
@@ -44,7 +45,7 @@ import java.util.Optional;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdIntelliJEditorProvider implements MultiEditorProvider {
+public class BinEdIntelliJEditorProvider extends BinaryMultiEditorProvider {
 
     @Nullable
     protected FileHandler activeFile = null;

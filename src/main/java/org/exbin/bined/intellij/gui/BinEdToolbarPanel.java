@@ -38,7 +38,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
@@ -65,8 +64,8 @@ public class BinEdToolbarPanel extends JBPanel {
     private static final Key<Boolean> SELECTED_PROPERTY_KEY = Key.create(Toggleable.SELECTED_PROPERTY);
 
     private Control codeAreaControl;
-    private AbstractAction optionsAction;
-    private AnAction onlineHelpAction;
+    private ActionListener optionsAction;
+    private ActionListener onlineHelpAction;
     private BinaryDataUndoRedo undoRedo;
 
     private final DefaultActionGroup actionGroup;
@@ -191,11 +190,11 @@ public class BinEdToolbarPanel extends JBPanel {
         setActionVisible(redoEditButton, true);
     }
 
-    public void setOptionsAction(AbstractAction optionsAction) {
+    public void setOptionsAction(ActionListener optionsAction) {
         this.optionsAction = optionsAction;
     }
 
-    public void setOnlineHelpAction(AnAction onlineHelpAction) {
+    public void setOnlineHelpAction(ActionListener onlineHelpAction) {
         this.onlineHelpAction = onlineHelpAction;
     }
 
@@ -401,7 +400,7 @@ public class BinEdToolbarPanel extends JBPanel {
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                onlineHelpAction.actionPerformed(anActionEvent);
+                onlineHelpAction.actionPerformed(null);
             }
         };
         actionGroup.addAction(onlineHelpToolbarAction);

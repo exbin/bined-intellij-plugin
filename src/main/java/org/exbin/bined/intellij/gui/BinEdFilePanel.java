@@ -15,23 +15,31 @@
  */
 package org.exbin.bined.intellij.gui;
 
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeType;
+import org.exbin.bined.EditOperation;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
+import org.exbin.bined.intellij.BinEdIntelliJEditorProvider;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.bined.BinEdEditorProvider;
 import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
+import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
+import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
+import org.exbin.framework.editor.text.EncodingsHandler;
+import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.options.action.OptionsAction;
+import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.preferences.api.PreferencesModuleApi;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -44,6 +52,8 @@ import javax.swing.event.PopupMenuListener;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 /**
  * Binary editor file panel.
@@ -55,12 +65,11 @@ public class BinEdFilePanel extends JPanel {
 
     private BinEdFileHandler fileHandler;
     private BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
-    private BinaryStatusPanel statusPanel = new BinaryStatusPanel();
+    private BinaryStatusPanel statusPanel;
 
     public BinEdFilePanel() {
         super(new BorderLayout());
         add(toolbarPanel, BorderLayout.NORTH);
-        add(statusPanel, BorderLayout.SOUTH);
     }
 
     public void setFileHandler(BinEdFileHandler fileHandler) {
@@ -98,23 +107,10 @@ public class BinEdFilePanel extends JPanel {
                 codeArea.repaint();
             }
         });
-        toolbarPanel.setOptionsAction(new OptionsAction());
-        toolbarPanel.setOnlineHelpAction(
-                new AnAction() {
-                    @Nonnull
-                    @Override
-                    public ActionUpdateThread getActionUpdateThread() {
-                        return ActionUpdateThread.BGT;
-                    }
-
-                    @Override
-                    public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
-                        createOnlineHelpAction().actionPerformed(new ActionEvent(BinEdFilePanel.this, 0, "COMMAND", 0));
-                    }
-                }
-        );
+        toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
 
         BinedModule binedModule = App.getModule(BinedModule.class);
+        BinEdIntelliJEditorProvider editorProvider = (BinEdIntelliJEditorProvider) binedModule.getEditorProvider();
         CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
                 binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.EDITOR);
         codeArea.setComponentPopupMenu(new JPopupMenu() {
@@ -140,9 +136,82 @@ public class BinEdFilePanel extends JPanel {
             }
         });
 
+        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+        toolbarPanel.setOptionsAction(optionsModule.createOptionsAction());
+
+        BinEdFileManager fileManager = binedModule.getFileManager();
+        EncodingsHandler encodingsHandler = binedModule.getEncodingsHandler();
+        fileManager.registerStatusBar();
+        fileManager.setStatusControlHandler(new BinaryStatusPanel.StatusControlHandler() {
+            @Override
+            public void changeEditOperation(EditOperation editOperation) {
+                Optional<FileHandler> activeFile = editorProvider.getActiveFile();
+                if (activeFile.isPresent()) {
+                    ((BinEdFileHandler) activeFile.get()).getCodeArea().setEditOperation(editOperation);
+                }
+            }
+
+            @Override
+            public void changeCursorPosition() {
+                GoToPositionAction action = new GoToPositionAction();
+                action.setCodeArea(fileHandler.getCodeArea());
+                action.actionPerformed(null);
+            }
+
+            @Override
+            public void cycleEncodings() {
+                if (encodingsHandler != null) {
+                    encodingsHandler.cycleEncodings();
+                }
+            }
+
+            @Override
+            public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
+                if (encodingsHandler != null) {
+                    encodingsHandler.popupEncodingsMenu(mouseEvent);
+                }
+            }
+
+            @Override
+            public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
+                Optional<FileHandler> activeFile = editorProvider.getActiveFile();
+                if (activeFile.isPresent()) {
+                    BinEdFileHandler fileHandler = (BinEdFileHandler) activeFile.get();
+                    FileHandlingMode fileHandlingMode = fileHandler.getFileHandlingMode();
+                    FileHandlingMode newHandlingMode = memoryMode == BinaryStatusApi.MemoryMode.DELTA_MODE ? FileHandlingMode.DELTA : FileHandlingMode.MEMORY;
+                    if (newHandlingMode != fileHandlingMode) {
+                        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
+                        BinaryEditorPreferences preferences = new BinaryEditorPreferences(preferencesModule.getAppPreferences());
+                        if (editorProvider.releaseFile(fileHandler)) {
+                            fileHandler.switchFileHandlingMode(newHandlingMode);
+                            preferences.getEditorPreferences().setFileHandlingMode(newHandlingMode);
+                        }
+                        ((BinEdEditorProvider) editorProvider).updateStatus();
+                    }
+                }
+            }
+        });
+        statusPanel = fileManager.getBinaryStatusPanel();
+        add(statusPanel, BorderLayout.SOUTH);
+
         add(componentPanel, BorderLayout.CENTER);
         revalidate();
         repaint();
+    }
+
+    @Nonnull
+    public BinEdToolbarPanel getToolbarPanel() {
+        return toolbarPanel;
+    }
+
+    @Nonnull
+    public BinaryStatusPanel getStatusPanel() {
+        return statusPanel;
+    }
+
+    @Nonnull
+    public SectCodeArea getCodeArea() {
+        return fileHandler.getCodeArea();
     }
 
     @Nonnull

@@ -20,9 +20,6 @@ import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.contents.FileContent;
 import com.intellij.diff.requests.ContentDiffRequest;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBPanel;
@@ -35,15 +32,14 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
-import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.options.BinEdApplyOptions;
 import org.exbin.bined.intellij.options.IntegrationOptions;
-import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
 import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
+import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
@@ -71,6 +67,7 @@ import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.options.TextFontOptions;
 import org.exbin.framework.language.api.LanguageModuleApi;
+import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -83,7 +80,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
@@ -164,21 +160,9 @@ public class BinedDiffPanel extends JBPanel {
                 diffPanel.repaint();
             }
         });
-        toolbarPanel.setOptionsAction(createOptionsAction());
-        toolbarPanel.setOnlineHelpAction(
-                new AnAction() {
-                    @Nonnull
-                    @Override
-                    public ActionUpdateThread getActionUpdateThread() {
-                        return ActionUpdateThread.BGT;
-                    }
-
-                    @Override
-                    public void actionPerformed(@Nonnull AnActionEvent anActionEvent) {
-                        createOnlineHelpAction().actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, "COMMAND", 0));
-                    }
-                }
-        );
+        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+        toolbarPanel.setOptionsAction(optionsModule.createOptionsAction());
+        toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
         statusPanel = new BinaryStatusPanel();
 
         init();
@@ -465,61 +449,6 @@ public class BinedDiffPanel extends JBPanel {
         if (binaryStatus != null) {
             binaryStatus.setMemoryMode(memoryMode);
         }
-    }
-
-    @Nonnull
-    private AbstractAction createOptionsAction() {
-        return new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final BinEdOptionsPanelBorder optionsPanelWrapper = new BinEdOptionsPanelBorder();
-                optionsPanelWrapper.setPreferredSize(new Dimension(700, 460));
-                /*BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
-                optionsPanel.setPreferences(preferences);
-                optionsPanel.setTextFontService(new TextFontService() {
-                    @Nonnull
-                    @Override
-                    public Font getCurrentFont() {
-                        return diffPanel.getLeftCodeArea().getCodeFont();
-                    }
-
-                    @Nonnull
-                    @Override
-                    public Font getDefaultFont() {
-                        return defaultFont;
-                    }
-
-                    @Override
-                    public void setCurrentFont(Font font) {
-                        diffPanel.getLeftCodeArea().setCodeFont(font);
-                        diffPanel.getRightCodeArea().setCodeFont(font);
-                    }
-                });
-                optionsPanel.loadFromPreferences();
-                updateApplyOptions(optionsPanel);
-                OptionsControlPanel optionsControlPanel = new OptionsControlPanel();
-                JPanel dialogPanel = WindowUtils.createDialogPanel(optionsPanelWrapper, optionsControlPanel);
-                WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(dialogPanel,
-                        BinedDiffPanel.this,
-                        optionsPanel.getResourceBundle().getString("dialog.title"),
-                        Dialog.ModalityType.APPLICATION_MODAL);
-                optionsControlPanel.setHandler((OptionsControlHandler.ControlActionType actionType) -> {
-                    if (actionType != OptionsControlHandler.ControlActionType.CANCEL) {
-                        optionsPanel.applyToOptions();
-                        if (actionType == OptionsControlHandler.ControlActionType.SAVE) {
-                            optionsPanel.saveToPreferences();
-                        }
-                        applyOptions(optionsPanel);
-                        diffPanel.getLeftCodeArea().repaint();
-                        diffPanel.getRightCodeArea().repaint();
-                    }
-
-                    dialog.close();
-                });
-                dialog.showCentered(BinedDiffPanel.this);
-                dialog.dispose(); */
-            }
-        };
     }
 
     public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi) {
