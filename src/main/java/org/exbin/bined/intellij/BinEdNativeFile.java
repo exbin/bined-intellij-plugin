@@ -26,16 +26,20 @@ import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
+import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
 import org.exbin.bined.swing.section.SectCodeArea;
+import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileHandlingMode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
-import java.awt.Font;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * File editor wrapper using BinEd editor component.
@@ -46,37 +50,41 @@ import java.io.IOException;
 public class BinEdNativeFile {
 
     private final BinEdFilePanel filePanel = new BinEdFilePanel();
-    private final BinEdFileHandler editorFile = new BinEdFileHandler();
+    private final BinEdFileHandler fileHandler = new BinEdFileHandler();
 
     private boolean opened = false;
     private VirtualFile virtualFile;
-    private Font defaultFont;
-    private long documentOriginalSize;
 
     public BinEdNativeFile(VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
-        filePanel.setFileHandler(editorFile);
-//        BinedModule binedModule = App.getModule(BinedModule.class);
-//        binedModule.getFileManager().initComponentPanel(componentPanel.getComponentPanel());
-        // TODO binedModule.getFileManager().initFileHandler(this);
+        filePanel.setFileHandler(fileHandler);
+        BinedModule binedModule = App.getModule(BinedModule.class);
+        binedModule.getFileManager().initComponentPanel(fileHandler.getComponent());
+        binedModule.getFileManager().initFileHandler(fileHandler);
 
-//        SectCodeArea codeArea = componentPanel.getCodeArea();
-//        CodeAreaUndoHandler undoHandler = new CodeAreaUndoHandler(codeArea);
-        editorFile.registerUndoHandler();
         openFile(virtualFile);
 
-        // TODO undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, this);
+        SectCodeArea codeArea = filePanel.getCodeArea();
+        // TODO BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, fileEditor);
 
 //        componentPanel.setModifiedChangeListener(() -> {
 //            updateModified();
 //        });
 //        defaultFont = codeArea.getCodeFont();
-        documentOriginalSize = virtualFile.getLength();
+        // TODO editorFile.fileSync();
+        // TODO filePanel.getToolbarPanel().documentOriginalSize = virtualFile.getLength();
 //        binedModule.getFileManager().initCommandHandler(componentPanel.getComponentPanel());
     }
 
+    public void registerUndoRedo(BinaryUndoIntelliJHandler undoIntelliJHandler) {
+        fileHandler.registerUndoHandler();
+        BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
+        toolbarPanel.setUndoHandler(fileHandler.getCodeAreaUndoHandler().get());
+        // TODO fileHandler.setUndoHandler(undoIntelliJHandler);
+    }
+
     public boolean isModified() {
-        return false; // TODO componentPanel.isModified();
+        return fileHandler.isModified();
     }
 
     @Nonnull
@@ -86,12 +94,12 @@ public class BinEdNativeFile {
 
     @Nonnull
     public SectCodeArea getCodeArea() {
-        return editorFile.getCodeArea();
+        return fileHandler.getCodeArea();
     }
 
     @Nonnull
     public BinEdFileHandler getEditorFile() {
-        return editorFile;
+        return fileHandler;
     }
 
     public void openFile(VirtualFile virtualFile) {
@@ -102,26 +110,26 @@ public class BinEdNativeFile {
                 byte[] fileContent = virtualFile.contentsToByteArray();
                 PagedData binaryData = new PagedData();
                 binaryData.insert(0, fileContent);
-                editorFile.getCodeArea().setContentData(binaryData);
+                fileHandler.getCodeArea().setContentData(binaryData);
             } catch (IOException e) {
                 throw createBrokenVirtualFileException(e);
             }
         });
-        SectCodeArea codeArea = editorFile.getCodeArea();
+        SectCodeArea codeArea = fileHandler.getCodeArea();
         codeArea.addDataChangedListener(this::saveDocument);
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
         opened = true;
-        documentOriginalSize = codeArea.getDataSize();
+        // TODO fileSync / documentOriginalSize = codeArea.getDataSize();
         updateModified();
-//        Optional<BinaryDataUndoHandler> undoHandler = componentPanel.getUndoHandler();
-//        if (undoHandler.isPresent()) {
-//            undoHandler.get().clear();
-//        }
+        Optional<BinaryDataUndoRedo> undoHandler = fileHandler.getCodeAreaUndoHandler();
+        if (undoHandler.isPresent()) {
+            undoHandler.get().clear();
+        }
     }
 
     public void saveDocument() {
-        BinaryData contentData = editorFile.getCodeArea().getContentData();
+        BinaryData contentData = fileHandler.getCodeArea().getContentData();
         long dataSize = contentData.getDataSize();
         final byte[] fileContent = new byte[(int) dataSize];
         if (dataSize > 0) {

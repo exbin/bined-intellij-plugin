@@ -17,13 +17,14 @@ package org.exbin.bined.intellij.search;
 
 import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
-import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
+import org.exbin.bined.intellij.search.gui.BinarySearchIntelliJPanel;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.search.ReplaceParameters;
 import org.exbin.framework.bined.search.SearchCondition;
 import org.exbin.framework.bined.search.SearchParameters;
 import org.exbin.framework.bined.search.gui.BinaryMultilinePanel;
+import org.exbin.framework.bined.search.gui.BinarySearchPanel;
 import org.exbin.framework.bined.search.gui.FindBinaryPanel;
 import org.exbin.framework.bined.search.service.BinarySearchService;
 import org.exbin.framework.bined.search.service.BinarySearchService.FoundMatches;
@@ -71,7 +72,7 @@ public class BinarySearch {
     private PanelClosingListener panelClosingListener = null;
     private BinarySearchService binarySearchService;
     private final BinarySearchService.SearchStatusListener searchStatusListener;
-    private final BinarySearchPanel binarySearchPanel = new BinarySearchPanel();
+    private final BinarySearchIntelliJPanel binarySearchPanel = new BinarySearchIntelliJPanel();
 
     public BinarySearch() {
         searchStatusListener = new BinarySearchService.SearchStatusListener() {
@@ -112,7 +113,7 @@ public class BinarySearch {
                 );
             }
         };
-        binarySearchPanel.setControl(new BinarySearchPanel.Control() {
+        binarySearchPanel.setControl(new BinarySearchIntelliJPanel.Control() {
             @Override
             public void prevMatch() {
                 foundMatches.prev();
@@ -352,7 +353,7 @@ public class BinarySearch {
     }
 
     @Nonnull
-    public BinarySearchPanel getPanel() {
+    public BinarySearchIntelliJPanel getPanel() {
         return binarySearchPanel;
     }
 

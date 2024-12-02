@@ -53,6 +53,8 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
     public BinEdNativeFileEditor(Project project, final VirtualFile virtualFile) {
         this.project = project;
         this.nativeFile = new BinEdNativeFile(virtualFile);
+        BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler(project, this);
+        nativeFile.registerUndoRedo(undoHandler);
 
         propertyChangeSupport = new PropertyChangeSupport(this);
     }

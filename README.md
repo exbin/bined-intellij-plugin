@@ -41,11 +41,26 @@ IntelliJ Idea platform is necessary to build this plugin. See. https://jetbrains
 
 Use "buildPlugin" gradle task to build distribution build.
 
-**Note: Building is currently broken as it requires dependencies deployed in local Maven repository from various repositories:**
-  * https://github.com/exbin/exbin-auxiliary-java  
-  * https://github.com/exbin/exbin-framework-java  
-  * https://github.com/exbin/bined-lib-java  
-  * https://github.com/exbin/bined  
+Building is currently broken as it requires dependencies deployed in local Maven repository from various repositories:
+
+You can try to run following commands. Start at parent directory to "bined" repo directory.
+
+    git clone https://github.com/exbin/exbin-auxiliary-java.git
+    cd exbin-auxiliary-java
+    gradlew build publish
+    cd ..
+    git clone https://github.com/exbin/bined-lib-java.git
+    cd bined-lib-java
+    gradlew build publish
+    cd ..
+    git clone https://github.com/exbin/exbin-framework-java.git
+    cd exbin-framework-java
+    gradlew build publish
+    cd .. 
+    git clone https://github.com/exbin/bined.git
+    cd bined
+    gradlew build publish
+    cd .. 
 
 Use "runIde" gradle task to run.
 

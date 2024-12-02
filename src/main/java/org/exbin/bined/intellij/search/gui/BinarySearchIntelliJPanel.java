@@ -44,6 +44,7 @@ import org.exbin.framework.bined.search.SearchCondition;
 import org.exbin.framework.bined.search.SearchHistoryModel;
 import org.exbin.framework.bined.search.SearchParameters;
 import org.exbin.framework.bined.search.gui.BinarySearchComboBoxPanel;
+import org.exbin.framework.bined.search.gui.BinarySearchPanel;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.utils.TestApplication;
 import org.exbin.framework.utils.WindowUtils;
@@ -79,15 +80,15 @@ import java.util.Objects;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinarySearchPanel extends JBPanel {
+public class BinarySearchIntelliJPanel extends JBPanel {
 
-    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(BinarySearchPanel.class);
+    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(BinarySearchIntelliJPanel.class);
 
     private Control control = null;
 
     private final SectCodeArea searchCodeArea = new SectCodeArea();
 
-    private PanelMode panelMode = PanelMode.REPLACE;
+    private BinarySearchPanel.PanelMode panelMode = BinarySearchPanel.PanelMode.REPLACE;
     private ComboBoxEditor findComboBoxEditor;
     private BinarySearchComboBoxPanel findComboBoxEditorComponent;
     private ComboBoxEditor replaceComboBoxEditor;
@@ -114,7 +115,7 @@ public class BinarySearchPanel extends JBPanel {
     private final JButton replaceAllButton;
     private final DefaultCustomComponentAction replaceAllAction;
 
-    public BinarySearchPanel() {
+    public BinarySearchIntelliJPanel() {
         findToolbarActionGroup = new DefaultActionGroup();
         findToolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".find",
                 findToolbarActionGroup, true);
@@ -213,7 +214,7 @@ public class BinarySearchPanel extends JBPanel {
         matchCaseToggleAction = new ToggleAction(
                 resourceBundle.getString("matchCaseToggleButton.toolTipText"),
                 null,
-                load("/org/exbin/framework/bined/search/resources/icons/case_sensitive.png")
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/case_sensitive.gif"))
         ) {
             @NotNull
             @Override
@@ -273,12 +274,6 @@ public class BinarySearchPanel extends JBPanel {
     }
 
     private void init() {
-/*        Project project = ProjectManager.getInstance().getDefaultProject();
-        SearchReplaceComponent.Builder builder = SearchReplaceComponent.buildFor(project, new JBLabel("TEST"));
-        SearchReplaceComponent component = builder.build();
-        add(new JButton("TEST 2"), BorderLayout.EAST);
-        add(component, BorderLayout.WEST); */
-
         findToolbarActionGroup.addSeparator();
         findToolbarActionGroup.addAction(optionsAction);
         findPanel.add(findToolbar, BorderLayout.CENTER);
@@ -286,7 +281,7 @@ public class BinarySearchPanel extends JBPanel {
         closeToolbarActionGroup.addAction(new AnAction(
                 resourceBundle.getString("closeButton.toolTipText"),
                 null,
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/dialog-cancel-3.png"))
+                load("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/dialog-cancel-3.png")
         ) {
             @Override
             public void actionPerformed(@Nonnull AnActionEvent e) {
@@ -553,10 +548,10 @@ public class BinarySearchPanel extends JBPanel {
         replaceComboBox.setModel(new SearchHistoryModel(history));
     }
 
-    public void switchPanelMode(PanelMode panelMode) {
+    public void switchPanelMode(BinarySearchPanel.PanelMode panelMode) {
         if (this.panelMode != panelMode) {
             this.panelMode = panelMode;
-            if (panelMode == PanelMode.REPLACE) {
+            if (panelMode == BinarySearchPanel.PanelMode.REPLACE) {
                 add(replacePanel, BorderLayout.SOUTH);
             } else {
                 remove(replacePanel);
@@ -726,7 +721,7 @@ public class BinarySearchPanel extends JBPanel {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        TestApplication.run(() -> WindowUtils.invokeWindow(new BinarySearchPanel()));
+        TestApplication.run(() -> WindowUtils.invokeWindow(new BinarySearchIntelliJPanel()));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -796,9 +791,5 @@ public class BinarySearchPanel extends JBPanel {
         void searchOptions();
 
         void close();
-    }
-
-    public enum PanelMode {
-        FIND, REPLACE
     }
 }

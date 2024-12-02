@@ -21,7 +21,10 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
+import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.BinedModule;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -47,7 +50,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     private final VirtualFile parentFile;
     private String displayName;
     private final BinEdFilePanel filePanel = new BinEdFilePanel();
-    private final BinEdFileHandler editorFile = new BinEdFileHandler();
+    private final BinEdFileHandler fileHandler = new BinEdFileHandler();
     private boolean closing = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
@@ -63,13 +66,21 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         } else {
             this.displayName = "";
         }
-        filePanel.setFileHandler(editorFile);
-        editorFile.registerUndoHandler();
+
+        BinedModule binedModule = App.getModule(BinedModule.class);
+        binedModule.getFileManager().initComponentPanel(fileHandler.getComponent());
+        binedModule.getFileManager().initFileHandler(fileHandler);
+        filePanel.setFileHandler(fileHandler);
+        fileHandler.registerUndoHandler();
+
+        BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
+        toolbarPanel.setUndoHandler(fileHandler.getCodeAreaUndoHandler().get());
+        toolbarPanel.setSaveAction(e -> fileHandler.saveFile());
     }
 
     @Nonnull
     public BinEdFileHandler getEditorFile() {
-        return editorFile;
+        return fileHandler;
     }
 
     @Nonnull
@@ -197,8 +208,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     }
 
     public void dispose() {
-        if (editorFile != null) {
-            editorFile.closeData();
+        if (fileHandler != null) {
+            fileHandler.closeData();
         }
     }
 

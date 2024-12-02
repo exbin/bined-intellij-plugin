@@ -15,15 +15,16 @@
  */
 package org.exbin.bined.intellij.search;
 
-import org.exbin.bined.intellij.search.gui.BinarySearchPanel;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
+import org.exbin.framework.bined.search.BinEdComponentSearch;
 import org.exbin.framework.bined.search.SearchCondition;
 import org.exbin.framework.bined.search.SearchParameters;
+import org.exbin.framework.bined.search.gui.BinarySearchPanel;
 import org.exbin.framework.bined.search.service.BinarySearchService;
 import org.exbin.framework.bined.search.service.impl.BinarySearchServiceImpl;
 
@@ -31,12 +32,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.BorderLayout;
 
 /**
- * Bined component search.
+ * BinEd component search.
  *
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdComponentSearch implements BinEdComponentPanel.BinEdComponentExtension {
+public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
 
     private BinEdComponentPanel componentPanel;
     private final BinarySearch binarySearch = new BinarySearch();
@@ -77,6 +78,7 @@ public class BinEdComponentSearch implements BinEdComponentPanel.BinEdComponentE
     public void onClose() {
     }
 
+    @Override
     public void showSearchPanel(BinarySearchPanel.PanelMode panelMode) {
         if (!binarySearchPanelVisible) {
             componentPanel.add(binarySearch.getPanel(), BorderLayout.NORTH);
@@ -87,6 +89,7 @@ public class BinEdComponentSearch implements BinEdComponentPanel.BinEdComponentE
         binarySearch.getPanel().switchPanelMode(panelMode);
     }
 
+    @Override
     public void hideSearchPanel() {
         if (binarySearchPanelVisible) {
             binarySearch.cancelSearch();
@@ -96,7 +99,8 @@ public class BinEdComponentSearch implements BinEdComponentPanel.BinEdComponentE
             binarySearchPanelVisible = false;
         }
     }
-    
+
+    @Override
     public void performSearchText(String text) {
         SearchParameters searchParameters = new SearchParameters();
         SearchCondition searchCondition = new SearchCondition();
@@ -105,6 +109,7 @@ public class BinEdComponentSearch implements BinEdComponentPanel.BinEdComponentE
         binarySearchService.performFind(searchParameters, binarySearch.getSearchStatusListener());
     }
 
+    @Override
     public void performFindAgain() {
         if (binarySearchPanelVisible) {
             binarySearchService.performFindAgain(binarySearch.getSearchStatusListener());
@@ -113,6 +118,7 @@ public class BinEdComponentSearch implements BinEdComponentPanel.BinEdComponentE
         }
     }
 
+    @Override
     public void setCodeAreaPopupMenuHandler(CodeAreaPopupMenuHandler codeAreaPopupMenuHandler) {
         binarySearch.getPanel().setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler);
     }

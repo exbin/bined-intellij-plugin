@@ -50,6 +50,7 @@ import org.exbin.bined.intellij.objectdata.MainBinaryViewHandler;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
+import org.exbin.bined.intellij.search.BinEdIntelliJComponentSearch;
 import org.exbin.framework.App;
 import org.exbin.framework.Module;
 import org.exbin.framework.ModuleProvider;
@@ -63,6 +64,7 @@ import org.exbin.framework.action.api.MenuPosition;
 import org.exbin.framework.action.api.PositionMode;
 import org.exbin.framework.action.api.SeparationMode;
 import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
 import org.exbin.framework.bined.compare.BinedCompareModule;
@@ -119,6 +121,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -380,6 +383,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             ResourceBundle bundle = languageModule.getBundle(BinEdIntelliJPlugin.class);
             languageModule.setAppBundle(bundle);
 
+            WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
+            windowModule.setHideHeaderPanels(true);
+
             AboutModuleApi aboutModule = App.getModule(AboutModuleApi.class);
             OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
             optionsModule.registerMenuAction();
@@ -397,6 +403,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             BinedSearchModule binedSearchModule = App.getModule(BinedSearchModule.class);
             binedSearchModule.setEditorProvider(editorProvider);
+            BinEdFileManager fileManager = binedModule.getFileManager();
+            fileManager.addBinEdComponentExtension(component -> Optional.of(new BinEdIntelliJComponentSearch()));
 
             BinedOperationModule binedOperationModule = App.getModule(BinedOperationModule.class);
             binedOperationModule.setEditorProvider(editorProvider);

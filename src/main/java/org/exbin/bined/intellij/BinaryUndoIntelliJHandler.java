@@ -26,7 +26,6 @@ import org.exbin.bined.operation.BinaryDataCommand;
 import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
 import org.exbin.bined.operation.undo.BinaryDataUndoRedoChangeListener;
 import org.exbin.bined.operation.undo.BinaryDataUndoableCommand;
-import org.exbin.bined.swing.section.SectCodeArea;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -47,10 +46,9 @@ import java.util.logging.Logger;
 @ParametersAreNonnullByDefault
 public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
 
-    private final SectCodeArea codeArea;
     private final List<BinaryDataUndoRedoChangeListener> listeners = new ArrayList<>();
     private final UndoManager undoManager;
-    private final BinEdFileEditor fileEditor;
+    private final BinEdNativeFileEditor fileEditor;
     private final Project project;
     private DocumentReference documentReference;
     private int commandPosition;
@@ -58,14 +56,12 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
 
     /**
      * Creates a new instance.
-     *
-     * @param codeArea binary component
      */
-    public BinaryUndoIntelliJHandler(SectCodeArea codeArea, Project project, BinEdFileEditor fileEditor) {
-        this.codeArea = codeArea;
+    public BinaryUndoIntelliJHandler(Project project, BinEdNativeFileEditor fileEditor) {
         this.fileEditor = fileEditor;
         this.project = project;
         undoManager = UndoManager.getInstance(project);
+        documentReference = DocumentReferenceManager.getInstance().create(fileEditor.getFile());
         init();
     }
 
@@ -167,7 +163,6 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
 
     @Override
     public void clear() {
-        documentReference = DocumentReferenceManager.getInstance().create(fileEditor.getVirtualFile());
         ((UndoManagerImpl) undoManager).invalidateActionsFor(documentReference);
         init();
     }
