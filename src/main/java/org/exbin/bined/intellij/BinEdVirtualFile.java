@@ -94,6 +94,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return parentFile.getName();
     }
 
+    @Nonnull
     public String getDisplayName() {
         return displayName;
     }
@@ -170,6 +171,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return parentFile.getInputStream();
     }
 
+    @Override
     public long getModificationStamp() {
         return parentFile.getModificationStamp();
     }
@@ -208,9 +210,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     }
 
     public void dispose() {
-        if (fileHandler != null) {
-            fileHandler.closeData();
-        }
+        fileHandler.closeData();
     }
 
     @Nonnull
@@ -237,7 +237,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     @Nonnull
     private static File extractFile(BinEdVirtualFile virtualFile) {
         String path = virtualFile.getPath();
-        if (path.startsWith("bined://")) {
+        if (path.startsWith(PATH_PREFIX)) {
             path = path.substring(8);
         }
         return new File(path);

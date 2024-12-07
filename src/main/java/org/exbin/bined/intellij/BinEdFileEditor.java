@@ -27,6 +27,8 @@ import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
+import org.exbin.framework.App;
+import org.exbin.framework.bined.BinedModule;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -104,7 +106,8 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
 
     @Override
     public void selectNotify() {
-
+        BinedModule binedModule = App.getModule(BinedModule.class);
+        ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider()).setActiveFile(virtualFile.getEditorFile());
     }
 
     @Override

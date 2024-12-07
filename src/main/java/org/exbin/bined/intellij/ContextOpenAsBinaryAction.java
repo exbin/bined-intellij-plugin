@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.fileTypes.DirectoryFileType;
 import com.intellij.openapi.vfs.VirtualFile;
 
@@ -38,7 +38,7 @@ public class ContextOpenAsBinaryAction extends OpenAsBinaryAction {
 
     @Override
     public void update(AnActionEvent event) {
-        VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
+        VirtualFile virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
         event.getPresentation()
                 .setEnabledAndVisible(actionVisible && virtualFile != null && virtualFile.isValid() && !(virtualFile.isDirectory()
                         || virtualFile.getFileType() instanceof DirectoryFileType));

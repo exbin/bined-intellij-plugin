@@ -25,6 +25,7 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.ByteArrayData;
+import org.exbin.auxiliary.binary_data.paged.ByteArrayPagedData;
 import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.CodeAreaUtils;
@@ -278,7 +279,7 @@ public class BinedDiffPanel extends JBPanel {
         if (contents.size() > index) {
             DiffContent diffContent = contents.get(index);
             if (diffContent instanceof FileContent) {
-                PagedData pageData = new PagedData();
+                PagedData pageData = new ByteArrayPagedData();
                 try {
                     byte[] fileContent = ((FileContent) diffContent).getFile().contentsToByteArray();
                     pageData.insert(0, fileContent);

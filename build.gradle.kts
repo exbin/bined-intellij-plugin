@@ -69,12 +69,12 @@ tasks {
 val exbinFrameworkLibraryVersion = "0.3.0-SNAPSHOT"
 val binedAppLibraryVersion = "0.3.0-SNAPSHOT"
 val binedLibraryVersion = "0.3.0-SNAPSHOT"
-val binaryDataLibraryVersion = "0.2.1"
+val binaryDataLibraryVersion = "0.2.2-SNAPSHOT"
 
 fun exbinFrameworkLibrary(libName: String): String = if (exbinFrameworkLibraryVersion.endsWith("-SNAPSHOTX")) ":${libName}-${exbinFrameworkLibraryVersion}" else "org.exbin.framework:${libName}:${exbinFrameworkLibraryVersion}"
 fun binedAppLibrary(libName: String): String = if (binedAppLibraryVersion.endsWith("-SNAPSHOTX")) ":${libName}-${binedAppLibraryVersion}" else "org.exbin.framework:${libName}:${binedAppLibraryVersion}"
 fun binedLibrary(libName: String): String = if (binedLibraryVersion.endsWith("-SNAPSHOTX")) ":${libName}-${binedLibraryVersion}" else "org.exbin.bined:${libName}:${binedLibraryVersion}"
-fun binaryDataLibrary(libName: String): String = if (binaryDataLibraryVersion.endsWith("-SNAPSHOT")) ":${libName}-${binaryDataLibraryVersion}" else "org.exbin.auxiliary:${libName}:${binaryDataLibraryVersion}"
+fun binaryDataLibrary(libName: String): String = if (binaryDataLibraryVersion.endsWith("-SNAPSHOTX")) ":${libName}-${binaryDataLibraryVersion}" else "org.exbin.auxiliary:${libName}:${binaryDataLibraryVersion}"
 
 repositories {
     flatDir {
@@ -125,7 +125,7 @@ dependencies {
     implementation(binedLibrary("bined-swing"))
     implementation(binedLibrary("bined-swing-section"))
     implementation(binaryDataLibrary("binary_data"))
-    implementation(binaryDataLibrary("binary_data-paged"))
+    implementation(binaryDataLibrary("binary_data-array"))
     implementation(binaryDataLibrary("binary_data-delta"))
     implementation(":flatlaf-desktop-3.2")
     compileOnly(":debugvalue-clion-2022.2.1")

@@ -36,6 +36,7 @@ import javax.swing.JComponent;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,7 +57,11 @@ public class BinEdIntelliJEditorProvider extends BinaryMultiEditorProvider {
     @Nonnull
     @Override
     public List<FileHandler> getFileHandlers() {
-        return null;
+        List<FileHandler> result = new ArrayList<>();
+        if (activeFile != null) {
+            result.add(activeFile);
+        }
+        return result;
     }
 
     @Nonnull
@@ -103,7 +108,12 @@ public class BinEdIntelliJEditorProvider extends BinaryMultiEditorProvider {
     @Nonnull
     @Override
     public JComponent getEditorComponent() {
+        if (activeFile instanceof BinEdFileHandler) {
+            return ((BinEdFileHandler) activeFile).getComponent();
+        }
+
         return null;
+//        TODO throw new IllegalStateException("Unsupported file handler");
     }
 
     @Nonnull

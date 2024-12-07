@@ -15,9 +15,7 @@
  */
 package org.exbin.bined.intellij;
 
-import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 import com.intellij.openapi.project.DumbAware;
@@ -26,6 +24,8 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.exbin.framework.App;
+import org.exbin.framework.bined.BinedModule;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -52,8 +52,10 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
 
     public BinEdNativeFileEditor(Project project, final VirtualFile virtualFile) {
         this.project = project;
-        this.nativeFile = new BinEdNativeFile(virtualFile);
-        BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler(project, this);
+        this.nativeFile = new BinEdNativeFile();
+        nativeFile.openFile(virtualFile);
+        BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler();
+        undoHandler.setFileEditor(this);
         nativeFile.registerUndoRedo(undoHandler);
 
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -99,7 +101,8 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
 
     @Override
     public void selectNotify() {
-
+        BinedModule binedModule = App.getModule(BinedModule.class);
+        ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider()).setActiveFile(nativeFile.getEditorFile());
     }
 
     @Override
@@ -115,19 +118,6 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
     @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
-    @Nullable
-    @Override
-    public BackgroundEditorHighlighter getBackgroundHighlighter() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public FileEditorLocation getCurrentLocation() {
-        return null;
-//        return new TextEditorLocation(codeArea.getCaretPosition(), this);
     }
 
     @Override

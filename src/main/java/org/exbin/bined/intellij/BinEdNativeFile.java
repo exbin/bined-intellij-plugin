@@ -23,6 +23,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.LocalTimeCounter;
 import org.exbin.auxiliary.binary_data.BinaryData;
+import org.exbin.auxiliary.binary_data.paged.ByteArrayPagedData;
 import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
@@ -55,17 +56,14 @@ public class BinEdNativeFile {
     private boolean opened = false;
     private VirtualFile virtualFile;
 
-    public BinEdNativeFile(VirtualFile virtualFile) {
-        this.virtualFile = virtualFile;
+    public BinEdNativeFile() {
         filePanel.setFileHandler(fileHandler);
         BinedModule binedModule = App.getModule(BinedModule.class);
-        binedModule.getFileManager().initComponentPanel(fileHandler.getComponent());
         binedModule.getFileManager().initFileHandler(fileHandler);
-
-        openFile(virtualFile);
+        BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler();
+        fileHandler.setUndoHandler(undoHandler);
 
         SectCodeArea codeArea = filePanel.getCodeArea();
-        // TODO BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler(codeArea, project, fileEditor);
 
 //        componentPanel.setModifiedChangeListener(() -> {
 //            updateModified();
@@ -103,12 +101,17 @@ public class BinEdNativeFile {
     }
 
     public void openFile(VirtualFile virtualFile) {
+        if (this.virtualFile != null) {
+            throw new IllegalStateException("Unable to reopen native file");
+        }
+
+        this.virtualFile = virtualFile;
         boolean editable = virtualFile.isWritable();
 
         ApplicationManager.getApplication().runReadAction(() -> {
             try {
                 byte[] fileContent = virtualFile.contentsToByteArray();
-                PagedData binaryData = new PagedData();
+                PagedData binaryData = new ByteArrayPagedData();
                 binaryData.insert(0, fileContent);
                 fileHandler.getCodeArea().setContentData(binaryData);
             } catch (IOException e) {
@@ -122,10 +125,6 @@ public class BinEdNativeFile {
         opened = true;
         // TODO fileSync / documentOriginalSize = codeArea.getDataSize();
         updateModified();
-        Optional<BinaryDataUndoRedo> undoHandler = fileHandler.getCodeAreaUndoHandler();
-        if (undoHandler.isPresent()) {
-            undoHandler.get().clear();
-        }
     }
 
     public void saveDocument() {
@@ -155,7 +154,7 @@ public class BinEdNativeFile {
     }
 
     private void updateModified() {
-        boolean modified = false; // componentPanel.isModified();
+        boolean modified = fileHandler.isModified();
 //        // TODO: Trying to force "modified behavior"
         Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
         if (document instanceof DocumentEx) {

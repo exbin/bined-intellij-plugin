@@ -47,9 +47,8 @@ import java.util.logging.Logger;
 public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
 
     private final List<BinaryDataUndoRedoChangeListener> listeners = new ArrayList<>();
-    private final UndoManager undoManager;
-    private final BinEdNativeFileEditor fileEditor;
-    private final Project project;
+    private UndoManager undoManager = null;
+    private BinEdNativeFileEditor fileEditor;
     private DocumentReference documentReference;
     private int commandPosition;
     private int syncPointPosition = -1;
@@ -57,17 +56,19 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
     /**
      * Creates a new instance.
      */
-    public BinaryUndoIntelliJHandler(Project project, BinEdNativeFileEditor fileEditor) {
-        this.fileEditor = fileEditor;
-        this.project = project;
-        undoManager = UndoManager.getInstance(project);
-        documentReference = DocumentReferenceManager.getInstance().create(fileEditor.getFile());
+    public BinaryUndoIntelliJHandler() {
         init();
     }
 
     private void init() {
         commandPosition = 0;
         setSyncPosition(0);
+    }
+
+    public void setFileEditor(BinEdNativeFileEditor fileEditor) {
+        this.fileEditor = fileEditor;
+        undoManager = UndoManager.getInstance(fileEditor.getProject());
+        documentReference = DocumentReferenceManager.getInstance().create(fileEditor.getFile());
     }
 
     @Override
@@ -118,7 +119,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
             }
         };
         CommandProcessor commandProcessor = CommandProcessor.getInstance();
-        commandProcessor.executeCommand(project, () -> undoManager.undoableActionPerformed(action), command.getType().getClass().getTypeName(), "BinEd");
+        commandProcessor.executeCommand(fileEditor.getProject(), () -> undoManager.undoableActionPerformed(action), command.getType().getClass().getTypeName(), "BinEd");
 
         commandPosition++;
         undoUpdated();
