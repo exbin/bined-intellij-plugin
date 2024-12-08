@@ -24,6 +24,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Icon;
+import java.util.ResourceBundle;
 
 /**
  * File type for binary files.
@@ -35,6 +36,7 @@ public class BinaryFileType implements FileType, DumbAware {
 
     public static final String DEFAULT_EXTENSION = "bin";
     public static final BinaryFileType INSTANCE = new BinaryFileType();
+    private ResourceBundle resourceBundle = BinEdIntelliJPlugin.getResourceBundle();
 
     private BinaryFileType() {
     }
@@ -42,13 +44,13 @@ public class BinaryFileType implements FileType, DumbAware {
     @Nonnull
     @Override
     public String getName() {
-        return "Binary File";
+        return resourceBundle.getString("BinaryFileType.name");
     }
 
     @Nonnull
     @Override
     public String getDescription() {
-        return "Binary File (opened by BinEd plugin)";
+        return resourceBundle.getString("BinaryFileType.description");
     }
 
     @Nonnull

@@ -24,7 +24,6 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.exbin.framework.utils.ActionUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -40,7 +39,7 @@ public class FileMenuOpenAsBinaryAction extends AnAction implements DumbAware {
     private boolean actionVisible = true;
 
     public FileMenuOpenAsBinaryAction() {
-        super("Open As Binary" + "...");
+        super(BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.FileOpenAsBinary.name"));
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterFileMenuOpenAsBinary());
     }
 

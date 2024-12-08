@@ -22,6 +22,7 @@ import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
 import com.intellij.openapi.project.DumbAware;
 
 import javax.annotation.Nonnull;
+import java.util.ResourceBundle;
 
 /**
  * File template group descriptor factory.
@@ -30,11 +31,13 @@ import javax.annotation.Nonnull;
  */
 public class BinEdFileTemplateGroupDescriptionFactory implements FileTemplateGroupDescriptorFactory, DumbAware {
 
+    private ResourceBundle resourceBundle = BinEdIntelliJPlugin.getResourceBundle();
+
     @Nonnull
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
-        final FileTemplateGroupDescriptor descriptor = new FileTemplateGroupDescriptor("Binary File", AllIcons.FileTypes.Any_type);
-        descriptor.addTemplate(new FileTemplateDescriptor("Empty binary file.bin", AllIcons.FileTypes.Any_type));
+        final FileTemplateGroupDescriptor descriptor = new FileTemplateGroupDescriptor(resourceBundle.getString("BinEdFileTemplateGroupDescriptionFactory.descriptorName"), AllIcons.FileTypes.Any_type);
+        descriptor.addTemplate(new FileTemplateDescriptor(resourceBundle.getString("BinEdFileTemplateGroupDescriptionFactory.fileName"), AllIcons.FileTypes.Any_type));
         return descriptor;
     }
 }

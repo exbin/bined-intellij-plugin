@@ -46,7 +46,7 @@ import java.util.List;
 public class OpenAsBinaryAction extends AnAction implements DumbAware {
 
     public OpenAsBinaryAction() {
-        super("Open As Binary");
+        super(BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.OpenAsBinaryAction.name"));
     }
 
     public OpenAsBinaryAction(@Nullable @NlsActions.ActionText String text) {
@@ -88,8 +88,8 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
             openValidVirtualFile(project, virtualFile);
         } else {
             JOptionPane.showMessageDialog(null,
-                    "File reported as invalid",
-                    "Unable to open file",
+                    BinEdIntelliJPlugin.getResourceBundle().getString("OpenAsBinaryAction.openFileFailed.message"),
+                    BinEdIntelliJPlugin.getResourceBundle().getString("OpenAsBinaryAction.openFileFailed.title"),
                     JOptionPane.ERROR_MESSAGE);
         }
     }

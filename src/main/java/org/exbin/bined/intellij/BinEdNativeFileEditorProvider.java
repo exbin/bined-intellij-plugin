@@ -60,6 +60,7 @@ public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAw
     @Nonnull
     @Override
     public FileEditor createEditor(Project project, VirtualFile virtualFile) {
+        BinEdPluginStartupActivity.initialize();
         BinEdNativeFileEditor fileEditor = new BinEdNativeFileEditor(project, virtualFile);
         fileEditor.setDisplayName(virtualFile.getPresentableName());
 

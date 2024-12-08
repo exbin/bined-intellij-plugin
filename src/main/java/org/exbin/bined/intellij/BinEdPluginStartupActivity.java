@@ -140,7 +140,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
     private static final List<IntegrationOptionsListener> INTEGRATION_OPTIONS_LISTENERS = new ArrayList<>();
     private static IntegrationOptions initialIntegrationOptions = null;
 
-    private boolean initialized = false;
+    private static boolean initialized = false;
     private final BinaryViewHandler viewHandler = new MainBinaryViewHandler();
     private final List<BinaryViewData> initializedExtensions = new ArrayList<>();
 
@@ -157,6 +157,16 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
     @Override
     public void runActivity(Project project) {
         projectOpened(project);
+    }
+
+    public static void initialize() {
+        if (!initialized) {
+            initialized = true;
+            AppModuleProvider appModuleProvider = new AppModuleProvider();
+            appModuleProvider.createModules();
+            App.setModuleProvider(appModuleProvider);
+            appModuleProvider.init();
+        }
     }
 
     private void initExtensions() {
@@ -177,13 +187,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
     }
 
     private void projectOpened(Project project) {
-        if (!initialized) {
-            initialized = true;
-            AppModuleProvider appModuleProvider = new AppModuleProvider();
-            appModuleProvider.createModules();
-            App.setModuleProvider(appModuleProvider);
-            appModuleProvider.init();
-        }
+        BinEdPluginStartupActivity.initialize();
 
         if (initialIntegrationOptions == null) {
             ProjectManager.getInstance().addProjectManagerListener(new BinEdVetoableProjectListener());

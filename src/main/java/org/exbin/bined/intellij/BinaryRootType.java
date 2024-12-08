@@ -16,12 +16,8 @@
 package org.exbin.bined.intellij;
 
 import com.intellij.ide.scratch.RootType;
-import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.openapi.extensions.ExtensionPointName;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -37,7 +33,7 @@ public class BinaryRootType extends RootType {
     public static final ExtensionPointName<BinaryRootType> ROOT_EP = new ExtensionPointName<>(ID);
 
     public BinaryRootType() {
-        super(ID, "Binary File (BinEd plugin)");
+        super(ID, BinEdIntelliJPlugin.getResourceBundle().getString("BinaryRootType.name"));
     }
 
     @NotNull

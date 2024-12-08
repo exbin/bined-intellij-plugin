@@ -15,6 +15,9 @@
  */
 package org.exbin.bined.intellij;
 
+import javax.annotation.Nonnull;
+import java.util.ResourceBundle;
+
 /**
  * Anchor class for BinEd plugin preferences root.
  *
@@ -24,7 +27,16 @@ public class BinEdIntelliJPlugin {
 
     public static final String PLUGIN_ID = "org.exbin.deltahex.intellij";
     public static final String PLUGIN_PREFIX = "BinEdPlugin.";
+    private static ResourceBundle resourceBundle = null;
 
     private BinEdIntelliJPlugin() {
+    }
+
+    @Nonnull
+    public static ResourceBundle getResourceBundle() {
+        if (resourceBundle == null) {
+            resourceBundle = ResourceBundle.getBundle("org.exbin.bined.intellij.resources.Plugin");
+        }
+        return resourceBundle;
     }
 }

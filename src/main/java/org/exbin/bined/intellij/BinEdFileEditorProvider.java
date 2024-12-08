@@ -45,6 +45,7 @@ public class BinEdFileEditorProvider implements FileEditorProvider, DumbAware {
     @Nonnull
     @Override
     public FileEditor createEditor(Project project, VirtualFile virtualFile) {
+        BinEdPluginStartupActivity.initialize();
         BinEdVirtualFile binEdVirtualFile;
         if (virtualFile instanceof BinEdVirtualFile) {
             binEdVirtualFile = (BinEdVirtualFile) virtualFile;

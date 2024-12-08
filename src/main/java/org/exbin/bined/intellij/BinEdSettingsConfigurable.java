@@ -18,12 +18,12 @@ package org.exbin.bined.intellij;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
-//import org.exbin.bined.intellij.options.gui.BinEdOptionsPanel;
 import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.swing.JComponent;
+import java.util.ResourceBundle;
 
 /**
  * TODO: Settings component.
@@ -34,6 +34,7 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
     private BinEdOptionsPanelBorder optionsPanelWrapper;
     private boolean modified = true;
+    private ResourceBundle resourceBundle = BinEdIntelliJPlugin.getResourceBundle();
 
     public BinEdSettingsConfigurable() {
     }
@@ -41,7 +42,7 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
     @Nonnull
     @Override
     public String getDisplayName() {
-        return "BinEd Plugin";
+        return resourceBundle.getString("BinEdSettingsConfigurable.displayName");
     }
 
     @Nullable

@@ -44,7 +44,7 @@ public class OpenFileAsBinaryViaToolbarAction extends AnAction implements DumbAw
     private boolean internalChooser = false;
 
     public OpenFileAsBinaryViaToolbarAction() {
-        super("Open As Binary");
+        super(BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.FileOpenToolbarAsBinary.name"));
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible =
                 integrationOptions.isRegisterOpenFileAsBinaryViaToolbar());
     }
@@ -91,7 +91,7 @@ public class OpenFileAsBinaryViaToolbarAction extends AnAction implements DumbAw
     @Nullable
     private VirtualFile chooseVirtualFile(Project project, @Nullable VirtualFile directory) {
         FileChooserDescriptor chooserDescriptor = new FileChooserDescriptor(true, false, true, true, false, false);
-        chooserDescriptor.setTitle("Open File in Binary Editor");
+        chooserDescriptor.setTitle(BinEdIntelliJPlugin.getResourceBundle().getString("OpenFileAsBinaryViaToolbarAction.fileChooser.title"));
         if (directory != null) {
             chooserDescriptor.setRoots(directory);
         }
