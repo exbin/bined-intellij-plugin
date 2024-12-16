@@ -109,6 +109,9 @@ public class BinEdFilePanel extends JPanel {
         });
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
 
+        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+        toolbarPanel.setOptionsAction(optionsModule.createOptionsAction());
+
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinEdIntelliJEditorProvider editorProvider = (BinEdIntelliJEditorProvider) binedModule.getEditorProvider();
         CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
@@ -135,9 +138,6 @@ public class BinEdFilePanel extends JPanel {
                 popupMenu.show(invoker, x, y);
             }
         });
-
-        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-        toolbarPanel.setOptionsAction(optionsModule.createOptionsAction());
 
         BinEdFileManager fileManager = binedModule.getFileManager();
         EncodingsHandler encodingsHandler = binedModule.getEncodingsHandler();
