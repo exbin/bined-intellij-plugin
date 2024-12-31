@@ -1,4 +1,4 @@
-0.3.0
+0.2.11
 
 0.2.10.1 (2024-04-13)
 - Fixed issue with null default font (issue #58)

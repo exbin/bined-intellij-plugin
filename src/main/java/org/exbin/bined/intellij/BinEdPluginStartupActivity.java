@@ -61,9 +61,12 @@ import org.exbin.framework.about.api.AboutModuleApi;
 import org.exbin.framework.action.ActionModule;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.action.api.ComponentActivationListener;
-import org.exbin.framework.action.api.MenuGroup;
-import org.exbin.framework.action.api.MenuPosition;
+import org.exbin.framework.action.api.GroupMenuContributionRule;
+import org.exbin.framework.action.api.MenuContribution;
+import org.exbin.framework.action.api.MenuManagement;
+import org.exbin.framework.action.api.PositionMenuContributionRule;
 import org.exbin.framework.action.api.PositionMode;
+import org.exbin.framework.action.api.SeparationMenuContributionRule;
 import org.exbin.framework.action.api.SeparationMode;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
@@ -423,7 +426,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedOperationModule.setEditorProvider(editorProvider);
 
             BinedOperationBouncycastleModule binedOperationBouncycastleModule = App.getModule(BinedOperationBouncycastleModule.class);
-            binedOperationBouncycastleModule.setEditorProvider(editorProvider);
+            binedOperationBouncycastleModule.register();
 
             BinedToolContentModule binedToolContentModule = App.getModule(BinedToolContentModule.class);
 
@@ -505,22 +508,32 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedBookmarksModule.registerBookmarksPopupMenuActions();
 
             String toolsSubMenuId = BinEdIntelliJPlugin.PLUGIN_PREFIX + "toolsMenu";
-            actionModule.registerMenu(toolsSubMenuId, BinedModule.MODULE_ID);
+            MenuManagement menuManagement = actionModule.getMenuManagement(BinedModule.MODULE_ID);
+            menuManagement.registerMenu(toolsSubMenuId);
             Action toolsSubMenuAction = new AbstractAction(((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.text")) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                 }
             };
             // toolsSubMenuAction.putValue(Action.SHORT_DESCRIPTION, ((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.shortDescription"));
-            actionModule.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, BinedModule.MODULE_ID, toolsSubMenuId, toolsSubMenuAction, new MenuPosition(PositionMode.BOTTOM_LAST));
-            actionModule.registerMenuItem(toolsSubMenuId, BinedModule.MODULE_ID, binedCompareModule.createCompareFilesAction(), new MenuPosition(PositionMode.TOP));
-            actionModule.registerMenuItem(toolsSubMenuId, BinedModule.MODULE_ID, binedToolContentModule.createClipboardContentAction(), new MenuPosition(PositionMode.TOP));
-            actionModule.registerMenuItem(toolsSubMenuId, BinedModule.MODULE_ID, binedToolContentModule.createDragDropContentAction(), new MenuPosition(PositionMode.TOP));
+            MenuContribution menuContribution = menuManagement.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, toolsSubMenuId, toolsSubMenuAction);
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.BOTTOM_LAST));
+            menuContribution = menuManagement.registerMenuItem(toolsSubMenuId, binedCompareModule.createCompareFilesAction());
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.TOP));
+            menuContribution = menuManagement.registerMenuItem(toolsSubMenuId, binedToolContentModule.createClipboardContentAction());
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.TOP));
+            menuContribution = menuManagement.registerMenuItem(toolsSubMenuId, binedToolContentModule.createDragDropContentAction());
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.TOP));
 
             String aboutMenuGroup = BinEdIntelliJPlugin.PLUGIN_PREFIX + "helpAboutMenuGroup";
-            actionModule.registerMenuGroup(BinedModule.CODE_AREA_POPUP_MENU_ID, new MenuGroup(aboutMenuGroup, new MenuPosition(PositionMode.BOTTOM_LAST), SeparationMode.ABOVE));
-            actionModule.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, HelpOnlineModule.MODULE_ID, helpOnlineModule.createOnlineHelpAction(), new MenuPosition(aboutMenuGroup));
-            actionModule.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, AboutModule.MODULE_ID, aboutModule.createAboutAction(), new MenuPosition(aboutMenuGroup));
+            menuContribution = menuManagement.registerMenuGroup(BinedModule.CODE_AREA_POPUP_MENU_ID, aboutMenuGroup);
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.BOTTOM_LAST));
+            menuManagement.registerMenuRule(menuContribution, new SeparationMenuContributionRule(SeparationMode.ABOVE));
+            menuManagement.registerMenuRule(menuContribution, new GroupMenuContributionRule(aboutMenuGroup));
+            menuContribution = menuManagement.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, helpOnlineModule.createOnlineHelpAction());
+            menuManagement.registerMenuRule(menuContribution, new GroupMenuContributionRule(aboutMenuGroup));
+            menuContribution = menuManagement.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, aboutModule.createAboutAction());
+            menuManagement.registerMenuRule(menuContribution, new GroupMenuContributionRule(aboutMenuGroup));
 
             ComponentActivationListener componentActivationListener =
                     frameModule.getFrameHandler().getComponentActivationListener();
@@ -555,6 +568,11 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
         @Override
         public void launch(Runnable runnable) {
+
+        }
+
+        @Override
+        public void launch(String launchModuleId, String[] args) {
         }
 
         @Nonnull
