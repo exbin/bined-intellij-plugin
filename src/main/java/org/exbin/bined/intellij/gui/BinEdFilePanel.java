@@ -114,8 +114,7 @@ public class BinEdFilePanel extends JPanel {
 
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinEdIntelliJEditorProvider editorProvider = (BinEdIntelliJEditorProvider) binedModule.getEditorProvider();
-        CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
-                binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.EDITOR);
+        CodeAreaPopupMenuHandler codeAreaPopupMenuHandler = binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.EDITOR);
         codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
             public void show(Component invoker, int x, int y) {

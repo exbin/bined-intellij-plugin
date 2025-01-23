@@ -437,7 +437,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedCompareModule.registerToolsOptionsMenuActions();
 
             BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
-            binedBookmarksModule.setEditorProvider(editorProvider);
 
             BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
             binedMacroModule.setEditorProvider(editorProvider);
@@ -529,7 +528,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             menuContribution = menuManagement.registerMenuGroup(BinedModule.CODE_AREA_POPUP_MENU_ID, aboutMenuGroup);
             menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.BOTTOM_LAST));
             menuManagement.registerMenuRule(menuContribution, new SeparationMenuContributionRule(SeparationMode.ABOVE));
-            menuManagement.registerMenuRule(menuContribution, new GroupMenuContributionRule(aboutMenuGroup));
             menuContribution = menuManagement.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, helpOnlineModule.createOnlineHelpAction());
             menuManagement.registerMenuRule(menuContribution, new GroupMenuContributionRule(aboutMenuGroup));
             menuContribution = menuManagement.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, aboutModule.createAboutAction());
@@ -564,6 +562,11 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     return new JRadioButtonMenuItem();
                 }
             });
+        }
+
+        @Nonnull
+        public Class getManifestClass() {
+            return BinEdIntelliJPlugin.class;
         }
 
         @Override

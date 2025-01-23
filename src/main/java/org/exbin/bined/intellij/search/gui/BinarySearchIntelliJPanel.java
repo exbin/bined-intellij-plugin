@@ -306,7 +306,6 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         searchCodeArea.setThemeProfile(themeProfile);
 
         searchCodeArea.setBorder(null);
-        searchCodeArea.setLayoutProfile(layoutProfile);
         searchCodeArea.setRowWrapping(RowWrappingMode.WRAPPING);
         searchCodeArea.setWrappingBytesGroupSize(0);
         searchCodeArea.setVerticalScrollBarVisibility(ScrollBarVisibility.NEVER);
