@@ -194,16 +194,6 @@ public class BinEdIntelliJEditorProvider extends BinaryMultiEditorProvider {
     }
 
     @Override
-    public boolean releaseFile(FileHandler fileHandler) {
-        return false;
-    }
-
-    @Override
-    public boolean releaseAllFiles() {
-        return false;
-    }
-
-    @Override
     public void loadFromFile(String s) throws URISyntaxException {
 
     }

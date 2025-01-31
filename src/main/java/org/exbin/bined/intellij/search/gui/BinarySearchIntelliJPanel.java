@@ -82,7 +82,7 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 public class BinarySearchIntelliJPanel extends JBPanel {
 
-    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(BinarySearchIntelliJPanel.class);
+    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(BinarySearchPanel.class);
 
     private Control control = null;
 

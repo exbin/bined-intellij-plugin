@@ -34,7 +34,7 @@ public class ContextOpenInBinaryEditorAction extends OpenAsBinaryAction {
     private boolean actionVisible = true;
 
     public ContextOpenInBinaryEditorAction() {
-        super(BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.OpenInBinaryEditorAction.name"));
+        super(BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.OpenInBinaryEditorAction.name"), BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.OpenInBinaryEditorAction.description"), null);
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterContextOpenInBinaryEditor());
     }
 

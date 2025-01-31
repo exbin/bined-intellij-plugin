@@ -32,6 +32,9 @@ public interface IntegrationOptions {
 
     void setLanguageLocale(Locale languageLocale);
 
+    @Nonnull
+    String getIconSet();
+
     boolean isRegisterFileMenuOpenAsBinary();
 
     boolean isRegisterOpenFileAsBinaryViaToolbar();

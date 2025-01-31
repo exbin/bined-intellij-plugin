@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import java.util.List;
 
@@ -46,11 +47,15 @@ import java.util.List;
 public class OpenAsBinaryAction extends AnAction implements DumbAware {
 
     public OpenAsBinaryAction() {
-        super(BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.OpenAsBinaryAction.name"));
+        super(BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.OpenAsBinaryAction.name"), BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.OpenAsBinaryAction.description"), null);
     }
 
     public OpenAsBinaryAction(@Nullable @NlsActions.ActionText String text) {
         super(text);
+    }
+
+    public OpenAsBinaryAction(@Nullable @NlsActions.ActionText String text, @Nullable @NlsActions.ActionDescription String description, @Nullable Icon icon) {
+        super(text, description, icon);
     }
 
     @Nonnull

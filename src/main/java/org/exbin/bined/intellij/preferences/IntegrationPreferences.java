@@ -35,6 +35,7 @@ public class IntegrationPreferences implements IntegrationOptions {
     public static final String PREFERENCES_LOCALE_COUNTRY = "locale.country";
     public static final String PREFERENCES_LOCALE_VARIANT = "locale.variant";
     public static final String PREFERENCES_LOCALE_TAG = "locale.tag";
+    public static final String PREFERENCES_ICONSET = "iconset";
     public static final String PREFERENCES_REGISTER_FILE_MENU_OPEN_AS_BINARY = "registerFileMenuOpenAsBinary";
     public static final String PREFERENCES_REGISTER_OPEN_FILE_AS_BINARY_VIA_TOOLBAR = "registerOpenFileAsBinaryViaToolbar";
     public static final String PREFERENCES_REGISTER_CONTEXT_OPEN_AS_BINARY = "registerContextOpenAsBinary";
@@ -117,6 +118,16 @@ public class IntegrationPreferences implements IntegrationOptions {
         setLocaleLanguage(locale.getLanguage());
         setLocaleCountry(locale.getCountry());
         setLocaleVariant(locale.getVariant());
+    }
+
+    @Nonnull
+    @Override
+    public String getIconSet() {
+        return preferences.get(PREFERENCES_ICONSET, "");
+    }
+
+    public void setIconSet(String iconSet) {
+        preferences.put(PREFERENCES_ICONSET, iconSet);
     }
 
     @Override

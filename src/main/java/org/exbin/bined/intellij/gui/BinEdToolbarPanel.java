@@ -81,11 +81,11 @@ public class BinEdToolbarPanel extends JBPanel {
 
     public BinEdToolbarPanel() {
         LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
-        resourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/bined/resources/BinedModule");
-        fileResourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/file/resources/FileModule");
-        optionsResourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/options/resources/OptionsModule");
-        onlineHelpResourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/help/online/action/resources/OnlineHelpAction");
-        operationUndoResourceBundle = languageModule.getResourceBundleByBundleName("org/exbin/framework/operation/undo/resources/OperationUndoModule");
+        resourceBundle = languageModule.getBundle(org.exbin.framework.bined.BinedModule.class);
+        fileResourceBundle = languageModule.getBundle(org.exbin.framework.file.FileModule.class);
+        optionsResourceBundle = languageModule.getBundle(org.exbin.framework.options.OptionsModule.class);
+        onlineHelpResourceBundle = languageModule.getBundle(org.exbin.framework.help.online.action.OnlineHelpAction.class);
+        operationUndoResourceBundle = languageModule.getBundle(org.exbin.framework.operation.undo.OperationUndoModule.class);
 
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
@@ -265,7 +265,7 @@ public class BinEdToolbarPanel extends JBPanel {
         saveFileButton = new AnAction(
                 fileResourceBundle.getString("saveFileAction.text"),
                 fileResourceBundle.getString("saveFileAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/document-save.png"))
+                new javax.swing.ImageIcon(getClass().getResource(fileResourceBundle.getString("saveFileAction.smallIcon")))
         ) {
             @NotNull
             @Override
@@ -293,7 +293,7 @@ public class BinEdToolbarPanel extends JBPanel {
         undoEditButton = new AnAction(
                 operationUndoResourceBundle.getString("editUndoAction.text"),
                 operationUndoResourceBundle.getString("editUndoAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-undo.png"))
+                new javax.swing.ImageIcon(getClass().getResource(operationUndoResourceBundle.getString("editUndoAction.smallIcon")))
         ) {
             @NotNull
             @Override
@@ -319,7 +319,7 @@ public class BinEdToolbarPanel extends JBPanel {
         redoEditButton = new AnAction(
                 operationUndoResourceBundle.getString("editRedoAction.text"),
                 operationUndoResourceBundle.getString("editRedoAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/edit-redo.png"))
+                new javax.swing.ImageIcon(getClass().getResource(operationUndoResourceBundle.getString("editRedoAction.smallIcon")))
         ) {
             @NotNull
             @Override
@@ -345,7 +345,7 @@ public class BinEdToolbarPanel extends JBPanel {
         showNonprintablesToggleButton = new ToggleAction(
                 resourceBundle.getString("viewNonprintablesAction.text"),
                 resourceBundle.getString("viewNonprintablesAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/insert-pilcrow.png"))
+                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("viewNonprintablesToolbarAction.smallIcon")))
         ) {
             @NotNull
             @Override
@@ -372,7 +372,7 @@ public class BinEdToolbarPanel extends JBPanel {
         AnAction settingsAction = new AnAction(
                 optionsResourceBundle.getString("optionsAction.text"),
                 optionsResourceBundle.getString("optionsAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/Preferences16.gif"))
+                new javax.swing.ImageIcon(getClass().getResource(optionsResourceBundle.getString("optionsAction.smallIcon")))
         ) {
             @NotNull
             @Override

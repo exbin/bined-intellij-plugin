@@ -44,7 +44,7 @@ public class OpenFileAsBinaryViaToolbarAction extends AnAction implements DumbAw
     private boolean internalChooser = false;
 
     public OpenFileAsBinaryViaToolbarAction() {
-        super(BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.FileOpenToolbarAsBinary.name"));
+        super(BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.FileOpenToolbarAsBinary.name"), BinEdIntelliJPlugin.getResourceBundle().getString("action.BinEdEditor.FileOpenToolbarAsBinary.description"), null);
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible =
                 integrationOptions.isRegisterOpenFileAsBinaryViaToolbar());
     }

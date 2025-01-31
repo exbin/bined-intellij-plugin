@@ -53,7 +53,7 @@ import java.util.ResourceBundle;
 @ParametersAreNonnullByDefault
 public class BinarySearch {
 
-    private final ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(BinarySearch.class);
+    private final ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(org.exbin.framework.bined.search.BinarySearch.class);
     private static final int DEFAULT_DELAY = 500;
 
     private InvokeSearchThread invokeSearchThread;

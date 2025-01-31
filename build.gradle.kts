@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.exbin.deltahex.intellij"
-version = "0.3.0.snapshot"
+version = "0.2.11.snapshot"
 val ideLocalPath = providers.gradleProperty("ideLocalPath").getOrElse("")
 
 repositories {
@@ -67,7 +67,7 @@ tasks {
 }
 
 val exbinFrameworkLibraryVersion = "0.3.0-SNAPSHOT"
-val binedAppLibraryVersion = "0.2.4"
+val binedAppLibraryVersion = "0.3.0-SNAPSHOT"
 val binedLibraryVersion = "0.3.0-SNAPSHOT"
 val binaryDataLibraryVersion = "0.2.2-SNAPSHOT"
 
@@ -78,7 +78,7 @@ fun binaryDataLibrary(libName: String): String = if (binaryDataLibraryVersion.en
 
 repositories {
     flatDir {
-        dirs("lib", "lib/jetbrains")
+        dirs("lib", "lib/jetbrains", "plugins")
     }
     mavenLocal()
 }
@@ -127,6 +127,18 @@ dependencies {
     implementation(binaryDataLibrary("binary_data"))
     implementation(binaryDataLibrary("binary_data-array"))
     implementation(binaryDataLibrary("binary_data-delta"))
+    implementation(":exbin-framework-language-cs_CZ-0.2.4")
+    implementation(":exbin-framework-language-de_DE-0.2.4")
+    implementation(":exbin-framework-language-es_ES-0.2.4")
+    implementation(":exbin-framework-language-fr_FR-0.2.4")
+    implementation(":exbin-framework-language-it_IT-0.2.4")
+    implementation(":exbin-framework-language-ja_JP-0.2.4")
+    implementation(":exbin-framework-language-ko_KR-0.2.4")
+    implementation(":exbin-framework-language-pl_PL-0.2.4")
+    implementation(":exbin-framework-language-ru_RU-0.2.4")
+    implementation(":exbin-framework-language-zh_Hans-0.2.4")
+    implementation(":exbin-framework-language-zh_Hant-0.2.4")
+    implementation(":exbin-framework-material-iconset-0.2.4")
     implementation(":flatlaf-desktop-3.2")
     compileOnly(":debugvalue-clion-2022.2.1")
     compileOnly(":debugvalue-goland-2022.2.1")

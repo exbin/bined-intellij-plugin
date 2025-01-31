@@ -92,6 +92,7 @@ import org.exbin.framework.frame.FrameModule;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.help.online.HelpOnlineModule;
 import org.exbin.framework.language.LanguageModule;
+import org.exbin.framework.language.api.IconSetProvider;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.language.api.LanguageProvider;
 import org.exbin.framework.operation.undo.OperationUndoModule;
@@ -101,6 +102,18 @@ import org.exbin.framework.options.api.DefaultOptionsPage;
 import org.exbin.framework.options.api.OptionsComponent;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.options.api.OptionsPanelType;
+import org.exbin.framework.plugin.language.cs_CZ.LanguageCsCzModule;
+import org.exbin.framework.plugin.language.de_DE.LanguageDeDeModule;
+import org.exbin.framework.plugin.language.es_ES.LanguageEsEsModule;
+import org.exbin.framework.plugin.language.fr_FR.LanguageFrFrModule;
+import org.exbin.framework.plugin.language.it_IT.LanguageItItModule;
+import org.exbin.framework.plugin.language.ja_JP.LanguageJaJpModule;
+import org.exbin.framework.plugin.language.ko_KR.LanguageKoKrModule;
+import org.exbin.framework.plugin.language.pl_PL.LanguagePlPlModule;
+import org.exbin.framework.plugin.language.ru_RU.LanguageRuRuModule;
+import org.exbin.framework.plugin.language.zh_Hans.LanguageZhHansModule;
+import org.exbin.framework.plugin.language.zh_Hant.LanguageZhHantModule;
+import org.exbin.framework.plugins.iconset.material.IconSetMaterialModule;
 import org.exbin.framework.preferences.PreferencesModule;
 import org.exbin.framework.preferences.api.Preferences;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
@@ -191,10 +204,11 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
     }
 
     private static void initIntegration() {
-        initialIntegrationOptions = new IntegrationPreferences(
-                new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX)
-        );
-        applyIntegrationOptions(initialIntegrationOptions);
+//        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
+//        Preferences preferences = preferencesModule.getAppPreferences();
+//
+//        initialIntegrationOptions = new IntegrationPreferences(preferences);
+//        applyIntegrationOptions(initialIntegrationOptions);
     }
 
     private void projectOpened(Project project) {
@@ -219,10 +233,10 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
         MessageBus messageBus = project.getMessageBus();
         MessageBusConnection connect = messageBus.connect();
+        BinedModule binedModule = App.getModule(BinedModule.class);
         connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
             public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
-                final BinedModule binedModule = App.getModule(BinedModule.class);
                 BinEdIntelliJEditorProvider editorProvider =
                         (BinEdIntelliJEditorProvider) binedModule.getEditorProvider();
                 BinEdFileHandler activeFile = null;
@@ -253,7 +267,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     BinEdFileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
                     if (fileHandler.isModified() && ((BinEdComponentFileApi) fileHandler).isSaveSupported()) {
                         ApplicationManager.getApplication().invokeLater(() -> {
-                            boolean released = false; // TODO editorProvider.releaseFile(fileHandler);
+                            boolean released = binedModule.getEditorProvider().releaseFile(fileHandler);
                             ((BinEdVirtualFile) file).setClosing(false);
                             if (released) {
                                 passNext = true;
@@ -338,10 +352,18 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             List<Locale> match = Locale.filter(localeRange, locales);
             if (!match.isEmpty()) {
                 languageModule.switchToLanguage(match.get(0));
+            } else {
+                languageModule.switchToLanguage(Locale.US);
             }
         } else {
             languageModule.switchToLanguage(languageLocale);
         }
+
+        String iconSet = integrationOptions.getIconSet();
+        if (!iconSet.isEmpty()) {
+            languageModule.switchToIconSet(iconSet);
+        }
+
         for (IntegrationOptionsListener listener : INTEGRATION_OPTIONS_LISTENERS) {
             listener.integrationInit(integrationOptions);
         }
@@ -381,12 +403,44 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(BinedBookmarksModule.class, new BinedBookmarksModule());
             modules.put(BinedMacroModule.class, new BinedMacroModule());
             modules.put(AboutModuleApi.class, new AboutModule());
+
+            // Language plugins
+            modules.put(LanguageCsCzModule.class, new LanguageCsCzModule());
+            modules.put(LanguageDeDeModule.class, new LanguageDeDeModule());
+            modules.put(LanguageEsEsModule.class, new LanguageEsEsModule());
+            modules.put(LanguageFrFrModule.class, new LanguageFrFrModule());
+            modules.put(LanguageItItModule.class, new LanguageItItModule());
+            modules.put(LanguageJaJpModule.class, new LanguageJaJpModule());
+            modules.put(LanguageKoKrModule.class, new LanguageKoKrModule());
+            modules.put(LanguagePlPlModule.class, new LanguagePlPlModule());
+            modules.put(LanguageRuRuModule.class, new LanguageRuRuModule());
+            modules.put(LanguageZhHansModule.class, new LanguageZhHansModule());
+            modules.put(LanguageZhHantModule.class, new LanguageZhHantModule());
+
+            // Iconset plugins
+            modules.put(IconSetMaterialModule.class, new IconSetMaterialModule());
         }
 
         private void init() {
             PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
             preferencesModule.setupAppPreferences(BinEdIntelliJPlugin.class);
             Preferences preferences = preferencesModule.getAppPreferences();
+
+            App.getModule(LanguageCsCzModule.class).register();
+            App.getModule(LanguageDeDeModule.class).register();
+            App.getModule(LanguageEsEsModule.class).register();
+            App.getModule(LanguageFrFrModule.class).register();
+            App.getModule(LanguageItItModule.class).register();
+            App.getModule(LanguageJaJpModule.class).register();
+            App.getModule(LanguageKoKrModule.class).register();
+            App.getModule(LanguagePlPlModule.class).register();
+            App.getModule(LanguageRuRuModule.class).register();
+            App.getModule(LanguageZhHansModule.class).register();
+            App.getModule(LanguageZhHantModule.class).register();
+            App.getModule(IconSetMaterialModule.class).register();
+
+            initialIntegrationOptions = new IntegrationPreferences(preferences);
+            applyIntegrationOptions(initialIntegrationOptions);
 
             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
             frameModule.createMainMenu();
@@ -457,12 +511,25 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                         languageLocales.add(new LanguageRecord(new Locale("en", "US"), new ImageIcon(getClass().getResource(resourceBundle.getString("locale.englishFlag")))));
 
                         List<LanguageRecord> languageRecords = new ArrayList<>();
-                        languageRecords.add(new LanguageRecord(new Locale("ja", "JP"), new ImageIcon(getClass().getResource("/images/flags/jp.png"))));
-                        languageRecords.add(new LanguageRecord(Locale.forLanguageTag("zh-Hans"), new ImageIcon(getClass().getResource("/images/flags/cn.png"))));
-                        languageRecords.add(new LanguageRecord(new Locale("ko", "KR"), new ImageIcon(getClass().getResource("/images/flags/kr.png"))));
+                        List<LanguageProvider> languagePlugins = languageModule.getLanguagePlugins();
+                        for (LanguageProvider languageProvider : languagePlugins) {
+                            languageRecords.add(new LanguageRecord(languageProvider.getLocale(), languageProvider.getFlag().orElse(null)));
+                        }
 
                         languageLocales.addAll(languageRecords);
+
+                        List<String> iconSets = new ArrayList<>();
+                        iconSets.add("");
+                        List<String> iconSetNames = new ArrayList<>();
+                        iconSetNames.add(resourceBundle.getString("iconset.defaultTheme"));
+                        List<IconSetProvider> providers = App.getModule(LanguageModuleApi.class).getIconSets();
+                        for (IconSetProvider provider : providers) {
+                            iconSets.add(provider.getId());
+                            iconSetNames.add(provider.getName());
+                        }
+
                         panel.setLanguageLocales(languageLocales);
+                        panel.setIconSets(iconSets, iconSetNames);
                     }
 
                     return panel;
@@ -571,7 +638,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
         @Override
         public void launch(Runnable runnable) {
-
         }
 
         @Override
