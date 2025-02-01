@@ -18,7 +18,6 @@ package org.exbin.bined.intellij;
 import com.intellij.diff.impl.DiffSettingsHolder;
 import com.intellij.diff.tools.fragmented.UnifiedDiffTool;
 import com.intellij.diff.tools.simple.SimpleDiffTool;
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.ExtensionPointAdapter;
 import com.intellij.openapi.extensions.ExtensionPointName;
@@ -51,7 +50,6 @@ import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.options.gui.IntegrationOptionsPanel;
 import org.exbin.bined.intellij.options.impl.IntegrationOptionsImpl;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
-import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.search.BinEdIntelliJComponentSearch;
 import org.exbin.framework.App;
 import org.exbin.framework.Module;
@@ -352,11 +350,14 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             List<Locale> match = Locale.filter(localeRange, locales);
             if (!match.isEmpty()) {
                 languageModule.switchToLanguage(match.get(0));
+                BinEdIntelliJPlugin.setLocale(match.get(0));
             } else {
                 languageModule.switchToLanguage(Locale.US);
+                BinEdIntelliJPlugin.setLocale(Locale.US);
             }
         } else {
             languageModule.switchToLanguage(languageLocale);
+            BinEdIntelliJPlugin.setLocale(languageLocale);
         }
 
         String iconSet = integrationOptions.getIconSet();

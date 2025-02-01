@@ -1,12 +1,12 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin url="https://bined.exbin.org/intellij-plugin">
-    <resource-bundle>org.exbin.bined.intellij.resources.Plugin</resource-bundle>
+    <resource-bundle>org.exbin.bined.intellij.resources.BinEdIntelliJPlugin</resource-bundle>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>org.exbin.deltahex.intellij</id>
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
     <name>BinEd - Binary/Hex Editor</name>
-    <version>0.3.0.snapshot</version>
+    <version>0.2.11.snapshot</version>
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="exbinproject@gmail.com" url="https://exbin.org">ExBin Project</vendor>
 
@@ -22,7 +22,7 @@
 <li>Use "Edit as Binary" in column context menu in DB view</li></ul>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.3.0.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.11.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
 
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>

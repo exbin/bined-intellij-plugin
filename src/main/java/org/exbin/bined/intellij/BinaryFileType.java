@@ -34,6 +34,7 @@ import java.util.ResourceBundle;
 @ParametersAreNonnullByDefault
 public class BinaryFileType implements FileType, DumbAware {
 
+    public static final String NAME = "Binary File"; // NO NLS
     public static final String DEFAULT_EXTENSION = "bin";
     public static final BinaryFileType INSTANCE = new BinaryFileType();
     private ResourceBundle resourceBundle = BinEdIntelliJPlugin.getResourceBundle();
@@ -44,7 +45,7 @@ public class BinaryFileType implements FileType, DumbAware {
     @Nonnull
     @Override
     public String getName() {
-        return resourceBundle.getString("BinaryFileType.name");
+        return NAME;
     }
 
     @Nonnull
