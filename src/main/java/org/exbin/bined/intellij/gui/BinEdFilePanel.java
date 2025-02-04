@@ -15,6 +15,9 @@
  */
 package org.exbin.bined.intellij.gui;
 
+import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
+import com.intellij.ui.Graphics2DDelegate;
+import com.intellij.ui.components.JBLabel;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
@@ -45,12 +48,18 @@ import org.exbin.framework.utils.DesktopUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.plaf.basic.BasicArrowButton;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
@@ -138,9 +147,62 @@ public class BinEdFilePanel extends JPanel {
             }
         });
 
+        editorProvider.addFile(fileHandler);
+        editorProvider.setActiveFile(fileHandler);
+
         BinEdFileManager fileManager = binedModule.getFileManager();
         EncodingsHandler encodingsHandler = binedModule.getEncodingsHandler();
-        fileManager.registerStatusBar();
+        fileManager.registerStatusBar(new BinaryStatusPanel() {
+
+            private Graphics2DDelegate graphicsCache = null;
+
+            @Nonnull
+            @Override
+            protected Graphics getComponentGraphics(Graphics g) {
+                if (g instanceof Graphics2DDelegate) {
+                    return g;
+                }
+
+                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                    return graphicsCache;
+                }
+
+                if (graphicsCache != null) {
+                    graphicsCache.dispose();
+                }
+
+                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
+                return graphicsCache;
+            }
+
+            @Nonnull
+            @Override
+            protected JLabel createLabel() {
+                return new JBLabel();
+            }
+
+            @Nonnull
+            @Override
+            protected JLabel createEncodingLabel() {
+                return new JBLabel() {
+                    private final BasicArrowButton basicArrowButton = new BasicArrowButton(SwingConstants.NORTH);
+
+                    @Override
+                    protected void paintComponent(Graphics g) {
+                        super.paintComponent(g);
+                        Dimension areaSize = getSize();
+
+                        int h = areaSize.height;
+                        int w = areaSize.width;
+                        int size = Math.min(Math.max((h - 4) / 4, 2), 10);
+                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 - (h / 5), size, SwingConstants.NORTH, true);
+                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 + (h / 5), size, SwingConstants.SOUTH, true);
+                    }
+                };
+            }
+
+        });
         fileManager.setStatusControlHandler(new BinaryStatusPanel.StatusControlHandler() {
             @Override
             public void changeEditOperation(EditOperation editOperation) {

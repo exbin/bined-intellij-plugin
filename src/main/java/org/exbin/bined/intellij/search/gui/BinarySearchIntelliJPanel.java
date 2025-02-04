@@ -144,7 +144,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         prevMatchAction = new AnActionButton(
                 resourceBundle.getString("prevMatchButton.toolTipText"),
                 null,
-                load("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-left.png")
+                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("prevMatchButton.icon")))
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
@@ -162,7 +162,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         nextMatchAction = new AnActionButton(
                 resourceBundle.getString("nextMatchButton.toolTipText"),
                 null,
-                load("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/arrow-right.png")
+                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("nextMatchButton.icon")))
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
@@ -214,7 +214,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         matchCaseToggleAction = new ToggleAction(
                 resourceBundle.getString("matchCaseToggleButton.toolTipText"),
                 null,
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/framework/bined/search/resources/icons/case_sensitive.gif"))
+                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("matchCaseToggleButton.icon")))
         ) {
             @NotNull
             @Override
@@ -243,7 +243,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         multipleMatchesToggle = new ToggleAction(
                 resourceBundle.getString("multipleMatchesToggleButton.toolTipText"),
                 null,
-                load("/org/exbin/framework/bined/search/resources/icons/mark_occurrences.png")
+                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("multipleMatchesToggleButton.icon")))
         ) {
             @NotNull
             @Override
@@ -281,7 +281,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         closeToolbarActionGroup.addAction(new AnAction(
                 resourceBundle.getString("closeButton.toolTipText"),
                 null,
-                load("/org/exbin/framework/bined/search/resources/icons/open_icon_library/icons/png/16x16/actions/dialog-cancel-3.png")
+                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("closeButton.icon")))
         ) {
             @Override
             public void actionPerformed(@Nonnull AnActionEvent e) {
@@ -751,10 +751,6 @@ public class BinarySearchIntelliJPanel extends JBPanel {
 
     public void updateSearchHistory(SearchCondition condition) {
         findComboBoxEditorComponent.exclusiveUpdate(() -> ((SearchHistoryModel) findComboBox.getModel()).addSearchCondition(condition));
-    }
-
-    private Icon load(String path) {
-        return IconLoader.getIcon(path, getClass());
     }
 
     public interface Control {

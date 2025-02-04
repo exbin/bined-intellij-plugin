@@ -20,16 +20,24 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
+import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
+import com.intellij.ui.Graphics2DDelegate;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinedModule;
+import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.ActionMap;
 import javax.swing.JComponent;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,10 +58,11 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     private final VirtualFile parentFile;
     private String displayName;
     private final BinEdFilePanel filePanel = new BinEdFilePanel();
-    private final BinEdFileHandler fileHandler = new BinEdFileHandler();
+    private final BinEdFileHandler fileHandler;
     private boolean closing = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
+        fileHandler = BinEdVirtualFile.createBinEdFileHandler();
         if (parentFile.getPath().startsWith(PATH_PREFIX)) {
             this.parentFile = LocalFileSystem.getInstance().findFileByPath(parentFile.getPath().substring(PATH_PREFIX.length()));
         } else {
@@ -85,6 +94,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     @Nonnull
     public JComponent getEditorComponent() {
+        // Beware: IntelliJ analysis component if it finds JTextComponent it overrides its document handling
+        // Introduce component later
         return filePanel;
     }
 
@@ -210,6 +221,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     }
 
     public void dispose() {
+        BinedModule binedModule = App.getModule(BinedModule.class);
+        ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider()).removeFile(fileHandler);
         fileHandler.closeData();
     }
 
@@ -232,6 +245,52 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
                 }
             }
         }
+    }
+
+    @Nonnull
+    public static BinEdFileHandler createBinEdFileHandler() {
+        return new BinEdFileHandler() {
+            @Nonnull
+            @Override
+            protected BinEdEditorComponent createEditorComponent() {
+                return new BinEdEditorComponent() {
+                    @Nonnull
+                    @Override
+                    protected BinEdComponentPanel createComponentPanel() {
+                        return new BinEdComponentPanel() {
+                            @Nonnull
+                            @Override
+                            protected SectCodeArea createCodeArea() {
+                                return new SectCodeArea() {
+
+                                    private Graphics2DDelegate graphicsCache = null;
+
+                                    @Nonnull
+                                    @Override
+                                    protected Graphics getComponentGraphics(Graphics g) {
+                                        if (g instanceof Graphics2DDelegate) {
+                                            return g;
+                                        }
+
+                                        if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                            return graphicsCache;
+                                        }
+
+                                        if (graphicsCache != null) {
+                                            graphicsCache.dispose();
+                                        }
+
+                                        Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                                        graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
+                                        return graphicsCache;
+                                    }
+                                };
+                            }
+                        };
+                    }
+                };
+            }
+        };
     }
 
     @Nonnull

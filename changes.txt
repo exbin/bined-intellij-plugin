@@ -3,6 +3,7 @@
 - Added option for inspector input fields font
 - Added icon set support
 - Added more languages (de, cs, fr, it, pt, pl, ru)
+- Fixed write-unsafe context (issue #60)
 
 0.2.10.1 (2024-04-13)
 - Fixed issue with null default font (issue #58)

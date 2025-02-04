@@ -173,7 +173,6 @@ public class BinedDiffPanel extends JBPanel {
         this.add(toolbarPanel, BorderLayout.NORTH);
         registerEncodingStatus(statusPanel);
         encodingsHandler = new EncodingsHandler();
-        encodingsHandler.setParentComponent(this);
         encodingsHandler.init();
         encodingsHandler.setTextEncodingStatus(new TextEncodingStatusApi() {
             @Nonnull

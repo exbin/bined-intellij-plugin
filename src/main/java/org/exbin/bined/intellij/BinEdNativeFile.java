@@ -21,6 +21,8 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
+import com.intellij.ui.Graphics2DDelegate;
 import com.intellij.util.LocalTimeCounter;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.paged.ByteArrayPagedData;
@@ -28,19 +30,21 @@ import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
-import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.gui.BinEdComponentPanel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * File editor wrapper using BinEd editor component.
@@ -51,12 +55,13 @@ import java.util.Optional;
 public class BinEdNativeFile {
 
     private final BinEdFilePanel filePanel = new BinEdFilePanel();
-    private final BinEdFileHandler fileHandler = new BinEdFileHandler();
+    private final BinEdFileHandler fileHandler;
 
     private boolean opened = false;
     private VirtualFile virtualFile;
 
     public BinEdNativeFile() {
+        fileHandler = BinEdVirtualFile.createBinEdFileHandler();
         filePanel.setFileHandler(fileHandler);
         BinedModule binedModule = App.getModule(BinedModule.class);
         binedModule.getFileManager().initFileHandler(fileHandler);
@@ -65,7 +70,7 @@ public class BinEdNativeFile {
 
         SectCodeArea codeArea = filePanel.getCodeArea();
 
-//        componentPanel.setModifiedChangeListener(() -> {
+        //        componentPanel.setModifiedChangeListener(() -> {
 //            updateModified();
 //        });
 //        defaultFont = codeArea.getCodeFont();
@@ -87,12 +92,9 @@ public class BinEdNativeFile {
 
     @Nonnull
     public JComponent getComponent() {
+        // Beware: IntelliJ analysis component if it finds JTextComponent it overrides its document handling
+        // Introduce component later
         return filePanel;
-    }
-
-    @Nonnull
-    public SectCodeArea getCodeArea() {
-        return fileHandler.getCodeArea();
     }
 
     @Nonnull

@@ -163,6 +163,7 @@ public class IntegrationOptionsImpl implements OptionsData, IntegrationOptions {
 
     public void setOptions(IntegrationOptionsImpl options) {
         languageLocale = options.getLanguageLocale();
+        iconSet = options.getIconSet();
         registerFileMenuOpenAsBinary = options.isRegisterFileMenuOpenAsBinary();
         registerOpenFileAsBinaryViaToolbar = options.isRegisterOpenFileAsBinaryViaToolbar();
         registerContextOpenAsBinary = options.isRegisterContextOpenAsBinary();

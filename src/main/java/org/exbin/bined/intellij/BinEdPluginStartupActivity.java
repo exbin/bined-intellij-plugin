@@ -18,7 +18,13 @@ package org.exbin.bined.intellij;
 import com.intellij.diff.impl.DiffSettingsHolder;
 import com.intellij.diff.tools.fragmented.UnifiedDiffTool;
 import com.intellij.diff.tools.simple.SimpleDiffTool;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.extensions.ExtensionPointAdapter;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -36,8 +42,15 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
+import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
+import com.intellij.ui.Graphics2DDelegate;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBCheckBoxMenuItem;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBMenu;
+import com.intellij.ui.components.JBRadioButton;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import kotlin.Unit;
@@ -72,7 +85,9 @@ import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
 import org.exbin.framework.bined.compare.BinedCompareModule;
 import org.exbin.framework.bined.gui.BinEdComponentFileApi;
+import org.exbin.framework.bined.inspector.BinEdComponentInspector;
 import org.exbin.framework.bined.inspector.BinedInspectorModule;
+import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
 import org.exbin.framework.bined.macro.BinedMacroModule;
 import org.exbin.framework.bined.objectdata.BinedObjectDataModule;
 import org.exbin.framework.bined.operation.BinedOperationModule;
@@ -130,11 +145,18 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -207,6 +229,19 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 //
 //        initialIntegrationOptions = new IntegrationPreferences(preferences);
 //        applyIntegrationOptions(initialIntegrationOptions);
+
+        // Editor actions overtakes action events
+        EditorActionManager actionManager = EditorActionManager.getInstance();
+        EditorActionHandler actionHandler = actionManager.getActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_START);
+        actionManager.setActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_START,
+                new EditorActionHandler.ForEachCaret() {
+                    @Override
+                    protected void doExecute(@NotNull Editor editor, @NotNull Caret caret, DataContext dataContext) {
+                        System.out.println("Action");
+                        actionHandler.execute(editor, caret, dataContext);
+                    }
+                }
+        );
     }
 
     private void projectOpened(Project project) {
@@ -349,15 +384,16 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             localeRange.add(new Locale.LanguageRange(languageTag));
             List<Locale> match = Locale.filter(localeRange, locales);
             if (!match.isEmpty()) {
-                languageModule.switchToLanguage(match.get(0));
-                BinEdIntelliJPlugin.setLocale(match.get(0));
+                Locale firstMatchLlocale = match.get(0);
+                languageModule.switchToLanguage(firstMatchLlocale);
+                BinEdIntelliJPlugin.setLocale(firstMatchLlocale);
             } else {
                 languageModule.switchToLanguage(Locale.US);
-                BinEdIntelliJPlugin.setLocale(Locale.US);
+                BinEdIntelliJPlugin.setLocale(Locale.ROOT);
             }
         } else {
             languageModule.switchToLanguage(languageLocale);
-            BinEdIntelliJPlugin.setLocale(languageLocale);
+            BinEdIntelliJPlugin.setLocale("en-US".equals(languageLocale.toLanguageTag()) ? Locale.ROOT : languageLocale);
         }
 
         String iconSet = integrationOptions.getIconSet();
@@ -440,6 +476,11 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             App.getModule(LanguageZhHantModule.class).register();
             App.getModule(IconSetMaterialModule.class).register();
 
+            BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
+            binedBookmarksModule.register();
+            BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
+            binedMacroModule.register();
+
             initialIntegrationOptions = new IntegrationPreferences(preferences);
             applyIntegrationOptions(initialIntegrationOptions);
 
@@ -469,8 +510,12 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             }
 
             BinEdIntelliJEditorProvider editorProvider = new BinEdIntelliJEditorProvider();
+            EditorModuleApi editorModule = App.getModule(EditorModuleApi.class);
+            editorModule.registerEditor("binary", editorProvider);
             BinedModule binedModule = App.getModule(BinedModule.class);
             binedModule.setEditorProvider(editorProvider);
+            binedBookmarksModule.getBookmarksManager().setEditorProvider(editorProvider);
+            binedMacroModule.setEditorProvider(editorProvider);
 
             BinedSearchModule binedSearchModule = App.getModule(BinedSearchModule.class);
             binedSearchModule.setEditorProvider(editorProvider);
@@ -486,15 +531,66 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             BinedToolContentModule binedToolContentModule = App.getModule(BinedToolContentModule.class);
 
             BinedInspectorModule binedInspectorModule = App.getModule(BinedInspectorModule.class);
-            binedInspectorModule.setEditorProvider(editorProvider);
+            binedInspectorModule.setEditorProvider(editorProvider, new BinEdComponentInspector.ComponentsProvider() {
+                @Nonnull
+                public BasicValuesPanel createValuesPanel() {
+                    return new BasicValuesPanel() {
+                        private Graphics2DDelegate graphicsCache = null;
+
+                        @Nonnull
+                        @Override
+                        protected Graphics getComponentGraphics(Graphics g) {
+                            if (g instanceof Graphics2DDelegate) {
+                                return g;
+                            }
+
+                            if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                return graphicsCache;
+                            }
+
+                            if (graphicsCache != null) {
+                                graphicsCache.dispose();
+                            }
+
+                            Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                            graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
+                            return graphicsCache;
+                        }
+
+                        @Nonnull
+                        @Override
+                        protected JLabel createLabel() {
+                            return new JBLabel();
+                        }
+
+                        @Nonnull
+                        @Override
+                        protected JCheckBox createCheckBox() {
+                            return new JBCheckBox();
+                        }
+
+                        @Nonnull
+                        @Override
+                        protected JTextField createTextField() {
+                            return new JBTextField();
+                        }
+
+                        @Nonnull
+                        @Override
+                        protected JRadioButton createRadioButton() {
+                            return new JBRadioButton();
+                        }
+                    };
+                }
+
+                @Nonnull
+                public JScrollPane createScrollPane() {
+                    return new JBScrollPane();
+                }
+            });
 
             BinedCompareModule binedCompareModule = App.getModule(BinedCompareModule.class);
             binedCompareModule.registerToolsOptionsMenuActions();
-
-            BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
-
-            BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
-            binedMacroModule.setEditorProvider(editorProvider);
 
             optionsModule.addOptionsPage(new DefaultOptionsPage<IntegrationOptionsImpl>() {
 
@@ -516,7 +612,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                         for (LanguageProvider languageProvider : languagePlugins) {
                             languageRecords.add(new LanguageRecord(languageProvider.getLocale(), languageProvider.getFlag().orElse(null)));
                         }
-
                         languageLocales.addAll(languageRecords);
 
                         List<String> iconSets = new ArrayList<>();
@@ -633,6 +728,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         }
 
         @Nonnull
+        @Override
         public Class getManifestClass() {
             return BinEdIntelliJPlugin.class;
         }
