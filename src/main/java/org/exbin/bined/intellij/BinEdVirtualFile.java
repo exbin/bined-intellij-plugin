@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -56,9 +55,9 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     public static final String PATH_PREFIX = "bined://";
 
     private final VirtualFile parentFile;
-    private String displayName;
     private final BinEdFilePanel filePanel = new BinEdFilePanel();
     private final BinEdFileHandler fileHandler;
+    private String displayName;
     private boolean closing = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
@@ -85,6 +84,65 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
         toolbarPanel.setUndoHandler(fileHandler.getCodeAreaUndoHandler().get());
         toolbarPanel.setSaveAction(e -> fileHandler.saveFile());
+    }
+
+    @Nonnull
+    public static BinEdFileHandler createBinEdFileHandler() {
+        return new BinEdFileHandler() {
+            @Nonnull
+            @Override
+            protected BinEdEditorComponent createEditorComponent() {
+                return new BinEdEditorComponent() {
+                    @Nonnull
+                    @Override
+                    protected BinEdComponentPanel createComponentPanel() {
+                        return new BinEdComponentPanel() {
+                            @Nonnull
+                            @Override
+                            protected SectCodeArea createCodeArea() {
+                                SectCodeArea codeArea = new SectCodeArea() {
+
+                                    private Graphics2DDelegate graphicsCache = null;
+
+                                    @Nonnull
+                                    @Override
+                                    protected Graphics getComponentGraphics(Graphics g) {
+                                        if (g instanceof Graphics2DDelegate) {
+                                            return g;
+                                        }
+
+                                        if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                            return graphicsCache;
+                                        }
+
+                                        if (graphicsCache != null) {
+                                            graphicsCache.dispose();
+                                        }
+
+                                        Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                                        graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                                                (Graphics2DDelegate) editorGraphics :
+                                                new Graphics2DDelegate(editorGraphics);
+                                        return graphicsCache;
+                                    }
+                                };
+
+                                return codeArea;
+                            }
+                        };
+                    }
+                };
+            }
+        };
+    }
+
+    @Nonnull
+    private static File extractFile(BinEdVirtualFile virtualFile) {
+        String path = virtualFile.getPath();
+        if (path.startsWith(PATH_PREFIX)) {
+            path = path.substring(8);
+        }
+        return new File(path);
     }
 
     @Nonnull
@@ -245,60 +303,5 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
                 }
             }
         }
-    }
-
-    @Nonnull
-    public static BinEdFileHandler createBinEdFileHandler() {
-        return new BinEdFileHandler() {
-            @Nonnull
-            @Override
-            protected BinEdEditorComponent createEditorComponent() {
-                return new BinEdEditorComponent() {
-                    @Nonnull
-                    @Override
-                    protected BinEdComponentPanel createComponentPanel() {
-                        return new BinEdComponentPanel() {
-                            @Nonnull
-                            @Override
-                            protected SectCodeArea createCodeArea() {
-                                return new SectCodeArea() {
-
-                                    private Graphics2DDelegate graphicsCache = null;
-
-                                    @Nonnull
-                                    @Override
-                                    protected Graphics getComponentGraphics(Graphics g) {
-                                        if (g instanceof Graphics2DDelegate) {
-                                            return g;
-                                        }
-
-                                        if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                                            return graphicsCache;
-                                        }
-
-                                        if (graphicsCache != null) {
-                                            graphicsCache.dispose();
-                                        }
-
-                                        Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                                        graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
-                                        return graphicsCache;
-                                    }
-                                };
-                            }
-                        };
-                    }
-                };
-            }
-        };
-    }
-
-    @Nonnull
-    private static File extractFile(BinEdVirtualFile virtualFile) {
-        String path = virtualFile.getPath();
-        if (path.startsWith(PATH_PREFIX)) {
-            path = path.substring(8);
-        }
-        return new File(path);
     }
 }

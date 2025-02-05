@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.extensions.ExtensionPointAdapter;
@@ -53,6 +54,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
+import java.lang.Deprecated;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import org.exbin.bined.intellij.api.BinaryViewData;
@@ -64,6 +66,8 @@ import org.exbin.bined.intellij.options.gui.IntegrationOptionsPanel;
 import org.exbin.bined.intellij.options.impl.IntegrationOptionsImpl;
 import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.bined.intellij.search.BinEdIntelliJComponentSearch;
+import org.exbin.bined.swing.CodeAreaCommandHandler;
+import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.framework.App;
 import org.exbin.framework.Module;
 import org.exbin.framework.ModuleProvider;
@@ -147,6 +151,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -158,6 +163,7 @@ import javax.swing.JTextField;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -210,6 +216,210 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             appModuleProvider.createModules();
             App.setModuleProvider(appModuleProvider);
             appModuleProvider.init();
+
+            // Editor actions overtakes action events
+            // No other method how to handle this was found so far...
+            registerActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_START, 0, KeyEvent.VK_HOME);
+            registerActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_START_WITH_SELECTION, KeyEvent.SHIFT_DOWN_MASK, KeyEvent.VK_HOME);
+            registerActionHandler(IdeActions.ACTION_EDITOR_TEXT_START, KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_HOME);
+            registerActionHandler(IdeActions.ACTION_EDITOR_TEXT_START_WITH_SELECTION, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_HOME);
+            registerActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_END, 0, KeyEvent.VK_END);
+            registerActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_END_WITH_SELECTION, KeyEvent.SHIFT_DOWN_MASK, KeyEvent.VK_END);
+            registerActionHandler(IdeActions.ACTION_EDITOR_TEXT_END, KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_END);
+            registerActionHandler(IdeActions.ACTION_EDITOR_TEXT_END_WITH_SELECTION, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_END);
+            registerActionHandler(IdeActions.ACTION_EDITOR_BACKSPACE, 0, KeyEvent.VK_BACK_SPACE);
+            registerActionHandler(IdeActions.ACTION_EDITOR_CUT, CodeAreaCommandHandler::cut);
+            registerActionHandler(IdeActions.ACTION_EDITOR_COPY, CodeAreaCommandHandler::copy);
+            registerActionHandler(IdeActions.ACTION_EDITOR_PASTE, CodeAreaCommandHandler::paste);
+            registerActionHandler(IdeActions.ACTION_SELECT_ALL, CodeAreaCommandHandler::selectAll);
+            registerActionHandler(IdeActions.ACTION_FIND, KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_F);
+            registerActionHandler(IdeActions.ACTION_REPLACE, KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_H);
+        }
+    }
+
+    private static void registerActionHandler(String actionId, int modifiers, int key) {
+        registerActionHandlerCodeArea(actionId, codeAreaComponent ->
+            codeAreaComponent.getCommandHandler().keyPressed(new KeyEvent(codeAreaComponent, 0, 0, modifiers, key))
+        );
+    }
+
+    private static void registerActionHandler(String actionId, CodeAreaCommanderAction codeAreaCommanderAction) {
+        registerActionHandlerCodeArea(actionId, codeAreaComponent -> codeAreaCommanderAction.perform(codeAreaComponent.getCommandHandler()));
+    }
+
+    private static void registerActionHandlerCodeArea(String actionId, CodeAreaCoreAction codeAreaCoreAction) {
+        EditorActionManager actionManager = EditorActionManager.getInstance();
+        EditorActionHandler actionHandler = actionManager.getActionHandler(actionId);
+        if (actionHandler instanceof EditorActionHandler.ForEachCaret) {
+            actionManager.setActionHandler(actionId,
+                    new EditorActionHandler.ForEachCaret() {
+                        /**
+                         * @deprecated Implementations should override
+                         * {@link #isEnabledForCaret(Editor, Caret, DataContext)}
+                         * instead,
+                         * client code should invoke
+                         * {@link #isEnabled(Editor, Caret, DataContext)}
+                         * instead.
+                         */
+                        @Deprecated
+                        @Override
+                        public boolean isEnabled(Editor editor, DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                return super.isEnabled(editor, dataContext);
+                            }
+
+                            return actionHandler.isEnabled(editor, dataContext);
+                        }
+
+                        @Override
+                        protected boolean isEnabledForCaret(@NotNull Editor editor,
+                                @NotNull Caret caret,
+                                DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                return super.isEnabledForCaret(editor, caret, dataContext);
+                            }
+
+                            return actionHandler.isEnabled(editor, caret, dataContext);
+                        }
+
+                        /**
+                         * @deprecated To implement action logic, override
+                         * {@link #doExecute(Editor, Caret, DataContext)},
+                         * to invoke the handler, call
+                         * {@link #execute(Editor, Caret, DataContext)}.
+                         */
+                        @Deprecated
+                        @Override
+                        public void execute(@NotNull Editor editor,
+                                @org.jetbrains.annotations.Nullable DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                super.execute(editor, dataContext);
+                            }
+
+                            actionHandler.execute(editor, dataContext);
+                        }
+
+                        @Override
+                        public boolean executeInCommand(@NotNull Editor editor, DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                return super.executeInCommand(editor, dataContext);
+                            }
+
+                            return actionHandler.executeInCommand(editor, dataContext);
+                        }
+
+                        @Override
+                        public boolean runForAllCarets() {
+                            return actionHandler.runForAllCarets();
+                        }
+
+                        @Override
+                        public DocCommandGroupId getCommandGroupId(@NotNull Editor editor) {
+                            return actionHandler.getCommandGroupId(editor);
+                        }
+
+                        @Override
+                        protected void doExecute(@NotNull Editor editor, @NotNull Caret caret, DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                codeAreaCoreAction.perform((CodeAreaCore) component);
+                                return;
+                            }
+
+                            // This should not be reached unless there will be some changes in EditorActionHandler
+                            actionHandler.execute(editor, caret, dataContext);
+                        }
+                    }
+            );
+        } else {
+            actionManager.setActionHandler(actionId,
+                    new EditorActionHandler() {
+                        /**
+                         * @deprecated Implementations should override
+                         * {@link #isEnabledForCaret(Editor, Caret, DataContext)}
+                         * instead,
+                         * client code should invoke
+                         * {@link #isEnabled(Editor, Caret, DataContext)}
+                         * instead.
+                         */
+                        @Deprecated
+                        @Override
+                        public boolean isEnabled(Editor editor, DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                return super.isEnabled(editor, dataContext);
+                            }
+
+                            return actionHandler.isEnabled(editor, dataContext);
+                        }
+
+                        @Override
+                        protected boolean isEnabledForCaret(@NotNull Editor editor,
+                                @NotNull Caret caret,
+                                DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                return super.isEnabledForCaret(editor, caret, dataContext);
+                            }
+
+                            return actionHandler.isEnabled(editor, caret, dataContext);
+                        }
+
+                        /**
+                         * @deprecated To implement action logic, override
+                         * {@link #doExecute(Editor, Caret, DataContext)},
+                         * to invoke the handler, call
+                         * {@link #execute(Editor, Caret, DataContext)}.
+                         */
+                        @Deprecated
+                        @Override
+                        public void execute(@NotNull Editor editor,
+                                @org.jetbrains.annotations.Nullable DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                super.execute(editor, dataContext);
+                            }
+
+                            actionHandler.execute(editor, dataContext);
+                        }
+
+                        @Override
+                        public boolean executeInCommand(@NotNull Editor editor, DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                return super.executeInCommand(editor, dataContext);
+                            }
+
+                            return actionHandler.executeInCommand(editor, dataContext);
+                        }
+
+                        @Override
+                        public boolean runForAllCarets() {
+                            return actionHandler.runForAllCarets();
+                        }
+
+                        @Override
+                        public DocCommandGroupId getCommandGroupId(@NotNull Editor editor) {
+                            return actionHandler.getCommandGroupId(editor);
+                        }
+
+                        @Override
+                        protected void doExecute(@NotNull Editor editor, @Nullable Caret caret, DataContext dataContext) {
+                            JComponent component = editor.getComponent();
+                            if (component instanceof CodeAreaCore) {
+                                codeAreaCoreAction.perform((CodeAreaCore) component);
+                                return;
+                            }
+
+                            // This should not be reached unless there will be some changes in EditorActionHandler
+                            actionHandler.execute(editor, caret, dataContext);
+                        }
+                    }
+            );
         }
     }
 
@@ -230,18 +440,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 //        initialIntegrationOptions = new IntegrationPreferences(preferences);
 //        applyIntegrationOptions(initialIntegrationOptions);
 
-        // Editor actions overtakes action events
-        EditorActionManager actionManager = EditorActionManager.getInstance();
-        EditorActionHandler actionHandler = actionManager.getActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_START);
-        actionManager.setActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_START,
-                new EditorActionHandler.ForEachCaret() {
-                    @Override
-                    protected void doExecute(@NotNull Editor editor, @NotNull Caret caret, DataContext dataContext) {
-                        System.out.println("Action");
-                        actionHandler.execute(editor, caret, dataContext);
-                    }
-                }
-        );
     }
 
     private void projectOpened(Project project) {
@@ -746,5 +944,13 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         public <T extends Module> T getModule(Class<T> moduleClass) {
             return (T) modules.get(moduleClass);
         }
+    }
+
+    private interface CodeAreaCoreAction {
+        void perform(CodeAreaCore component);
+    }
+
+    private interface CodeAreaCommanderAction {
+        void perform(CodeAreaCommandHandler commandHandler);
     }
 }
