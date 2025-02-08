@@ -39,6 +39,7 @@ import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
 import org.exbin.framework.editor.text.EncodingsHandler;
+import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
@@ -49,6 +50,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
@@ -252,6 +255,9 @@ public class BinEdFilePanel extends JPanel {
                 }
             }
         });
+
+        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
+        encodingsHandler.loadFromPreferences(new TextEncodingPreferences(preferencesModule.getAppPreferences()));
         statusPanel = fileManager.getBinaryStatusPanel();
         add(statusPanel, BorderLayout.SOUTH);
 

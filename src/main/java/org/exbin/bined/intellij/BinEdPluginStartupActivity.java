@@ -239,7 +239,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
     private static void registerActionHandler(String actionId, int modifiers, int key) {
         registerActionHandlerCodeArea(actionId, codeAreaComponent ->
-            codeAreaComponent.getCommandHandler().keyPressed(new KeyEvent(codeAreaComponent, 0, 0, modifiers, key))
+            codeAreaComponent.getCommandHandler().keyPressed(new KeyEvent(codeAreaComponent, 0, 0, modifiers, key, KeyEvent.CHAR_UNDEFINED))
         );
     }
 
@@ -492,8 +492,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     return;
                 }
 
-                if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isMoved()
-                        && !((BinEdVirtualFile) file).isClosing()) {
+                if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isClosing()) {
                     ((BinEdVirtualFile) file).setClosing(true);
                     BinEdFileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
                     if (fileHandler.isModified() && ((BinEdComponentFileApi) fileHandler).isSaveSupported()) {
@@ -678,10 +677,14 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedBookmarksModule.register();
             BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
             binedMacroModule.register();
+            BinedOperationBouncycastleModule binedOperationBouncycastleModule = App.getModule(BinedOperationBouncycastleModule.class);
+            binedOperationBouncycastleModule.register();
 
             initialIntegrationOptions = new IntegrationPreferences(preferences);
             applyIntegrationOptions(initialIntegrationOptions);
 
+            UiModuleApi uiModule = App.getModule(UiModuleApi.class);
+            uiModule.executePostInitActions();
             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
             frameModule.createMainMenu();
             ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
@@ -721,10 +724,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             fileManager.addBinEdComponentExtension(component -> Optional.of(new BinEdIntelliJComponentSearch()));
 
             BinedOperationModule binedOperationModule = App.getModule(BinedOperationModule.class);
-            binedOperationModule.setEditorProvider(editorProvider);
-
-            BinedOperationBouncycastleModule binedOperationBouncycastleModule = App.getModule(BinedOperationBouncycastleModule.class);
-            binedOperationBouncycastleModule.register();
+            binedOperationModule.addBasicMethods();
 
             BinedToolContentModule binedToolContentModule = App.getModule(BinedToolContentModule.class);
 
@@ -786,6 +786,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     return new JBScrollPane();
                 }
             });
+            binedInspectorModule.registerViewValuesPanelMenuActions();
+            binedInspectorModule.registerViewValuesPanelPopupMenuActions();
 
             BinedCompareModule binedCompareModule = App.getModule(BinedCompareModule.class);
             binedCompareModule.registerToolsOptionsMenuActions();
@@ -864,8 +866,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedToolContentModule.registerDragDropContentMenu();
             binedInspectorModule.registerViewValuesPanelMenuActions();
             binedInspectorModule.registerOptionsPanels();
-            binedMacroModule.registerMacrosPopupMenuActions();
-            binedBookmarksModule.registerBookmarksPopupMenuActions();
 
             String toolsSubMenuId = BinEdIntelliJPlugin.PLUGIN_PREFIX + "toolsMenu";
             MenuManagement menuManagement = actionModule.getMenuManagement(BinedModule.MODULE_ID);

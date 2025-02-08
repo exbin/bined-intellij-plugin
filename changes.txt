@@ -1,4 +1,4 @@
-0.2.11
+0.2.11 (2025-02-08)
 - Added Base 64 conversion
 - Added option for inspector input fields font
 - Added icon set support

@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij.search.gui;
 
 import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -23,6 +24,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.ex.DefaultCustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.components.JBPanel;
@@ -96,11 +98,11 @@ public class BinarySearchIntelliJPanel extends JBPanel {
 
     private static final String TOOLBAR_PLACE = "BinEdBinarySearchPanel";
     private final DefaultActionGroup findToolbarActionGroup;
-    private final ActionToolbarImpl findToolbar;
+    private final ActionToolbar findToolbar;
     private final DefaultActionGroup closeToolbarActionGroup;
-    private final ActionToolbarImpl closeToolbar;
+    private final ActionToolbar closeToolbar;
     private final DefaultActionGroup replaceToolbarActionGroup;
-    private final ActionToolbarImpl replaceToolbar;
+    private final ActionToolbar replaceToolbar;
 
     private final DefaultCustomComponentAction optionsAction;
     private final AnActionButton prevMatchAction;
@@ -117,13 +119,13 @@ public class BinarySearchIntelliJPanel extends JBPanel {
 
     public BinarySearchIntelliJPanel() {
         findToolbarActionGroup = new DefaultActionGroup();
-        findToolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".find",
+        findToolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".find",
                 findToolbarActionGroup, true);
         closeToolbarActionGroup = new DefaultActionGroup();
-        closeToolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".close",
+        closeToolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".close",
                 closeToolbarActionGroup, true);
         replaceToolbarActionGroup = new DefaultActionGroup();
-        replaceToolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".replace",
+        replaceToolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".replace",
                 replaceToolbarActionGroup, true);
 
         optionsAction = new DefaultCustomComponentAction(
@@ -276,7 +278,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
     private void init() {
         findToolbarActionGroup.addSeparator();
         findToolbarActionGroup.addAction(optionsAction);
-        findPanel.add(findToolbar, BorderLayout.CENTER);
+        findPanel.add(findToolbar.getComponent(), BorderLayout.CENTER);
 
         closeToolbarActionGroup.addAction(new AnAction(
                 resourceBundle.getString("closeButton.toolTipText"),
@@ -294,7 +296,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
                 return ActionUpdateThread.BGT;
             }
         });
-        add(closeToolbar, BorderLayout.EAST);
+        add(closeToolbar.getComponent(), BorderLayout.EAST);
 
         SectionCodeAreaLayoutProfile layoutProfile = Objects.requireNonNull(searchCodeArea.getLayoutProfile());
         layoutProfile.setShowHeader(false);
@@ -569,17 +571,17 @@ public class BinarySearchIntelliJPanel extends JBPanel {
     private void initComponents() {
 
         topSeparator = new javax.swing.JSeparator();
-        findPanel = new JBPanel();
+        findPanel = new JBPanel<>();
         findPanel.setLayout(new BorderLayout());
         findLabel = new javax.swing.JLabel();
         findTypeButton = new javax.swing.JButton();
-        findComboBox = new JComboBox<>();
+        findComboBox = new ComboBox<>();
         infoLabel = new javax.swing.JLabel();
-        replacePanel = new JBPanel();
+        replacePanel = new JBPanel<>();
         replacePanel.setLayout(new BorderLayout());
         replaceLabel = new javax.swing.JLabel();
         replaceTypeButton = new javax.swing.JButton();
-        replaceComboBox = new JComboBox<>();
+        replaceComboBox = new ComboBox<>();
 
         setName("Form"); // NOI18N
         setLayout(new java.awt.BorderLayout());
@@ -654,7 +656,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         replaceToolbarActionGroup.addAction(replaceAction);
         replaceToolbarActionGroup.addAction(replaceAllAction);
 
-        replacePanel.add(replaceToolbar, BorderLayout.CENTER);
+        replacePanel.add(replaceToolbar.getComponent(), BorderLayout.CENTER);
 
         add(replacePanel, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents

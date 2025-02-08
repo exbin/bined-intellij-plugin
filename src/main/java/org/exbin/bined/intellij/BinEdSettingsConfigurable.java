@@ -18,21 +18,28 @@ package org.exbin.bined.intellij;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
-import org.exbin.bined.intellij.options.gui.BinEdOptionsPanelBorder;
+import org.exbin.framework.App;
+import org.exbin.framework.options.action.OptionsAction;
+import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.options.api.OptionsPageReceiver;
+import org.exbin.framework.options.gui.OptionsListPanel;
+import org.exbin.framework.preferences.api.PreferencesModuleApi;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.swing.JComponent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.ResourceBundle;
 
 /**
- * TODO: Settings component.
+ * Settings component.
  *
  * @author ExBin Project (https://exbin.org)
  */
 public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
-    private BinEdOptionsPanelBorder optionsPanelWrapper;
+    private OptionsListPanel optionsListPanel;
     private boolean modified = true;
     private ResourceBundle resourceBundle = BinEdIntelliJPlugin.getResourceBundle();
 
@@ -48,19 +55,24 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
     @Nullable
     @Override
     public JComponent createComponent() {
-        optionsPanelWrapper = new BinEdOptionsPanelBorder();
-//        BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
-//        BinEdManager binEdManager = BinEdManager.getInstance();
-//        optionsPanel.setPreferences(binEdManager.getPreferences());
-//        optionsPanel.loadFromPreferences();
-//        optionsPanelWrapper.addFocusListener(new FocusAdapter() {
-//            @Override
-//            public void focusGained(FocusEvent e) {
-//                modified = true;
-//                optionsPanelWrapper.firePropertyChange("modified", false, true);
-//            }
-//        });
-        return optionsPanelWrapper;
+        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
+        OptionsAction.OptionsPagesProvider optionsPagesProvider = (OptionsPageReceiver optionsTreePanel) -> {
+            OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+            optionsModule.passOptionsPages(optionsTreePanel);
+        };
+        optionsListPanel = new OptionsListPanel();
+        optionsPagesProvider.registerOptionsPages(optionsListPanel);
+        optionsListPanel.setPreferences(preferencesModule.getAppPreferences());
+        optionsListPanel.pagesFinished();
+        optionsListPanel.loadAllFromPreferences();
+        optionsListPanel.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                modified = true;
+            }
+        });
+
+        return optionsListPanel;
     }
 
     @Override
@@ -70,7 +82,6 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
     @Override
     public void apply() throws ConfigurationException {
-//        BinEdOptionsPanel optionsPanel = optionsPanelWrapper.getOptionsPanel();
-//        optionsPanel.saveToPreferences();
+        optionsListPanel.saveAndApplyAll();
     }
 }

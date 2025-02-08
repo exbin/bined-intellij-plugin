@@ -42,7 +42,11 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>-</li></ul>
+<ul><li>Added Base 64 conversion</li>
+<li>Added option for inspector input fields font</li>
+<li>Added icon set support</li>
+<li>Added more languages (de, cs, fr, it, pt, pl, ru)</li>
+<li>Fixed write-unsafe context (issue #60)</li></ul>
     ]]>
     </change-notes>
 
@@ -64,6 +68,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     <depends optional="true" config-file="appcode-ext.xml">com.intellij.appcode</depends>
     <depends optional="true" config-file="debugger-ext.xml">com.intellij.modules.xdebugger</depends>
     <depends optional="true" config-file="database-ext.xml">com.intellij.modules.database</depends>
+    <depends optional="true" config-file="database2-ext.xml">com.intellij.database</depends>
 
     <project-components>
     </project-components>

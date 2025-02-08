@@ -34,27 +34,29 @@ import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.BinEdIntelliJPlugin;
-import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.options.BinEdApplyOptions;
-import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
+import org.exbin.bined.swing.CodeAreaCore;
+import org.exbin.bined.swing.CodeAreaPainter;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
+import org.exbin.bined.swing.capability.CharAssessorPainterCapable;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.bined.swing.section.diff.SectCodeAreaDiffPanel;
 import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.framework.App;
+import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.bined.BinEdCodeAreaAssessor;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.inspector.options.DataInspectorOptions;
 import org.exbin.framework.bined.options.CodeAreaColorOptions;
 import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
 import org.exbin.framework.bined.options.CodeAreaOptions;
@@ -67,8 +69,11 @@ import org.exbin.framework.editor.text.EncodingsHandler;
 import org.exbin.framework.editor.text.TextEncodingStatusApi;
 import org.exbin.framework.editor.text.options.TextEncodingOptions;
 import org.exbin.framework.editor.text.options.TextFontOptions;
+import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.utils.ClipboardActionsHandler;
+import org.exbin.framework.utils.ClipboardActionsUpdateListener;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -122,6 +127,16 @@ public class BinedDiffPanel extends JBPanel {
         defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
         SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
         SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
+
+        CodeAreaPainter leftPainter = leftCodeArea.getPainter();
+        BinEdCodeAreaAssessor codeAreaAssessor = new BinEdCodeAreaAssessor(((ColorAssessorPainterCapable)leftPainter).getColorAssessor(), ((CharAssessorPainterCapable)leftPainter).getCharAssessor());
+        ((ColorAssessorPainterCapable)leftPainter).setColorAssessor(codeAreaAssessor);
+        ((CharAssessorPainterCapable)leftPainter).setCharAssessor(codeAreaAssessor);
+        CodeAreaPainter rightPainter = rightCodeArea.getPainter();
+        codeAreaAssessor = new BinEdCodeAreaAssessor(((ColorAssessorPainterCapable)rightPainter).getColorAssessor(), ((CharAssessorPainterCapable)rightPainter).getCharAssessor());
+        ((ColorAssessorPainterCapable)rightPainter).setColorAssessor(codeAreaAssessor);
+        ((CharAssessorPainterCapable)rightPainter).setCharAssessor(codeAreaAssessor);
+
         defaultLayoutProfile = leftCodeArea.getLayoutProfile();
         defaultThemeProfile = leftCodeArea.getThemeProfile();
         defaultColorProfile = leftCodeArea.getColorsProfile();
@@ -215,6 +230,58 @@ public class BinedDiffPanel extends JBPanel {
             leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
+                    FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+                    ComponentActivationListener componentActivationListener =
+                            frameModule.getFrameHandler().getComponentActivationListener();
+
+                    componentActivationListener.updated(CodeAreaCore.class, leftCodeArea);
+                    componentActivationListener.updated(ClipboardActionsHandler.class, new ClipboardActionsHandler() {
+                        public void performCut() {
+                            leftCodeArea.cut();
+                        }
+
+                        public void performCopy() {
+                            leftCodeArea.copy();
+                        }
+
+                        public void performPaste() {
+                            leftCodeArea.paste();
+                        }
+
+                        public void performDelete() {
+                            leftCodeArea.delete();
+                        }
+
+                        public void performSelectAll() {
+                            leftCodeArea.selectAll();
+                        }
+
+                        public boolean isSelection() {
+                            return leftCodeArea.hasSelection();
+                        }
+
+                        public boolean isEditable() {
+                            return leftCodeArea.isEditable();
+                        }
+
+                        public boolean canSelectAll() {
+                            return true;
+                        }
+
+                        public boolean canPaste() {
+                            return leftCodeArea.canPaste();
+                        }
+
+                        public boolean canDelete() {
+                            return true;
+                        }
+
+                        @Override
+                        public void setUpdateListener(ClipboardActionsUpdateListener clipboardActionsUpdateListener) {
+
+                        }
+                    });
+
                     String popupMenuId = "BinDiffPanel.left";
                     BinedModule binedModule = App.getModule(BinedModule.class);
                     CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
@@ -247,11 +314,63 @@ public class BinedDiffPanel extends JBPanel {
             rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override
                 public void show(Component invoker, int x, int y) {
+                    FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+                    ComponentActivationListener componentActivationListener =
+                            frameModule.getFrameHandler().getComponentActivationListener();
+
+                    componentActivationListener.updated(CodeAreaCore.class, rightCodeArea);
+                    componentActivationListener.updated(ClipboardActionsHandler.class, new ClipboardActionsHandler() {
+                        public void performCut() {
+                            rightCodeArea.cut();
+                        }
+
+                        public void performCopy() {
+                            rightCodeArea.copy();
+                        }
+
+                        public void performPaste() {
+                            rightCodeArea.paste();
+                        }
+
+                        public void performDelete() {
+                            rightCodeArea.delete();
+                        }
+
+                        public void performSelectAll() {
+                            rightCodeArea.selectAll();
+                        }
+
+                        public boolean isSelection() {
+                            return rightCodeArea.hasSelection();
+                        }
+
+                        public boolean isEditable() {
+                            return rightCodeArea.isEditable();
+                        }
+
+                        public boolean canSelectAll() {
+                            return true;
+                        }
+
+                        public boolean canPaste() {
+                            return rightCodeArea.canPaste();
+                        }
+
+                        public boolean canDelete() {
+                            return true;
+                        }
+
+                        @Override
+                        public void setUpdateListener(ClipboardActionsUpdateListener clipboardActionsUpdateListener) {
+
+                        }
+                    });
+
                     String popupMenuId = "BinDiffPanel.right";
                     BinedModule binedModule = App.getModule(BinedModule.class);
                     CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
                             binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
-                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(leftCodeArea, popupMenuId, x, y);
+                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(rightCodeArea, popupMenuId, x, y);
                     popupMenu.addPopupMenuListener(new PopupMenuListener() {
                         @Override
                         public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
@@ -395,12 +514,6 @@ public class BinedDiffPanel extends JBPanel {
 
             @Nonnull
             @Override
-            public IntegrationOptions getIntegrationOptions() {
-                return null; // TODO preferences.getIntegrationPreferences();
-            }
-
-            @Nonnull
-            @Override
             public EditorOptions getEditorOptions() {
                 return preferences.getEditorPreferences();
             }
@@ -409,12 +522,6 @@ public class BinedDiffPanel extends JBPanel {
             @Override
             public StatusOptions getStatusOptions() {
                 return preferences.getStatusPreferences();
-            }
-
-            @Nonnull
-            @Override
-            public DataInspectorOptions getDataInspectorOptions() {
-                return null; // TODO preferences.getDataInspectorPreferences();
             }
 
             @Nonnull
@@ -460,32 +567,12 @@ public class BinedDiffPanel extends JBPanel {
 //        });
     }
 
-    private void updateApplyOptions(BinEdApplyOptions applyOptions) {
-        SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
-        SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
-        CodeAreaOptionsImpl.applyFromCodeArea(applyOptions.getCodeAreaOptions(), leftCodeArea);
-        CodeAreaOptionsImpl.applyFromCodeArea(applyOptions.getCodeAreaOptions(), rightCodeArea);
-        applyOptions.getEncodingOptions().setSelectedEncoding(((CharsetCapable) leftCodeArea).getCharset().name());
-        applyOptions.getEncodingOptions().setSelectedEncoding(((CharsetCapable) rightCodeArea).getCharset().name());
-
-        EditorOptions editorOptions = applyOptions.getEditorOptions();
-        if (leftCodeArea.getCommandHandler() instanceof CodeAreaOperationCommandHandler) {
-            editorOptions.setEnterKeyHandlingMode(((CodeAreaOperationCommandHandler) leftCodeArea.getCommandHandler()).getEnterKeyHandlingMode());
-        }
-        if (rightCodeArea.getCommandHandler() instanceof CodeAreaOperationCommandHandler) {
-            editorOptions.setEnterKeyHandlingMode(((CodeAreaOperationCommandHandler) rightCodeArea.getCommandHandler()).getEnterKeyHandlingMode());
-        }
-
-        // TODO applyOptions.getStatusOptions().loadFromPreferences(preferences.getStatusPreferences());
-    }
-
     private void applyOptions(BinEdApplyOptions applyOptions) {
         applyOptions(applyOptions, diffPanel.getLeftCodeArea());
         applyOptions(applyOptions, diffPanel.getRightCodeArea());
     }
 
     private void applyOptions(BinEdApplyOptions applyOptions, SectCodeArea codeArea) {
-        BinEdPluginStartupActivity.applyIntegrationOptions(applyOptions.getIntegrationOptions());
         CodeAreaOptionsImpl.applyToCodeArea(applyOptions.getCodeAreaOptions(), codeArea);
 
         ((CharsetCapable) codeArea).setCharset(Charset.forName(applyOptions.getEncodingOptions()

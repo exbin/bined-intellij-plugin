@@ -267,7 +267,8 @@ public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomCom
             }
             else {
                 // Cycle actions
-                final AnActionEvent newEvent = AnActionEvent.createFromInputEvent(event.getInputEvent(), myPlace, event.getPresentation(), getDataContext());
+                final AnActionEvent newEvent = new AnActionEvent(event.getInputEvent(), getDataContext(), myPlace, event.getPresentation(), ActionManager.getInstance(),
+                        event.getModifiers());
                 AnAction[] actions = myActionGroup.getChildren(null);
                 if (selectedIndex >= actions.length -1) {
                     selectedIndex = 0;

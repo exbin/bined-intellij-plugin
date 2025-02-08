@@ -64,6 +64,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
     @Nullable
     protected BinEdFileHandler activeFile = null;
     private BinaryStatusApi binaryStatus;
+    private TextEncodingStatusApi textEncodingStatusApi;
     private EditorModificationListener editorModificationListener;
 
     public BinEdIntelliJEditorProvider() {
@@ -164,8 +165,10 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
     }
 
     public void setActiveFile(@Nullable FileHandler fileHandler) {
-        activeFile = (BinEdFileHandler) fileHandler;
-        activeFileChanged();
+        if (activeFile != fileHandler) {
+            activeFile = (BinEdFileHandler) fileHandler;
+            activeFileChanged();
+        }
     }
 
     public void activeFileChanged() {
@@ -185,6 +188,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
             extCodeArea = activeFile.getCodeArea();
             undoHandler = activeFile.getUndoRedo().orElse(null);
             clipboardActionsHandler = activeFile;
+            updateStatus();
         }
 
         componentActivationListener.updated(FileHandler.class, activeFile);
@@ -211,6 +215,10 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
         updateCurrentSelectionRange();
         updateCurrentMemoryMode();
         updateCurrentEditMode();
+
+        if (textEncodingStatusApi != null) {
+            updateCurrentEncoding();
+        }
     }
 
     private void updateCurrentDocumentSize() {
@@ -271,7 +279,16 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
 
     @Override
     public void registerEncodingStatus(TextEncodingStatusApi encodingStatus) {
-        encodingStatus.setEncoding(activeFile.getCharset().name());
+        this.textEncodingStatusApi = encodingStatus;
+        updateCurrentEncoding();
+    }
+
+    public void updateCurrentEncoding() {
+        if (textEncodingStatusApi == null) {
+            return;
+        }
+
+        textEncodingStatusApi.setEncoding(activeFile.getCharset().name());
     }
 
     @Override

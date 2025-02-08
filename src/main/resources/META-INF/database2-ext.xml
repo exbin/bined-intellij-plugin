@@ -1,0 +1,10 @@
+<idea-plugin>
+    <actions>
+        <group>
+            <action id="BinEdEditor.EditDBColumnAsBinary" class="org.exbin.bined.intellij.database.DbEditBinaryAction"
+                    text="Edit As Binary" icon="/images/icon-idea.png" description="Edit using BinEd plugin">
+            </action>
+            <add-to-group group-id="Console.TableResult.PopupGroup" anchor="after" relative-to-action="Console.TableResult.EditValueMaximized"/>
+        </group>
+    </actions>
+</idea-plugin>

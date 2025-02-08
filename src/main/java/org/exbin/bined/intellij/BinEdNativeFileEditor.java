@@ -24,7 +24,9 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
 import org.exbin.framework.App;
+import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
 
 import javax.annotation.Nonnull;
@@ -57,6 +59,10 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
         BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler();
         undoHandler.setFileEditor(this);
         nativeFile.registerUndoRedo(undoHandler);
+
+        BinedModule binedModule = App.getModule(BinedModule.class);
+        BinEdFileManager fileManager = binedModule.getFileManager();
+        fileManager.initCommandHandler(nativeFile.getEditorFile().getComponent());
 
         propertyChangeSupport = new PropertyChangeSupport(this);
     }

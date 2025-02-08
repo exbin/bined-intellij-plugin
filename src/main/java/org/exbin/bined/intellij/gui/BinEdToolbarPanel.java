@@ -17,6 +17,7 @@ package org.exbin.bined.intellij.gui;
 
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -70,10 +71,12 @@ public class BinEdToolbarPanel extends JBPanel {
 
     private final DefaultActionGroup actionGroup;
     private final ActionGroup cycleActionGroup;
-    private final ActionToolbarImpl toolbar;
+    private final ActionToolbar toolbar;
 
     private ActionListener saveAction = null;
     private final CodeTypeSplitAction cycleCodeTypesSplitAction;
+    private final AnAction settingsAction;
+    private final AnAction onlineHelpToolbarAction;
     private final AnAction binaryCodeTypeAction;
     private final AnAction octalCodeTypeAction;
     private final AnAction decimalCodeTypeAction;
@@ -89,8 +92,42 @@ public class BinEdToolbarPanel extends JBPanel {
 
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
-        toolbar = (ActionToolbarImpl) ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE, actionGroup, true);
-        add(toolbar, BorderLayout.CENTER);
+        toolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE, actionGroup, true);
+        add(toolbar.getComponent(), BorderLayout.CENTER);
+
+        settingsAction = new AnAction(
+                optionsResourceBundle.getString("optionsAction.text"),
+                optionsResourceBundle.getString("optionsAction.shortDescription"),
+                new javax.swing.ImageIcon(getClass().getResource(optionsResourceBundle.getString("optionsAction.smallIcon")))
+        ) {
+            @NotNull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                optionsAction.actionPerformed(null);
+            }
+        };
+
+        onlineHelpToolbarAction = new AnAction(
+                onlineHelpResourceBundle.getString("onlineHelpAction.text"),
+                onlineHelpResourceBundle.getString("onlineHelpAction.shortDescription"),
+                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/help.png"))
+        ) {
+            @NotNull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                onlineHelpAction.actionPerformed(null);
+            }
+        };
 
         binaryCodeTypeAction = new AnAction(
                 resourceBundle.getString("binaryCodeTypeAction.text"),
@@ -185,12 +222,15 @@ public class BinEdToolbarPanel extends JBPanel {
 
     public void setUndoHandler(BinaryDataUndoRedo undoRedo) {
         this.undoRedo = undoRedo;
-
-        setActionVisible(undoEditButton, true);
-        setActionVisible(redoEditButton, true);
+        updateActionsState();
     }
 
     public void setOptionsAction(ActionListener optionsAction) {
+        if (this.optionsAction == null) {
+            actionGroup.remove(onlineHelpToolbarAction);
+            actionGroup.addAction(settingsAction);
+            actionGroup.addAction(onlineHelpToolbarAction);
+        }
         this.optionsAction = optionsAction;
     }
 
@@ -223,33 +263,23 @@ public class BinEdToolbarPanel extends JBPanel {
 
     public void applyFromCodeArea() {
         updateCycleButtonState();
-        updateNonprintables();
+        updateActionsState();
     }
 
     public void loadFromPreferences(BinaryEditorPreferences preferences) {
         codeAreaControl.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
         updateCycleButtonState();
-        updateNonprintables();
+        updateActionsState();
     }
 
-    public void updateUndoState() {
-        toolbar.getPresentation(undoEditButton).setEnabled(undoRedo != null && undoRedo.canUndo());
-        toolbar.getPresentation(redoEditButton).setEnabled(undoRedo != null && undoRedo.canRedo());
-        if (saveAction != null) {
-            boolean modified = undoRedo != null && undoRedo.getCommandPosition() != undoRedo.getSyncPosition();
-            toolbar.getPresentation(saveFileButton).setEnabled(modified);
-        }
-    }
-
-    public void updateNonprintables() {
-        boolean showNonprintables = codeAreaControl.isShowNonprintables();
-        setActionSelection(showNonprintablesToggleButton, showNonprintables);
+    public void updateActionsState() {
+        // Is supposed to be updated automatically
+        // toolbar.updateActionsImmediately();
     }
 
     public void setSaveAction(ActionListener saveAction) {
         this.saveAction = saveAction;
-        setActionVisible(saveFileButton, true);
-        updateUndoState();
+        updateActionsState();
     }
 
     public void saveFile() {
@@ -287,7 +317,6 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
         actionGroup.addAction(saveFileButton);
-        setActionVisible(saveFileButton, false);
         actionGroup.addSeparator();
 
         undoEditButton = new AnAction(
@@ -314,7 +343,6 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
         actionGroup.addAction(undoEditButton);
-        setActionVisible(undoEditButton, false);
 
         redoEditButton = new AnAction(
                 operationUndoResourceBundle.getString("editRedoAction.text"),
@@ -340,7 +368,6 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
         actionGroup.addAction(redoEditButton);
-        setActionVisible(redoEditButton, false);
 
         showNonprintablesToggleButton = new ToggleAction(
                 resourceBundle.getString("viewNonprintablesAction.text"),
@@ -361,7 +388,12 @@ public class BinEdToolbarPanel extends JBPanel {
             @Override
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean selected) {
                 codeAreaControl.setShowNonprintables(selected);
-                updateNonprintables();
+            }
+
+            @Override
+            public void update(@NotNull AnActionEvent e) {
+                Presentation presentation = e.getPresentation();
+                presentation.putClientProperty(SELECTED_PROPERTY_KEY, codeAreaControl.isShowNonprintables());
             }
         };
         actionGroup.addAction(showNonprintablesToggleButton);
@@ -369,40 +401,7 @@ public class BinEdToolbarPanel extends JBPanel {
         actionGroup.addAction(cycleCodeTypesSplitAction);
 
         actionGroup.addSeparator();
-        AnAction settingsAction = new AnAction(
-                optionsResourceBundle.getString("optionsAction.text"),
-                optionsResourceBundle.getString("optionsAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource(optionsResourceBundle.getString("optionsAction.smallIcon")))
-        ) {
-            @NotNull
-            @Override
-            public ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
 
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                optionsAction.actionPerformed(null);
-            }
-        };
-        actionGroup.addAction(settingsAction);
-
-        AnAction onlineHelpToolbarAction = new AnAction(
-                onlineHelpResourceBundle.getString("onlineHelpAction.text"),
-                onlineHelpResourceBundle.getString("onlineHelpAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource("/org/exbin/bined/intellij/resources/icons/help.png"))
-        ) {
-            @NotNull
-            @Override
-            public ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
-
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                onlineHelpAction.actionPerformed(null);
-            }
-        };
         actionGroup.addAction(onlineHelpToolbarAction);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -417,7 +416,7 @@ public class BinEdToolbarPanel extends JBPanel {
         try {
             undoRedo.performUndo();
             codeAreaControl.repaint();
-            updateUndoState();
+            updateActionsState();
         } catch (Exception ex) {
             Logger.getLogger(BinEdToolbarPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -427,18 +426,10 @@ public class BinEdToolbarPanel extends JBPanel {
         try {
             undoRedo.performRedo();
             codeAreaControl.repaint();
-            updateUndoState();
+            updateActionsState();
         } catch (Exception ex) {
             Logger.getLogger(BinEdToolbarPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private void setActionVisible(AnAction action, boolean enabled) {
-        toolbar.getPresentation(action).setVisible(enabled);
-    }
-
-    private void setActionSelection(AnAction action, boolean selected) {
-        toolbar.getPresentation(action).putClientProperty(SELECTED_PROPERTY_KEY, selected);
     }
 
     private Icon load(String path) {
