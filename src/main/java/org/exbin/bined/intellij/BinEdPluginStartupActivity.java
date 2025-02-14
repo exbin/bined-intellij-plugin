@@ -193,6 +193,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
     private static IntegrationOptions initialIntegrationOptions = null;
 
     private static boolean initialized = false;
+    private boolean extensionInitialized = false;
     private final BinaryViewHandler viewHandler = new MainBinaryViewHandler();
     private final List<BinaryViewData> initializedExtensions = new ArrayList<>();
 
@@ -435,19 +436,10 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 });
     }
 
-    private static void initIntegration() {
-//        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-//        Preferences preferences = preferencesModule.getAppPreferences();
-//
-//        initialIntegrationOptions = new IntegrationPreferences(preferences);
-//        applyIntegrationOptions(initialIntegrationOptions);
-
-    }
-
     private void projectOpened(Project project) {
         BinEdPluginStartupActivity.initialize();
 
-        if (initialIntegrationOptions == null) {
+        if (!extensionInitialized) {
             ProjectManager.getInstance().addProjectManagerListener(new BinEdVetoableProjectListener());
 
             try {
@@ -461,7 +453,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 Logger.getLogger(BinEdPluginStartupActivity.class.getName()).log(Level.SEVERE, "Extension initialization failed", ex);
             }
             initExtensions();
-            initIntegration();
+            extensionInitialized = true;
         }
 
         MessageBus messageBus = project.getMessageBus();
