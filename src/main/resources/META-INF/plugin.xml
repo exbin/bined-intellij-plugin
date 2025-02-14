@@ -6,7 +6,7 @@
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
     <name>BinEd - Binary/Hex Editor</name>
-    <version>0.2.12.snapshot</version>
+    <version>0.2.11.1</version>
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="exbinproject@gmail.com" url="https://exbin.org">ExBin Project</vendor>
 
@@ -22,7 +22,7 @@
 <li>Use "Edit as Binary" in column context menu in DB view</li></ul>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.12.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.11.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
 
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
@@ -42,7 +42,13 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-    -
+<ul><li>Plugin breaks access to the settings screen  (issue #63)</li>
+<li>Database module dependency issue (issue #62)</li>
+<li>Added Base 64 conversion</li>
+<li>Added option for inspector input fields font</li>
+<li>Added icon set support</li>
+<li>Added more languages (de, cs, fr, it, pt, pl, ru)</li>
+<li>Fixed write-unsafe context (issue #60)</li></ul>
     ]]>
     </change-notes>
 
@@ -64,7 +70,6 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     <depends optional="true" config-file="appcode-ext.xml">com.intellij.appcode</depends>
     <depends optional="true" config-file="debugger-ext.xml">com.intellij.modules.xdebugger</depends>
     <depends optional="true" config-file="database-ext.xml">com.intellij.modules.database</depends>
-    <!-- Possibly renamed, check with more recent versions <depends optional="true" config-file="database2-ext.xml">com.intellij.database</depends> -->
 
     <project-components>
     </project-components>

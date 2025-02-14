@@ -74,6 +74,7 @@ import org.exbin.framework.ModuleProvider;
 import org.exbin.framework.about.AboutModule;
 import org.exbin.framework.about.api.AboutModuleApi;
 import org.exbin.framework.action.ActionModule;
+import org.exbin.framework.action.api.ActionConsts;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.action.api.ComponentActivationListener;
 import org.exbin.framework.action.api.GroupMenuContributionRule;
@@ -115,6 +116,7 @@ import org.exbin.framework.language.api.LanguageProvider;
 import org.exbin.framework.operation.undo.OperationUndoModule;
 import org.exbin.framework.operation.undo.api.OperationUndoModuleApi;
 import org.exbin.framework.options.OptionsModule;
+import org.exbin.framework.options.action.OptionsAction;
 import org.exbin.framework.options.api.DefaultOptionsPage;
 import org.exbin.framework.options.api.OptionsComponent;
 import org.exbin.framework.options.api.OptionsModuleApi;
@@ -701,7 +703,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             AboutModuleApi aboutModule = App.getModule(AboutModuleApi.class);
             OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
             optionsModule.setOptionsPanelType(OptionsPanelType.LIST);
-            optionsModule.registerMenuAction();
+            // TODO Is currently stealing options action on macOS
+            // optionsModule.registerMenuAction();
 
             HelpOnlineModule helpOnlineModule = App.getModule(HelpOnlineModule.class);
             try {
