@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij.preferences;
 
 import com.intellij.ide.util.PropertiesComponent;
-import org.exbin.framework.preferences.api.Preferences;
+import org.exbin.framework.preferences.api.OptionsStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,7 +30,7 @@ import java.util.Optional;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class IntelliJPreferencesWrapper implements Preferences {
+public class IntelliJPreferencesWrapper implements OptionsStorage {
 
     private final PropertiesComponent preferences;
     private final String prefix;

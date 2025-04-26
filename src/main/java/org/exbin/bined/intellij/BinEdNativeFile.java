@@ -38,7 +38,7 @@ import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
-import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
+import org.exbin.framework.bined.options.BinaryEditorOptions;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
 
 import javax.annotation.Nonnull;
@@ -75,8 +75,8 @@ public class BinEdNativeFile {
         fileHandler.setUndoHandler(undoHandler);
 
         PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-        BinaryEditorPreferences binaryEditorPreferences = new BinaryEditorPreferences(preferencesModule.getAppPreferences());
-        fileHandler.onInitFromPreferences(binaryEditorPreferences);
+        BinaryEditorOptions binaryEditorOptions = new BinaryEditorOptions(preferencesModule.getAppPreferences());
+        fileHandler.onInitFromPreferences(binaryEditorOptions);
 
         SectCodeArea codeArea = filePanel.getCodeArea();
 
@@ -90,7 +90,7 @@ public class BinEdNativeFile {
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
         toolbarPanel.setUndoHandler(fileHandler.getCodeAreaUndoHandler().get());
 
-        toolbarPanel.loadFromPreferences(binaryEditorPreferences);
+        toolbarPanel.loadFromPreferences(binaryEditorOptions);
     }
 
     public void registerUndoRedo(BinaryUndoIntelliJHandler undoIntelliJHandler) {

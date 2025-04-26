@@ -28,7 +28,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
-import org.exbin.bined.intellij.options.impl.IntegrationOptionsImpl;
+
+import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.framework.App;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.ui.model.LanguageRecord;
@@ -43,7 +44,7 @@ import org.exbin.framework.options.api.OptionsModifiedListener;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class IntegrationOptionsPanel extends javax.swing.JPanel implements OptionsComponent<IntegrationOptionsImpl> {
+public class IntegrationOptionsPanel extends javax.swing.JPanel implements OptionsComponent<IntegrationOptions> {
 
     private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(IntegrationOptionsPanel.class);
     private OptionsModifiedListener optionsModifiedListener;
@@ -60,7 +61,7 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
     }
 
     @Override
-    public void saveToOptions(IntegrationOptionsImpl options) {
+    public void saveToOptions(IntegrationOptions options) {
         options.setLanguageLocale(((LanguageRecord) languageComboBox.getSelectedItem()).getLocale());
         options.setIconSet((String) iconSetComboBox.getSelectedItem());
         options.setRegisterFileMenuOpenAsBinary(openFileAsBinaryCheckBox.isSelected());
@@ -74,7 +75,7 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
     }
 
     @Override
-    public void loadFromOptions(IntegrationOptionsImpl options) {
+    public void loadFromOptions(IntegrationOptions options) {
         Locale languageLocale = options.getLanguageLocale();
         ComboBoxModel<LanguageRecord> languageComboBoxModel = languageComboBox.getModel();
         for (int i = 0; i < languageComboBoxModel.getSize(); i++) {

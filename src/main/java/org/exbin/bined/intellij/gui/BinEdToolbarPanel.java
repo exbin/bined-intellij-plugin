@@ -33,7 +33,7 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
 import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
 import org.exbin.framework.App;
-import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
+import org.exbin.framework.bined.options.BinaryEditorOptions;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -266,8 +266,8 @@ public class BinEdToolbarPanel extends JBPanel {
         updateActionsState();
     }
 
-    public void loadFromPreferences(BinaryEditorPreferences preferences) {
-        codeAreaControl.setCodeType(preferences.getCodeAreaPreferences().getCodeType());
+    public void loadFromPreferences(BinaryEditorOptions options) {
+        codeAreaControl.setCodeType(options.getCodeAreaOptions().getCodeType());
         updateCycleButtonState();
         updateActionsState();
     }

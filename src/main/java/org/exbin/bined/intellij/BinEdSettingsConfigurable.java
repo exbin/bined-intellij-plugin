@@ -19,6 +19,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
 import org.exbin.framework.App;
+import org.exbin.framework.options.OptionsModule;
 import org.exbin.framework.options.action.OptionsAction;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.options.api.OptionsPageReceiver;
@@ -57,8 +58,8 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
     public JComponent createComponent() {
         PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
         OptionsAction.OptionsPagesProvider optionsPagesProvider = (OptionsPageReceiver optionsTreePanel) -> {
-            OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-            optionsModule.passOptionsPages(optionsTreePanel);
+            OptionsModule optionsModule = (OptionsModule) App.getModule(OptionsModuleApi.class);
+            optionsModule.getOptionsPageManager().passOptionsPages(optionsTreePanel);
         };
         optionsListPanel = new OptionsListPanel();
         optionsPagesProvider.registerOptionsPages(optionsListPanel);

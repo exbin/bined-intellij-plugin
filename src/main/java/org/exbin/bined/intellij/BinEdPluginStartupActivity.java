@@ -54,7 +54,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
-import java.lang.Deprecated;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import org.exbin.bined.intellij.api.BinaryViewData;
@@ -63,8 +62,6 @@ import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.objectdata.MainBinaryViewHandler;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.options.gui.IntegrationOptionsPanel;
-import org.exbin.bined.intellij.options.impl.IntegrationOptionsImpl;
-import org.exbin.bined.intellij.preferences.IntegrationPreferences;
 import org.exbin.bined.intellij.search.BinEdIntelliJComponentSearch;
 import org.exbin.bined.swing.CodeAreaCommandHandler;
 import org.exbin.bined.swing.CodeAreaCore;
@@ -74,22 +71,13 @@ import org.exbin.framework.ModuleProvider;
 import org.exbin.framework.about.AboutModule;
 import org.exbin.framework.about.api.AboutModuleApi;
 import org.exbin.framework.action.ActionModule;
-import org.exbin.framework.action.api.ActionConsts;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.action.api.ComponentActivationListener;
-import org.exbin.framework.action.api.GroupMenuContributionRule;
-import org.exbin.framework.action.api.MenuContribution;
-import org.exbin.framework.action.api.MenuManagement;
-import org.exbin.framework.action.api.PositionMenuContributionRule;
-import org.exbin.framework.action.api.PositionMode;
-import org.exbin.framework.action.api.SeparationMenuContributionRule;
-import org.exbin.framework.action.api.SeparationMode;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
 import org.exbin.framework.bined.compare.BinedCompareModule;
-import org.exbin.framework.bined.gui.BinEdComponentFileApi;
 import org.exbin.framework.bined.inspector.BinEdComponentInspector;
 import org.exbin.framework.bined.inspector.BinedInspectorModule;
 import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
@@ -108,15 +96,22 @@ import org.exbin.framework.file.FileModule;
 import org.exbin.framework.file.api.FileModuleApi;
 import org.exbin.framework.frame.FrameModule;
 import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.framework.help.HelpModule;
+import org.exbin.framework.help.api.HelpModuleApi;
 import org.exbin.framework.help.online.HelpOnlineModule;
 import org.exbin.framework.language.LanguageModule;
 import org.exbin.framework.language.api.IconSetProvider;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.language.api.LanguageProvider;
+import org.exbin.framework.menu.MenuModule;
+import org.exbin.framework.menu.api.GroupMenuContributionRule;
+import org.exbin.framework.menu.api.MenuContribution;
+import org.exbin.framework.menu.api.MenuManagement;
+import org.exbin.framework.menu.api.MenuModuleApi;
+import org.exbin.framework.menu.api.PositionMenuContributionRule;
+import org.exbin.framework.menu.api.SeparationMenuContributionRule;
 import org.exbin.framework.operation.undo.OperationUndoModule;
 import org.exbin.framework.operation.undo.api.OperationUndoModuleApi;
-import org.exbin.framework.options.OptionsModule;
-import org.exbin.framework.options.action.OptionsAction;
 import org.exbin.framework.options.api.DefaultOptionsPage;
 import org.exbin.framework.options.api.OptionsComponent;
 import org.exbin.framework.options.api.OptionsModuleApi;
@@ -134,12 +129,17 @@ import org.exbin.framework.plugin.language.zh_Hans.LanguageZhHansModule;
 import org.exbin.framework.plugin.language.zh_Hant.LanguageZhHantModule;
 import org.exbin.framework.plugins.iconset.material.IconSetMaterialModule;
 import org.exbin.framework.preferences.PreferencesModule;
-import org.exbin.framework.preferences.api.Preferences;
+import org.exbin.framework.preferences.api.OptionsStorage;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
-import org.exbin.framework.ui.MainOptionsManager;
+import org.exbin.framework.toolbar.ToolBarModule;
+import org.exbin.framework.toolbar.api.ToolBarModuleApi;
 import org.exbin.framework.ui.UiModule;
 import org.exbin.framework.ui.api.UiModuleApi;
+import org.exbin.framework.ui.gui.LanguageOptionsPanel;
 import org.exbin.framework.ui.model.LanguageRecord;
+import org.exbin.framework.ui.theme.ThemeOptionsManager;
+import org.exbin.framework.ui.theme.UiThemeModule;
+import org.exbin.framework.ui.theme.api.UiThemeModuleApi;
 import org.exbin.framework.utils.UiUtils;
 import org.exbin.framework.window.WindowModule;
 import org.exbin.framework.window.api.WindowModuleApi;
@@ -186,6 +186,7 @@ import java.util.logging.Logger;
 @ParametersAreNonnullByDefault
 public final class BinEdPluginStartupActivity implements ProjectActivity, StartupActivity, StartupActivity.DumbAware {
 
+    private static final String BINARY_PLUGIN_ID = "binary";
     private static final ExtensionPointName<BinaryViewData> BINED_VIEW_DATA =
             ExtensionPointName.create("org.exbin.deltahex.intellij.viewBinaryData");
     private static final String BINED_DIFF_TOOL_ID = BinEdDiffTool.class.getCanonicalName();
@@ -489,7 +490,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isClosing()) {
                     ((BinEdVirtualFile) file).setClosing(true);
                     BinEdFileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
-                    if (fileHandler.isModified() && ((BinEdComponentFileApi) fileHandler).isSaveSupported()) {
+                    if (fileHandler.isModified()) {
                         ApplicationManager.getApplication().invokeLater(() -> {
                             boolean released = binedModule.getEditorProvider().releaseFile(fileHandler);
                             ((BinEdVirtualFile) file).setClosing(false);
@@ -611,9 +612,13 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(LanguageModuleApi.class, new LanguageModule());
             modules.put(ActionModuleApi.class, new ActionModule());
             modules.put(OperationUndoModuleApi.class, new OperationUndoModule());
-            modules.put(OptionsModuleApi.class, new OptionsModule());
+            modules.put(OptionsModuleApi.class, new org.exbin.framework.options.OptionsModule());
             modules.put(PreferencesModuleApi.class, new PreferencesModule());
             modules.put(UiModuleApi.class, new UiModule());
+            modules.put(UiThemeModuleApi.class, new UiThemeModule());
+            modules.put(HelpModuleApi.class, new HelpModule());
+            modules.put(MenuModuleApi.class, new MenuModule());
+            modules.put(ToolBarModuleApi.class, new ToolBarModule());
             modules.put(ComponentModuleApi.class, new ComponentModule());
             modules.put(WindowModuleApi.class, new WindowModule());
             modules.put(FrameModuleApi.class, new FrameModule());
@@ -652,7 +657,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         private void init() {
             PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
             preferencesModule.setupAppPreferences(BinEdIntelliJPlugin.class);
-            Preferences preferences = preferencesModule.getAppPreferences();
+            OptionsStorage preferences = preferencesModule.getAppPreferences();
 
             App.getModule(LanguageCsCzModule.class).register();
             App.getModule(LanguageDeDeModule.class).register();
@@ -674,20 +679,19 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             BinedOperationBouncycastleModule binedOperationBouncycastleModule = App.getModule(BinedOperationBouncycastleModule.class);
             binedOperationBouncycastleModule.register();
 
-            initialIntegrationOptions = new IntegrationPreferences(preferences);
+            LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
+            ResourceBundle bundle = languageModule.getBundle(BinEdIntelliJPlugin.class);
+            languageModule.setAppBundle(bundle);
+
+            initialIntegrationOptions = new IntegrationOptions(preferences);
             applyIntegrationOptions(initialIntegrationOptions);
 
             UiModuleApi uiModule = App.getModule(UiModuleApi.class);
             uiModule.executePostInitActions();
             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-            frameModule.createMainMenu();
+            frameModule.init();
             ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
-            actionModule.registerMenuClipboardActions();
-            actionModule.registerToolBarClipboardActions();
-
-            LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
-            ResourceBundle bundle = languageModule.getBundle(BinEdIntelliJPlugin.class);
-            languageModule.setAppBundle(bundle);
+            MenuModuleApi menuModule = App.getModule(MenuModuleApi.class);
 
             WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
             windowModule.setHideHeaderPanels(true);
@@ -701,13 +705,14 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             HelpOnlineModule helpOnlineModule = App.getModule(HelpOnlineModule.class);
             try {
                 helpOnlineModule.setOnlineHelpUrl(new URL(bundle.getString("online_help_url")));
+                helpOnlineModule.registerOpeningHandler();
             } catch (MalformedURLException ex) {
                 Logger.getLogger(BinEdPluginStartupActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             BinEdIntelliJEditorProvider editorProvider = new BinEdIntelliJEditorProvider();
             EditorModuleApi editorModule = App.getModule(EditorModuleApi.class);
-            editorModule.registerEditor("binary", editorProvider);
+            editorModule.registerEditor(BINARY_PLUGIN_ID, editorProvider);
             BinedModule binedModule = App.getModule(BinedModule.class);
             binedModule.setEditorProvider(editorProvider);
             binedBookmarksModule.getBookmarksManager().setEditorProvider(editorProvider);
@@ -787,16 +792,24 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             BinedCompareModule binedCompareModule = App.getModule(BinedCompareModule.class);
             binedCompareModule.registerToolsOptionsMenuActions();
 
-            optionsModule.addOptionsPage(new DefaultOptionsPage<IntegrationOptionsImpl>() {
+            optionsModule.getOptionsPageManagement(BinedModule.MODULE_ID).registerPage(new DefaultOptionsPage<IntegrationOptions>() {
+
+                public static final String PAGE_ID = "integration";
 
                 private IntegrationOptionsPanel panel;
 
                 @Nonnull
                 @Override
-                public OptionsComponent<IntegrationOptionsImpl> createPanel() {
+                public String getId() {
+                    return PAGE_ID;
+                }
+
+                @Nonnull
+                @Override
+                public OptionsComponent<IntegrationOptions> createComponent() {
                     if (panel == null) {
                         panel = new IntegrationOptionsPanel();
-                        ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(MainOptionsManager.class);
+                        ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(LanguageOptionsPanel.class);
                         panel.setDefaultLocaleName("<" + resourceBundle.getString("locale.defaultLanguage") + ">");
                         List<LanguageRecord> languageLocales = new ArrayList<>();
                         languageLocales.add(new LanguageRecord(Locale.ROOT, null));
@@ -812,7 +825,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                         List<String> iconSets = new ArrayList<>();
                         iconSets.add("");
                         List<String> iconSetNames = new ArrayList<>();
-                        iconSetNames.add(resourceBundle.getString("iconset.defaultTheme"));
+                        ResourceBundle themeResourceBundle = App.getModule(LanguageModuleApi.class).getBundle(ThemeOptionsManager.class);
+                        iconSetNames.add(themeResourceBundle.getString("iconset.defaultTheme"));
                         List<IconSetProvider> providers = App.getModule(LanguageModuleApi.class).getIconSets();
                         for (IconSetProvider provider : providers) {
                             iconSets.add(provider.getId());
@@ -834,26 +848,27 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
                 @Nonnull
                 @Override
-                public IntegrationOptionsImpl createOptions() {
-                    return new IntegrationOptionsImpl();
+                public IntegrationOptions createOptions() {
+                    return new IntegrationOptions(preferences);
                 }
 
                 @Override
-                public void loadFromPreferences(Preferences preferences, IntegrationOptionsImpl options) {
-                    options.loadFromPreferences(new IntegrationPreferences(preferences));
+                public void loadFromPreferences(OptionsStorage optionsStorage, IntegrationOptions options) {
+                    new IntegrationOptions(optionsStorage).copyTo(options);
                 }
 
                 @Override
-                public void saveToPreferences(Preferences preferences, IntegrationOptionsImpl options) {
-                    options.saveToPreferences(new IntegrationPreferences(preferences));
+                public void saveToPreferences(OptionsStorage optionsStorage, IntegrationOptions options) {
+                    options.copyTo(new IntegrationOptions(optionsStorage));
                 }
 
                 @Override
-                public void applyPreferencesChanges(IntegrationOptionsImpl options) {
+                public void applyPreferencesChanges(IntegrationOptions options) {
                     applyIntegrationOptions(options);
                 }
             });
             binedModule.registerCodeAreaPopupMenu();
+            editorModule.registerOptionsPanels();
             binedModule.registerOptionsPanels();
             binedSearchModule.registerEditFindPopupMenuActions();
             binedOperationModule.registerBlockEditPopupMenuActions();
@@ -863,30 +878,30 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedInspectorModule.registerOptionsPanels();
 
             String toolsSubMenuId = BinEdIntelliJPlugin.PLUGIN_PREFIX + "toolsMenu";
-            MenuManagement menuManagement = actionModule.getMenuManagement(BinedModule.MODULE_ID);
-            menuManagement.registerMenu(toolsSubMenuId);
+            MenuManagement menuManagement = menuModule.getMenuManagement(BinedModule.CODE_AREA_POPUP_MENU_ID, BinedModule.MODULE_ID);
             Action toolsSubMenuAction = new AbstractAction(((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.text")) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                 }
             };
             // toolsSubMenuAction.putValue(Action.SHORT_DESCRIPTION, ((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.shortDescription"));
-            MenuContribution menuContribution = menuManagement.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, toolsSubMenuId, toolsSubMenuAction);
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.BOTTOM_LAST));
-            menuContribution = menuManagement.registerMenuItem(toolsSubMenuId, binedCompareModule.createCompareFilesAction());
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.TOP));
-            menuContribution = menuManagement.registerMenuItem(toolsSubMenuId, binedToolContentModule.createClipboardContentAction());
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.TOP));
-            menuContribution = menuManagement.registerMenuItem(toolsSubMenuId, binedToolContentModule.createDragDropContentAction());
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.TOP));
+            MenuContribution menuContribution = menuManagement.registerMenuItem(toolsSubMenuId, toolsSubMenuAction);
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.BOTTOM_LAST));
+            MenuManagement subMenu = menuManagement.getSubMenu(toolsSubMenuId);
+            menuContribution = subMenu.registerMenuItem(binedCompareModule.createCompareFilesAction());
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.TOP));
+            menuContribution = subMenu.registerMenuItem(binedToolContentModule.createClipboardContentAction());
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.TOP));
+            menuContribution = subMenu.registerMenuItem(binedToolContentModule.createDragDropContentAction());
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.TOP));
 
             String aboutMenuGroup = BinEdIntelliJPlugin.PLUGIN_PREFIX + "helpAboutMenuGroup";
-            menuContribution = menuManagement.registerMenuGroup(BinedModule.CODE_AREA_POPUP_MENU_ID, aboutMenuGroup);
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMode.BOTTOM_LAST));
-            menuManagement.registerMenuRule(menuContribution, new SeparationMenuContributionRule(SeparationMode.ABOVE));
-            menuContribution = menuManagement.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, helpOnlineModule.createOnlineHelpAction());
+            menuContribution = menuManagement.registerMenuGroup(aboutMenuGroup);
+            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.BOTTOM_LAST));
+            menuManagement.registerMenuRule(menuContribution, new SeparationMenuContributionRule(SeparationMenuContributionRule.SeparationMode.ABOVE));
+            menuContribution = menuManagement.registerMenuItem(helpOnlineModule.createOnlineHelpAction());
             menuManagement.registerMenuRule(menuContribution, new GroupMenuContributionRule(aboutMenuGroup));
-            menuContribution = menuManagement.registerMenuItem(BinedModule.CODE_AREA_POPUP_MENU_ID, aboutModule.createAboutAction());
+            menuContribution = menuManagement.registerMenuItem(aboutModule.createAboutAction());
             menuManagement.registerMenuRule(menuContribution, new GroupMenuContributionRule(aboutMenuGroup));
 
             ComponentActivationListener componentActivationListener =

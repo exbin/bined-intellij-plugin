@@ -21,8 +21,8 @@ import org.exbin.framework.bined.options.CodeAreaOptions;
 import org.exbin.framework.bined.options.CodeAreaThemeOptions;
 import org.exbin.framework.bined.options.EditorOptions;
 import org.exbin.framework.bined.options.StatusOptions;
-import org.exbin.framework.editor.text.options.TextEncodingOptions;
-import org.exbin.framework.editor.text.options.TextFontOptions;
+import org.exbin.framework.text.encoding.options.TextEncodingOptions;
+import org.exbin.framework.text.font.options.TextFontOptions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;

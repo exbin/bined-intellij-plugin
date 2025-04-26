@@ -32,7 +32,7 @@ import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.editor.api.EditorModuleApi;
 import org.exbin.framework.editor.api.MultiEditorProvider;
-import org.exbin.framework.editor.text.TextEncodingStatusApi;
+import org.exbin.framework.text.encoding.TextEncodingStatusApi;
 import org.exbin.framework.file.api.EditableFileHandler;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.file.api.FileModuleApi;
@@ -65,7 +65,6 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
     protected BinEdFileHandler activeFile = null;
     private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi textEncodingStatusApi;
-    private EditorModificationListener editorModificationListener;
 
     public BinEdIntelliJEditorProvider() {
         super();
@@ -88,9 +87,6 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
         SectCodeArea codeArea = fileHandler.getCodeArea();
         codeArea.addDataChangedListener(() -> {
             activeFile.getComponent().notifyDataChanged();
-            if (editorModificationListener != null) {
-                editorModificationListener.modified();
-            }
             updateCurrentDocumentSize();
         });
 
@@ -187,7 +183,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
         if (activeFile != null) {
             extCodeArea = activeFile.getCodeArea();
             undoHandler = activeFile.getUndoRedo().orElse(null);
-            clipboardActionsHandler = activeFile;
+            clipboardActionsHandler = activeFile.getClipboardActionsHandler();
             updateStatus();
         }
 
@@ -288,7 +284,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
             return;
         }
 
-        textEncodingStatusApi.setEncoding(activeFile.getCharset().name());
+        textEncodingStatusApi.setEncoding(activeFile.getTextEncodingHandler().getCharset().name());
     }
 
     @Override
@@ -329,11 +325,6 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
 
     @Override
     public void openFile(URI uri, FileType fileType) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setModificationListener(EditorModificationListener editorModificationListener) {
         throw new UnsupportedOperationException();
     }
 

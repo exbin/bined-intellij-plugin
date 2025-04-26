@@ -39,14 +39,14 @@ import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
-import org.exbin.framework.bined.preferences.StatusPreferences;
-import org.exbin.framework.editor.text.EncodingsHandler;
-import org.exbin.framework.editor.text.preferences.TextEncodingPreferences;
+import org.exbin.framework.bined.options.BinaryEditorOptions;
+import org.exbin.framework.bined.options.StatusOptions;
+import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.text.encoding.options.TextEncodingOptions;
 import org.exbin.framework.utils.ClipboardActionsHandler;
 import org.exbin.framework.utils.ClipboardActionsUpdateListener;
 import org.exbin.framework.utils.DesktopUtils;
@@ -99,7 +99,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
         fileManager.initComponentPanel(componentPanel);
 
         PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-        editorComponent.onInitFromPreferences(new BinaryEditorPreferences(preferencesModule.getAppPreferences()));
+        editorComponent.onInitFromPreferences(new BinaryEditorOptions(preferencesModule.getAppPreferences()));
 
         SectCodeArea codeArea = componentPanel.getCodeArea();
         codeArea.setEditMode(EditMode.READ_ONLY);
@@ -220,7 +220,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
         });
 
         EncodingsHandler encodingsHandler = binedModule.getEncodingsHandler();
-        encodingsHandler.loadFromPreferences(new TextEncodingPreferences(preferencesModule.getAppPreferences()));
+        encodingsHandler.loadFromPreferences(new TextEncodingOptions(preferencesModule.getAppPreferences()));
         statusPanel.setStatusControlHandler(new BinaryStatusPanel.StatusControlHandler() {
             @Override
             public void changeEditOperation(EditOperation editOperation) {
@@ -235,9 +235,16 @@ public class DebugViewPanel extends javax.swing.JPanel {
             }
 
             @Override
-            public void cycleEncodings() {
+            public void cycleNextEncoding() {
                 if (encodingsHandler != null) {
-                    encodingsHandler.cycleEncodings();
+                    encodingsHandler.cycleNextEncoding();
+                }
+            }
+
+            @Override
+            public void cyclePreviousEncoding() {
+                if (encodingsHandler != null) {
+                    encodingsHandler.cyclePreviousEncoding();
                 }
             }
 
@@ -253,7 +260,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
                 // Ignore
             }
         });
-        statusPanel.loadFromPreferences(new StatusPreferences(preferencesModule.getAppPreferences()));
+        statusPanel.loadFromPreferences(new StatusOptions(preferencesModule.getAppPreferences()));
         registerBinaryStatus(statusPanel);
 
         panel.add(toolbarPanel, BorderLayout.NORTH);

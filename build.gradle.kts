@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.exbin.deltahex.intellij"
-version = "0.2.11.1"
+version = "0.2.12.snapshot"
 val ideLocalPath = providers.gradleProperty("ideLocalPath").getOrElse("")
 
 repositories {
@@ -88,6 +88,8 @@ dependencies {
     implementation(exbinFrameworkLibrary("exbin-framework-basic"))
     implementation(exbinFrameworkLibrary("exbin-framework-frame"))
     implementation(exbinFrameworkLibrary("exbin-framework-ui"))
+    implementation(exbinFrameworkLibrary("exbin-framework-ui-theme"))
+    implementation(exbinFrameworkLibrary("exbin-framework-ui-theme-api"))
     implementation(exbinFrameworkLibrary("exbin-framework-component"))
 //    implementation(exbinFrameworkLibrary("exbin-framework-data"))
     implementation(exbinFrameworkLibrary("exbin-framework-window"))
@@ -98,7 +100,13 @@ dependencies {
     implementation(exbinFrameworkLibrary("exbin-framework-about"))
     implementation(exbinFrameworkLibrary("exbin-framework-operation"))
     implementation(exbinFrameworkLibrary("exbin-framework-operation-undo"))
-    implementation(exbinFrameworkLibrary("exbin-framework-action-popup"))
+    implementation(exbinFrameworkLibrary("exbin-framework-menu-api"))
+    implementation(exbinFrameworkLibrary("exbin-framework-menu"))
+    implementation(exbinFrameworkLibrary("exbin-framework-menu-popup"))
+    implementation(exbinFrameworkLibrary("exbin-framework-toolbar-api"))
+    implementation(exbinFrameworkLibrary("exbin-framework-toolbar"))
+    implementation(exbinFrameworkLibrary("exbin-framework-help-api"))
+    implementation(exbinFrameworkLibrary("exbin-framework-help"))
     implementation(exbinFrameworkLibrary("exbin-framework-help-online"))
     implementation(exbinFrameworkLibrary("exbin-framework-options"))
     implementation(exbinFrameworkLibrary("exbin-framework-options-api"))
@@ -106,7 +114,8 @@ dependencies {
     implementation(exbinFrameworkLibrary("exbin-framework-preferences"))
     implementation(exbinFrameworkLibrary("exbin-framework-language-api"))
     implementation(exbinFrameworkLibrary("exbin-framework-language"))
-    implementation(exbinFrameworkLibrary("exbin-framework-editor-text"))
+    implementation(exbinFrameworkLibrary("exbin-framework-text-encoding"))
+    implementation(exbinFrameworkLibrary("exbin-framework-text-font"))
     implementation(binedAppLibrary("exbin-framework-bined"))
     implementation(binedAppLibrary("exbin-framework-bined-bookmarks"))
     implementation(binedAppLibrary("exbin-framework-bined-compare"))

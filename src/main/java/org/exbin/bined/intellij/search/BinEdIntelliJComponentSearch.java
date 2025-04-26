@@ -20,7 +20,7 @@ import org.exbin.framework.App;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.preferences.BinaryEditorPreferences;
+import org.exbin.framework.bined.options.BinaryEditorOptions;
 import org.exbin.framework.bined.search.BinEdComponentSearch;
 import org.exbin.framework.bined.search.SearchCondition;
 import org.exbin.framework.bined.search.SearchParameters;
@@ -71,7 +71,7 @@ public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
     }
 
     @Override
-    public void onInitFromPreferences(BinaryEditorPreferences preferences) {
+    public void onInitFromPreferences(BinaryEditorOptions options) {
     }
 
     @Override
