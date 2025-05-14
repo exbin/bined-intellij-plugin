@@ -28,7 +28,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.components.JBPanel;
-import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.binary_data.array.ByteArrayEditableData;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.RowWrappingMode;
 import org.exbin.bined.ScrollBarVisibility;

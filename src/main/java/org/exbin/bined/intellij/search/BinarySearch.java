@@ -15,7 +15,7 @@
  */
 package org.exbin.bined.intellij.search;
 
-import org.exbin.auxiliary.binary_data.ByteArrayEditableData;
+import org.exbin.auxiliary.binary_data.array.ByteArrayEditableData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.intellij.search.gui.BinarySearchIntelliJPanel;
 import org.exbin.framework.App;

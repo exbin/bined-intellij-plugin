@@ -45,7 +45,7 @@ import com.sun.jdi.ShortValue;
 import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 import org.exbin.auxiliary.binary_data.BinaryData;
-import org.exbin.auxiliary.binary_data.ByteArrayData;
+import org.exbin.auxiliary.binary_data.array.ByteArrayData;
 import org.exbin.framework.bined.objectdata.PageProviderBinaryData;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.debug.DefaultDebugViewDataProvider;
