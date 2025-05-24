@@ -57,12 +57,11 @@ import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.options.BinaryEditorOptions;
-import org.exbin.framework.bined.options.CodeAreaColorOptions;
-import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
-import org.exbin.framework.bined.options.CodeAreaOptions;
-import org.exbin.framework.bined.options.CodeAreaThemeOptions;
-import org.exbin.framework.bined.options.EditorOptions;
+import org.exbin.framework.bined.theme.options.CodeAreaColorOptions;
+import org.exbin.framework.bined.theme.options.CodeAreaLayoutOptions;
+import org.exbin.framework.bined.viewer.options.CodeAreaOptions;
+import org.exbin.framework.bined.theme.options.CodeAreaThemeOptions;
+import org.exbin.framework.bined.editor.options.BinaryEditorOptions;
 import org.exbin.framework.bined.options.StatusOptions;
 import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.text.encoding.TextEncodingStatusApi;
@@ -103,7 +102,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class BinedDiffPanel extends JBPanel {
 
-    private final BinaryEditorOptions preferences;
+    private final IntelliJPreferencesWrapper preferences;
     private final SectCodeAreaDiffPanel diffPanel = new SectCodeAreaDiffPanel();
 
     private final Font defaultFont;
@@ -121,8 +120,7 @@ public class BinedDiffPanel extends JBPanel {
     public BinedDiffPanel() {
         setLayout(new java.awt.BorderLayout());
 
-        preferences = new BinaryEditorOptions(new IntelliJPreferencesWrapper(getPreferences(),
-                BinEdIntelliJPlugin.PLUGIN_PREFIX));
+        preferences = new IntelliJPreferencesWrapper(getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX);
         defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
         SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
         SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
@@ -200,7 +198,7 @@ public class BinedDiffPanel extends JBPanel {
                 diffPanel.getLeftCodeArea().setCharset(Charset.forName(encodingName));
                 diffPanel.getRightCodeArea().setCharset(Charset.forName(encodingName));
                 encodingStatus.setEncoding(encodingName);
-                preferences.getEncodingOptions().setSelectedEncoding(encodingName);
+                new TextEncodingOptions(preferences).setSelectedEncoding(encodingName);
             }
         });
         goToPositionAction.setup(App.getModule(LanguageModuleApi.class).getBundle(BinedModule.class));
@@ -503,55 +501,55 @@ public class BinedDiffPanel extends JBPanel {
             @Nonnull
             @Override
             public CodeAreaOptions getCodeAreaOptions() {
-                return preferences.getCodeAreaOptions();
+                return new CodeAreaOptions(preferences);
             }
 
             @Nonnull
             @Override
             public TextEncodingOptions getEncodingOptions() {
-                return preferences.getEncodingOptions();
+                return new TextEncodingOptions(preferences);
             }
 
             @Nonnull
             @Override
             public TextFontOptions getFontOptions() {
-                return preferences.getFontOptions();
+                return new TextFontOptions(preferences);
             }
 
             @Nonnull
             @Override
-            public EditorOptions getEditorOptions() {
-                return preferences.getEditorOptions();
+            public BinaryEditorOptions getEditorOptions() {
+                return new BinaryEditorOptions(preferences);
             }
 
             @Nonnull
             @Override
             public StatusOptions getStatusOptions() {
-                return preferences.getStatusOptions();
+                return new StatusOptions(preferences);
             }
 
             @Nonnull
             @Override
             public CodeAreaLayoutOptions getLayoutOptions() {
-                return preferences.getLayoutOptions();
+                return new CodeAreaLayoutOptions(preferences);
             }
 
             @Nonnull
             @Override
             public CodeAreaColorOptions getColorOptions() {
-                return preferences.getColorOptions();
+                return new CodeAreaColorOptions(preferences);
             }
 
             @Nonnull
             @Override
             public CodeAreaThemeOptions getThemeOptions() {
-                return preferences.getThemeOptions();
+                return new CodeAreaThemeOptions(preferences);
             }
         });
 
-        encodingsHandler.loadFromPreferences(preferences.getEncodingOptions());
-        statusPanel.loadFromPreferences(preferences.getStatusOptions());
-        toolbarPanel.loadFromPreferences(new BinaryEditorOptions(preferences.getPreferences()));
+        encodingsHandler.loadFromOptions(new TextEncodingOptions(preferences));
+        statusPanel.loadFromOptions(new StatusOptions(preferences));
+        toolbarPanel.loadFromOptions(preferences);
 
         updateCurrentMemoryMode();
     }
@@ -588,7 +586,7 @@ public class BinedDiffPanel extends JBPanel {
                 defaultFont :
                 applyOptions.getFontOptions().getFont(defaultFont));
 
-        EditorOptions editorOptions = applyOptions.getEditorOptions();
+        BinaryEditorOptions editorOptions = applyOptions.getEditorOptions();
         //        switchShowValuesPanel(editorOptions.isShowValuesPanel());
         if (codeArea.getCommandHandler() instanceof CodeAreaOperationCommandHandler) {
             ((CodeAreaOperationCommandHandler) codeArea.getCommandHandler()).setEnterKeyHandlingMode(editorOptions.getEnterKeyHandlingMode());

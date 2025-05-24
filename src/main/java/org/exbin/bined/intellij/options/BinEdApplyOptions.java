@@ -15,11 +15,11 @@
  */
 package org.exbin.bined.intellij.options;
 
-import org.exbin.framework.bined.options.CodeAreaColorOptions;
-import org.exbin.framework.bined.options.CodeAreaLayoutOptions;
-import org.exbin.framework.bined.options.CodeAreaOptions;
-import org.exbin.framework.bined.options.CodeAreaThemeOptions;
-import org.exbin.framework.bined.options.EditorOptions;
+import org.exbin.framework.bined.theme.options.CodeAreaColorOptions;
+import org.exbin.framework.bined.theme.options.CodeAreaLayoutOptions;
+import org.exbin.framework.bined.viewer.options.CodeAreaOptions;
+import org.exbin.framework.bined.theme.options.CodeAreaThemeOptions;
+import org.exbin.framework.bined.editor.options.BinaryEditorOptions;
 import org.exbin.framework.bined.options.StatusOptions;
 import org.exbin.framework.text.encoding.options.TextEncodingOptions;
 import org.exbin.framework.text.font.options.TextFontOptions;
@@ -45,7 +45,7 @@ public interface BinEdApplyOptions {
     TextFontOptions getFontOptions();
 
     @Nonnull
-    EditorOptions getEditorOptions();
+    BinaryEditorOptions getEditorOptions();
 
     @Nonnull
     StatusOptions getStatusOptions();

@@ -43,8 +43,9 @@ import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.options.BinaryEditorOptions;
+import org.exbin.framework.bined.theme.options.BinaryThemeOptions;
 import org.exbin.framework.bined.options.StatusOptions;
+import org.exbin.framework.bined.viewer.BinedViewerModule;
 import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
@@ -107,12 +108,12 @@ public final class DataDialog extends DialogWrapper {
         panel = new JPanel(new BorderLayout());
         editorComponent = new BinEdEditorComponent();
         BinedModule binedModule = App.getModule(BinedModule.class);
+        BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
         BinEdComponentPanel componentPanel = editorComponent.getComponentPanel();
         fileManager.initComponentPanel(componentPanel);
 
         PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-        editorComponent.onInitFromPreferences(new BinaryEditorOptions(preferencesModule.getAppPreferences()));
 
         SectCodeArea codeArea = editorComponent.getCodeArea();
         toolbarPanel.setTargetComponent(componentPanel);
@@ -227,8 +228,8 @@ public final class DataDialog extends DialogWrapper {
             }
         });
 
-        EncodingsHandler encodingsHandler = binedModule.getEncodingsHandler();
-        encodingsHandler.loadFromPreferences(new TextEncodingOptions(preferencesModule.getAppPreferences()));
+        EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
+        encodingsHandler.loadFromOptions(new TextEncodingOptions(preferencesModule.getAppPreferences()));
         statusPanel.setStatusControlHandler(new BinaryStatusPanel.StatusControlHandler() {
             @Override
             public void changeEditOperation(EditOperation editOperation) {
@@ -268,7 +269,7 @@ public final class DataDialog extends DialogWrapper {
                 // Ignore
             }
         });
-        statusPanel.loadFromPreferences(new StatusOptions(preferencesModule.getAppPreferences()));
+        statusPanel.loadFromOptions(new StatusOptions(preferencesModule.getAppPreferences()));
         registerBinaryStatus(statusPanel);
 
         panel.add(toolbarPanel, BorderLayout.NORTH);

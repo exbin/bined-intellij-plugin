@@ -21,8 +21,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
-import com.intellij.ui.Graphics2DDelegate;
 import com.intellij.util.LocalTimeCounter;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.array.paged.ByteArrayPagedData;
@@ -32,21 +30,16 @@ import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
-import org.exbin.framework.bined.BinEdEditorComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileHandlingMode;
-import org.exbin.framework.bined.gui.BinEdComponentPanel;
-import org.exbin.framework.bined.options.BinaryEditorOptions;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.io.IOException;
 
 /**
@@ -75,8 +68,8 @@ public class BinEdNativeFile {
         fileHandler.setUndoHandler(undoHandler);
 
         PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-        BinaryEditorOptions binaryEditorOptions = new BinaryEditorOptions(preferencesModule.getAppPreferences());
-        fileHandler.onInitFromPreferences(binaryEditorOptions);
+        // TODO BinaryEditorOptions binaryEditorOptions = new BinaryEditorOptions(preferencesModule.getAppPreferences());
+        // fileHandler.onInitFromOptions(binaryEditorOptions);
 
         SectCodeArea codeArea = filePanel.getCodeArea();
 
@@ -90,7 +83,7 @@ public class BinEdNativeFile {
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
         toolbarPanel.setUndoHandler(fileHandler.getCodeAreaUndoHandler().get());
 
-        toolbarPanel.loadFromPreferences(binaryEditorOptions);
+        toolbarPanel.loadFromOptions(preferencesModule.getAppPreferences());
     }
 
     public void registerUndoRedo(BinaryUndoIntelliJHandler undoIntelliJHandler) {

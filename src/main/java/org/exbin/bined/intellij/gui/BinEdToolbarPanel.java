@@ -25,7 +25,6 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.Toggleable;
-import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
@@ -33,8 +32,9 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
 import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
 import org.exbin.framework.App;
-import org.exbin.framework.bined.options.BinaryEditorOptions;
+import org.exbin.framework.bined.viewer.options.CodeAreaOptions;
 import org.exbin.framework.language.api.LanguageModuleApi;
+import org.exbin.framework.preferences.api.OptionsStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -266,8 +266,8 @@ public class BinEdToolbarPanel extends JBPanel {
         updateActionsState();
     }
 
-    public void loadFromPreferences(BinaryEditorOptions options) {
-        codeAreaControl.setCodeType(options.getCodeAreaOptions().getCodeType());
+    public void loadFromOptions(OptionsStorage options) {
+        codeAreaControl.setCodeType(new CodeAreaOptions(options).getCodeType());
         updateCycleButtonState();
         updateActionsState();
     }

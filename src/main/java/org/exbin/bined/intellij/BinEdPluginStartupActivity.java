@@ -78,6 +78,7 @@ import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
 import org.exbin.framework.bined.compare.BinedCompareModule;
+import org.exbin.framework.bined.editor.BinedEditorModule;
 import org.exbin.framework.bined.inspector.BinEdComponentInspector;
 import org.exbin.framework.bined.inspector.BinedInspectorModule;
 import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
@@ -86,7 +87,9 @@ import org.exbin.framework.bined.objectdata.BinedObjectDataModule;
 import org.exbin.framework.bined.operation.BinedOperationModule;
 import org.exbin.framework.bined.operation.bouncycastle.BinedOperationBouncycastleModule;
 import org.exbin.framework.bined.search.BinedSearchModule;
+import org.exbin.framework.bined.theme.BinedThemeModule;
 import org.exbin.framework.bined.tool.content.BinedToolContentModule;
+import org.exbin.framework.bined.viewer.BinedViewerModule;
 import org.exbin.framework.component.ComponentModule;
 import org.exbin.framework.component.api.ComponentModuleApi;
 import org.exbin.framework.editor.EditorModule;
@@ -626,6 +629,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(EditorModuleApi.class, new EditorModule());
             modules.put(HelpOnlineModule.class, new HelpOnlineModule());
             modules.put(BinedModule.class, new BinedModule());
+            modules.put(BinedViewerModule.class, new BinedViewerModule());
+            modules.put(BinedEditorModule.class, new BinedEditorModule());
+            modules.put(BinedThemeModule.class, new BinedThemeModule());
             modules.put(BinedSearchModule.class, new BinedSearchModule());
             modules.put(BinedOperationModule.class, new BinedOperationModule());
             modules.put(BinedOperationBouncycastleModule.class, new BinedOperationBouncycastleModule());
@@ -714,6 +720,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             EditorModuleApi editorModule = App.getModule(EditorModuleApi.class);
             editorModule.registerEditor(BINARY_PLUGIN_ID, editorProvider);
             BinedModule binedModule = App.getModule(BinedModule.class);
+            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
+            BinedEditorModule binedEditorModule = App.getModule(BinedEditorModule.class);
+            BinedThemeModule binedThemeModule = App.getModule(BinedThemeModule.class);
             binedModule.setEditorProvider(editorProvider);
             binedBookmarksModule.getBookmarksManager().setEditorProvider(editorProvider);
             binedMacroModule.setEditorProvider(editorProvider);
@@ -786,8 +795,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     return new JBScrollPane();
                 }
             });
-            binedInspectorModule.registerViewValuesPanelMenuActions();
-            binedInspectorModule.registerViewValuesPanelPopupMenuActions();
+            binedInspectorModule.registerShowParsingPanelMenuActions();
+            binedInspectorModule.registerShowParsingPanelPopupMenuActions();
 
             BinedCompareModule binedCompareModule = App.getModule(BinedCompareModule.class);
             binedCompareModule.registerToolsOptionsMenuActions();
@@ -868,13 +877,19 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 }
             });
             binedModule.registerCodeAreaPopupMenu();
+            binedViewerModule.registerCodeAreaPopupMenu();
+            binedEditorModule.registerCodeAreaPopupMenu();
             editorModule.registerOptionsPanels();
-            binedModule.registerOptionsPanels();
+            binedViewerModule.registerOptionsPanels();
+            binedViewerModule.registerViewModeMenu();
+            binedViewerModule.registerCodeTypeMenu();
+            binedViewerModule.registerPositionCodeTypeMenu();
+            binedViewerModule.registerHexCharactersCaseHandlerMenu();
+            binedViewerModule.registerLayoutMenu();
             binedSearchModule.registerEditFindPopupMenuActions();
             binedOperationModule.registerBlockEditPopupMenuActions();
             binedToolContentModule.registerClipboardContentMenu();
             binedToolContentModule.registerDragDropContentMenu();
-            binedInspectorModule.registerViewValuesPanelMenuActions();
             binedInspectorModule.registerOptionsPanels();
 
             String toolsSubMenuId = BinEdIntelliJPlugin.PLUGIN_PREFIX + "toolsMenu";
