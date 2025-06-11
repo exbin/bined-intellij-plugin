@@ -35,7 +35,7 @@ import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ComponentActivationListener;
-import org.exbin.framework.bined.BinEdEditorComponent;
+import org.exbin.framework.bined.BinEdDocumentView;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
@@ -85,7 +85,7 @@ public final class DataDialog extends DialogWrapper {
     private BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
     private BinaryStatusPanel statusPanel = new BinaryStatusPanel();
     private BinaryStatusApi binaryStatus;
-    private final BinEdEditorComponent editorComponent;
+    private final BinEdDocumentView editorComponent;
     private final SetDataListener setDataListener;
     private long documentOriginalSize = 0;
     private final boolean editable;
@@ -106,11 +106,11 @@ public final class DataDialog extends DialogWrapper {
         setCrossClosesWindow(true);
 
         panel = new JPanel(new BorderLayout());
-        editorComponent = new BinEdEditorComponent();
+        editorComponent = new BinEdDocumentView();
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
-        BinEdComponentPanel componentPanel = editorComponent.getComponentPanel();
+        BinEdComponentPanel componentPanel = (BinEdComponentPanel) editorComponent.getComponent();
         fileManager.initComponentPanel(componentPanel);
 
         PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
@@ -274,7 +274,7 @@ public final class DataDialog extends DialogWrapper {
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
         panel.add(statusPanel, BorderLayout.SOUTH);
-        panel.add(editorComponent.getComponentPanel(), BorderLayout.CENTER);
+        panel.add(editorComponent.getComponent(), BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
 

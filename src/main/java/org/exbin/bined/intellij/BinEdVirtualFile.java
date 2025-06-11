@@ -25,7 +25,7 @@ import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
-import org.exbin.framework.bined.BinEdEditorComponent;
+import org.exbin.framework.bined.BinEdDocumentView;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
@@ -107,8 +107,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return new BinEdFileHandler() {
             @Nonnull
             @Override
-            protected BinEdEditorComponent createEditorComponent() {
-                return new BinEdEditorComponent() {
+            protected BinEdDocumentView createEditorComponent() {
+                return new BinEdDocumentView() {
                     @Nonnull
                     @Override
                     protected BinEdComponentPanel createComponentPanel() {
