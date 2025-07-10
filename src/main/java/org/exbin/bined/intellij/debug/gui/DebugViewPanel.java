@@ -47,8 +47,9 @@ import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
 import org.exbin.framework.text.encoding.options.TextEncodingOptions;
-import org.exbin.framework.utils.ClipboardActionsHandler;
-import org.exbin.framework.utils.ClipboardActionsUpdateListener;
+import org.exbin.framework.action.api.clipboard.ClipboardSupported;
+import org.exbin.framework.action.api.clipboard.ClipboardStateListener;
+import org.exbin.framework.action.api.clipboard.TextClipboardSupported;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -152,7 +153,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
                         frameModule.getFrameHandler().getComponentActivationListener();
 
                 componentActivationListener.updated(CodeAreaCore.class, codeArea);
-                componentActivationListener.updated(ClipboardActionsHandler.class, new ClipboardActionsHandler() {
+                componentActivationListener.updated(ClipboardSupported.class, new TextClipboardSupported() {
                     public void performCut() {
                         codeArea.cut();
                     }
@@ -173,8 +174,12 @@ public class DebugViewPanel extends javax.swing.JPanel {
                         codeArea.selectAll();
                     }
 
-                    public boolean isSelection() {
+                    public boolean hasSelection() {
                         return codeArea.hasSelection();
+                    }
+
+                    public boolean hasDataToCopy() {
+                        return hasSelection();
                     }
 
                     public boolean isEditable() {
@@ -194,7 +199,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
                     }
 
                     @Override
-                    public void setUpdateListener(ClipboardActionsUpdateListener clipboardActionsUpdateListener) {
+                    public void setUpdateListener(ClipboardStateListener clipboardStateListener) {
 
                     }
                 });
@@ -222,45 +227,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
         EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
         encodingsHandler.loadFromOptions(new TextEncodingOptions(preferencesModule.getAppPreferences()));
-        statusPanel.setStatusControlHandler(new BinaryStatusPanel.StatusControlHandler() {
-            @Override
-            public void changeEditOperation(EditOperation editOperation) {
-                codeArea.setEditOperation(editOperation);
-            }
-
-            @Override
-            public void changeCursorPosition() {
-                GoToPositionAction action = new GoToPositionAction();
-                action.setCodeArea(codeArea);
-                action.actionPerformed(null);
-            }
-
-            @Override
-            public void cycleNextEncoding() {
-                if (encodingsHandler != null) {
-                    encodingsHandler.cycleNextEncoding();
-                }
-            }
-
-            @Override
-            public void cyclePreviousEncoding() {
-                if (encodingsHandler != null) {
-                    encodingsHandler.cyclePreviousEncoding();
-                }
-            }
-
-            @Override
-            public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
-                if (encodingsHandler != null) {
-                    encodingsHandler.popupEncodingsMenu(mouseEvent);
-                }
-            }
-
-            @Override
-            public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
-                // Ignore
-            }
-        });
+        statusPanel.setController(new BinaryStatusController());
         statusPanel.loadFromOptions(new StatusOptions(preferencesModule.getAppPreferences()));
         registerBinaryStatus(statusPanel);
 
@@ -403,5 +370,54 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
         SectCodeArea codeArea = editorComponent.getCodeArea();
         binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
+    }
+
+    @ParametersAreNonnullByDefault
+    private class BinaryStatusController implements BinaryStatusPanel.Controller, BinaryStatusPanel.EncodingsController, BinaryStatusPanel.MemoryModeController {
+        @Override
+        public void changeEditOperation(EditOperation editOperation) {
+            SectCodeArea codeArea = editorComponent.getCodeArea();
+            codeArea.setEditOperation(editOperation);
+        }
+
+        @Override
+        public void changeCursorPosition() {
+            SectCodeArea codeArea = editorComponent.getCodeArea();
+            GoToPositionAction action = new GoToPositionAction();
+            action.setCodeArea(codeArea);
+            action.actionPerformed(null);
+        }
+
+        @Override
+        public void cycleNextEncoding() {
+            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
+            EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
+            if (encodingsHandler != null) {
+                encodingsHandler.cycleNextEncoding();
+            }
+        }
+
+        @Override
+        public void cyclePreviousEncoding() {
+            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
+            EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
+            if (encodingsHandler != null) {
+                encodingsHandler.cyclePreviousEncoding();
+            }
+        }
+
+        @Override
+        public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
+            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
+            EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
+            if (encodingsHandler != null) {
+                encodingsHandler.popupEncodingsMenu(mouseEvent);
+            }
+        }
+
+        @Override
+        public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
+            // Ignore
+        }
     }
 }

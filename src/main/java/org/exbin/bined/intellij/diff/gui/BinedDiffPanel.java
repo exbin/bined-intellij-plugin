@@ -70,8 +70,9 @@ import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.text.encoding.options.TextEncodingOptions;
 import org.exbin.framework.text.font.options.TextFontOptions;
-import org.exbin.framework.utils.ClipboardActionsHandler;
-import org.exbin.framework.utils.ClipboardActionsUpdateListener;
+import org.exbin.framework.action.api.clipboard.ClipboardSupported;
+import org.exbin.framework.action.api.clipboard.ClipboardStateListener;
+import org.exbin.framework.action.api.clipboard.TextClipboardSupported;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -232,7 +233,7 @@ public class BinedDiffPanel extends JBPanel {
                             frameModule.getFrameHandler().getComponentActivationListener();
 
                     componentActivationListener.updated(CodeAreaCore.class, leftCodeArea);
-                    componentActivationListener.updated(ClipboardActionsHandler.class, new ClipboardActionsHandler() {
+                    componentActivationListener.updated(ClipboardSupported.class, new TextClipboardSupported() {
                         public void performCut() {
                             leftCodeArea.cut();
                         }
@@ -253,8 +254,12 @@ public class BinedDiffPanel extends JBPanel {
                             leftCodeArea.selectAll();
                         }
 
-                        public boolean isSelection() {
+                        public boolean hasSelection() {
                             return leftCodeArea.hasSelection();
+                        }
+
+                        public boolean hasDataToCopy() {
+                            return hasSelection();
                         }
 
                         public boolean isEditable() {
@@ -274,7 +279,7 @@ public class BinedDiffPanel extends JBPanel {
                         }
 
                         @Override
-                        public void setUpdateListener(ClipboardActionsUpdateListener clipboardActionsUpdateListener) {
+                        public void setUpdateListener(ClipboardStateListener clipboardStateListener) {
 
                         }
                     });
@@ -316,7 +321,7 @@ public class BinedDiffPanel extends JBPanel {
                             frameModule.getFrameHandler().getComponentActivationListener();
 
                     componentActivationListener.updated(CodeAreaCore.class, rightCodeArea);
-                    componentActivationListener.updated(ClipboardActionsHandler.class, new ClipboardActionsHandler() {
+                    componentActivationListener.updated(ClipboardSupported.class, new TextClipboardSupported() {
                         public void performCut() {
                             rightCodeArea.cut();
                         }
@@ -337,8 +342,12 @@ public class BinedDiffPanel extends JBPanel {
                             rightCodeArea.selectAll();
                         }
 
-                        public boolean isSelection() {
+                        public boolean hasSelection() {
                             return rightCodeArea.hasSelection();
+                        }
+
+                        public boolean hasDataToCopy() {
+                            return hasSelection();
                         }
 
                         public boolean isEditable() {
@@ -358,7 +367,7 @@ public class BinedDiffPanel extends JBPanel {
                         }
 
                         @Override
-                        public void setUpdateListener(ClipboardActionsUpdateListener clipboardActionsUpdateListener) {
+                        public void setUpdateListener(ClipboardStateListener clipboardStateListener) {
 
                         }
                     });
@@ -447,44 +456,7 @@ public class BinedDiffPanel extends JBPanel {
 
         updateBinaryStatus(leftCodeArea);
 
-        ((BinaryStatusPanel) binaryStatus).setStatusControlHandler(new BinaryStatusPanel.StatusControlHandler() {
-            @Override
-            public void changeEditOperation(EditOperation editOperation) {
-                leftCodeArea.setEditOperation(editOperation);
-                rightCodeArea.setEditOperation(editOperation);
-            }
-
-            @Override
-            public void changeCursorPosition() {
-                goToPositionAction.actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, ""));
-            }
-
-            @Override
-            public void cycleNextEncoding() {
-                if (encodingsHandler != null) {
-                    encodingsHandler.cycleNextEncoding();
-                }
-            }
-
-            @Override
-            public void cyclePreviousEncoding() {
-                if (encodingsHandler != null) {
-                    encodingsHandler.cyclePreviousEncoding();
-                }
-            }
-
-            @Override
-            public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
-                if (encodingsHandler != null) {
-                    encodingsHandler.popupEncodingsMenu(mouseEvent);
-                }
-            }
-
-            @Override
-            public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
-                // Ignore
-            }
-        });
+        ((BinaryStatusPanel) binaryStatus).setController(new BinaryStatusController());
     }
 
     private void updateBinaryStatus(SectCodeArea codeArea) {
@@ -639,5 +611,47 @@ public class BinedDiffPanel extends JBPanel {
 
     private Icon load(String path) {
         return IconLoader.getIcon(path, getClass());
+    }
+
+    @ParametersAreNonnullByDefault
+    private class BinaryStatusController implements BinaryStatusPanel.Controller, BinaryStatusPanel.EncodingsController, BinaryStatusPanel.MemoryModeController {
+        @Override
+        public void changeEditOperation(EditOperation editOperation) {
+            SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
+            SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
+            leftCodeArea.setEditOperation(editOperation);
+            rightCodeArea.setEditOperation(editOperation);
+        }
+
+        @Override
+        public void changeCursorPosition() {
+            goToPositionAction.actionPerformed(new ActionEvent(BinedDiffPanel.this, 0, ""));
+        }
+
+        @Override
+        public void cycleNextEncoding() {
+            if (encodingsHandler != null) {
+                encodingsHandler.cycleNextEncoding();
+            }
+        }
+
+        @Override
+        public void cyclePreviousEncoding() {
+            if (encodingsHandler != null) {
+                encodingsHandler.cyclePreviousEncoding();
+            }
+        }
+
+        @Override
+        public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
+            if (encodingsHandler != null) {
+                encodingsHandler.popupEncodingsMenu(mouseEvent);
+            }
+        }
+
+        @Override
+        public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
+            // Ignore
+        }
     }
 }
