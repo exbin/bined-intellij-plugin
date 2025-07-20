@@ -35,6 +35,7 @@ import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdDocumentView;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryStatusApi;
@@ -51,9 +52,10 @@ import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
 import org.exbin.framework.text.encoding.options.TextEncodingOptions;
-import org.exbin.framework.action.api.clipboard.ClipboardSupported;
+import org.exbin.framework.action.api.ActiveComponent;
+import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.action.api.clipboard.ClipboardStateListener;
-import org.exbin.framework.action.api.clipboard.TextClipboardSupported;
+import org.exbin.framework.action.api.clipboard.TextClipboardController;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -160,8 +162,8 @@ public final class DataDialog extends DialogWrapper {
                 ComponentActivationListener componentActivationListener =
                         frameModule.getFrameHandler().getComponentActivationListener();
 
-                componentActivationListener.updated(CodeAreaCore.class, codeArea);
-                componentActivationListener.updated(ClipboardSupported.class, new TextClipboardSupported() {
+                componentActivationListener.updated(ActiveComponent.class, new BinEdDataComponent(codeArea));
+                componentActivationListener.updated(ClipboardController.class, new TextClipboardController() {
                     public void performCut() {
                         codeArea.cut();
                     }

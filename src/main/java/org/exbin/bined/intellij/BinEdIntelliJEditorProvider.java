@@ -26,6 +26,7 @@ import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdEditorProvider;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinaryStatusApi;
@@ -40,8 +41,9 @@ import org.exbin.framework.file.api.FileOperations;
 import org.exbin.framework.file.api.FileType;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.operation.undo.api.UndoRedoState;
-import org.exbin.framework.action.api.clipboard.ClipboardSupported;
-import org.exbin.framework.action.api.clipboard.TextClipboardSupported;
+import org.exbin.framework.action.api.ActiveComponent;
+import org.exbin.framework.action.api.clipboard.ClipboardController;
+import org.exbin.framework.action.api.clipboard.TextClipboardController;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -179,20 +181,22 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
                 frameModule.getFrameHandler().getComponentActivationListener();
 
         SectCodeArea extCodeArea = null;
-        TextClipboardSupported clipboardSupported = null;
+        BinEdDataComponent binEdDataComponent = null;
+        TextClipboardController clipboardController = null;
         UndoRedoState undoHandler = null;
         if (activeFile != null) {
             extCodeArea = activeFile.getCodeArea();
+            binEdDataComponent = new BinEdDataComponent(extCodeArea);
             undoHandler = activeFile.getUndoRedo().orElse(null);
-            clipboardSupported = activeFile.getClipboardActionsController();
+            clipboardController = activeFile.getClipboardActionsController();
             updateStatus();
         }
 
         componentActivationListener.updated(FileHandler.class, activeFile);
         componentActivationListener.updated(FileOperations.class, this);
-        componentActivationListener.updated(CodeAreaCore.class, extCodeArea);
+        componentActivationListener.updated(ActiveComponent.class, binEdDataComponent);
         componentActivationListener.updated(UndoRedoState.class, undoHandler);
-        componentActivationListener.updated(ClipboardSupported.class, clipboardSupported);
+        componentActivationListener.updated(ClipboardController.class, clipboardController);
 
         /* if (this.undoHandler != null) {
             this.undoHandler.setActiveFile(this.activeFile);
@@ -285,7 +289,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
             return;
         }
 
-        textEncodingStatusApi.setEncoding(activeFile.getTextEncodingHandler().getCharset().name());
+        textEncodingStatusApi.setEncoding(activeFile.getBinaryDataComponent().getCharset().name());
     }
 
     @Override
