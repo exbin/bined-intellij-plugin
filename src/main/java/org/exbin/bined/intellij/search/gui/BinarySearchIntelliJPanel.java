@@ -23,9 +23,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.ex.DefaultCustomComponentAction;
-import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.auxiliary.binary_data.array.ByteArrayEditableData;
@@ -58,7 +56,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.ComboBoxEditor;
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -82,11 +79,11 @@ import java.util.Objects;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinarySearchIntelliJPanel extends JBPanel {
+public class BinarySearchIntelliJPanel extends JPanel {
 
     private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(BinarySearchPanel.class);
 
-    private Control control = null;
+    private Controller controller = null;
 
     private final SectCodeArea searchCodeArea = new SectCodeArea();
 
@@ -132,7 +129,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
                 () -> new JButton(new AbstractAction(resourceBundle.getString("optionsButton.text")) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        control.searchOptions();
+                        controller.searchOptions();
                     }
                 })
         ) {
@@ -150,7 +147,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                control.prevMatch();
+                controller.prevMatch();
             }
 
             @Nonnull
@@ -168,7 +165,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         ) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                control.nextMatch();
+                controller.nextMatch();
             }
 
             @Nonnull
@@ -182,7 +179,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         replaceButton = new JButton(new AbstractAction(resourceBundle.getString("replaceButton.text")) {
             @Override
             public void actionPerformed(ActionEvent e) {
-                control.performReplace();
+                controller.performReplace();
             }
         });
         replaceAction = new DefaultCustomComponentAction(
@@ -198,7 +195,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         replaceAllButton = new JButton(new AbstractAction(resourceBundle.getString("replaceAllButton.text")) {
             @Override
             public void actionPerformed(ActionEvent e) {
-                control.performReplaceAll();
+                controller.performReplaceAll();
             }
         });
         // TODO
@@ -232,7 +229,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
             @Override
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean selected) {
                 matchCase = selected;
-                control.notifySearchChanged();
+                controller.notifySearchChanged();
             }
 
             @Override
@@ -261,7 +258,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
             @Override
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean selected) {
                 multipleMatches = selected;
-                control.notifySearchChanged();
+                controller.notifySearchChanged();
             }
         };
 
@@ -287,7 +284,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         ) {
             @Override
             public void actionPerformed(@Nonnull AnActionEvent e) {
-                control.close();
+                controller.close();
             }
 
             @Nonnull
@@ -318,10 +315,10 @@ public class BinarySearchIntelliJPanel extends JBPanel {
             @Override
             public void keyPressed(@Nonnull KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    control.performEscape();
+                    controller.performEscape();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    control.performFind();
+                    controller.performFind();
                 }
             }
         };
@@ -488,8 +485,8 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         replaceComboBoxEditorComponent.addValueKeyListener(editorKeyListener);
     }
 
-    public void setControl(Control control) {
-        this.control = control;
+    public void setController(Controller controller) {
+        this.controller = controller;
     }
 
     public void setInfoLabel(String text) {
@@ -501,7 +498,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         SearchParameters searchParameters = new SearchParameters();
         searchParameters.setMatchCase(matchCase);
         searchParameters.setMatchMode(SearchParameters.MatchMode.fromBoolean(multipleMatches));
-        SearchParameters.SearchDirection searchDirection = control.getSearchDirection();
+        SearchParameters.SearchDirection searchDirection = controller.getSearchDirection();
         searchParameters.setSearchDirection(searchDirection);
 
         long startPosition;
@@ -674,7 +671,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         findComboBox.invalidate();
         findComboBox.repaint();
         updateFindStatus();
-        control.notifySearchChanged();
+        controller.notifySearchChanged();
     }//GEN-LAST:event_findTypeButtonActionPerformed
 
     public void updateFindStatus() {
@@ -728,18 +725,18 @@ public class BinarySearchIntelliJPanel extends JBPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JComboBox<SearchCondition> findComboBox;
     private javax.swing.JLabel findLabel;
-    private JBPanel findPanel;
+    private JPanel findPanel;
     private javax.swing.JButton findTypeButton;
     private javax.swing.JLabel infoLabel;
     private JComboBox<SearchCondition> replaceComboBox;
     private javax.swing.JLabel replaceLabel;
-    private JBPanel replacePanel;
+    private JPanel replacePanel;
     private javax.swing.JButton replaceTypeButton;
     private javax.swing.JSeparator topSeparator;
     // End of variables declaration//GEN-END:variables
 
     private void comboBoxValueChanged() {
-        control.notifySearchChanging();
+        controller.notifySearchChanging();
     }
 
     public void requestSearchFocus() {
@@ -755,7 +752,7 @@ public class BinarySearchIntelliJPanel extends JBPanel {
         findComboBoxEditorComponent.exclusiveUpdate(() -> ((SearchHistoryModel) findComboBox.getModel()).addSearchCondition(condition));
     }
 
-    public interface Control {
+    public interface Controller {
 
         void prevMatch();
 

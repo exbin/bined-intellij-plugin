@@ -113,7 +113,7 @@ public class BinarySearch {
                 );
             }
         };
-        binarySearchPanel.setControl(new BinarySearchIntelliJPanel.Control() {
+        binarySearchPanel.setController(new BinarySearchIntelliJPanel.Controller() {
             @Override
             public void prevMatch() {
                 foundMatches.prev();

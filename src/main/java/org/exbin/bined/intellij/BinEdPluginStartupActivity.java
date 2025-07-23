@@ -773,7 +773,31 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                         @Nonnull
                         @Override
                         protected JCheckBox createCheckBox() {
-                            return new JBCheckBox();
+                            return new JBCheckBox() {
+                                private Graphics2DDelegate graphicsCache = null;
+
+                                @Nonnull
+                                @Override
+                                protected Graphics getComponentGraphics(Graphics g) {
+                                    if (g instanceof Graphics2DDelegate) {
+                                        return g;
+                                    }
+
+                                    if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                        return graphicsCache;
+                                    }
+
+                                    if (graphicsCache != null) {
+                                        graphicsCache.dispose();
+                                    }
+
+                                    Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                                    graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                                            (Graphics2DDelegate) editorGraphics :
+                                            new Graphics2DDelegate(editorGraphics);
+                                    return graphicsCache;
+                                }
+                            };
                         }
 
                         @Nonnull
@@ -785,7 +809,31 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                         @Nonnull
                         @Override
                         protected JRadioButton createRadioButton() {
-                            return new JBRadioButton();
+                            return new JBRadioButton() {
+                                private Graphics2DDelegate graphicsCache = null;
+
+                                @Nonnull
+                                @Override
+                                protected Graphics getComponentGraphics(Graphics g) {
+                                    if (g instanceof Graphics2DDelegate) {
+                                        return g;
+                                    }
+
+                                    if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                        return graphicsCache;
+                                    }
+
+                                    if (graphicsCache != null) {
+                                        graphicsCache.dispose();
+                                    }
+
+                                    Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                                    graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                                            (Graphics2DDelegate) editorGraphics :
+                                            new Graphics2DDelegate(editorGraphics);
+                                    return graphicsCache;
+                                }
+                            };
                         }
                     };
                 }

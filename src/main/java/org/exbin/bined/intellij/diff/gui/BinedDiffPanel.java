@@ -22,6 +22,9 @@ import com.intellij.diff.requests.ContentDiffRequest;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
+import com.intellij.ui.Graphics2DDelegate;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.array.ByteArrayData;
@@ -39,7 +42,6 @@ import org.exbin.bined.intellij.options.BinEdApplyOptions;
 import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
-import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.CodeAreaPainter;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
@@ -47,34 +49,33 @@ import org.exbin.bined.swing.capability.CharAssessorPainterCapable;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
-import org.exbin.bined.swing.section.diff.SectCodeAreaDiffPanel;
 import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.framework.App;
-import org.exbin.framework.action.api.ComponentActivationListener;
-import org.exbin.framework.bined.BinEdDataComponent;
-import org.exbin.framework.bined.BinEdCodeAreaAssessor;
-import org.exbin.framework.bined.BinaryStatusApi;
-import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.action.GoToPositionAction;
-import org.exbin.framework.bined.gui.BinaryStatusPanel;
-import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.theme.options.CodeAreaColorOptions;
-import org.exbin.framework.bined.theme.options.CodeAreaLayoutOptions;
-import org.exbin.framework.bined.viewer.options.CodeAreaOptions;
-import org.exbin.framework.bined.theme.options.CodeAreaThemeOptions;
-import org.exbin.framework.bined.editor.options.BinaryEditorOptions;
-import org.exbin.framework.bined.options.StatusOptions;
-import org.exbin.framework.text.encoding.EncodingsHandler;
-import org.exbin.framework.text.encoding.TextEncodingStatusApi;
-import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.options.api.OptionsModuleApi;
-import org.exbin.framework.text.encoding.options.TextEncodingOptions;
-import org.exbin.framework.text.font.options.TextFontOptions;
 import org.exbin.framework.action.api.ActiveComponent;
+import org.exbin.framework.action.api.ComponentActivationListener;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.action.api.clipboard.ClipboardStateListener;
 import org.exbin.framework.action.api.clipboard.TextClipboardController;
+import org.exbin.framework.bined.BinEdCodeAreaAssessor;
+import org.exbin.framework.bined.BinEdDataComponent;
+import org.exbin.framework.bined.BinaryStatusApi;
+import org.exbin.framework.bined.BinedModule;
+import org.exbin.framework.bined.action.GoToPositionAction;
+import org.exbin.framework.bined.editor.options.BinaryEditorOptions;
+import org.exbin.framework.bined.gui.BinaryStatusPanel;
+import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
+import org.exbin.framework.bined.options.StatusOptions;
+import org.exbin.framework.bined.theme.options.CodeAreaColorOptions;
+import org.exbin.framework.bined.theme.options.CodeAreaLayoutOptions;
+import org.exbin.framework.bined.theme.options.CodeAreaThemeOptions;
+import org.exbin.framework.bined.viewer.options.CodeAreaOptions;
+import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.framework.language.api.LanguageModuleApi;
+import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.text.encoding.EncodingsHandler;
+import org.exbin.framework.text.encoding.TextEncodingStatusApi;
+import org.exbin.framework.text.encoding.options.TextEncodingOptions;
+import org.exbin.framework.text.font.options.TextFontOptions;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -82,12 +83,18 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.plaf.basic.BasicArrowButton;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -179,7 +186,56 @@ public class BinedDiffPanel extends JBPanel {
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         toolbarPanel.setOptionsAction(optionsModule.createOptionsAction());
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
-        statusPanel = new BinaryStatusPanel();
+        statusPanel = new BinaryStatusPanel() {
+
+            private Graphics2DDelegate graphicsCache = null;
+
+            @Nonnull
+            @Override
+            protected Graphics getComponentGraphics(Graphics g) {
+                if (g instanceof Graphics2DDelegate) {
+                    return g;
+                }
+
+                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                    return graphicsCache;
+                }
+
+                if (graphicsCache != null) {
+                    graphicsCache.dispose();
+                }
+
+                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
+                return graphicsCache;
+            }
+
+            @Nonnull
+            @Override
+            protected JLabel createLabel() {
+                return new JBLabel();
+            }
+
+            @Nonnull
+            @Override
+            protected JLabel createEncodingLabel() {
+                return new JBLabel() {
+                    private final BasicArrowButton basicArrowButton = new BasicArrowButton(SwingConstants.NORTH);
+
+                    @Override
+                    protected void paintComponent(Graphics g) {
+                        super.paintComponent(g);
+                        Dimension areaSize = getSize();
+
+                        int h = areaSize.height;
+                        int w = areaSize.width;
+                        int size = Math.min(Math.max((h - 4) / 4, 2), 10);
+                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 - (h / 5), size, SwingConstants.NORTH, true);
+                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 + (h / 5), size, SwingConstants.SOUTH, true);
+                    }
+                };
+            }
+        };
 
         init();
     }
