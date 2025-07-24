@@ -27,6 +27,7 @@ import org.exbin.bined.swing.section.diff.DiffHighlightCodeAreaColorAssessor;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -110,7 +111,9 @@ public class SectCodeAreaDiffPanel extends javax.swing.JPanel {
 
     private void init() {
         leftCodeArea.setEditMode(EditMode.READ_ONLY);
+        leftCodeArea.setPreferredSize(new Dimension(0, 150));
         rightCodeArea.setEditMode(EditMode.READ_ONLY);
+        rightCodeArea.setPreferredSize(new Dimension(0, 150));
         leftPanel.add(leftCodeArea, BorderLayout.CENTER);
         rightPanel.add(rightCodeArea, BorderLayout.CENTER);
 
