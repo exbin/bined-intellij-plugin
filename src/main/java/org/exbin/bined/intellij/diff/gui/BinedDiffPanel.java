@@ -278,10 +278,9 @@ public class BinedDiffPanel extends JBPanel {
         List<DiffContent> contents = request.getContents();
         if (!contents.isEmpty()) {
             BinaryData leftData = getDiffBinaryData(request, 0);
-            if (leftData == null) {
-                return;
+            if (leftData != null) {
+                diffPanel.setLeftContentData(leftData);
             }
-            diffPanel.setLeftContentData(leftData);
             SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
             leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
                 @Override

@@ -705,6 +705,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             AboutModuleApi aboutModule = App.getModule(AboutModuleApi.class);
             OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
             optionsModule.setOptionsPanelType(OptionsPanelType.LIST);
+            optionsModule.setOptionsRootCaption(App.getModule(LanguageModuleApi.class).getBundle(IntegrationOptionsPanel.class).getString("options.caption"));
             // TODO Is currently stealing options action on macOS
             // optionsModule.registerMenuAction();
 
