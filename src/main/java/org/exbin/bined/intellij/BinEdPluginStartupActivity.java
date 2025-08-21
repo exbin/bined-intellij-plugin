@@ -79,9 +79,14 @@ import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
 import org.exbin.framework.bined.compare.BinedCompareModule;
 import org.exbin.framework.bined.editor.BinedEditorModule;
-import org.exbin.framework.bined.inspector.BinEdComponentInspector;
+import org.exbin.framework.bined.inspector.BinEdInspectorComponentExtension;
+import org.exbin.framework.bined.inspector.BinEdInspector;
+import org.exbin.framework.bined.inspector.BinEdInspectorManager;
 import org.exbin.framework.bined.inspector.BinedInspectorModule;
+import org.exbin.framework.bined.inspector.BasicValuesInspector;
+import org.exbin.framework.bined.inspector.BasicValuesInspectorProvider;
 import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
+import org.exbin.framework.bined.inspector.gui.InspectorPanel;
 import org.exbin.framework.bined.macro.BinedMacroModule;
 import org.exbin.framework.bined.objectdata.BinedObjectDataModule;
 import org.exbin.framework.bined.operation.BinedOperationModule;
@@ -739,10 +744,11 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             BinedToolContentModule binedToolContentModule = App.getModule(BinedToolContentModule.class);
 
             BinedInspectorModule binedInspectorModule = App.getModule(BinedInspectorModule.class);
-            binedInspectorModule.setEditorProvider(editorProvider, new BinEdComponentInspector.ComponentsProvider() {
+            BinEdInspectorManager binEdInspectorManager = binedInspectorModule.getBinEdInspectorManager();
+            binedInspectorModule.setEditorProvider(editorProvider, new BinEdInspectorComponentExtension.ComponentsProvider() {
                 @Nonnull
-                public BasicValuesPanel createValuesPanel() {
-                    return new BasicValuesPanel() {
+                public InspectorPanel createInspectorPanel() {
+                    return new InspectorPanel() {
                         private Graphics2DDelegate graphicsCache = null;
 
                         @Nonnull
@@ -764,84 +770,99 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                             graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
                             return graphicsCache;
                         }
-
-                        @Nonnull
-                        @Override
-                        protected JLabel createLabel() {
-                            return new JBLabel();
-                        }
-
-                        @Nonnull
-                        @Override
-                        protected JCheckBox createCheckBox() {
-                            return new JBCheckBox() {
-                                private Graphics2DDelegate graphicsCache = null;
-
-                                @Nonnull
-                                @Override
-                                protected Graphics getComponentGraphics(Graphics g) {
-                                    if (g instanceof Graphics2DDelegate) {
-                                        return g;
-                                    }
-
-                                    if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                                        return graphicsCache;
-                                    }
-
-                                    if (graphicsCache != null) {
-                                        graphicsCache.dispose();
-                                    }
-
-                                    Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                                    graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
-                                            (Graphics2DDelegate) editorGraphics :
-                                            new Graphics2DDelegate(editorGraphics);
-                                    return graphicsCache;
-                                }
-                            };
-                        }
-
-                        @Nonnull
-                        @Override
-                        protected JTextField createTextField() {
-                            return new JBTextField();
-                        }
-
-                        @Nonnull
-                        @Override
-                        protected JRadioButton createRadioButton() {
-                            return new JBRadioButton() {
-                                private Graphics2DDelegate graphicsCache = null;
-
-                                @Nonnull
-                                @Override
-                                protected Graphics getComponentGraphics(Graphics g) {
-                                    if (g instanceof Graphics2DDelegate) {
-                                        return g;
-                                    }
-
-                                    if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                                        return graphicsCache;
-                                    }
-
-                                    if (graphicsCache != null) {
-                                        graphicsCache.dispose();
-                                    }
-
-                                    Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                                    graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
-                                            (Graphics2DDelegate) editorGraphics :
-                                            new Graphics2DDelegate(editorGraphics);
-                                    return graphicsCache;
-                                }
-                            };
-                        }
                     };
                 }
 
                 @Nonnull
                 public JScrollPane createScrollPane() {
                     return new JBScrollPane();
+                }
+            });
+            binEdInspectorManager.removeAllInspectors();
+            binEdInspectorManager.addInspector(new BasicValuesInspectorProvider() {
+                @Nonnull
+                @Override
+                public BinEdInspector createInspector() {
+                    return new BasicValuesInspector() {
+
+                        @Nonnull
+                        @Override
+                        protected BasicValuesPanel createComponent() {
+                            return new BasicValuesPanel() {
+                                @Nonnull
+                                @Override
+                                protected JTextField createTextField() {
+                                    return new JBTextField();
+                                }
+
+                                @Nonnull
+                                @Override
+                                protected JRadioButton createRadioButton() {
+                                    return new JBRadioButton() {
+                                        private Graphics2DDelegate graphicsCache = null;
+
+                                        @Nonnull
+                                        @Override
+                                        protected Graphics getComponentGraphics(Graphics g) {
+                                            if (g instanceof Graphics2DDelegate) {
+                                                return g;
+                                            }
+
+                                            if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                                return graphicsCache;
+                                            }
+
+                                            if (graphicsCache != null) {
+                                                graphicsCache.dispose();
+                                            }
+
+                                            Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                                            graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                                                    (Graphics2DDelegate) editorGraphics :
+                                                    new Graphics2DDelegate(editorGraphics);
+                                            return graphicsCache;
+                                        }
+                                    };
+                                }
+
+                                @Nonnull
+                                @Override
+                                protected JLabel createLabel() {
+                                    return new JBLabel();
+                                }
+
+                                @Nonnull
+                                @Override
+                                protected JCheckBox createCheckBox() {
+                                    return new JBCheckBox() {
+                                        private Graphics2DDelegate graphicsCache = null;
+
+                                        @Nonnull
+                                        @Override
+                                        protected Graphics getComponentGraphics(Graphics g) {
+                                            if (g instanceof Graphics2DDelegate) {
+                                                return g;
+                                            }
+
+                                            if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                                return graphicsCache;
+                                            }
+
+                                            if (graphicsCache != null) {
+                                                graphicsCache.dispose();
+                                            }
+
+                                            Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                                            graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                                                    (Graphics2DDelegate) editorGraphics :
+                                                    new Graphics2DDelegate(editorGraphics);
+                                            return graphicsCache;
+                                        }
+                                    };
+                                }
+                            };
+                        }
+                    };
                 }
             });
             binedInspectorModule.registerShowParsingPanelMenuActions();
