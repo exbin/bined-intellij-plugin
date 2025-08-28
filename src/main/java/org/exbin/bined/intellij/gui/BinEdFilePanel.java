@@ -27,6 +27,7 @@ import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.action.api.ActionContextService;
 import org.exbin.framework.bined.BinEdEditorProvider;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
@@ -34,11 +35,16 @@ import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.action.GoToPositionAction;
+import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.editor.options.BinaryEditorOptions;
+import org.exbin.framework.bined.macro.BinedMacroModule;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
+import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.framework.options.action.OptionsAction;
+import org.exbin.framework.preferences.api.OptionsStorage;
 import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.language.api.LanguageModuleApi;
@@ -123,7 +129,10 @@ public class BinEdFilePanel extends JPanel {
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-        toolbarPanel.setOptionsAction(optionsModule.createOptionsAction());
+        OptionsAction optionsAction = (OptionsAction) optionsModule.createOptionsAction();
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        optionsAction.setDialogParentComponent(() -> frameModule.getFrame());
+        toolbarPanel.setOptionsAction(optionsAction);
 
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
@@ -133,6 +142,15 @@ public class BinEdFilePanel extends JPanel {
             @Override
             public void show(Component invoker, int x, int y) {
                 String popupMenuId = "BinEdFilePanel.popup";
+
+                // TODO Temporary workaround for unfinished rework of actions
+                FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+                ActionContextService actionContextService = frameModule.getFrameHandler().getActionContextService();
+                BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
+                actionContextService.requestUpdate(binedBookmarksModule.getManageBookmarksAction());
+                BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
+                actionContextService.requestUpdate(binedMacroModule.getMacroManager().getManageMacrosAction());
+
                 JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, x, y);
                 popupMenu.addPopupMenuListener(new PopupMenuListener() {
                     @Override
@@ -246,6 +264,10 @@ public class BinEdFilePanel extends JPanel {
         };
     }
 
+    public void loadFromOptions(OptionsStorage appPreferences) {
+        fileHandler.getComponent().onInitFromPreferences(appPreferences);
+    }
+
     @ParametersAreNonnullByDefault
     private class BinaryStatusController implements BinaryStatusPanel.Controller, BinaryStatusPanel.EncodingsController, BinaryStatusPanel.MemoryModeController {
         @Override
@@ -269,27 +291,21 @@ public class BinEdFilePanel extends JPanel {
         public void cycleNextEncoding() {
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
             EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            if (encodingsHandler != null) {
-                encodingsHandler.cycleNextEncoding();
-            }
+            encodingsHandler.cycleNextEncoding();
         }
 
         @Override
         public void cyclePreviousEncoding() {
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
             EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            if (encodingsHandler != null) {
-                encodingsHandler.cyclePreviousEncoding();
-            }
+            encodingsHandler.cyclePreviousEncoding();
         }
 
         @Override
         public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
             EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            if (encodingsHandler != null) {
-                encodingsHandler.popupEncodingsMenu(mouseEvent);
-            }
+            encodingsHandler.popupEncodingsMenu(mouseEvent);
         }
 
         @Override

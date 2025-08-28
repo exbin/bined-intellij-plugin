@@ -53,6 +53,7 @@ import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ActiveComponent;
 import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.action.api.clipboard.ClipboardStateListener;
 import org.exbin.framework.action.api.clipboard.TextClipboardController;
@@ -71,6 +72,7 @@ import org.exbin.framework.bined.theme.options.CodeAreaThemeOptions;
 import org.exbin.framework.bined.viewer.options.CodeAreaOptions;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
+import org.exbin.framework.options.action.OptionsAction;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.text.encoding.TextEncodingStatusApi;
@@ -184,7 +186,10 @@ public class BinedDiffPanel extends JBPanel {
             }
         });
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-        toolbarPanel.setOptionsAction(optionsModule.createOptionsAction());
+        OptionsAction optionsAction = (OptionsAction) optionsModule.createOptionsAction();
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        optionsAction.setDialogParentComponent(() -> frameModule.getFrame());
+        toolbarPanel.setOptionsAction(optionsAction);
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
         statusPanel = new BinaryStatusPanel() {
 
@@ -289,57 +294,10 @@ public class BinedDiffPanel extends JBPanel {
                     ComponentActivationListener componentActivationListener =
                             frameModule.getFrameHandler().getComponentActivationListener();
 
-                    componentActivationListener.updated(ActiveComponent.class, new BinEdDataComponent(leftCodeArea));
-                    componentActivationListener.updated(ClipboardController.class, new TextClipboardController() {
-                        public void performCut() {
-                            leftCodeArea.cut();
-                        }
-
-                        public void performCopy() {
-                            leftCodeArea.copy();
-                        }
-
-                        public void performPaste() {
-                            leftCodeArea.paste();
-                        }
-
-                        public void performDelete() {
-                            leftCodeArea.delete();
-                        }
-
-                        public void performSelectAll() {
-                            leftCodeArea.selectAll();
-                        }
-
-                        public boolean hasSelection() {
-                            return leftCodeArea.hasSelection();
-                        }
-
-                        public boolean hasDataToCopy() {
-                            return hasSelection();
-                        }
-
-                        public boolean isEditable() {
-                            return leftCodeArea.isEditable();
-                        }
-
-                        public boolean canSelectAll() {
-                            return true;
-                        }
-
-                        public boolean canPaste() {
-                            return leftCodeArea.canPaste();
-                        }
-
-                        public boolean canDelete() {
-                            return true;
-                        }
-
-                        @Override
-                        public void setUpdateListener(ClipboardStateListener clipboardStateListener) {
-
-                        }
-                    });
+                    BinEdDataComponent leftBinEdDataComponent = new BinEdDataComponent(leftCodeArea);
+                    componentActivationListener.updated(ActiveComponent.class, leftBinEdDataComponent);
+                    componentActivationListener.updated(DialogParentComponent.class, () -> leftCodeArea);
+                    componentActivationListener.updated(ClipboardController.class, leftBinEdDataComponent);
 
                     String popupMenuId = "BinDiffPanel.left";
                     BinedModule binedModule = App.getModule(BinedModule.class);
@@ -377,57 +335,10 @@ public class BinedDiffPanel extends JBPanel {
                     ComponentActivationListener componentActivationListener =
                             frameModule.getFrameHandler().getComponentActivationListener();
 
-                    componentActivationListener.updated(ActiveComponent.class, new BinEdDataComponent(rightCodeArea));
-                    componentActivationListener.updated(ClipboardController.class, new TextClipboardController() {
-                        public void performCut() {
-                            rightCodeArea.cut();
-                        }
-
-                        public void performCopy() {
-                            rightCodeArea.copy();
-                        }
-
-                        public void performPaste() {
-                            rightCodeArea.paste();
-                        }
-
-                        public void performDelete() {
-                            rightCodeArea.delete();
-                        }
-
-                        public void performSelectAll() {
-                            rightCodeArea.selectAll();
-                        }
-
-                        public boolean hasSelection() {
-                            return rightCodeArea.hasSelection();
-                        }
-
-                        public boolean hasDataToCopy() {
-                            return hasSelection();
-                        }
-
-                        public boolean isEditable() {
-                            return rightCodeArea.isEditable();
-                        }
-
-                        public boolean canSelectAll() {
-                            return true;
-                        }
-
-                        public boolean canPaste() {
-                            return rightCodeArea.canPaste();
-                        }
-
-                        public boolean canDelete() {
-                            return true;
-                        }
-
-                        @Override
-                        public void setUpdateListener(ClipboardStateListener clipboardStateListener) {
-
-                        }
-                    });
+                    BinEdDataComponent rightBinEdDataComponent = new BinEdDataComponent(rightCodeArea);
+                    componentActivationListener.updated(ActiveComponent.class, rightBinEdDataComponent);
+                    componentActivationListener.updated(DialogParentComponent.class, () -> rightCodeArea);
+                    componentActivationListener.updated(ClipboardController.class, rightBinEdDataComponent);
 
                     String popupMenuId = "BinDiffPanel.right";
                     BinedModule binedModule = App.getModule(BinedModule.class);

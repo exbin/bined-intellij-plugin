@@ -73,6 +73,7 @@ import org.exbin.framework.about.api.AboutModuleApi;
 import org.exbin.framework.action.ActionModule;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
@@ -994,6 +995,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             ComponentActivationListener componentActivationListener =
                     frameModule.getFrameHandler().getComponentActivationListener();
             componentActivationListener.updated(EditorProvider.class, editorProvider);
+            componentActivationListener.updated(DialogParentComponent.class, () -> frameModule.getFrame());
             UiUtils.setMenuBuilder(new UiUtils.MenuBuilder() {
                 @Nonnull
                 public JMenu buildMenu() {

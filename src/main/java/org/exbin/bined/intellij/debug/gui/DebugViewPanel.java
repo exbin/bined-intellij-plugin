@@ -31,6 +31,7 @@ import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdDocumentView;
 import org.exbin.framework.bined.BinEdFileManager;
@@ -42,6 +43,7 @@ import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.options.StatusOptions;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
+import org.exbin.framework.options.action.OptionsAction;
 import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
@@ -144,7 +146,10 @@ public class DebugViewPanel extends javax.swing.JPanel {
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-        toolbarPanel.setOptionsAction(optionsModule.createOptionsAction());
+        OptionsAction optionsAction = (OptionsAction) optionsModule.createOptionsAction();
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        optionsAction.setDialogParentComponent(() -> frameModule.getFrame());
+        toolbarPanel.setOptionsAction(optionsAction);
 
         CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
                 binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
@@ -156,56 +161,8 @@ public class DebugViewPanel extends javax.swing.JPanel {
                         frameModule.getFrameHandler().getComponentActivationListener();
 
                 componentActivationListener.updated(ActiveComponent.class, binEdDataComponent);
-                componentActivationListener.updated(ClipboardController.class, new TextClipboardController() {
-                    public void performCut() {
-                        codeArea.cut();
-                    }
-
-                    public void performCopy() {
-                        codeArea.copy();
-                    }
-
-                    public void performPaste() {
-                        codeArea.paste();
-                    }
-
-                    public void performDelete() {
-                        codeArea.delete();
-                    }
-
-                    public void performSelectAll() {
-                        codeArea.selectAll();
-                    }
-
-                    public boolean hasSelection() {
-                        return codeArea.hasSelection();
-                    }
-
-                    public boolean hasDataToCopy() {
-                        return hasSelection();
-                    }
-
-                    public boolean isEditable() {
-                        return codeArea.isEditable();
-                    }
-
-                    public boolean canSelectAll() {
-                        return true;
-                    }
-
-                    public boolean canPaste() {
-                        return codeArea.canPaste();
-                    }
-
-                    public boolean canDelete() {
-                        return true;
-                    }
-
-                    @Override
-                    public void setUpdateListener(ClipboardStateListener clipboardStateListener) {
-
-                    }
-                });
+                componentActivationListener.updated(DialogParentComponent.class, () -> binEdDataComponent.getCodeArea());
+                componentActivationListener.updated(ClipboardController.class, binEdDataComponent);
 
                 String popupMenuId = "DebugViewPanel.popup";
                 JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, x, y);

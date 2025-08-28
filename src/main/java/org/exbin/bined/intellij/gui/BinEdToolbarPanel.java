@@ -217,6 +217,7 @@ public class BinEdToolbarPanel extends JBPanel {
 
     public void setCodeAreaControl(Control codeAreaControl) {
         this.codeAreaControl = codeAreaControl;
+        updateNonprintables();
         updateCycleButtonState();
     }
 
@@ -270,6 +271,10 @@ public class BinEdToolbarPanel extends JBPanel {
         codeAreaControl.setCodeType(new CodeAreaOptions(options).getCodeType());
         updateCycleButtonState();
         updateActionsState();
+    }
+
+    public void updateNonprintables() {
+        // showNonprintablesToggleButton.setSelected(codeAreaControl.isShowNonprintables());
     }
 
     public void updateActionsState() {

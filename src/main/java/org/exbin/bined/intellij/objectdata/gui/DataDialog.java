@@ -29,12 +29,14 @@ import org.exbin.bined.EditOperation;
 import org.exbin.bined.SelectionRange;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
-import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.action.api.ActiveComponent;
 import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.action.api.DialogParentComponent;
+import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdDocumentView;
 import org.exbin.framework.bined.BinEdFileManager;
@@ -44,18 +46,13 @@ import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.theme.options.BinaryThemeOptions;
 import org.exbin.framework.bined.options.StatusOptions;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
-import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.text.encoding.options.TextEncodingOptions;
-import org.exbin.framework.action.api.ActiveComponent;
-import org.exbin.framework.action.api.clipboard.ClipboardController;
-import org.exbin.framework.action.api.clipboard.ClipboardStateListener;
-import org.exbin.framework.action.api.clipboard.TextClipboardController;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -119,6 +116,7 @@ public final class DataDialog extends DialogWrapper {
         PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
 
         SectCodeArea codeArea = editorComponent.getCodeArea();
+        BinEdDataComponent binEdDataComponent = new BinEdDataComponent(codeArea);
         toolbarPanel.setTargetComponent(componentPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
             @Nonnull
@@ -162,57 +160,9 @@ public final class DataDialog extends DialogWrapper {
                 ComponentActivationListener componentActivationListener =
                         frameModule.getFrameHandler().getComponentActivationListener();
 
-                componentActivationListener.updated(ActiveComponent.class, new BinEdDataComponent(codeArea));
-                componentActivationListener.updated(ClipboardController.class, new TextClipboardController() {
-                    public void performCut() {
-                        codeArea.cut();
-                    }
-
-                    public void performCopy() {
-                        codeArea.copy();
-                    }
-
-                    public void performPaste() {
-                        codeArea.paste();
-                    }
-
-                    public void performDelete() {
-                        codeArea.delete();
-                    }
-
-                    public void performSelectAll() {
-                        codeArea.selectAll();
-                    }
-
-                    public boolean hasSelection() {
-                        return codeArea.hasSelection();
-                    }
-
-                    public boolean hasDataToCopy() {
-                        return hasSelection();
-                    }
-
-                    public boolean isEditable() {
-                        return codeArea.isEditable();
-                    }
-
-                    public boolean canSelectAll() {
-                        return true;
-                    }
-
-                    public boolean canPaste() {
-                        return codeArea.canPaste();
-                    }
-
-                    public boolean canDelete() {
-                        return true;
-                    }
-
-                    @Override
-                    public void setUpdateListener(ClipboardStateListener clipboardStateListener) {
-
-                    }
-                });
+                componentActivationListener.updated(ActiveComponent.class, binEdDataComponent);
+                componentActivationListener.updated(DialogParentComponent.class, () -> codeArea);
+                componentActivationListener.updated(ClipboardController.class, binEdDataComponent);
 
                 String popupMenuId = "DataDialog.popup";
                 JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, x, y);
@@ -406,27 +356,21 @@ public final class DataDialog extends DialogWrapper {
         public void cycleNextEncoding() {
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
             EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            if (encodingsHandler != null) {
-                encodingsHandler.cycleNextEncoding();
-            }
+            encodingsHandler.cycleNextEncoding();
         }
 
         @Override
         public void cyclePreviousEncoding() {
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
             EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            if (encodingsHandler != null) {
-                encodingsHandler.cyclePreviousEncoding();
-            }
+            encodingsHandler.cyclePreviousEncoding();
         }
 
         @Override
         public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
             EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            if (encodingsHandler != null) {
-                encodingsHandler.popupEncodingsMenu(mouseEvent);
-            }
+            encodingsHandler.popupEncodingsMenu(mouseEvent);
         }
 
         @Override
