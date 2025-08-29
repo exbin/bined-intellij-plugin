@@ -87,6 +87,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
+import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -300,10 +301,16 @@ public class BinedDiffPanel extends JBPanel {
                     componentActivationListener.updated(ClipboardController.class, leftBinEdDataComponent);
 
                     String popupMenuId = "BinDiffPanel.left";
+                    int clickedX = x;
+                    int clickedY = y;
+                    if (invoker instanceof JViewport) {
+                        clickedX += invoker.getParent().getX();
+                        clickedY += invoker.getParent().getY();
+                    }
                     BinedModule binedModule = App.getModule(BinedModule.class);
                     CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
                             binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
-                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(leftCodeArea, popupMenuId, x, y);
+                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(leftCodeArea, popupMenuId, clickedX, clickedY);
                     popupMenu.addPopupMenuListener(new PopupMenuListener() {
                         @Override
                         public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
@@ -341,10 +348,16 @@ public class BinedDiffPanel extends JBPanel {
                     componentActivationListener.updated(ClipboardController.class, rightBinEdDataComponent);
 
                     String popupMenuId = "BinDiffPanel.right";
+                    int clickedX = x;
+                    int clickedY = y;
+                    if (invoker instanceof JViewport) {
+                        clickedX += invoker.getParent().getX();
+                        clickedY += invoker.getParent().getY();
+                    }
                     BinedModule binedModule = App.getModule(BinedModule.class);
                     CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
                             binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
-                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(rightCodeArea, popupMenuId, x, y);
+                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(rightCodeArea, popupMenuId, clickedX, clickedY);
                     popupMenu.addPopupMenuListener(new PopupMenuListener() {
                         @Override
                         public void popupMenuWillBecomeVisible(PopupMenuEvent e) {

@@ -61,6 +61,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -142,6 +143,12 @@ public class BinEdFilePanel extends JPanel {
             @Override
             public void show(Component invoker, int x, int y) {
                 String popupMenuId = "BinEdFilePanel.popup";
+                int clickedX = x;
+                int clickedY = y;
+                if (invoker instanceof JViewport) {
+                    clickedX += invoker.getParent().getX();
+                    clickedY += invoker.getParent().getY();
+                }
 
                 // TODO Temporary workaround for unfinished rework of actions
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
@@ -151,7 +158,7 @@ public class BinEdFilePanel extends JPanel {
                 BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
                 actionContextService.requestUpdate(binedMacroModule.getMacroManager().getManageMacrosAction());
 
-                JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, x, y);
+                JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
                 popupMenu.addPopupMenuListener(new PopupMenuListener() {
                     @Override
                     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {

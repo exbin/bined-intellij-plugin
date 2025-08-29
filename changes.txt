@@ -1,7 +1,8 @@
 0.2.12
+- Fixed issue with pasting over selection (issue #64)
 
 0.2.11.1 (2025-02-14)
-- Plugin breaks access to the settings screen  (issue #63)
+- Plugin breaks access to the settings screen (issue #63)
 - Database module dependency issue (issue #62)
 
 0.2.11 (2025-02-08)
