@@ -55,8 +55,6 @@ import org.exbin.framework.action.api.ActiveComponent;
 import org.exbin.framework.action.api.ComponentActivationListener;
 import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
-import org.exbin.framework.action.api.clipboard.ClipboardStateListener;
-import org.exbin.framework.action.api.clipboard.TextClipboardController;
 import org.exbin.framework.bined.BinEdCodeAreaAssessor;
 import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinaryStatusApi;
@@ -124,10 +122,9 @@ public class BinedDiffPanel extends JBPanel {
     private final CodeAreaColorsProfile defaultColorProfile;
 
     private final BinEdToolbarPanel toolbarPanel;
-    private final BinaryStatusPanel statusPanel;
+    private final BinaryStatusPanel leftStatusPanel;
+    private final BinaryStatusPanel rightStatusPanel;
     private EncodingsHandler encodingsHandler;
-    private BinaryStatusApi binaryStatus;
-    private TextEncodingStatusApi encodingStatus;
     private GoToPositionAction goToPositionAction = new GoToPositionAction();
 
     public BinedDiffPanel() {
@@ -154,7 +151,8 @@ public class BinedDiffPanel extends JBPanel {
         toolbarPanel.setTargetComponent(diffPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
             @Nonnull
-            @Override public CodeType getCodeType() {
+            @Override
+            public CodeType getCodeType() {
                 return leftCodeArea.getCodeType();
             }
 
@@ -192,7 +190,57 @@ public class BinedDiffPanel extends JBPanel {
         optionsAction.setDialogParentComponent(() -> frameModule.getFrame());
         toolbarPanel.setOptionsAction(optionsAction);
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
-        statusPanel = new BinaryStatusPanel() {
+        leftStatusPanel = new BinaryStatusPanel() {
+
+            private Graphics2DDelegate graphicsCache = null;
+
+            @Nonnull
+            @Override
+            protected Graphics getComponentGraphics(Graphics g) {
+                if (g instanceof Graphics2DDelegate) {
+                    return g;
+                }
+
+                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                    return graphicsCache;
+                }
+
+                if (graphicsCache != null) {
+                    graphicsCache.dispose();
+                }
+
+                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
+                return graphicsCache;
+            }
+
+            @Nonnull
+            @Override
+            protected JLabel createLabel() {
+                return new JBLabel();
+            }
+
+            @Nonnull
+            @Override
+            protected JLabel createEncodingLabel() {
+                return new JBLabel() {
+                    private final BasicArrowButton basicArrowButton = new BasicArrowButton(SwingConstants.NORTH);
+
+                    @Override
+                    protected void paintComponent(Graphics g) {
+                        super.paintComponent(g);
+                        Dimension areaSize = getSize();
+
+                        int h = areaSize.height;
+                        int w = areaSize.width;
+                        int size = Math.min(Math.max((h - 4) / 4, 2), 10);
+                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 - (h / 5), size, SwingConstants.NORTH, true);
+                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 + (h / 5), size, SwingConstants.SOUTH, true);
+                    }
+                };
+            }
+        };
+        rightStatusPanel = new BinaryStatusPanel() {
 
             private Graphics2DDelegate graphicsCache = null;
 
@@ -248,31 +296,33 @@ public class BinedDiffPanel extends JBPanel {
 
     private void init() {
         this.add(toolbarPanel, BorderLayout.NORTH);
-        registerEncodingStatus(statusPanel);
         encodingsHandler = new EncodingsHandler();
         encodingsHandler.init();
         encodingsHandler.setTextEncodingStatus(new TextEncodingStatusApi() {
             @Nonnull
             @Override
             public String getEncoding() {
-                return encodingStatus.getEncoding();
+                return leftStatusPanel.getEncoding();
             }
 
             @Override
             public void setEncoding(String encodingName) {
                 diffPanel.getLeftCodeArea().setCharset(Charset.forName(encodingName));
                 diffPanel.getRightCodeArea().setCharset(Charset.forName(encodingName));
-                encodingStatus.setEncoding(encodingName);
+                leftStatusPanel.setEncoding(encodingName);
+                rightStatusPanel.setEncoding(encodingName);
                 new TextEncodingOptions(preferences).setSelectedEncoding(encodingName);
             }
         });
         goToPositionAction.setup(App.getModule(LanguageModuleApi.class).getBundle(BinedModule.class));
 
-        registerBinaryStatus(statusPanel);
+        registerBinaryStatus(leftStatusPanel, diffPanel.getLeftCodeArea());
+        registerBinaryStatus(rightStatusPanel, diffPanel.getRightCodeArea());
 
         initialLoadFromPreferences();
 
-        this.add(statusPanel, BorderLayout.SOUTH);
+        diffPanel.getLeftPanel().add(leftStatusPanel, BorderLayout.SOUTH);
+        diffPanel.getRightPanel().add(rightStatusPanel, BorderLayout.SOUTH);
         this.add(diffPanel, BorderLayout.CENTER);
         diffPanel.revalidate();
         diffPanel.repaint();
@@ -286,6 +336,7 @@ public class BinedDiffPanel extends JBPanel {
             BinaryData leftData = getDiffBinaryData(request, 0);
             if (leftData != null) {
                 diffPanel.setLeftContentData(leftData);
+                updateBinaryStatus(leftStatusPanel, diffPanel.getLeftCodeArea());
             }
             SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
             leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
@@ -327,12 +378,12 @@ public class BinedDiffPanel extends JBPanel {
                     });
                     popupMenu.show(invoker, x, y);
                 }
-
-
             });
+
             BinaryData rightData = getDiffBinaryData(request, 1);
             if (rightData != null) {
                 diffPanel.setRightContentData(rightData);
+                updateBinaryStatus(rightStatusPanel, diffPanel.getRightCodeArea());
             }
             SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
             rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
@@ -402,45 +453,29 @@ public class BinedDiffPanel extends JBPanel {
         return null;
     }
 
-    public void registerBinaryStatus(BinaryStatusApi binaryStatusApi) {
-        this.binaryStatus = binaryStatusApi;
-        SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
-        SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
-        leftCodeArea.addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
+    public void registerBinaryStatus(BinaryStatusApi binaryStatus, SectCodeArea codeArea) {
+        codeArea.addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
             binaryStatus.setCursorPosition(caretPosition);
         });
-        rightCodeArea.addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
-            binaryStatus.setCursorPosition(caretPosition);
-        });
-        leftCodeArea.addSelectionChangedListener(() -> {
-            binaryStatus.setSelectionRange(leftCodeArea.getSelection());
-        });
-        rightCodeArea.addSelectionChangedListener(() -> {
-            binaryStatus.setSelectionRange(rightCodeArea.getSelection());
+        codeArea.addSelectionChangedListener(() -> {
+            binaryStatus.setSelectionRange(codeArea.getSelection());
         });
 
-        leftCodeArea.addEditModeChangedListener(binaryStatus::setEditMode);
-        rightCodeArea.addEditModeChangedListener(binaryStatus::setEditMode);
+        codeArea.addEditModeChangedListener(binaryStatus::setEditMode);
 
-        leftCodeArea.addFocusListener(new FocusAdapter() {
+        codeArea.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                updateBinaryStatus(leftCodeArea);
-            }
-        });
-        rightCodeArea.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                updateBinaryStatus(rightCodeArea);
+                updateBinaryStatus(binaryStatus, codeArea);
             }
         });
 
-        updateBinaryStatus(leftCodeArea);
+        updateBinaryStatus(binaryStatus, codeArea);
 
         ((BinaryStatusPanel) binaryStatus).setController(new BinaryStatusController());
     }
 
-    private void updateBinaryStatus(SectCodeArea codeArea) {
+    private void updateBinaryStatus(BinaryStatusApi binaryStatus, SectCodeArea codeArea) {
         binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
         binaryStatus.setCursorPosition(codeArea.getActiveCaretPosition());
         binaryStatus.setSelectionRange(codeArea.getSelection());
@@ -501,27 +536,13 @@ public class BinedDiffPanel extends JBPanel {
         });
 
         encodingsHandler.loadFromOptions(new TextEncodingOptions(preferences));
-        statusPanel.loadFromOptions(new StatusOptions(preferences));
+        leftStatusPanel.loadFromOptions(new StatusOptions(preferences));
+        rightStatusPanel.loadFromOptions(new StatusOptions(preferences));
         toolbarPanel.loadFromOptions(preferences);
 
-        updateCurrentMemoryMode();
-    }
-
-    private void updateCurrentMemoryMode() {
         BinaryStatusApi.MemoryMode memoryMode = BinaryStatusApi.MemoryMode.READ_ONLY;
-
-        if (binaryStatus != null) {
-            binaryStatus.setMemoryMode(memoryMode);
-        }
-    }
-
-    public void registerEncodingStatus(TextEncodingStatusApi encodingStatusApi) {
-        this.encodingStatus = encodingStatusApi;
-        // TODO
-//        setCharsetChangeListener(() -> {
-//            String selectedEncoding = diffPanel.getLeftCodeArea().getCharset().name();
-//            encodingStatus.setEncoding(selectedEncoding);
-//        });
+        leftStatusPanel.setMemoryMode(memoryMode);
+        rightStatusPanel.setMemoryMode(memoryMode);
     }
 
     private void applyOptions(BinEdApplyOptions applyOptions) {
@@ -546,7 +567,8 @@ public class BinedDiffPanel extends JBPanel {
         }
 
         StatusOptions statusOptions = applyOptions.getStatusOptions();
-        statusPanel.setStatusOptions(statusOptions);
+        leftStatusPanel.setStatusOptions(statusOptions);
+        rightStatusPanel.setStatusOptions(statusOptions);
         toolbarPanel.applyFromCodeArea();
 
         CodeAreaLayoutOptions layoutOptions = applyOptions.getLayoutOptions();
