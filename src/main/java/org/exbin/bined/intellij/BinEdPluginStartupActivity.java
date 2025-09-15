@@ -141,6 +141,7 @@ import org.exbin.framework.plugin.language.ru_RU.LanguageRuRuModule;
 import org.exbin.framework.plugin.language.zh_Hans.LanguageZhHansModule;
 import org.exbin.framework.plugin.language.zh_Hant.LanguageZhHantModule;
 import org.exbin.framework.plugins.iconset.material.IconSetMaterialModule;
+import org.exbin.framework.preferences.FilePreferencesFactory;
 import org.exbin.framework.preferences.PreferencesModule;
 import org.exbin.framework.preferences.api.OptionsStorage;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
@@ -190,6 +191,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 /**
  * Post startup activity.
@@ -673,8 +676,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
         private void init() {
             PreferencesModule preferencesModule = (PreferencesModule) App.getModule(PreferencesModuleApi.class);
-//            preferencesModule.setupAppPreferences(BinEdIntelliJPlugin.class);
             preferencesModule.setAppPreferences(new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
+            convertIncorrectPreferences();
+
             OptionsStorage preferences = preferencesModule.getAppPreferences();
 
             UiUtils.setMenuBuilder(new UiUtils.MenuBuilder() {
@@ -1029,6 +1033,41 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     frameModule.getFrameHandler().getComponentActivationListener();
             componentActivationListener.updated(EditorProvider.class, editorProvider);
             componentActivationListener.updated(DialogParentComponent.class, () -> frameModule.getFrame());
+        }
+
+        /**
+         * Version 0.2.11.x had incorrect storage of the preferences.
+         * <p>
+         * If it exists import it.
+         */
+        private void convertIncorrectPreferences() {
+            PreferencesModule preferencesModule = (PreferencesModule) App.getModule(PreferencesModuleApi.class);
+            OptionsStorage preferences = preferencesModule.getAppPreferences();
+
+            String versionKey = preferences.get("version", "");
+            if (!"0.2.12".equals(versionKey)) {
+                String osName = System.getProperty("os.name").toLowerCase();
+                Preferences prefsPreferences;
+                if (osName.startsWith("win")) {
+                    prefsPreferences = (new FilePreferencesFactory()).userNodeForPackage(BinEdIntelliJPlugin.class);
+                } else {
+                    prefsPreferences = Preferences.userNodeForPackage(BinEdIntelliJPlugin.class);
+                }
+
+                try {
+                    String[] keys = prefsPreferences.keys();
+                    for (String key : keys) {
+                        String value = prefsPreferences.get(key, null);
+                        if (value != null) {
+                            preferences.put(key, value);
+                        }
+                    }
+                    preferences.put("version", "0.2.12");
+                    preferences.flush();
+                } catch (BackingStoreException e) {
+                    // Can't process
+                }
+            }
         }
 
         @Nonnull

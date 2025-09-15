@@ -36,10 +36,8 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
-import org.exbin.bined.intellij.BinEdIntelliJPlugin;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.intellij.options.BinEdApplyOptions;
-import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.swing.CodeAreaPainter;
@@ -72,6 +70,8 @@ import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.action.OptionsAction;
 import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.preferences.api.OptionsStorage;
+import org.exbin.framework.preferences.api.PreferencesModuleApi;
 import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.text.encoding.TextEncodingStatusApi;
 import org.exbin.framework.text.encoding.options.TextEncodingOptions;
@@ -113,7 +113,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class BinedDiffPanel extends JBPanel {
 
-    private final IntelliJPreferencesWrapper preferences;
+    private final OptionsStorage preferences;
     private final SectCodeAreaDiffPanel diffPanel = new SectCodeAreaDiffPanel();
 
     private final Font defaultFont;
@@ -130,7 +130,8 @@ public class BinedDiffPanel extends JBPanel {
     public BinedDiffPanel() {
         setLayout(new java.awt.BorderLayout());
 
-        preferences = new IntelliJPreferencesWrapper(getPreferences(), BinEdIntelliJPlugin.PLUGIN_PREFIX);
+        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
+        preferences = preferencesModule.getAppPreferences();
         defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
         SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
         SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
