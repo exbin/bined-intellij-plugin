@@ -18,6 +18,7 @@ package org.exbin.bined.intellij;
 import com.intellij.diff.impl.DiffSettingsHolder;
 import com.intellij.diff.tools.fragmented.UnifiedDiffTool;
 import com.intellij.diff.tools.simple.SimpleDiffTool;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.application.ApplicationManager;
@@ -62,6 +63,7 @@ import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.objectdata.MainBinaryViewHandler;
 import org.exbin.bined.intellij.options.IntegrationOptions;
 import org.exbin.bined.intellij.options.gui.IntegrationOptionsPanel;
+import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.search.BinEdIntelliJComponentSearch;
 import org.exbin.bined.swing.CodeAreaCommandHandler;
 import org.exbin.bined.swing.CodeAreaCore;
@@ -98,6 +100,12 @@ import org.exbin.framework.bined.tool.content.BinedToolContentModule;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
 import org.exbin.framework.component.ComponentModule;
 import org.exbin.framework.component.api.ComponentModuleApi;
+import org.exbin.framework.contribution.ContributionModule;
+import org.exbin.framework.contribution.api.ContributionModuleApi;
+import org.exbin.framework.contribution.api.GroupSequenceContributionRule;
+import org.exbin.framework.contribution.api.SequenceContribution;
+import org.exbin.framework.contribution.api.PositionSequenceContributionRule;
+import org.exbin.framework.contribution.api.SeparationSequenceContributionRule;
 import org.exbin.framework.editor.EditorModule;
 import org.exbin.framework.editor.api.EditorModuleApi;
 import org.exbin.framework.editor.api.EditorProvider;
@@ -113,12 +121,8 @@ import org.exbin.framework.language.api.IconSetProvider;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.language.api.LanguageProvider;
 import org.exbin.framework.menu.MenuModule;
-import org.exbin.framework.menu.api.GroupMenuContributionRule;
-import org.exbin.framework.menu.api.MenuContribution;
 import org.exbin.framework.menu.api.MenuManagement;
 import org.exbin.framework.menu.api.MenuModuleApi;
-import org.exbin.framework.menu.api.PositionMenuContributionRule;
-import org.exbin.framework.menu.api.SeparationMenuContributionRule;
 import org.exbin.framework.operation.undo.OperationUndoModule;
 import org.exbin.framework.operation.undo.api.OperationUndoModuleApi;
 import org.exbin.framework.options.api.DefaultOptionsPage;
@@ -619,6 +623,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
         private void createModules() {
             modules.put(LanguageModuleApi.class, new LanguageModule());
+            modules.put(ContributionModuleApi.class, new ContributionModule());
             modules.put(ActionModuleApi.class, new ActionModule());
             modules.put(OperationUndoModuleApi.class, new OperationUndoModule());
             modules.put(OptionsModuleApi.class, new org.exbin.framework.options.OptionsModule());
@@ -667,9 +672,37 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         }
 
         private void init() {
-            PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-            preferencesModule.setupAppPreferences(BinEdIntelliJPlugin.class);
+            PreferencesModule preferencesModule = (PreferencesModule) App.getModule(PreferencesModuleApi.class);
+//            preferencesModule.setupAppPreferences(BinEdIntelliJPlugin.class);
+            preferencesModule.setAppPreferences(new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
             OptionsStorage preferences = preferencesModule.getAppPreferences();
+
+            UiUtils.setMenuBuilder(new UiUtils.MenuBuilder() {
+                @Nonnull
+                public JMenu buildMenu() {
+                    return new JBMenu();
+                }
+
+                @Nonnull
+                public JPopupMenu buildPopupMenu() {
+                    return new JBPopupMenu();
+                }
+
+                @Nonnull
+                public JMenuItem buildMenuItem() {
+                    return new JBMenuItem("");
+                }
+
+                @Nonnull
+                public JCheckBoxMenuItem buildCheckBoxMenuItem() {
+                    return new JBCheckBoxMenuItem();
+                }
+
+                @Nonnull
+                public JRadioButtonMenuItem buildRadioButtonMenuItem() {
+                    return new JRadioButtonMenuItem();
+                }
+            });
 
             App.getModule(LanguageCsCzModule.class).register();
             App.getModule(LanguageDeDeModule.class).register();
@@ -973,55 +1006,29 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 }
             };
             // toolsSubMenuAction.putValue(Action.SHORT_DESCRIPTION, ((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.shortDescription"));
-            MenuContribution menuContribution = menuManagement.registerMenuItem(toolsSubMenuId, toolsSubMenuAction);
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.BOTTOM_LAST));
+            SequenceContribution contribution = menuManagement.registerMenuItem(toolsSubMenuId, toolsSubMenuAction);
+            menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.BOTTOM_LAST));
             MenuManagement subMenu = menuManagement.getSubMenu(toolsSubMenuId);
-            menuContribution = subMenu.registerMenuItem(binedCompareModule.createCompareFilesAction());
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.TOP));
-            menuContribution = subMenu.registerMenuItem(binedToolContentModule.createClipboardContentAction());
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.TOP));
-            menuContribution = subMenu.registerMenuItem(binedToolContentModule.createDragDropContentAction());
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.TOP));
+            contribution = subMenu.registerMenuItem(binedCompareModule.createCompareFilesAction());
+            menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.TOP));
+            contribution = subMenu.registerMenuItem(binedToolContentModule.createClipboardContentAction());
+            menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.TOP));
+            contribution = subMenu.registerMenuItem(binedToolContentModule.createDragDropContentAction());
+            menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.TOP));
 
             String aboutMenuGroup = BinEdIntelliJPlugin.PLUGIN_PREFIX + "helpAboutMenuGroup";
-            menuContribution = menuManagement.registerMenuGroup(aboutMenuGroup);
-            menuManagement.registerMenuRule(menuContribution, new PositionMenuContributionRule(PositionMenuContributionRule.PositionMode.BOTTOM_LAST));
-            menuManagement.registerMenuRule(menuContribution, new SeparationMenuContributionRule(SeparationMenuContributionRule.SeparationMode.ABOVE));
-            menuContribution = menuManagement.registerMenuItem(helpOnlineModule.createOnlineHelpAction());
-            menuManagement.registerMenuRule(menuContribution, new GroupMenuContributionRule(aboutMenuGroup));
-            menuContribution = menuManagement.registerMenuItem(aboutModule.createAboutAction());
-            menuManagement.registerMenuRule(menuContribution, new GroupMenuContributionRule(aboutMenuGroup));
+            contribution = menuManagement.registerMenuGroup(aboutMenuGroup);
+            menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.BOTTOM_LAST));
+            menuManagement.registerMenuRule(contribution, new SeparationSequenceContributionRule(SeparationSequenceContributionRule.SeparationMode.ABOVE));
+            contribution = menuManagement.registerMenuItem(helpOnlineModule.createOnlineHelpAction());
+            menuManagement.registerMenuRule(contribution, new GroupSequenceContributionRule(aboutMenuGroup));
+            contribution = menuManagement.registerMenuItem(aboutModule.createAboutAction());
+            menuManagement.registerMenuRule(contribution, new GroupSequenceContributionRule(aboutMenuGroup));
 
             ComponentActivationListener componentActivationListener =
                     frameModule.getFrameHandler().getComponentActivationListener();
             componentActivationListener.updated(EditorProvider.class, editorProvider);
             componentActivationListener.updated(DialogParentComponent.class, () -> frameModule.getFrame());
-            UiUtils.setMenuBuilder(new UiUtils.MenuBuilder() {
-                @Nonnull
-                public JMenu buildMenu() {
-                    return new JBMenu();
-                }
-
-                @Nonnull
-                public JPopupMenu buildPopupMenu() {
-                    return new JBPopupMenu();
-                }
-
-                @Nonnull
-                public JMenuItem buildMenuItem() {
-                    return new JBMenuItem("");
-                }
-
-                @Nonnull
-                public JCheckBoxMenuItem buildCheckBoxMenuItem() {
-                    return new JBCheckBoxMenuItem();
-                }
-
-                @Nonnull
-                public JRadioButtonMenuItem buildRadioButtonMenuItem() {
-                    return new JRadioButtonMenuItem();
-                }
-            });
         }
 
         @Nonnull

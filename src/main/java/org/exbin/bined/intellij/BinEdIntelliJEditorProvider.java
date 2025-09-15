@@ -21,12 +21,14 @@ import org.exbin.bined.EditMode;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.SelectionRange;
 import org.exbin.bined.capability.EditModeCapable;
-import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ActionModuleApi;
+import org.exbin.framework.action.api.ActiveComponent;
 import org.exbin.framework.action.api.ComponentActivationListener;
 import org.exbin.framework.action.api.DialogParentComponent;
+import org.exbin.framework.action.api.clipboard.ClipboardController;
+import org.exbin.framework.action.api.clipboard.TextClipboardController;
 import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdEditorProvider;
 import org.exbin.framework.bined.BinEdFileHandler;
@@ -34,7 +36,6 @@ import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.editor.api.EditorModuleApi;
 import org.exbin.framework.editor.api.MultiEditorProvider;
-import org.exbin.framework.text.encoding.TextEncodingStatusApi;
 import org.exbin.framework.file.api.EditableFileHandler;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.file.api.FileModuleApi;
@@ -42,9 +43,8 @@ import org.exbin.framework.file.api.FileOperations;
 import org.exbin.framework.file.api.FileType;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.operation.undo.api.UndoRedoState;
-import org.exbin.framework.action.api.ActiveComponent;
-import org.exbin.framework.action.api.clipboard.ClipboardController;
-import org.exbin.framework.action.api.clipboard.TextClipboardController;
+import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.text.encoding.TextEncodingStatusApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -109,6 +109,9 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
 
         EditorModuleApi editorModule = App.getModule(EditorModuleApi.class);
         editorModule.notifyEditorComponentCreated(fileHandler.getComponent());
+
+        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
+        fileHandler.getComponent().onInitFromPreferences(preferencesModule.getAppPreferences());
     }
 
     public void removeFile(BinEdFileHandler fileHandler) {

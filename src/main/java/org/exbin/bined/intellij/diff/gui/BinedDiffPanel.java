@@ -136,13 +136,13 @@ public class BinedDiffPanel extends JBPanel {
         SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
 
         CodeAreaPainter leftPainter = leftCodeArea.getPainter();
-        BinEdCodeAreaAssessor codeAreaAssessor = new BinEdCodeAreaAssessor(((ColorAssessorPainterCapable)leftPainter).getColorAssessor(), ((CharAssessorPainterCapable)leftPainter).getCharAssessor());
-        ((ColorAssessorPainterCapable)leftPainter).setColorAssessor(codeAreaAssessor);
-        ((CharAssessorPainterCapable)leftPainter).setCharAssessor(codeAreaAssessor);
+        BinEdCodeAreaAssessor codeAreaAssessor = new BinEdCodeAreaAssessor(((ColorAssessorPainterCapable) leftPainter).getColorAssessor(), ((CharAssessorPainterCapable) leftPainter).getCharAssessor());
+        ((ColorAssessorPainterCapable) leftPainter).setColorAssessor(codeAreaAssessor);
+        ((CharAssessorPainterCapable) leftPainter).setCharAssessor(codeAreaAssessor);
         CodeAreaPainter rightPainter = rightCodeArea.getPainter();
-        codeAreaAssessor = new BinEdCodeAreaAssessor(((ColorAssessorPainterCapable)rightPainter).getColorAssessor(), ((CharAssessorPainterCapable)rightPainter).getCharAssessor());
-        ((ColorAssessorPainterCapable)rightPainter).setColorAssessor(codeAreaAssessor);
-        ((CharAssessorPainterCapable)rightPainter).setCharAssessor(codeAreaAssessor);
+        codeAreaAssessor = new BinEdCodeAreaAssessor(((ColorAssessorPainterCapable) rightPainter).getColorAssessor(), ((CharAssessorPainterCapable) rightPainter).getCharAssessor());
+        ((ColorAssessorPainterCapable) rightPainter).setColorAssessor(codeAreaAssessor);
+        ((CharAssessorPainterCapable) rightPainter).setCharAssessor(codeAreaAssessor);
 
         defaultLayoutProfile = leftCodeArea.getLayoutProfile();
         defaultThemeProfile = leftCodeArea.getThemeProfile();
@@ -188,7 +188,17 @@ public class BinedDiffPanel extends JBPanel {
         OptionsAction optionsAction = (OptionsAction) optionsModule.createOptionsAction();
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         optionsAction.setDialogParentComponent(() -> frameModule.getFrame());
-        toolbarPanel.setOptionsAction(optionsAction);
+        AbstractAction wrapperAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                optionsAction.actionPerformed(e);
+                // TODO Options are not applied due to no active file handler is present
+                toolbarPanel.applyFromCodeArea();
+                leftStatusPanel.updateStatus();
+                rightStatusPanel.updateStatus();
+            }
+        };
+        toolbarPanel.setOptionsAction(wrapperAction);
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
         leftStatusPanel = new BinaryStatusPanel() {
 
@@ -240,6 +250,7 @@ public class BinedDiffPanel extends JBPanel {
                 };
             }
         };
+        leftStatusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
         rightStatusPanel = new BinaryStatusPanel() {
 
             private Graphics2DDelegate graphicsCache = null;
@@ -290,6 +301,7 @@ public class BinedDiffPanel extends JBPanel {
                 };
             }
         };
+        rightStatusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
 
         init();
     }

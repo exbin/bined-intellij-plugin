@@ -100,6 +100,8 @@ dependencies {
     implementation(exbinFrameworkLibrary("exbin-framework-about"))
     implementation(exbinFrameworkLibrary("exbin-framework-operation"))
     implementation(exbinFrameworkLibrary("exbin-framework-operation-undo"))
+    implementation(exbinFrameworkLibrary("exbin-framework-contribution-api"))
+    implementation(exbinFrameworkLibrary("exbin-framework-contribution"))
     implementation(exbinFrameworkLibrary("exbin-framework-menu-api"))
     implementation(exbinFrameworkLibrary("exbin-framework-menu"))
     implementation(exbinFrameworkLibrary("exbin-framework-menu-popup"))

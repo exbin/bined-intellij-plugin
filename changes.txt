@@ -1,5 +1,9 @@
 0.2.12
+- Minor fixes
+- Added status bars to binary diff
+- Fixed NPE when moving hex viewer to its own window (issue #66)
 - Fixed issue with pasting over selection (issue #64)
+- Fixed height for one-diff view (issue #65)
 
 0.2.11.1 (2025-02-14)
 - Plugin breaks access to the settings screen (issue #63)

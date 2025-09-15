@@ -23,11 +23,14 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.BinEdIntelliJEditorProvider;
+import org.exbin.bined.intellij.utils.ActionUtils;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.action.api.ActionConsts;
 import org.exbin.framework.action.api.ActionContextService;
+import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.bined.BinEdEditorProvider;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
@@ -57,8 +60,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
@@ -133,7 +134,20 @@ public class BinEdFilePanel extends JPanel {
         OptionsAction optionsAction = (OptionsAction) optionsModule.createOptionsAction();
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         optionsAction.setDialogParentComponent(() -> frameModule.getFrame());
-        toolbarPanel.setOptionsAction(optionsAction);
+        AbstractAction wrapperAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                optionsAction.actionPerformed(e);
+                toolbarPanel.applyFromCodeArea();
+                statusPanel.updateStatus();
+            }
+        };
+        LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
+        java.util.ResourceBundle optionsResourceBundle = languageModule.getBundle(org.exbin.framework.options.OptionsModule.class);
+        ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+        actionModule.initAction(wrapperAction, optionsResourceBundle, OptionsAction.ACTION_ID);
+        wrapperAction.putValue(ActionConsts.ACTION_DIALOG_MODE, true);
+        toolbarPanel.setOptionsAction(wrapperAction);
 
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
@@ -173,6 +187,7 @@ public class BinEdFilePanel extends JPanel {
                     public void popupMenuCanceled(PopupMenuEvent e) {
                     }
                 });
+                ActionUtils.replaceAction(popupMenu, OptionsAction.ACTION_ID, wrapperAction);
                 popupMenu.show(invoker, x, y);
             }
         });
@@ -238,6 +253,7 @@ public class BinEdFilePanel extends JPanel {
         PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
         encodingsHandler.loadFromOptions(new TextEncodingOptions(preferencesModule.getAppPreferences()));
         statusPanel = fileManager.getBinaryStatusPanel();
+        statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
         add(statusPanel, BorderLayout.SOUTH);
 
         add(componentPanel, BorderLayout.CENTER);
@@ -273,6 +289,7 @@ public class BinEdFilePanel extends JPanel {
 
     public void loadFromOptions(OptionsStorage appPreferences) {
         fileHandler.getComponent().onInitFromPreferences(appPreferences);
+        toolbarPanel.applyFromCodeArea();
     }
 
     @ParametersAreNonnullByDefault

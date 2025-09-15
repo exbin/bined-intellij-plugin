@@ -67,6 +67,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -150,7 +151,16 @@ public class DebugViewPanel extends javax.swing.JPanel {
         OptionsAction optionsAction = (OptionsAction) optionsModule.createOptionsAction();
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         optionsAction.setDialogParentComponent(() -> frameModule.getFrame());
-        toolbarPanel.setOptionsAction(optionsAction);
+
+        AbstractAction wrapperAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                optionsAction.actionPerformed(e);
+                toolbarPanel.applyFromCodeArea();
+                statusPanel.updateStatus();
+            }
+        };
+        toolbarPanel.setOptionsAction(wrapperAction);
 
         CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
                 binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
@@ -197,6 +207,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
         encodingsHandler.loadFromOptions(new TextEncodingOptions(preferencesModule.getAppPreferences()));
         statusPanel.setController(new BinaryStatusController());
         statusPanel.loadFromOptions(new StatusOptions(preferencesModule.getAppPreferences()));
+        statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
         registerBinaryStatus(statusPanel);
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
