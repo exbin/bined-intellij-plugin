@@ -265,7 +265,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
 
         SectCodeArea codeArea = activeFile.getCodeArea();
         BinaryStatusApi.MemoryMode newMemoryMode = BinaryStatusApi.MemoryMode.RAM_MEMORY;
-        if (((EditModeCapable) codeArea).getEditMode() == EditMode.READ_ONLY) {
+        if (codeArea.getEditMode() == EditMode.READ_ONLY) {
             newMemoryMode = BinaryStatusApi.MemoryMode.READ_ONLY;
         } else if (codeArea.getContentData() instanceof DeltaDocument) {
             newMemoryMode = BinaryStatusApi.MemoryMode.DELTA_MODE;
@@ -385,12 +385,12 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
 
     @Override
     public void setLastUsedDirectory(@org.jetbrains.annotations.Nullable File file) {
-        throw new UnsupportedOperationException();
+        // ignore
     }
 
     @Override
     public void updateRecentFilesList(URI uri, FileType fileType) {
-        throw new UnsupportedOperationException();
+        // ignore
     }
 
     private void updateClipboardActionsStatus() {

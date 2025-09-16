@@ -25,7 +25,6 @@ import org.exbin.bined.SelectionRange;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
-import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
@@ -42,18 +41,16 @@ import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.options.StatusOptions;
-import org.exbin.framework.bined.viewer.BinedViewerModule;
 import org.exbin.framework.options.action.OptionsAction;
 import org.exbin.framework.text.encoding.EncodingsHandler;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.text.encoding.TextEncodingStatusApi;
 import org.exbin.framework.text.encoding.options.TextEncodingOptions;
 import org.exbin.framework.action.api.ActiveComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
-import org.exbin.framework.action.api.clipboard.ClipboardStateListener;
-import org.exbin.framework.action.api.clipboard.TextClipboardController;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -70,6 +67,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,8 +85,8 @@ public class DebugViewPanel extends javax.swing.JPanel {
     private final JPanel panel;
     private BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
     private BinaryStatusPanel statusPanel = new BinaryStatusPanel();
-    private BinaryStatusApi binaryStatus;
     private final BinEdDocumentView editorComponent;
+    private EncodingsHandler encodingsHandler;
     private long documentOriginalSize = 0;
 
     public DebugViewPanel() {
@@ -101,7 +99,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
     private void init() {
         BinedModule binedModule = App.getModule(BinedModule.class);
-        BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
         BinEdComponentPanel componentPanel = (BinEdComponentPanel) editorComponent.getComponent();
         fileManager.initComponentPanel(componentPanel);
@@ -203,12 +200,26 @@ public class DebugViewPanel extends javax.swing.JPanel {
             }
         });
 
-        EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
+        encodingsHandler = new EncodingsHandler();
+        encodingsHandler.init();
+        encodingsHandler.setTextEncodingStatus(new TextEncodingStatusApi() {
+            @Nonnull
+            @Override
+            public String getEncoding() {
+                return codeArea.getCharset().name();
+            }
+
+            @Override
+            public void setEncoding(String encodingName) {
+                codeArea.setCharset(Charset.forName(encodingName));
+                statusPanel.setEncoding(encodingName);
+            }
+        });
         encodingsHandler.loadFromOptions(new TextEncodingOptions(preferencesModule.getAppPreferences()));
         statusPanel.setController(new BinaryStatusController());
         statusPanel.loadFromOptions(new StatusOptions(preferencesModule.getAppPreferences()));
         statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
-        registerBinaryStatus(statusPanel);
+        registerBinaryStatus();
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
         panel.add(statusPanel, BorderLayout.SOUTH);
@@ -281,24 +292,22 @@ public class DebugViewPanel extends javax.swing.JPanel {
         };
     }
 
-    public void registerBinaryStatus(BinaryStatusApi binaryStatus) {
-        this.binaryStatus = binaryStatus;
-
+    public void registerBinaryStatus() {
         SectCodeArea codeArea = editorComponent.getCodeArea();
         codeArea.addDataChangedListener(() -> {
             updateCurrentDocumentSize();
         });
 
         codeArea.addSelectionChangedListener(() -> {
-            binaryStatus.setSelectionRange(codeArea.getSelection());
+            statusPanel.setSelectionRange(codeArea.getSelection());
         });
 
         codeArea.addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
-            binaryStatus.setCursorPosition(caretPosition);
+            statusPanel.setCursorPosition(caretPosition);
         });
 
         codeArea.addEditModeChangedListener((EditMode mode, EditOperation operation) -> {
-            binaryStatus.setEditMode(mode, operation);
+            statusPanel.setEditMode(mode, operation);
         });
 
         updateStatus();
@@ -313,42 +322,26 @@ public class DebugViewPanel extends javax.swing.JPanel {
     }
 
     private void updateCurrentDocumentSize() {
-        if (binaryStatus == null) {
-            return;
-        }
-
         SectCodeArea codeArea = editorComponent.getCodeArea();
         long dataSize = codeArea.getDataSize();
-        binaryStatus.setCurrentDocumentSize(dataSize, documentOriginalSize);
+        statusPanel.setCurrentDocumentSize(dataSize, documentOriginalSize);
     }
 
     private void updateCurrentCaretPosition() {
-        if (binaryStatus == null) {
-            return;
-        }
-
         SectCodeArea codeArea = editorComponent.getCodeArea();
         CodeAreaCaretPosition caretPosition = codeArea.getActiveCaretPosition();
-        binaryStatus.setCursorPosition(caretPosition);
+        statusPanel.setCursorPosition(caretPosition);
     }
 
     private void updateCurrentSelectionRange() {
-        if (binaryStatus == null) {
-            return;
-        }
-
         SectCodeArea codeArea = editorComponent.getCodeArea();
         SelectionRange selectionRange = codeArea.getSelection();
-        binaryStatus.setSelectionRange(selectionRange);
+        statusPanel.setSelectionRange(selectionRange);
     }
 
     private void updateCurrentEditMode() {
-        if (binaryStatus == null) {
-            return;
-        }
-
         SectCodeArea codeArea = editorComponent.getCodeArea();
-        binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
+        statusPanel.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
     }
 
     @ParametersAreNonnullByDefault
@@ -369,29 +362,17 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
         @Override
         public void cycleNextEncoding() {
-            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            if (encodingsHandler != null) {
-                encodingsHandler.cycleNextEncoding();
-            }
+            encodingsHandler.cycleNextEncoding();
         }
 
         @Override
         public void cyclePreviousEncoding() {
-            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            if (encodingsHandler != null) {
-                encodingsHandler.cyclePreviousEncoding();
-            }
+            encodingsHandler.cyclePreviousEncoding();
         }
 
         @Override
         public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
-            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            if (encodingsHandler != null) {
-                encodingsHandler.popupEncodingsMenu(mouseEvent);
-            }
+            encodingsHandler.popupEncodingsMenu(mouseEvent);
         }
 
         @Override
