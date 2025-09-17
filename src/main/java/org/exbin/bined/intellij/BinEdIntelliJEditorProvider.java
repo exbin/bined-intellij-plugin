@@ -20,7 +20,6 @@ import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.SelectionRange;
-import org.exbin.bined.capability.EditModeCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ActionModuleApi;
@@ -90,7 +89,8 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
 
         SectCodeArea codeArea = fileHandler.getCodeArea();
         codeArea.addDataChangedListener(() -> {
-            activeFile.getComponent().notifyDataChanged();
+            fileHandler.getComponent().notifyDataChanged();
+            setActiveFile(fileHandler);
             updateCurrentDocumentSize();
         });
 

@@ -21,8 +21,6 @@ import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionGroupWrapper;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -37,13 +35,10 @@ import com.intellij.openapi.actionSystem.ex.ActionButtonLook;
 import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import com.intellij.openapi.actionSystem.impl.ActionManagerImpl;
-import com.intellij.openapi.actionSystem.impl.MenuItemPresentationFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.messages.SimpleMessageBusConnection;
@@ -54,8 +49,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.UIManager;
 import java.awt.Dimension;
@@ -63,6 +60,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.util.Objects;
@@ -267,9 +265,7 @@ public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomCom
             }
             else {
                 // Cycle actions
-                final AnActionEvent newEvent = new AnActionEvent(event.getInputEvent(), getDataContext(), myPlace, event.getPresentation(), ActionManager.getInstance(),
-                        event.getModifiers());
-                AnAction[] actions = myActionGroup.getChildren(null);
+                AnAction[] actions = CodeTypeSplitAction.getChildren(myActionGroup);
                 if (selectedIndex >= actions.length -1) {
                     selectedIndex = 0;
                 } else {
@@ -279,14 +275,14 @@ public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomCom
                 myPresentation.setIcon(selectedAction.getTemplatePresentation().getIcon());
                 myPresentation.setText(selectedAction.getTemplatePresentation().getText());
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    selectedAction.actionPerformed(newEvent);
+                    CodeTypeSplitAction.performAction(selectedAction, event);
                 });
             }
         }
 
         public void setSelectedIndex(int selectedIndex) {
             this.selectedIndex = selectedIndex;
-            AnAction[] actions = myActionGroup.getChildren(null);
+            AnAction[] actions = CodeTypeSplitAction.getChildren(myActionGroup);
             selectedAction = actions[selectedIndex];
             myPresentation.setIcon(selectedAction.getTemplatePresentation().getIcon());
             myPresentation.setText(selectedAction.getTemplatePresentation().getText());
@@ -294,8 +290,9 @@ public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomCom
 
         @Override
         protected void showActionGroupPopup(@NotNull ActionGroup actionGroup, @NotNull AnActionEvent event) {
-            if (myPopupState.isRecentlyHidden()) return; // do not show new popup
-            ActionManagerImpl am = (ActionManagerImpl) ActionManager.getInstance();
+            //if (myPopupState.isRecentlyHidden()) return; // do not show new popup
+            // ctionManagerImpl is marked as internal - creating simple popup menu instead
+            /*ActionManagerImpl am = (ActionManagerImpl) ActionManager.getInstance();
             ActionPopupMenu popupMenu = am.createActionPopupMenu(event.getPlace(), actionGroup, new MenuItemPresentationFactory() {
                 @Override
                 protected void processPresentation(@NotNull Presentation presentation) {
@@ -308,8 +305,22 @@ public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomCom
             });
             popupMenu.setTargetComponent(this);
 
-            JPopupMenu menu = popupMenu.getComponent();
-            myPopupState.prepareToShow(menu);
+            JPopupMenu menu = popupMenu.getComponent(); */
+            JPopupMenu menu = new JBPopupMenu();
+            AnAction[] children = CodeTypeSplitAction.getChildren(actionGroup);
+            for (AnAction action : children) {
+                JMenuItem menuItem = new JMenuItem();
+                menuItem.setAction(new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        CodeTypeSplitAction.performAction(action, event);
+                    }
+                });
+                menuItem.setText(action.getTemplateText());
+                menuItem.setIcon(action.getTemplatePresentation().getIcon());
+                menu.add(menuItem);
+            }
+            //myPopupState.prepareToShow(menu);
             if (event.isFromActionToolbar()) {
                 menu.show(this, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE.width + getInsets().left, getHeight());
             }
@@ -362,5 +373,15 @@ public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomCom
             Logger.getLogger(CodeTypeSplitAction.class.getName()).log(Level.SEVERE, "Unable to use JBUI class", ex);
         }
         return i;
+    }
+
+    private static void performAction(AnAction action, AnActionEvent event) {
+        // TODO: Method is deprecated, but replacement method is not available in currently supported lowest version
+        com.intellij.openapi.actionSystem.ex.ActionUtil.performActionDumbAwareWithCallbacks(action, event);
+    }
+
+    private static AnAction[] getChildren(ActionGroup actionGroup) {
+        // TODO: For some reason this reports override only, no idea what to do with this mess
+        return actionGroup.getChildren(null);
     }
 }

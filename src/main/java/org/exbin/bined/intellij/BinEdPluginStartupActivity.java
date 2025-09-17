@@ -33,6 +33,7 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -82,12 +83,12 @@ import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
 import org.exbin.framework.bined.compare.BinedCompareModule;
 import org.exbin.framework.bined.editor.BinedEditorModule;
-import org.exbin.framework.bined.inspector.BinEdInspectorComponentExtension;
-import org.exbin.framework.bined.inspector.BinEdInspector;
-import org.exbin.framework.bined.inspector.BinEdInspectorManager;
-import org.exbin.framework.bined.inspector.BinedInspectorModule;
 import org.exbin.framework.bined.inspector.BasicValuesInspector;
 import org.exbin.framework.bined.inspector.BasicValuesInspectorProvider;
+import org.exbin.framework.bined.inspector.BinEdInspector;
+import org.exbin.framework.bined.inspector.BinEdInspectorComponentExtension;
+import org.exbin.framework.bined.inspector.BinEdInspectorManager;
+import org.exbin.framework.bined.inspector.BinedInspectorModule;
 import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
 import org.exbin.framework.bined.inspector.gui.InspectorPanel;
 import org.exbin.framework.bined.macro.BinedMacroModule;
@@ -103,9 +104,9 @@ import org.exbin.framework.component.api.ComponentModuleApi;
 import org.exbin.framework.contribution.ContributionModule;
 import org.exbin.framework.contribution.api.ContributionModuleApi;
 import org.exbin.framework.contribution.api.GroupSequenceContributionRule;
-import org.exbin.framework.contribution.api.SequenceContribution;
 import org.exbin.framework.contribution.api.PositionSequenceContributionRule;
 import org.exbin.framework.contribution.api.SeparationSequenceContributionRule;
+import org.exbin.framework.contribution.api.SequenceContribution;
 import org.exbin.framework.editor.EditorModule;
 import org.exbin.framework.editor.api.EditorModuleApi;
 import org.exbin.framework.editor.api.EditorProvider;
@@ -181,7 +182,8 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -237,7 +239,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             App.setModuleProvider(appModuleProvider);
             appModuleProvider.init();
 
-            // Editor actions overtakes action events
+            // EditorActionHandler takes key and selection events for IDE and makes then inaccessible
+            // This workaround passes them if editor is binary editor
             // No other method how to handle this was found so far...
             registerActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_START, 0, KeyEvent.VK_HOME);
             registerActionHandler(IdeActions.ACTION_EDITOR_MOVE_LINE_START_WITH_SELECTION, KeyEvent.SHIFT_DOWN_MASK, KeyEvent.VK_HOME);
@@ -252,8 +255,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             registerActionHandler(IdeActions.ACTION_EDITOR_COPY, CodeAreaCommandHandler::copy);
             registerActionHandler(IdeActions.ACTION_EDITOR_PASTE, CodeAreaCommandHandler::paste);
             registerActionHandler(IdeActions.ACTION_SELECT_ALL, CodeAreaCommandHandler::selectAll);
-            registerActionHandler(IdeActions.ACTION_FIND, KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_F);
-            registerActionHandler(IdeActions.ACTION_REPLACE, KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_H);
+//            registerActionHandler(IdeActions.ACTION_FIND, KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_F);
+//            registerActionHandler(IdeActions.ACTION_REPLACE, KeyEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK, KeyEvent.VK_H);
         }
     }
 
@@ -273,25 +276,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         if (actionHandler instanceof EditorActionHandler.ForEachCaret) {
             actionManager.setActionHandler(actionId,
                     new EditorActionHandler.ForEachCaret() {
-                        /**
-                         * @deprecated Implementations should override
-                         * {@link #isEnabledForCaret(Editor, Caret, DataContext)}
-                         * instead,
-                         * client code should invoke
-                         * {@link #isEnabled(Editor, Caret, DataContext)}
-                         * instead.
-                         */
-                        @Deprecated
-                        @Override
-                        public boolean isEnabled(Editor editor, DataContext dataContext) {
-                            JComponent component = editor.getComponent();
-                            if (component instanceof CodeAreaCore) {
-                                return super.isEnabled(editor, dataContext);
-                            }
-
-                            return actionHandler.isEnabled(editor, dataContext);
-                        }
-
                         @Override
                         protected boolean isEnabledForCaret(@NotNull Editor editor,
                                 @NotNull Caret caret,
@@ -302,24 +286,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                             }
 
                             return actionHandler.isEnabled(editor, caret, dataContext);
-                        }
-
-                        /**
-                         * @deprecated To implement action logic, override
-                         * {@link #doExecute(Editor, Caret, DataContext)},
-                         * to invoke the handler, call
-                         * {@link #execute(Editor, Caret, DataContext)}.
-                         */
-                        @Deprecated
-                        @Override
-                        public void execute(@NotNull Editor editor,
-                                @org.jetbrains.annotations.Nullable DataContext dataContext) {
-                            JComponent component = editor.getComponent();
-                            if (component instanceof CodeAreaCore) {
-                                super.execute(editor, dataContext);
-                            }
-
-                            actionHandler.execute(editor, dataContext);
                         }
 
                         @Override
@@ -358,25 +324,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         } else {
             actionManager.setActionHandler(actionId,
                     new EditorActionHandler() {
-                        /**
-                         * @deprecated Implementations should override
-                         * {@link #isEnabledForCaret(Editor, Caret, DataContext)}
-                         * instead,
-                         * client code should invoke
-                         * {@link #isEnabled(Editor, Caret, DataContext)}
-                         * instead.
-                         */
-                        @Deprecated
-                        @Override
-                        public boolean isEnabled(Editor editor, DataContext dataContext) {
-                            JComponent component = editor.getComponent();
-                            if (component instanceof CodeAreaCore) {
-                                return super.isEnabled(editor, dataContext);
-                            }
-
-                            return actionHandler.isEnabled(editor, dataContext);
-                        }
-
                         @Override
                         protected boolean isEnabledForCaret(@NotNull Editor editor,
                                 @NotNull Caret caret,
@@ -387,24 +334,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                             }
 
                             return actionHandler.isEnabled(editor, caret, dataContext);
-                        }
-
-                        /**
-                         * @deprecated To implement action logic, override
-                         * {@link #doExecute(Editor, Caret, DataContext)},
-                         * to invoke the handler, call
-                         * {@link #execute(Editor, Caret, DataContext)}.
-                         */
-                        @Deprecated
-                        @Override
-                        public void execute(@NotNull Editor editor,
-                                @org.jetbrains.annotations.Nullable DataContext dataContext) {
-                            JComponent component = editor.getComponent();
-                            if (component instanceof CodeAreaCore) {
-                                super.execute(editor, dataContext);
-                            }
-
-                            actionHandler.execute(editor, dataContext);
                         }
 
                         @Override
@@ -460,12 +389,12 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             ProjectManager.getInstance().addProjectManagerListener(new BinEdVetoableProjectListener());
 
             try {
-                BINED_VIEW_DATA.addExtensionPointListener(new ExtensionPointAdapter<>() {
+                BINED_VIEW_DATA.addExtensionPointListener(ApplicationManager.getApplication(), new ExtensionPointAdapter<>() {
                     @Override
                     public void extensionListChanged() {
                         initExtensions();
                     }
-                }, null);
+                });
             } catch (Throwable ex) {
                 Logger.getLogger(BinEdPluginStartupActivity.class.getName()).log(Level.SEVERE, "Extension initialization failed", ex);
             }
@@ -475,8 +404,20 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
         MessageBus messageBus = project.getMessageBus();
         MessageBusConnection connect = messageBus.connect();
+
         BinedModule binedModule = App.getModule(BinedModule.class);
         connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+            @Override
+            public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+                if (file instanceof BinEdVirtualFile) {
+                    // TODO: FileEditorManagerKeys.CLOSING_TO_REOPEN not available yet
+                    Boolean userData = file.getUserData(FileEditorManagerImpl.CLOSING_TO_REOPEN);
+                    if (userData == null || !userData) {
+                        ((BinEdVirtualFile) file).dispose();
+                    }
+                }
+            }
+
             @Override
             public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
                 BinEdIntelliJEditorProvider editorProvider =
@@ -754,9 +695,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             HelpOnlineModule helpOnlineModule = App.getModule(HelpOnlineModule.class);
             try {
-                helpOnlineModule.setOnlineHelpUrl(new URL(bundle.getString("online_help_url")));
+                helpOnlineModule.setOnlineHelpUrl(new URI(bundle.getString("online_help_url")).toURL());
                 helpOnlineModule.registerOpeningHandler();
-            } catch (MalformedURLException ex) {
+            } catch (MalformedURLException | URISyntaxException ex) {
                 Logger.getLogger(BinEdPluginStartupActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
 
@@ -930,7 +871,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                         panel.setDefaultLocaleName("<" + resourceBundle.getString("locale.defaultLanguage") + ">");
                         List<LanguageRecord> languageLocales = new ArrayList<>();
                         languageLocales.add(new LanguageRecord(Locale.ROOT, null));
-                        languageLocales.add(new LanguageRecord(new Locale("en", "US"), new ImageIcon(getClass().getResource(resourceBundle.getString("locale.englishFlag")))));
+                        languageLocales.add(new LanguageRecord(Locale.forLanguageTag("en-US"), new ImageIcon(getClass().getResource(resourceBundle.getString("locale.englishFlag")))));
 
                         List<LanguageRecord> languageRecords = new ArrayList<>();
                         List<LanguageProvider> languagePlugins = languageModule.getLanguagePlugins();

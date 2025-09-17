@@ -6,7 +6,7 @@
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
     <name>BinEd - Binary/Hex Editor</name>
-    <version>0.2.12.snapshot</version>
+    <version>0.2.12</version>
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="exbinproject@gmail.com" url="https://exbin.org">ExBin Project</vendor>
 
@@ -22,7 +22,7 @@
 <li>Use "Edit as Binary" in column context menu in DB view</li></ul>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.11.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.12.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
 
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
@@ -42,7 +42,11 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li></li></ul>
+<ul><li>Minor fixes</li>
+<li>Added status bars to binary diff</li>
+<li>Fixed NPE when moving hex viewer to its own window (issue #66)</li>
+<li>Fixed issue with pasting over selection (issue #64)</li>
+<li>Fixed height for one-diff view (issue #65)</li></ul>
     ]]>
     </change-notes>
 
@@ -53,8 +57,12 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true" config-file="java-ext.xml">com.intellij.modules.java</depends>
-    <depends optional="true" config-file="cidr-ext.xml">com.intellij.modules.cidr.debugger</depends>
-    <depends optional="true" config-file="python-ext.xml">com.intellij.modules.python</depends>
+    <depends optional="true" config-file="cidr-ext.xml">com.jetbrains.cidr</depends>
+    <depends optional="true" config-file="cidr-base-ext.xml">com.intellij.cidr.base</depends>
+    <depends optional="true" config-file="cidr-debugger-ext.xml">com.intellij.modules.cidr.debugger</depends>
+    <depends optional="true" config-file="python-ext.xml">com.jetbrains.python</depends>
+    <depends optional="true" config-file="python-alt-ext.xml">com.intellij.modules.python</depends>
+    <depends optional="true" config-file="python-debugger-ext.xml">com.jetbrains.python.debugger</depends>
     <depends optional="true" config-file="php-ext.xml">com.jetbrains.php</depends>
     <depends optional="true" config-file="go-ext.xml">com.intellij.modules.go</depends>
     <depends optional="true" config-file="ruby-ext.xml">com.intellij.modules.ruby</depends>

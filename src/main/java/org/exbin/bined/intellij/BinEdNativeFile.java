@@ -134,7 +134,9 @@ public class BinEdNativeFile {
         opened = true;
         fileHandler.fileSync();
         BinedModule binedModule = App.getModule(BinedModule.class);
-        ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider()).updateStatus();
+        BinEdIntelliJEditorProvider editorProvider = ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider());
+        editorProvider.setActiveFile(fileHandler);
+        editorProvider.updateStatus();
         updateModified();
     }
 
@@ -151,7 +153,9 @@ public class BinEdNativeFile {
                 virtualFile.setBinaryContent(fileContent);
                 fileHandler.fileSync();
                 BinedModule binedModule = App.getModule(BinedModule.class);
-                ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider()).updateStatus();
+                BinEdIntelliJEditorProvider editorProvider = ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider());
+                editorProvider.setActiveFile(fileHandler);
+                editorProvider.updateStatus();
             } catch (IOException e) {
                 throw createBrokenVirtualFileException(e);
             }

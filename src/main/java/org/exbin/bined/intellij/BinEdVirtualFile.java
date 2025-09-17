@@ -31,7 +31,6 @@ import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.editor.options.BinaryEditorOptions;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
-import org.exbin.framework.bined.viewer.options.BinaryViewerOptions;
 import org.exbin.framework.preferences.api.OptionsStorage;
 import org.exbin.framework.preferences.api.PreferencesModuleApi;
 import org.jetbrains.annotations.Nullable;
@@ -96,7 +95,9 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         toolbarPanel.setSaveAction(e -> {
             fileHandler.saveFile();
             fileHandler.fileSync();
-            ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider()).updateStatus();
+            BinEdIntelliJEditorProvider editorProvider = ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider());
+            editorProvider.setActiveFile(fileHandler);
+            editorProvider.updateStatus();
         });
 
         toolbarPanel.loadFromOptions(preferences);
@@ -317,6 +318,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             }
         }
         BinedModule binedModule = App.getModule(BinedModule.class);
-        ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider()).updateStatus();
+        BinEdIntelliJEditorProvider editorProvider = ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider());
+        editorProvider.setActiveFile(fileHandler);
+        editorProvider.updateStatus();
     }
 }

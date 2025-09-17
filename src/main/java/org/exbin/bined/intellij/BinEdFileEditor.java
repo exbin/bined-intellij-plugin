@@ -140,7 +140,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
 
     @Override
     public void dispose() {
-        virtualFile.dispose();
+        // Disposing editor doesn't mean file is disposing - editor could be moved
     }
 
     @Nullable
