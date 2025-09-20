@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.exbin.deltahex.intellij"
-version = "0.2.12"
+version = "0.2.13.snapshot"
 val ideLocalPath = providers.gradleProperty("ideLocalPath").getOrElse("")
 
 repositories {
