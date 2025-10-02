@@ -21,10 +21,10 @@ import com.intellij.openapi.command.undo.DocumentReference;
 import com.intellij.openapi.command.undo.DocumentReferenceManager;
 import com.intellij.openapi.command.undo.UndoManager;
 import com.intellij.openapi.command.undo.UndoableAction;
-import org.exbin.bined.operation.BinaryDataCommand;
-import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
-import org.exbin.bined.operation.undo.BinaryDataUndoRedoChangeListener;
-import org.exbin.bined.operation.undo.BinaryDataUndoableCommand;
+import org.exbin.bined.operation.BinaryDataUndoRedoChangeListener;
+import org.exbin.bined.operation.command.BinaryDataCommand;
+import org.exbin.bined.operation.command.BinaryDataUndoRedo;
+import org.exbin.bined.operation.command.BinaryDataUndoableCommand;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;

@@ -30,7 +30,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
-import org.exbin.bined.operation.undo.BinaryDataUndoRedo;
+import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.viewer.options.CodeAreaOptions;
 import org.exbin.framework.language.api.LanguageModuleApi;
