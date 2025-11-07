@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.options;
+package org.exbin.bined.intellij.settings;
 
-import org.exbin.framework.bined.theme.options.CodeAreaColorOptions;
-import org.exbin.framework.bined.theme.options.CodeAreaLayoutOptions;
-import org.exbin.framework.bined.viewer.options.CodeAreaOptions;
-import org.exbin.framework.bined.theme.options.CodeAreaThemeOptions;
-import org.exbin.framework.bined.editor.options.BinaryEditorOptions;
-import org.exbin.framework.bined.options.StatusOptions;
-import org.exbin.framework.text.encoding.options.TextEncodingOptions;
-import org.exbin.framework.text.font.options.TextFontOptions;
+import org.exbin.framework.bined.theme.settings.CodeAreaColorOptions;
+import org.exbin.framework.bined.theme.settings.CodeAreaLayoutOptions;
+import org.exbin.framework.bined.viewer.settings.CodeAreaOptions;
+import org.exbin.framework.bined.theme.settings.CodeAreaThemeOptions;
+import org.exbin.framework.bined.editor.settings.BinaryEditorOptions;
+import org.exbin.framework.bined.settings.CodeAreaStatusOptions;
+import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
+import org.exbin.framework.text.font.settings.TextFontOptions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -48,7 +48,7 @@ public interface BinEdApplyOptions {
     BinaryEditorOptions getEditorOptions();
 
     @Nonnull
-    StatusOptions getStatusOptions();
+    CodeAreaStatusOptions getStatusOptions();
 
     @Nonnull
     CodeAreaLayoutOptions getLayoutOptions();

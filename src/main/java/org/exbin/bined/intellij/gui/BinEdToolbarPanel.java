@@ -32,9 +32,9 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
 import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.framework.App;
-import org.exbin.framework.bined.viewer.options.CodeAreaOptions;
+import org.exbin.framework.bined.viewer.settings.CodeAreaOptions;
 import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.preferences.api.OptionsStorage;
+import org.exbin.framework.options.api.OptionsStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,7 +57,7 @@ public class BinEdToolbarPanel extends JBPanel {
 
     private final java.util.ResourceBundle resourceBundle;
     private final java.util.ResourceBundle fileResourceBundle;
-    private final java.util.ResourceBundle optionsResourceBundle;
+    private final java.util.ResourceBundle optionsSettingsResourceBundle;
     private final java.util.ResourceBundle onlineHelpResourceBundle;
     private final java.util.ResourceBundle operationUndoResourceBundle;
 
@@ -86,7 +86,7 @@ public class BinEdToolbarPanel extends JBPanel {
         LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
         resourceBundle = languageModule.getBundle(org.exbin.framework.bined.BinedModule.class);
         fileResourceBundle = languageModule.getBundle(org.exbin.framework.file.FileModule.class);
-        optionsResourceBundle = languageModule.getBundle(org.exbin.framework.options.OptionsModule.class);
+        optionsSettingsResourceBundle = languageModule.getBundle(org.exbin.framework.options.settings.OptionsSettingsModule.class);
         onlineHelpResourceBundle = languageModule.getBundle(org.exbin.framework.help.online.action.OnlineHelpAction.class);
         operationUndoResourceBundle = languageModule.getBundle(org.exbin.framework.operation.undo.OperationUndoModule.class);
 
@@ -96,9 +96,9 @@ public class BinEdToolbarPanel extends JBPanel {
         add(toolbar.getComponent(), BorderLayout.CENTER);
 
         settingsAction = new AnAction(
-                optionsResourceBundle.getString("optionsAction.text"),
-                optionsResourceBundle.getString("optionsAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource(optionsResourceBundle.getString("optionsAction.smallIcon")))
+                optionsSettingsResourceBundle.getString("settingsAction.text"),
+                optionsSettingsResourceBundle.getString("settingsAction.shortDescription"),
+                new javax.swing.ImageIcon(getClass().getResource(optionsSettingsResourceBundle.getString("settingsAction.smallIcon")))
         ) {
             @NotNull
             @Override

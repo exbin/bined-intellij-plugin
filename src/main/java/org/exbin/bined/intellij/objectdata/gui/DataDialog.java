@@ -33,8 +33,7 @@ import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
-import org.exbin.framework.action.api.ActiveComponent;
-import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.action.api.ContextComponent;
 import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.bined.BinEdDataComponent;
@@ -46,13 +45,14 @@ import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.options.StatusOptions;
+import org.exbin.framework.bined.settings.CodeAreaStatusOptions;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
+import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.text.encoding.EncodingsHandler;
-import org.exbin.framework.text.encoding.options.TextEncodingOptions;
+import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -114,7 +114,7 @@ public final class DataDialog extends DialogWrapper {
         BinEdComponentPanel componentPanel = (BinEdComponentPanel) editorComponent.getComponent();
         fileManager.initComponentPanel(componentPanel);
 
-        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
+        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
 
         SectCodeArea codeArea = editorComponent.getCodeArea();
         BinEdDataComponent binEdDataComponent = new BinEdDataComponent(codeArea);
@@ -158,12 +158,12 @@ public final class DataDialog extends DialogWrapper {
             @Override
             public void show(Component invoker, int x, int y) {
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                ComponentActivationListener componentActivationListener =
-                        frameModule.getFrameHandler().getComponentActivationListener();
+                ActiveContextManagement contextManager =
+                        frameModule.getFrameHandler().getContextManager();
 
-                componentActivationListener.updated(ActiveComponent.class, binEdDataComponent);
-                componentActivationListener.updated(DialogParentComponent.class, () -> codeArea);
-                componentActivationListener.updated(ClipboardController.class, binEdDataComponent);
+                contextManager.changeActiveState(ContextComponent.class, binEdDataComponent);
+                contextManager.changeActiveState(DialogParentComponent.class, () -> codeArea);
+                contextManager.changeActiveState(ClipboardController.class, binEdDataComponent);
 
                 String popupMenuId = "DataDialog.popup";
                 int clickedX = x;
@@ -193,9 +193,9 @@ public final class DataDialog extends DialogWrapper {
         });
 
         EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-        encodingsHandler.loadFromOptions(new TextEncodingOptions(preferencesModule.getAppPreferences()));
+        encodingsHandler.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
         statusPanel.setController(new BinaryStatusController());
-        statusPanel.loadFromOptions(new StatusOptions(preferencesModule.getAppPreferences()));
+        statusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
         registerBinaryStatus(statusPanel);
 
         panel.add(toolbarPanel, BorderLayout.NORTH);

@@ -29,10 +29,10 @@ import org.exbin.framework.bined.BinEdDocumentView;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.editor.options.BinaryEditorOptions;
+import org.exbin.framework.bined.editor.settings.BinaryEditorOptions;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
-import org.exbin.framework.preferences.api.OptionsStorage;
-import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.options.api.OptionsStorage;
+import org.exbin.framework.options.api.OptionsModuleApi;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -85,10 +85,10 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         fileManager.initCommandHandler(fileHandler.getComponent());
 
         filePanel.setFileHandler(fileHandler);
-        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-        OptionsStorage preferences = preferencesModule.getAppPreferences();
+        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+        OptionsStorage optionsStorage = optionsModule.getAppOptions();
         // TODO fileHandler.onInitFromOptions(binaryEditorOptions);
-        fileHandler.setNewData(new BinaryEditorOptions(preferences).getFileHandlingMode());
+        fileHandler.setNewData(new BinaryEditorOptions(optionsStorage).getFileHandlingMode());
 
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
         toolbarPanel.setUndoHandler(fileHandler.getCodeAreaUndoHandler().get());
@@ -100,7 +100,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             editorProvider.updateStatus();
         });
 
-        toolbarPanel.loadFromOptions(preferences);
+        toolbarPanel.loadFromOptions(optionsStorage);
     }
 
     @Nonnull

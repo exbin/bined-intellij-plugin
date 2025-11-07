@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij.preferences;
 
 import com.intellij.ide.util.PropertiesComponent;
-import org.exbin.framework.preferences.api.OptionsStorage;
+import org.exbin.framework.options.api.OptionsStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

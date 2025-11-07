@@ -20,14 +20,13 @@ import org.exbin.framework.App;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.theme.options.BinaryThemeOptions;
 import org.exbin.framework.bined.search.BinEdComponentSearch;
 import org.exbin.framework.bined.search.SearchCondition;
 import org.exbin.framework.bined.search.SearchParameters;
 import org.exbin.framework.bined.search.gui.BinarySearchPanel;
 import org.exbin.framework.bined.search.service.BinarySearchService;
 import org.exbin.framework.bined.search.service.impl.BinarySearchServiceImpl;
-import org.exbin.framework.preferences.api.OptionsStorage;
+import org.exbin.framework.options.api.OptionsStorage;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.BorderLayout;

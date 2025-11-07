@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.options.gui;
+package org.exbin.bined.intellij.settings.gui;
 
 import java.awt.Component;
 import java.util.List;
@@ -29,28 +29,31 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 
-import org.exbin.bined.intellij.options.IntegrationOptions;
+import org.exbin.bined.intellij.settings.IntegrationOptions;
 import org.exbin.framework.App;
+import org.exbin.framework.context.api.ActiveContextProvider;
 import org.exbin.framework.language.api.LanguageModuleApi;
+import org.exbin.framework.options.settings.api.SettingsComponent;
+import org.exbin.framework.options.settings.api.SettingsModifiedListener;
+import org.exbin.framework.options.settings.api.SettingsOptionsProvider;
 import org.exbin.framework.ui.model.LanguageRecord;
 import org.exbin.framework.utils.TestApplication;
 import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.options.api.OptionsComponent;
-import org.exbin.framework.options.api.OptionsModifiedListener;
 
 /**
- * Integration preference parameters panel.
+ * Integration settings options panel.
  *
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class IntegrationOptionsPanel extends javax.swing.JPanel implements OptionsComponent<IntegrationOptions> {
+public class IntegrationSettingsPanel extends javax.swing.JPanel implements SettingsComponent {
 
-    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(IntegrationOptionsPanel.class);
-    private OptionsModifiedListener optionsModifiedListener;
+    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(
+            IntegrationSettingsPanel.class);
+    private SettingsModifiedListener settingsModifiedListener;
     private String defaultLocaleName = "";
 
-    public IntegrationOptionsPanel() {
+    public IntegrationSettingsPanel() {
         initComponents();
     }
 
@@ -61,7 +64,8 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
     }
 
     @Override
-    public void saveToOptions(IntegrationOptions options) {
+    public void saveToOptions(SettingsOptionsProvider settingsOptionsProvider, @Nullable ActiveContextProvider contextProvider) {
+        IntegrationOptions options = settingsOptionsProvider.getSettingsOptions(IntegrationOptions.class);
         options.setLanguageLocale(((LanguageRecord) languageComboBox.getSelectedItem()).getLocale());
         options.setIconSet((String) iconSetComboBox.getSelectedItem());
         options.setRegisterFileMenuOpenAsBinary(openFileAsBinaryCheckBox.isSelected());
@@ -75,7 +79,8 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
     }
 
     @Override
-    public void loadFromOptions(IntegrationOptions options) {
+    public void loadFromOptions(SettingsOptionsProvider settingsOptionsProvider, @Nullable ActiveContextProvider contextProvider) {
+        IntegrationOptions options = settingsOptionsProvider.getSettingsOptions(IntegrationOptions.class);
         Locale languageLocale = options.getLanguageLocale();
         ComboBoxModel<LanguageRecord> languageComboBoxModel = languageComboBox.getModel();
         for (int i = 0; i < languageComboBoxModel.getSize(); i++) {
@@ -351,7 +356,7 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        TestApplication.run(() -> WindowUtils.invokeWindow(new IntegrationOptionsPanel()));
+        TestApplication.run(() -> WindowUtils.invokeWindow(new IntegrationSettingsPanel()));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -370,13 +375,13 @@ public class IntegrationOptionsPanel extends javax.swing.JPanel implements Optio
     // End of variables declaration//GEN-END:variables
 
     private void notifyModified() {
-        if (optionsModifiedListener != null) {
-            optionsModifiedListener.wasModified();
+        if (settingsModifiedListener != null) {
+            settingsModifiedListener.wasModified();
         }
     }
 
     @Override
-    public void setOptionsModifiedListener(OptionsModifiedListener listener) {
-        optionsModifiedListener = listener;
+    public void setSettingsModifiedListener(SettingsModifiedListener listener) {
+        settingsModifiedListener = listener;
     }
 }

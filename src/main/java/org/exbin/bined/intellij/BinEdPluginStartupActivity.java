@@ -62,8 +62,8 @@ import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.objectdata.MainBinaryViewHandler;
-import org.exbin.bined.intellij.options.IntegrationOptions;
-import org.exbin.bined.intellij.options.gui.IntegrationOptionsPanel;
+import org.exbin.bined.intellij.settings.IntegrationOptions;
+import org.exbin.bined.intellij.settings.gui.IntegrationSettingsPanel;
 import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
 import org.exbin.bined.intellij.search.BinEdIntelliJComponentSearch;
 import org.exbin.bined.swing.CodeAreaCommandHandler;
@@ -75,7 +75,6 @@ import org.exbin.framework.about.AboutModule;
 import org.exbin.framework.about.api.AboutModuleApi;
 import org.exbin.framework.action.ActionModule;
 import org.exbin.framework.action.api.ActionModuleApi;
-import org.exbin.framework.action.api.ComponentActivationListener;
 import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
@@ -95,12 +94,16 @@ import org.exbin.framework.bined.macro.BinedMacroModule;
 import org.exbin.framework.bined.objectdata.BinedObjectDataModule;
 import org.exbin.framework.bined.operation.BinedOperationModule;
 import org.exbin.framework.bined.operation.bouncycastle.BinedOperationBouncycastleModule;
+import org.exbin.framework.bined.operation.code.BinedOperationCodeModule;
 import org.exbin.framework.bined.search.BinedSearchModule;
 import org.exbin.framework.bined.theme.BinedThemeModule;
 import org.exbin.framework.bined.tool.content.BinedToolContentModule;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
 import org.exbin.framework.component.ComponentModule;
 import org.exbin.framework.component.api.ComponentModuleApi;
+import org.exbin.framework.context.ContextModule;
+import org.exbin.framework.context.api.ActiveContextManagement;
+import org.exbin.framework.context.api.ContextModuleApi;
 import org.exbin.framework.contribution.ContributionModule;
 import org.exbin.framework.contribution.api.ContributionModuleApi;
 import org.exbin.framework.contribution.api.GroupSequenceContributionRule;
@@ -122,14 +125,19 @@ import org.exbin.framework.language.api.IconSetProvider;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.language.api.LanguageProvider;
 import org.exbin.framework.menu.MenuModule;
-import org.exbin.framework.menu.api.MenuManagement;
+import org.exbin.framework.menu.api.MenuDefinitionManagement;
 import org.exbin.framework.menu.api.MenuModuleApi;
 import org.exbin.framework.operation.undo.OperationUndoModule;
 import org.exbin.framework.operation.undo.api.OperationUndoModuleApi;
-import org.exbin.framework.options.api.DefaultOptionsPage;
-import org.exbin.framework.options.api.OptionsComponent;
+import org.exbin.framework.options.OptionsModule;
+import org.exbin.framework.options.preferences.FilePreferencesFactory;
+import org.exbin.framework.options.settings.OptionsSettingsModule;
+import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
+import org.exbin.framework.options.settings.api.SettingsComponent;
 import org.exbin.framework.options.api.OptionsModuleApi;
-import org.exbin.framework.options.api.OptionsPanelType;
+import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.framework.options.settings.api.SettingsComponentProvider;
+import org.exbin.framework.options.settings.api.SettingsPanelType;
 import org.exbin.framework.plugin.language.cs_CZ.LanguageCsCzModule;
 import org.exbin.framework.plugin.language.de_DE.LanguageDeDeModule;
 import org.exbin.framework.plugin.language.es_ES.LanguageEsEsModule;
@@ -142,17 +150,13 @@ import org.exbin.framework.plugin.language.ru_RU.LanguageRuRuModule;
 import org.exbin.framework.plugin.language.zh_Hans.LanguageZhHansModule;
 import org.exbin.framework.plugin.language.zh_Hant.LanguageZhHantModule;
 import org.exbin.framework.plugins.iconset.material.IconSetMaterialModule;
-import org.exbin.framework.preferences.FilePreferencesFactory;
-import org.exbin.framework.preferences.PreferencesModule;
-import org.exbin.framework.preferences.api.OptionsStorage;
-import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.toolbar.ToolBarModule;
 import org.exbin.framework.toolbar.api.ToolBarModuleApi;
 import org.exbin.framework.ui.UiModule;
 import org.exbin.framework.ui.api.UiModuleApi;
-import org.exbin.framework.ui.gui.LanguageOptionsPanel;
+import org.exbin.framework.ui.settings.gui.LanguageSettingsPanel;
 import org.exbin.framework.ui.model.LanguageRecord;
-import org.exbin.framework.ui.theme.ThemeOptionsManager;
 import org.exbin.framework.ui.theme.UiThemeModule;
 import org.exbin.framework.ui.theme.api.UiThemeModuleApi;
 import org.exbin.framework.utils.UiUtils;
@@ -568,10 +572,11 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         private void createModules() {
             modules.put(LanguageModuleApi.class, new LanguageModule());
             modules.put(ContributionModuleApi.class, new ContributionModule());
+            modules.put(ContextModuleApi.class, new ContextModule());
             modules.put(ActionModuleApi.class, new ActionModule());
             modules.put(OperationUndoModuleApi.class, new OperationUndoModule());
             modules.put(OptionsModuleApi.class, new org.exbin.framework.options.OptionsModule());
-            modules.put(PreferencesModuleApi.class, new PreferencesModule());
+            modules.put(OptionsSettingsModuleApi.class, new OptionsSettingsModule());
             modules.put(UiModuleApi.class, new UiModule());
             modules.put(UiThemeModuleApi.class, new UiThemeModule());
             modules.put(HelpModuleApi.class, new HelpModule());
@@ -589,6 +594,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(BinedThemeModule.class, new BinedThemeModule());
             modules.put(BinedSearchModule.class, new BinedSearchModule());
             modules.put(BinedOperationModule.class, new BinedOperationModule());
+            modules.put(BinedOperationCodeModule.class, new BinedOperationCodeModule());
             modules.put(BinedOperationBouncycastleModule.class, new BinedOperationBouncycastleModule());
             modules.put(BinedObjectDataModule.class, new BinedObjectDataModule());
             modules.put(BinedToolContentModule.class, new BinedToolContentModule());
@@ -616,11 +622,11 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         }
 
         private void init() {
-            PreferencesModule preferencesModule = (PreferencesModule) App.getModule(PreferencesModuleApi.class);
-            preferencesModule.setAppPreferences(new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
+            OptionsModule optionsModule = (OptionsModule) App.getModule(OptionsModuleApi.class);
+            optionsModule.setAppOptions(new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
             convertIncorrectPreferences();
 
-            OptionsStorage preferences = preferencesModule.getAppPreferences();
+            OptionsStorage preferences = optionsModule.getAppOptions();
 
             UiUtils.setMenuBuilder(new UiUtils.MenuBuilder() {
                 @Nonnull
@@ -666,6 +672,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedBookmarksModule.register();
             BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
             binedMacroModule.register();
+            BinedOperationCodeModule binedOperationCodeModule = App.getModule(BinedOperationCodeModule.class);
+            binedOperationCodeModule.register();
             BinedOperationBouncycastleModule binedOperationBouncycastleModule = App.getModule(BinedOperationBouncycastleModule.class);
             binedOperationBouncycastleModule.register();
 
@@ -687,9 +695,10 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             windowModule.setHideHeaderPanels(true);
 
             AboutModuleApi aboutModule = App.getModule(AboutModuleApi.class);
-            OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-            optionsModule.setOptionsPanelType(OptionsPanelType.LIST);
-            optionsModule.setOptionsRootCaption(App.getModule(LanguageModuleApi.class).getBundle(IntegrationOptionsPanel.class).getString("options.caption"));
+            OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
+            optionsSettingsModule.setSettingsPanelType(SettingsPanelType.LIST);
+            optionsSettingsModule.setOptionsRootCaption(App.getModule(LanguageModuleApi.class).getBundle(
+                    IntegrationSettingsPanel.class).getString("options.caption"));
             // TODO Is currently stealing options action on macOS
             // optionsModule.registerMenuAction();
 
@@ -850,101 +859,64 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             BinedCompareModule binedCompareModule = App.getModule(BinedCompareModule.class);
             binedCompareModule.registerToolsOptionsMenuActions();
 
-            optionsModule.getOptionsPageManagement(BinedModule.MODULE_ID).registerPage(new DefaultOptionsPage<IntegrationOptions>() {
+            OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
+            settingsManager.registerOptionsSettings(IntegrationOptions.class, IntegrationOptions::new);
+            settingsManager.registerComponent("integration",
+                    new SettingsComponentProvider() {
+                        @Nonnull
+                        @Override
+                        public SettingsComponent createComponent() {
+                            IntegrationSettingsPanel panel = new IntegrationSettingsPanel();
+                            ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(LanguageSettingsPanel.class);
+                            panel.setDefaultLocaleName("<" + resourceBundle.getString("locale.defaultLanguage") + ">");
+                            List<LanguageRecord> languageLocales = new ArrayList<>();
+                            languageLocales.add(new LanguageRecord(Locale.ROOT, null));
+                            languageLocales.add(new LanguageRecord(Locale.forLanguageTag("en-US"), new ImageIcon(getClass().getResource(resourceBundle.getString("locale.englishFlag")))));
 
-                public static final String PAGE_ID = "integration";
+                            List<LanguageRecord> languageRecords = new ArrayList<>();
+                            List<LanguageProvider> languagePlugins = languageModule.getLanguagePlugins();
+                            for (LanguageProvider languageProvider : languagePlugins) {
+                                languageRecords.add(new LanguageRecord(languageProvider.getLocale(), languageProvider.getFlag().orElse(null)));
+                            }
+                            languageLocales.addAll(languageRecords);
 
-                private IntegrationOptionsPanel panel;
+                            List<String> iconSets = new ArrayList<>();
+                            iconSets.add("");
+                            List<String> iconSetNames = new ArrayList<>();
+                            UiThemeModule themeModule = (UiThemeModule) App.getModule(UiThemeModuleApi.class);
+                            ResourceBundle themeResourceBundle = themeModule.getResourceBundle();
+                            iconSetNames.add(themeResourceBundle.getString("iconset.defaultTheme"));
+                            List<IconSetProvider> providers = App.getModule(LanguageModuleApi.class).getIconSets();
+                            for (IconSetProvider provider : providers) {
+                                iconSets.add(provider.getId());
+                                iconSetNames.add(provider.getName());
+                            }
 
-                @Nonnull
-                @Override
-                public String getId() {
-                    return PAGE_ID;
-                }
-
-                @Nonnull
-                @Override
-                public OptionsComponent<IntegrationOptions> createComponent() {
-                    if (panel == null) {
-                        panel = new IntegrationOptionsPanel();
-                        ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(LanguageOptionsPanel.class);
-                        panel.setDefaultLocaleName("<" + resourceBundle.getString("locale.defaultLanguage") + ">");
-                        List<LanguageRecord> languageLocales = new ArrayList<>();
-                        languageLocales.add(new LanguageRecord(Locale.ROOT, null));
-                        languageLocales.add(new LanguageRecord(Locale.forLanguageTag("en-US"), new ImageIcon(getClass().getResource(resourceBundle.getString("locale.englishFlag")))));
-
-                        List<LanguageRecord> languageRecords = new ArrayList<>();
-                        List<LanguageProvider> languagePlugins = languageModule.getLanguagePlugins();
-                        for (LanguageProvider languageProvider : languagePlugins) {
-                            languageRecords.add(new LanguageRecord(languageProvider.getLocale(), languageProvider.getFlag().orElse(null)));
+                            panel.setLanguageLocales(languageLocales);
+                            panel.setIconSets(iconSets, iconSetNames);
+                            return panel;
                         }
-                        languageLocales.addAll(languageRecords);
-
-                        List<String> iconSets = new ArrayList<>();
-                        iconSets.add("");
-                        List<String> iconSetNames = new ArrayList<>();
-                        ResourceBundle themeResourceBundle = App.getModule(LanguageModuleApi.class).getBundle(ThemeOptionsManager.class);
-                        iconSetNames.add(themeResourceBundle.getString("iconset.defaultTheme"));
-                        List<IconSetProvider> providers = App.getModule(LanguageModuleApi.class).getIconSets();
-                        for (IconSetProvider provider : providers) {
-                            iconSets.add(provider.getId());
-                            iconSetNames.add(provider.getName());
-                        }
-
-                        panel.setLanguageLocales(languageLocales);
-                        panel.setIconSets(iconSets, iconSetNames);
-                    }
-
-                    return panel;
-                }
-
-                @Nonnull
-                @Override
-                public ResourceBundle getResourceBundle() {
-                    return App.getModule(LanguageModuleApi.class).getBundle(IntegrationOptionsPanel.class);
-                }
-
-                @Nonnull
-                @Override
-                public IntegrationOptions createOptions() {
-                    return new IntegrationOptions(preferences);
-                }
-
-                @Override
-                public void loadFromPreferences(OptionsStorage optionsStorage, IntegrationOptions options) {
-                    new IntegrationOptions(optionsStorage).copyTo(options);
-                }
-
-                @Override
-                public void saveToPreferences(OptionsStorage optionsStorage, IntegrationOptions options) {
-                    options.copyTo(new IntegrationOptions(optionsStorage));
-                }
-
-                @Override
-                public void applyPreferencesChanges(IntegrationOptions options) {
-                    applyIntegrationOptions(options);
-                }
-            });
+                    });
             binedModule.registerCodeAreaPopupMenu();
             binedViewerModule.registerCodeAreaPopupMenu();
             binedEditorModule.registerCodeAreaPopupMenu();
-            editorModule.registerOptionsPanels();
-            binedViewerModule.registerOptionsPanels();
+            editorModule.registerSettings();
+            binedViewerModule.registerSettings();
             binedViewerModule.registerViewModeMenu();
             binedViewerModule.registerCodeTypeMenu();
             binedViewerModule.registerPositionCodeTypeMenu();
             binedViewerModule.registerHexCharactersCaseHandlerMenu();
             binedViewerModule.registerLayoutMenu();
-            binedEditorModule.registerOptionsPanels();
-            binedThemeModule.registerOptionsPanels();
+            binedEditorModule.registerSettings();
+            binedThemeModule.registerSettings();
             binedSearchModule.registerEditFindPopupMenuActions();
             binedOperationModule.registerBlockEditPopupMenuActions();
             binedToolContentModule.registerClipboardContentMenu();
             binedToolContentModule.registerDragDropContentMenu();
-            binedInspectorModule.registerOptionsPanels();
+            binedInspectorModule.registerSettings();
 
             String toolsSubMenuId = BinEdIntelliJPlugin.PLUGIN_PREFIX + "toolsMenu";
-            MenuManagement menuManagement = menuModule.getMenuManagement(BinedModule.CODE_AREA_POPUP_MENU_ID, BinedModule.MODULE_ID);
+            MenuDefinitionManagement menuManagement = menuModule.getMenuManager(BinedModule.CODE_AREA_POPUP_MENU_ID, BinedModule.MODULE_ID);
             Action toolsSubMenuAction = new AbstractAction(((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.text")) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -953,7 +925,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             // toolsSubMenuAction.putValue(Action.SHORT_DESCRIPTION, ((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.shortDescription"));
             SequenceContribution contribution = menuManagement.registerMenuItem(toolsSubMenuId, toolsSubMenuAction);
             menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.BOTTOM_LAST));
-            MenuManagement subMenu = menuManagement.getSubMenu(toolsSubMenuId);
+            MenuDefinitionManagement subMenu = menuManagement.getSubMenu(toolsSubMenuId);
             contribution = subMenu.registerMenuItem(binedCompareModule.createCompareFilesAction());
             menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.TOP));
             contribution = subMenu.registerMenuItem(binedToolContentModule.createClipboardContentAction());
@@ -970,10 +942,10 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             contribution = menuManagement.registerMenuItem(aboutModule.createAboutAction());
             menuManagement.registerMenuRule(contribution, new GroupSequenceContributionRule(aboutMenuGroup));
 
-            ComponentActivationListener componentActivationListener =
-                    frameModule.getFrameHandler().getComponentActivationListener();
-            componentActivationListener.updated(EditorProvider.class, editorProvider);
-            componentActivationListener.updated(DialogParentComponent.class, () -> frameModule.getFrame());
+            ActiveContextManagement contextManager =
+                    frameModule.getFrameHandler().getContextManager();
+            contextManager.changeActiveState(EditorProvider.class, editorProvider);
+            contextManager.changeActiveState(DialogParentComponent.class, () -> frameModule.getFrame());
         }
 
         /**
@@ -982,10 +954,10 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
          * If it exists import it.
          */
         private void convertIncorrectPreferences() {
-            PreferencesModule preferencesModule = (PreferencesModule) App.getModule(PreferencesModuleApi.class);
-            OptionsStorage preferences = preferencesModule.getAppPreferences();
+            OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+            OptionsStorage optionsStorage = optionsModule.getAppOptions();
 
-            String versionKey = preferences.get("version", "");
+            String versionKey = optionsStorage.get("version", "");
             if (!"0.2.12".equals(versionKey)) {
                 String osName = System.getProperty("os.name").toLowerCase();
                 Preferences prefsPreferences;
@@ -1000,11 +972,11 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     for (String key : keys) {
                         String value = prefsPreferences.get(key, null);
                         if (value != null) {
-                            preferences.put(key, value);
+                            optionsStorage.put(key, value);
                         }
                     }
-                    preferences.put("version", "0.2.12");
-                    preferences.flush();
+                    optionsStorage.put("version", "0.2.12");
+                    optionsStorage.flush();
                 } catch (BackingStoreException e) {
                     // Can't process
                 }

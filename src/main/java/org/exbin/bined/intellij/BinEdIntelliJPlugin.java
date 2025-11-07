@@ -103,7 +103,7 @@ public class BinEdIntelliJPlugin {
 
         @Nonnull
         public Enumeration<String> getKeys() {
-            Set<String> keys = new HashSet();
+            Set<String> keys = new HashSet<>();
             keys.addAll(Collections.list(this.languageResourceBundle.getKeys()));
             keys.addAll(Collections.list(this.mainResourceBundle.getKeys()));
             return Collections.enumeration(keys);

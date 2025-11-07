@@ -23,8 +23,7 @@ import org.exbin.bined.SelectionRange;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ActionModuleApi;
-import org.exbin.framework.action.api.ActiveComponent;
-import org.exbin.framework.action.api.ComponentActivationListener;
+import org.exbin.framework.action.api.ContextComponent;
 import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.action.api.clipboard.TextClipboardController;
@@ -33,6 +32,7 @@ import org.exbin.framework.bined.BinEdEditorProvider;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
+import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.editor.api.EditorModuleApi;
 import org.exbin.framework.editor.api.MultiEditorProvider;
 import org.exbin.framework.file.api.EditableFileHandler;
@@ -42,7 +42,7 @@ import org.exbin.framework.file.api.FileOperations;
 import org.exbin.framework.file.api.FileType;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.operation.undo.api.UndoRedoState;
-import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.text.encoding.TextEncodingStatusApi;
 
 import javax.annotation.Nonnull;
@@ -110,8 +110,8 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
         EditorModuleApi editorModule = App.getModule(EditorModuleApi.class);
         editorModule.notifyEditorComponentCreated(fileHandler.getComponent());
 
-        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-        fileHandler.getComponent().onInitFromPreferences(preferencesModule.getAppPreferences());
+        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+        fileHandler.getComponent().onInitFromPreferences(optionsModule.getAppOptions());
     }
 
     public void removeFile(BinEdFileHandler fileHandler) {
@@ -175,14 +175,14 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
     }
 
     public void activeFileChanged() {
-/*        componentActivationListener.updated(FileHandler.class, activeFile);
+/*        contextManager.updated(FileHandler.class, activeFile);
         if (activeFile instanceof EditorFileHandler) {
-            ((EditorFileHandler) activeFile).componentActivated(componentActivationListener);
+            ((EditorFileHandler) activeFile).componentActivated(contextManager);
         } */
 
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ComponentActivationListener componentActivationListener =
-                frameModule.getFrameHandler().getComponentActivationListener();
+        ActiveContextManagement contextManager =
+                frameModule.getFrameHandler().getContextManager();
 
         SectCodeArea extCodeArea = null;
         BinEdDataComponent binEdDataComponent = null;
@@ -196,12 +196,12 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
             updateStatus();
         }
 
-        componentActivationListener.updated(FileHandler.class, activeFile);
-        componentActivationListener.updated(FileOperations.class, this);
-        componentActivationListener.updated(ActiveComponent.class, binEdDataComponent);
-        componentActivationListener.updated(DialogParentComponent.class, binEdDataComponent == null ? () -> frameModule.getFrame() : binEdDataComponent::getCodeArea);
-        componentActivationListener.updated(UndoRedoState.class, undoHandler);
-        componentActivationListener.updated(ClipboardController.class, clipboardController);
+        contextManager.changeActiveState(FileHandler.class, activeFile);
+        contextManager.changeActiveState(FileOperations.class, this);
+        contextManager.changeActiveState(ContextComponent.class, binEdDataComponent);
+        contextManager.changeActiveState(DialogParentComponent.class, binEdDataComponent == null ? () -> frameModule.getFrame() : binEdDataComponent::getCodeArea);
+        contextManager.changeActiveState(UndoRedoState.class, undoHandler);
+        contextManager.changeActiveState(ClipboardController.class, clipboardController);
 
         /* if (this.undoHandler != null) {
             this.undoHandler.setActiveFile(this.activeFile);

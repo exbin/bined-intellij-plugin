@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.options;
+package org.exbin.bined.intellij.settings;
 
-import org.exbin.framework.options.api.OptionsData;
-import org.exbin.framework.preferences.api.OptionsStorage;
+import org.exbin.framework.options.api.OptionsStorage;
+import org.exbin.framework.options.settings.api.SettingsOptions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -28,7 +28,7 @@ import java.util.Locale;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class IntegrationOptions implements OptionsData {
+public class IntegrationOptions implements SettingsOptions {
 
     private final OptionsStorage storage;
 
@@ -195,7 +195,7 @@ public class IntegrationOptions implements OptionsData {
     }
 
     @Override
-    public void copyTo(OptionsData options) {
+    public void copyTo(SettingsOptions options) {
         IntegrationOptions with = (IntegrationOptions) options;
         with.setLanguageLocale(getLanguageLocale());
         with.setIconSet(getIconSet());

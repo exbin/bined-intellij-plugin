@@ -29,9 +29,8 @@ import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
-import org.exbin.framework.action.DefaultActionManager;
 import org.exbin.framework.action.api.ActionConsts;
-import org.exbin.framework.action.api.ActionContextService;
+import org.exbin.framework.action.api.ActionManagement;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
@@ -40,7 +39,7 @@ import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
-import org.exbin.framework.bined.editor.options.BinaryEditorOptions;
+import org.exbin.framework.bined.editor.settings.BinaryEditorOptions;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
@@ -48,15 +47,17 @@ import org.exbin.framework.bined.macro.BinedMacroModule;
 import org.exbin.framework.bined.search.BinedSearchModule;
 import org.exbin.framework.bined.search.action.FindReplaceActions;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
+import org.exbin.framework.context.api.ActiveContextManagement;
+import org.exbin.framework.context.api.ContextModuleApi;
 import org.exbin.framework.file.api.FileHandler;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.options.action.OptionsAction;
 import org.exbin.framework.options.api.OptionsModuleApi;
-import org.exbin.framework.preferences.api.OptionsStorage;
-import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.options.api.OptionsStorage;
+import org.exbin.framework.options.settings.action.SettingsAction;
+import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.framework.text.encoding.EncodingsHandler;
-import org.exbin.framework.text.encoding.options.TextEncodingOptions;
+import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -112,8 +113,11 @@ public class BinEdFilePanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FindReplaceActions.EditFindAction editFindAction = findReplaceActions.createEditFindAction();
-                DefaultActionManager actionManager = new DefaultActionManager();
-                actionManager.updated(FileHandler.class, fileHandler);
+                ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
+                ActiveContextManagement contextManager = contextModule.createContextManager();
+                contextManager.changeActiveState(FileHandler.class, fileHandler);
+                ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+                ActionManagement actionManager = actionModule.createActionManager(contextManager);
                 actionManager.registerAction(editFindAction);
                 actionManager.initAction(editFindAction);
                 editFindAction.actionPerformed(e);
@@ -125,8 +129,11 @@ public class BinEdFilePanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FindReplaceActions.EditReplaceAction editReplaceAction = findReplaceActions.createEditReplaceAction();
-                DefaultActionManager actionManager = new DefaultActionManager();
-                actionManager.updated(FileHandler.class, fileHandler);
+                ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
+                ActiveContextManagement contextManager = contextModule.createContextManager();
+                contextManager.changeActiveState(FileHandler.class, fileHandler);
+                ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+                ActionManagement actionManager = actionModule.createActionManager(contextManager);
                 actionManager.registerAction(editReplaceAction);
                 actionManager.initAction(editReplaceAction);
                 editReplaceAction.actionPerformed(e);
@@ -168,22 +175,22 @@ public class BinEdFilePanel extends JPanel {
         });
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
 
-        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-        OptionsAction optionsAction = (OptionsAction) optionsModule.createOptionsAction();
+        OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
+        SettingsAction settingsAction = (SettingsAction) optionsSettingsModule.createSettingsAction();
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        optionsAction.setDialogParentComponent(() -> frameModule.getFrame());
+        settingsAction.setDialogParentComponent(() -> frameModule.getFrame());
         AbstractAction wrapperAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                optionsAction.actionPerformed(e);
+                settingsAction.actionPerformed(e);
                 toolbarPanel.applyFromCodeArea();
                 statusPanel.updateStatus();
             }
         };
         LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
-        java.util.ResourceBundle optionsResourceBundle = languageModule.getBundle(org.exbin.framework.options.OptionsModule.class);
+        java.util.ResourceBundle optionsSettingsResourceBundle = languageModule.getBundle(org.exbin.framework.options.settings.OptionsSettingsModule.class);
         ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
-        actionModule.initAction(wrapperAction, optionsResourceBundle, OptionsAction.ACTION_ID);
+        actionModule.initAction(wrapperAction, optionsSettingsResourceBundle, SettingsAction.ACTION_ID);
         wrapperAction.putValue(ActionConsts.ACTION_DIALOG_MODE, true);
         toolbarPanel.setOptionsAction(wrapperAction);
 
@@ -204,11 +211,11 @@ public class BinEdFilePanel extends JPanel {
 
                 // TODO Temporary workaround for unfinished rework of actions
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                ActionContextService actionContextService = frameModule.getFrameHandler().getActionContextService();
+                ActionManagement actionContext = frameModule.getFrameHandler().getActionManager();
                 BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
-                actionContextService.requestUpdate(binedBookmarksModule.getManageBookmarksAction());
+                actionContext.requestUpdateForAction(binedBookmarksModule.getManageBookmarksAction());
                 BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
-                actionContextService.requestUpdate(binedMacroModule.getMacroManager().getManageMacrosAction());
+                actionContext.requestUpdateForAction(binedMacroModule.getMacroManager().getManageMacrosAction());
 
                 JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
                 popupMenu.addPopupMenuListener(new PopupMenuListener() {
@@ -225,7 +232,7 @@ public class BinEdFilePanel extends JPanel {
                     public void popupMenuCanceled(PopupMenuEvent e) {
                     }
                 });
-                ActionUtils.replaceAction(popupMenu, OptionsAction.ACTION_ID, wrapperAction);
+                ActionUtils.replaceAction(popupMenu, SettingsAction.ACTION_ID, wrapperAction);
                 popupMenu.show(invoker, x, y);
             }
         });
@@ -286,10 +293,10 @@ public class BinEdFilePanel extends JPanel {
             }
 
         });
-        fileManager.setStatusControlHandler(new BinaryStatusController());
+        fileManager.setBinaryStatusController(new BinaryStatusController());
 
-        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-        encodingsHandler.loadFromOptions(new TextEncodingOptions(preferencesModule.getAppPreferences()));
+        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+        encodingsHandler.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
         statusPanel = fileManager.getBinaryStatusPanel();
         statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
         encodingsHandler.setTextEncodingStatus(statusPanel);
@@ -373,8 +380,8 @@ public class BinEdFilePanel extends JPanel {
             FileHandlingMode fileHandlingMode = fileHandler.getFileHandlingMode();
             FileHandlingMode newHandlingMode = memoryMode == BinaryStatusApi.MemoryMode.DELTA_MODE ? FileHandlingMode.DELTA : FileHandlingMode.MEMORY;
             if (newHandlingMode != fileHandlingMode) {
-                PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-                BinaryEditorOptions options = new BinaryEditorOptions(preferencesModule.getAppPreferences());
+                OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+                BinaryEditorOptions options = new BinaryEditorOptions(optionsModule.getAppOptions());
                 if (editorProvider.releaseFile(fileHandler)) {
                     fileHandler.switchFileHandlingMode(newHandlingMode);
                     options.setFileHandlingMode(newHandlingMode);

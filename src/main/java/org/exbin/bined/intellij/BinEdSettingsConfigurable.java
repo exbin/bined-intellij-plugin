@@ -19,19 +19,26 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
 import org.exbin.framework.App;
-import org.exbin.framework.options.OptionsModule;
-import org.exbin.framework.options.action.OptionsAction;
-import org.exbin.framework.options.api.OptionsModuleApi;
-import org.exbin.framework.options.api.OptionsPageReceiver;
-import org.exbin.framework.options.gui.OptionsListPanel;
-import org.exbin.framework.preferences.api.PreferencesModuleApi;
+import org.exbin.framework.frame.api.ApplicationFrameHandler;
+import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.framework.options.settings.OptionsSettingsModule;
+import org.exbin.framework.options.settings.SettingsPage;
+import org.exbin.framework.options.settings.SettingsPageReceiver;
+import org.exbin.framework.options.settings.action.SettingsAction;
+import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
+import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.framework.options.settings.api.SettingsOptionsProvider;
+import org.exbin.framework.options.settings.gui.SettingsListPanel;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.swing.JComponent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Settings component.
@@ -40,7 +47,7 @@ import java.util.ResourceBundle;
  */
 public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
-    private OptionsListPanel optionsListPanel;
+    private SettingsListPanel settingsListPanel;
     private boolean modified = true;
     private ResourceBundle resourceBundle = BinEdIntelliJPlugin.getResourceBundle();
 
@@ -56,24 +63,22 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
     @Nullable
     @Override
     public JComponent createComponent() {
-        PreferencesModuleApi preferencesModule = App.getModule(PreferencesModuleApi.class);
-        OptionsAction.OptionsPagesProvider optionsPagesProvider = (OptionsPageReceiver optionsTreePanel) -> {
-            OptionsModule optionsModule = (OptionsModule) App.getModule(OptionsModuleApi.class);
-            optionsModule.getOptionsPageManager().passOptionsPages(optionsTreePanel);
+        SettingsAction.SettingsPagesProvider optionsPagesProvider = (SettingsPageReceiver optionsPageReceiver) -> {
+            OptionsSettingsModule optionsSettingsModule = (OptionsSettingsModule) App.getModule(OptionsSettingsModuleApi.class);
+            optionsSettingsModule.getMainSettingsManager().passSettingsPages(optionsPageReceiver);
         };
-        optionsListPanel = new OptionsListPanel();
-        optionsPagesProvider.registerOptionsPages(optionsListPanel);
-        optionsListPanel.setPreferences(preferencesModule.getAppPreferences());
-        optionsListPanel.pagesFinished();
-        optionsListPanel.loadAllFromPreferences();
-        optionsListPanel.addFocusListener(new FocusAdapter() {
+        settingsListPanel = new SettingsListPanel();
+        optionsPagesProvider.registerSettingsPages(settingsListPanel);
+        settingsListPanel.pagesFinished();
+        loadAll(settingsListPanel.getSettingsPages());
+        settingsListPanel.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 modified = true;
             }
         });
 
-        return optionsListPanel;
+        return settingsListPanel;
     }
 
     @Override
@@ -83,6 +88,38 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
     @Override
     public void apply() throws ConfigurationException {
-        optionsListPanel.saveAndApplyAll();
+        saveAndApplyAll(settingsListPanel.getSettingsPages());
+    }
+
+    private void loadAll(Collection<SettingsPage> pages) {
+        OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
+        SettingsOptionsProvider settingsOptionsProvider = optionsSettingsModule.getMainSettingsManager().getSettingsOptionsProvider();
+
+        for (SettingsPage page : pages) {
+            try {
+                page.loadFromOptions(settingsOptionsProvider, null);
+            } catch (Exception ex) {
+                Logger.getLogger(BinEdSettingsConfigurable.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void saveAndApplyAll(Collection<SettingsPage> pages) {
+        OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
+        OptionsSettingsManagement mainSettingsManager = optionsSettingsModule.getMainSettingsManager();
+        SettingsOptionsProvider settingsOptionsProvider = mainSettingsManager.getSettingsOptionsProvider();
+
+        for (SettingsPage page : pages) {
+            try {
+                page.saveAndApply(settingsOptionsProvider, null);
+            } catch (Exception ex) {
+                Logger.getLogger(BinEdSettingsConfigurable.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        // TODO Run in top context
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        ApplicationFrameHandler frameHandler = frameModule.getFrameHandler();
+        mainSettingsManager.applyAllOptions(frameHandler.getContextManager(), mainSettingsManager.getSettingsOptionsProvider());
     }
 }
