@@ -107,7 +107,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
     @Override
     public void selectNotify() {
         BinedModule binedModule = App.getModule(BinedModule.class);
-        ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider()).setActiveFile(virtualFile.getEditorFile());
+        ((BinEdIntelliJDocking) binedModule.getEditorProvider()).setActiveFile(virtualFile.getEditorFile());
     }
 
     @Override

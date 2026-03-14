@@ -65,6 +65,7 @@ import org.exbin.framework.bined.theme.settings.CodeAreaColorOptions;
 import org.exbin.framework.bined.theme.settings.CodeAreaLayoutOptions;
 import org.exbin.framework.bined.theme.settings.CodeAreaThemeOptions;
 import org.exbin.framework.bined.viewer.settings.CodeAreaOptions;
+import org.exbin.framework.bined.viewer.settings.CodeAreaViewerSettingsApplier;
 import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
@@ -72,8 +73,7 @@ import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.settings.action.SettingsAction;
 import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
-import org.exbin.framework.text.encoding.EncodingsHandler;
-import org.exbin.framework.text.encoding.TextEncodingStatusApi;
+import org.exbin.framework.text.encoding.EncodingsManager;
 import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
 import org.exbin.framework.text.font.settings.TextFontOptions;
 import org.exbin.framework.utils.DesktopUtils;
@@ -124,7 +124,7 @@ public class BinedDiffPanel extends JBPanel {
     private final BinEdToolbarPanel toolbarPanel;
     private final BinaryStatusPanel leftStatusPanel;
     private final BinaryStatusPanel rightStatusPanel;
-    private EncodingsHandler encodingsHandler;
+    private EncodingsManager encodingsManager;
     private GoToPositionAction goToPositionAction = new GoToPositionAction();
 
     public BinedDiffPanel() {
@@ -309,9 +309,9 @@ public class BinedDiffPanel extends JBPanel {
 
     private void init() {
         this.add(toolbarPanel, BorderLayout.NORTH);
-        encodingsHandler = new EncodingsHandler();
-        encodingsHandler.init();
-        encodingsHandler.setTextEncodingStatus(new TextEncodingStatusApi() {
+        encodingsManager = new EncodingsManager();
+        encodingsManager.init();
+        /* encodingsManager.setTextEncodingStatus(new TextEncodingStatusApi() {
             @Nonnull
             @Override
             public String getEncoding() {
@@ -326,7 +326,7 @@ public class BinedDiffPanel extends JBPanel {
                 rightStatusPanel.setEncoding(encodingName);
                 new TextEncodingOptions(preferences).setSelectedEncoding(encodingName);
             }
-        });
+        }); */
         goToPositionAction.setup(App.getModule(LanguageModuleApi.class).getBundle(BinedModule.class));
 
         registerBinaryStatus(leftStatusPanel, diffPanel.getLeftCodeArea());
@@ -548,7 +548,7 @@ public class BinedDiffPanel extends JBPanel {
             }
         });
 
-        encodingsHandler.loadFromOptions(new TextEncodingOptions(preferences));
+        // TODO encodingsManager.loadFromOptions(new TextEncodingOptions(preferences));
         leftStatusPanel.loadFromOptions(new CodeAreaStatusOptions(preferences));
         rightStatusPanel.loadFromOptions(new CodeAreaStatusOptions(preferences));
         toolbarPanel.loadFromOptions(preferences);
@@ -564,11 +564,11 @@ public class BinedDiffPanel extends JBPanel {
     }
 
     private void applyOptions(BinEdApplyOptions applyOptions, SectCodeArea codeArea) {
-        CodeAreaOptions.applyToCodeArea(applyOptions.getCodeAreaOptions(), codeArea);
+        CodeAreaViewerSettingsApplier.applyToCodeArea(applyOptions.getCodeAreaOptions(), codeArea);
 
         ((CharsetCapable) codeArea).setCharset(Charset.forName(applyOptions.getEncodingOptions()
                 .getSelectedEncoding()));
-        encodingsHandler.setEncodings(applyOptions.getEncodingOptions().getEncodings());
+        // TODO encodingsManager.setEncodings(applyOptions.getEncodingOptions().getEncodings());
         ((FontCapable) codeArea).setCodeFont(applyOptions.getFontOptions().isUseDefaultFont() ?
                 defaultFont :
                 applyOptions.getFontOptions().getFont(defaultFont));
@@ -646,22 +646,22 @@ public class BinedDiffPanel extends JBPanel {
 
         @Override
         public void cycleNextEncoding() {
-            if (encodingsHandler != null) {
-                encodingsHandler.cycleNextEncoding();
+            if (encodingsManager != null) {
+                encodingsManager.cycleNextEncoding();
             }
         }
 
         @Override
         public void cyclePreviousEncoding() {
-            if (encodingsHandler != null) {
-                encodingsHandler.cyclePreviousEncoding();
+            if (encodingsManager != null) {
+                encodingsManager.cyclePreviousEncoding();
             }
         }
 
         @Override
         public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
-            if (encodingsHandler != null) {
-                encodingsHandler.popupEncodingsMenu(mouseEvent);
+            if (encodingsManager != null) {
+                encodingsManager.popupEncodingsMenu(mouseEvent);
             }
         }
 

@@ -27,6 +27,7 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.EditOperation;
 import org.exbin.bined.SelectionRange;
+import org.exbin.bined.capability.EditModeCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
@@ -37,8 +38,8 @@ import org.exbin.framework.action.api.ContextComponent;
 import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.bined.BinEdDataComponent;
-import org.exbin.framework.bined.BinEdDocumentView;
 import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.BinaryStatus;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.action.GoToPositionAction;
@@ -51,7 +52,7 @@ import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
-import org.exbin.framework.text.encoding.EncodingsHandler;
+import org.exbin.framework.text.encoding.EncodingsManager;
 import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
 import org.exbin.framework.utils.DesktopUtils;
 
@@ -84,9 +85,8 @@ public final class DataDialog extends DialogWrapper {
 
     private final JPanel panel;
     private BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
-    private BinaryStatusPanel statusPanel = new BinaryStatusPanel();
-    private BinaryStatusApi binaryStatus;
-    private final BinEdDocumentView editorComponent;
+    private BinaryStatus binaryStatus;
+    private final BinEdDataComponent dataComponent;
     private final SetDataListener setDataListener;
     private long documentOriginalSize = 0;
     private final boolean editable;
@@ -107,16 +107,16 @@ public final class DataDialog extends DialogWrapper {
         setCrossClosesWindow(true);
 
         panel = new JPanel(new BorderLayout());
-        editorComponent = new BinEdDocumentView();
+        BinEdComponentPanel componentPanel = new BinEdComponentPanel();
+        dataComponent = new BinEdDataComponent(componentPanel);
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
-        BinEdComponentPanel componentPanel = (BinEdComponentPanel) editorComponent.getComponent();
-        fileManager.initComponentPanel(componentPanel);
+        fileManager.initDataComponent(dataComponent);
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
 
-        SectCodeArea codeArea = editorComponent.getCodeArea();
+        SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
         BinEdDataComponent binEdDataComponent = new BinEdDataComponent(codeArea);
         toolbarPanel.setTargetComponent(componentPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
@@ -192,22 +192,22 @@ public final class DataDialog extends DialogWrapper {
             }
         });
 
-        EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-        encodingsHandler.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
-        statusPanel.setController(new BinaryStatusController());
-        statusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
-        registerBinaryStatus(statusPanel);
+        EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
+        encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
+        binaryStatus.setBinaryStatusController(new BinaryStatusController());
+        binaryStatus.applySettings(optionsModule.getAppOptions());
+        binaryStatus.attachCodeArea(dataComponent);
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
-        panel.add(statusPanel, BorderLayout.SOUTH);
-        panel.add(editorComponent.getComponent(), BorderLayout.CENTER);
+        panel.add(binaryStatus.getBinaryStatusPanel(), BorderLayout.SOUTH);
+        panel.add(dataComponent.getComponent(), BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
 
-        editorComponent.setContentData(binaryData);
-        long dataSize = editorComponent.getContentData().getDataSize();
+        dataComponent.getCodeArea().setContentData(binaryData);
+        long dataSize = dataComponent.getCodeArea().getContentData().getDataSize();
         documentOriginalSize = dataSize;
-        statusPanel.setCurrentDocumentSize(dataSize, documentOriginalSize);
+        binaryStatus.setCurrentDocumentSize(dataSize, documentOriginalSize);
         if (!editable) {
             codeArea.setEditMode(EditMode.READ_ONLY);
         }
@@ -224,7 +224,7 @@ public final class DataDialog extends DialogWrapper {
         super.doOKAction();
 
         if (setDataListener != null) {
-            setDataListener.setData(editorComponent.getContentData());
+            setDataListener.setData(dataComponent.getCodeArea().getContentData());
         }
     }
 
@@ -241,7 +241,7 @@ public final class DataDialog extends DialogWrapper {
     @Nonnull
     @Override
     public JComponent getPreferredFocusedComponent() {
-        return editorComponent.getCodeArea();
+        return dataComponent.getCodeArea();
     }
 
     @Nonnull
@@ -270,76 +270,6 @@ public final class DataDialog extends DialogWrapper {
         };
     }
 
-    public void registerBinaryStatus(BinaryStatusApi binaryStatus) {
-        this.binaryStatus = binaryStatus;
-
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        codeArea.addDataChangedListener(() -> {
-            updateCurrentDocumentSize();
-        });
-
-        codeArea.addSelectionChangedListener(() -> {
-            binaryStatus.setSelectionRange(codeArea.getSelection());
-        });
-
-        codeArea.addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
-            binaryStatus.setCursorPosition(caretPosition);
-        });
-
-        codeArea.addEditModeChangedListener((EditMode mode, EditOperation operation) -> {
-            binaryStatus.setEditMode(mode, operation);
-        });
-
-        updateStatus();
-    }
-
-    public void updateStatus() {
-        updateCurrentDocumentSize();
-        updateCurrentCaretPosition();
-        updateCurrentSelectionRange();
-        // updateCurrentMemoryMode();
-        updateCurrentEditMode();
-    }
-
-    private void updateCurrentDocumentSize() {
-        if (binaryStatus == null) {
-            return;
-        }
-
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        long dataSize = codeArea.getDataSize();
-        binaryStatus.setCurrentDocumentSize(dataSize, documentOriginalSize);
-    }
-
-    private void updateCurrentCaretPosition() {
-        if (binaryStatus == null) {
-            return;
-        }
-
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        CodeAreaCaretPosition caretPosition = codeArea.getActiveCaretPosition();
-        binaryStatus.setCursorPosition(caretPosition);
-    }
-
-    private void updateCurrentSelectionRange() {
-        if (binaryStatus == null) {
-            return;
-        }
-
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        SelectionRange selectionRange = codeArea.getSelection();
-        binaryStatus.setSelectionRange(selectionRange);
-    }
-
-    private void updateCurrentEditMode() {
-        if (binaryStatus == null) {
-            return;
-        }
-
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        binaryStatus.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
-    }
-
     public interface SetDataListener {
 
         void setData(@Nullable BinaryData data);
@@ -349,35 +279,35 @@ public final class DataDialog extends DialogWrapper {
     private class BinaryStatusController implements BinaryStatusPanel.Controller, BinaryStatusPanel.EncodingsController, BinaryStatusPanel.MemoryModeController {
         @Override
         public void changeEditOperation(EditOperation editOperation) {
-            editorComponent.getCodeArea().setEditOperation(editOperation);
+            ((EditModeCapable) dataComponent.getCodeArea()).setEditOperation(editOperation);
         }
 
         @Override
         public void changeCursorPosition() {
             GoToPositionAction action = new GoToPositionAction();
-            action.setCodeArea(editorComponent.getCodeArea());
+            action.setCodeArea(dataComponent.getCodeArea());
             action.actionPerformed(null);
         }
 
         @Override
         public void cycleNextEncoding() {
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            encodingsHandler.cycleNextEncoding();
+            EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
+            encodingsManager.cycleNextEncoding();
         }
 
         @Override
         public void cyclePreviousEncoding() {
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            encodingsHandler.cyclePreviousEncoding();
+            EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
+            encodingsManager.cyclePreviousEncoding();
         }
 
         @Override
         public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsHandler encodingsHandler = binedViewerModule.getEncodingsHandler();
-            encodingsHandler.popupEncodingsMenu(mouseEvent);
+            EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
+            encodingsManager.popupEncodingsMenu(mouseEvent);
         }
 
         @Override

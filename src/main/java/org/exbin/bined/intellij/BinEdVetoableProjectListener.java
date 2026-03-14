@@ -19,8 +19,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.exbin.framework.editor.gui.UnsavedFilesPanel;
-import org.exbin.framework.file.api.FileHandler;
+import org.exbin.framework.file.api.FileDocument;
 import org.exbin.framework.utils.WindowUtils;
 
 import javax.annotation.Nonnull;
@@ -42,20 +41,20 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
     @Override
     public boolean canClose(Project project) {
         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-        List<FileHandler> fileHandlers = new ArrayList<>();
+        List<FileDocument> fileDocuments = new ArrayList<>();
         VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
         for (VirtualFile file : openFiles) {
             if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isClosing()) {
-                FileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
+                FileDocument fileDocument = ((BinEdVirtualFile) file).getEditorFile();
                 // TODO
-//                if (fileHandler.isModified()) {
-//                    fileHandlers.add(fileHandler);
+//                if (fileDocument.isModified()) {
+//                    fileDocuments.add(fileDocument);
 //                }
             }
         }
 
-        if (!fileHandlers.isEmpty()) {
-            boolean discardRest = showAskForSaveDialog(fileHandlers, fileHandlers.get(0).getComponent());
+        if (!fileDocuments.isEmpty()) {
+            boolean discardRest = showAskForSaveDialog(fileDocuments, fileDocuments.get(0).getComponent());
             if (discardRest) {
                 // Mark rest as already processed
                 for (VirtualFile file : openFiles) {
@@ -73,13 +72,13 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         return true;
     }
 
-    public static boolean showAskForSaveDialog(@Nonnull List<FileHandler> fileHandlers,
+    public static boolean showAskForSaveDialog(@Nonnull List<FileDocument> fileDocuments,
             @Nonnull Component parentComponent) {
         return false;
         // TODO
         /*
         UnsavedFilesPanel unsavedFilesPanel = new UnsavedFilesPanel();
-        unsavedFilesPanel.setUnsavedFiles(fileHandlers);
+        unsavedFilesPanel.setUnsavedFiles(fileDocuments);
         ResourceBundle resourceBundle = unsavedFilesPanel.getResourceBundle();
         final boolean[] result = new boolean[1];
         final WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(unsavedFilesPanel,
@@ -94,7 +93,7 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
             }
 
             @Override
-            public void discardAll(@Nonnull List<FileHandler> fileHandlers) {
+            public void discardAll(@Nonnull List<FileHandler> fileDocuments) {
                 result[0] = true;
                 dialog.close();
             }

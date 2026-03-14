@@ -19,7 +19,6 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
 import org.exbin.framework.App;
-import org.exbin.framework.frame.api.ApplicationFrameHandler;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.options.settings.OptionsSettingsModule;
 import org.exbin.framework.options.settings.SettingsPage;

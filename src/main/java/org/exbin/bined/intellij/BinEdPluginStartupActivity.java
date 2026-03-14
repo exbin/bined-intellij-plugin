@@ -76,7 +76,6 @@ import org.exbin.framework.about.api.AboutModuleApi;
 import org.exbin.framework.action.ActionModule;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.action.api.DialogParentComponent;
-import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
@@ -110,9 +109,6 @@ import org.exbin.framework.contribution.api.GroupSequenceContributionRule;
 import org.exbin.framework.contribution.api.PositionSequenceContributionRule;
 import org.exbin.framework.contribution.api.SeparationSequenceContributionRule;
 import org.exbin.framework.contribution.api.SequenceContribution;
-import org.exbin.framework.editor.EditorModule;
-import org.exbin.framework.editor.api.EditorModuleApi;
-import org.exbin.framework.editor.api.EditorProvider;
 import org.exbin.framework.file.FileModule;
 import org.exbin.framework.file.api.FileModuleApi;
 import org.exbin.framework.frame.FrameModule;
@@ -424,8 +420,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             @Override
             public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
-                BinEdIntelliJEditorProvider editorProvider =
-                        (BinEdIntelliJEditorProvider) binedModule.getEditorProvider();
+                BinEdIntelliJDocking editorProvider =
+                        (BinEdIntelliJDocking) binedModule.getEditorProvider();
                 BinEdFileHandler activeFile = null;
                 FileEditor fileEditor = event.getNewEditor();
                 if (fileEditor instanceof BinEdFileEditor) {
@@ -710,7 +706,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 Logger.getLogger(BinEdPluginStartupActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            BinEdIntelliJEditorProvider editorProvider = new BinEdIntelliJEditorProvider();
+            BinEdIntelliJDocking editorProvider = new BinEdIntelliJDocking();
             EditorModuleApi editorModule = App.getModule(EditorModuleApi.class);
             editorModule.registerEditor(BINARY_PLUGIN_ID, editorProvider);
             BinedModule binedModule = App.getModule(BinedModule.class);
@@ -860,7 +856,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedCompareModule.registerToolsOptionsMenuActions();
 
             OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
-            settingsManager.registerOptionsSettings(IntegrationOptions.class, IntegrationOptions::new);
+            settingsManager.registerSettingsOptions(IntegrationOptions.class, IntegrationOptions::new);
             settingsManager.registerComponent("integration",
                     new SettingsComponentProvider() {
                         @Nonnull

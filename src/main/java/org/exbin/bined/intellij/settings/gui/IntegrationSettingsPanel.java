@@ -64,7 +64,7 @@ public class IntegrationSettingsPanel extends javax.swing.JPanel implements Sett
     }
 
     @Override
-    public void saveToOptions(SettingsOptionsProvider settingsOptionsProvider, @Nullable ActiveContextProvider contextProvider) {
+    public void saveToOptions(SettingsOptionsProvider settingsOptionsProvider) {
         IntegrationOptions options = settingsOptionsProvider.getSettingsOptions(IntegrationOptions.class);
         options.setLanguageLocale(((LanguageRecord) languageComboBox.getSelectedItem()).getLocale());
         options.setIconSet((String) iconSetComboBox.getSelectedItem());
@@ -79,7 +79,7 @@ public class IntegrationSettingsPanel extends javax.swing.JPanel implements Sett
     }
 
     @Override
-    public void loadFromOptions(SettingsOptionsProvider settingsOptionsProvider, @Nullable ActiveContextProvider contextProvider) {
+    public void loadFromOptions(SettingsOptionsProvider settingsOptionsProvider) {
         IntegrationOptions options = settingsOptionsProvider.getSettingsOptions(IntegrationOptions.class);
         Locale languageLocale = options.getLanguageLocale();
         ComboBoxModel<LanguageRecord> languageComboBoxModel = languageComboBox.getModel();
@@ -376,7 +376,7 @@ public class IntegrationSettingsPanel extends javax.swing.JPanel implements Sett
 
     private void notifyModified() {
         if (settingsModifiedListener != null) {
-            settingsModifiedListener.wasModified();
+            settingsModifiedListener.notifyModified();
         }
     }
 

@@ -32,6 +32,7 @@ import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileHandlingMode;
 import org.exbin.framework.options.api.OptionsModuleApi;
@@ -51,7 +52,7 @@ import java.io.IOException;
 public class BinEdNativeFile {
 
     private final BinEdFilePanel filePanel = new BinEdFilePanel();
-    private final BinEdFileHandler fileHandler;
+    private final BinaryFileDocument binaryDocument;
 
     private boolean opened = false;
     private VirtualFile virtualFile;
@@ -60,12 +61,12 @@ public class BinEdNativeFile {
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
 
-        fileHandler = BinEdVirtualFile.createBinEdFileHandler();
-        fileManager.initFileHandler(fileHandler);
+        binaryDocument = BinEdVirtualFile.createBinaryFileDocument();
+        fileManager.initFileHandler(binaryDocument);
 
-        filePanel.setFileHandler(fileHandler);
+        filePanel.setFileHandler(binaryDocument);
         BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler();
-        fileHandler.setUndoHandler(undoHandler);
+        binaryDocument.setUndoHandler(undoHandler);
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         // TODO BinaryEditorOptions binaryEditorOptions = new BinaryEditorOptions(preferencesModule.getAppPreferences());
@@ -81,20 +82,20 @@ public class BinEdNativeFile {
         // TODO filePanel.getToolbarPanel().documentOriginalSize = virtualFile.getLength();
 //        binedModule.getFileManager().initCommandHandler(componentPanel.getComponentPanel());
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
-        toolbarPanel.setUndoHandler(fileHandler.getCodeAreaUndoHandler().get());
+        toolbarPanel.setUndoHandler(binaryDocument.getCodeAreaUndoHandler().get());
 
         toolbarPanel.loadFromOptions(optionsModule.getAppOptions());
     }
 
     public void registerUndoRedo(BinaryUndoIntelliJHandler undoIntelliJHandler) {
-        fileHandler.registerUndoHandler();
+        binaryDocument.registerUndoHandler();
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
-        toolbarPanel.setUndoHandler(fileHandler.getCodeAreaUndoHandler().get());
+        toolbarPanel.setUndoHandler(binaryDocument.getCodeAreaUndoHandler().get());
         // TODO fileHandler.setUndoHandler(undoIntelliJHandler);
     }
 
     public boolean isModified() {
-        return fileHandler.isModified();
+        return binaryDocument.isModified();
     }
 
     @Nonnull
@@ -106,7 +107,7 @@ public class BinEdNativeFile {
 
     @Nonnull
     public BinEdFileHandler getEditorFile() {
-        return fileHandler;
+        return binaryDocument;
     }
 
     public void openFile(VirtualFile virtualFile) {
@@ -122,26 +123,26 @@ public class BinEdNativeFile {
                 byte[] fileContent = virtualFile.contentsToByteArray();
                 PagedData binaryData = new ByteArrayPagedData();
                 binaryData.insert(0, fileContent);
-                fileHandler.getCodeArea().setContentData(binaryData);
+                binaryDocument.getCodeArea().setContentData(binaryData);
             } catch (IOException e) {
                 throw createBrokenVirtualFileException(e);
             }
         });
-        SectCodeArea codeArea = fileHandler.getCodeArea();
+        SectCodeArea codeArea = binaryDocument.getCodeArea();
         codeArea.addDataChangedListener(this::saveDocument);
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
         opened = true;
-        fileHandler.fileSync();
+        binaryDocument.fileSync();
         BinedModule binedModule = App.getModule(BinedModule.class);
-        BinEdIntelliJEditorProvider editorProvider = ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider());
-        editorProvider.setActiveFile(fileHandler);
+        BinEdIntelliJDocking editorProvider = ((BinEdIntelliJDocking) binedModule.getEditorProvider());
+        editorProvider.setActiveFile(binaryDocument);
         editorProvider.updateStatus();
         updateModified();
     }
 
     public void saveDocument() {
-        BinaryData contentData = fileHandler.getCodeArea().getContentData();
+        BinaryData contentData = binaryDocument.getCodeArea().getContentData();
         long dataSize = contentData.getDataSize();
         final byte[] fileContent = new byte[(int) dataSize];
         if (dataSize > 0) {
@@ -151,10 +152,10 @@ public class BinEdNativeFile {
         application.runWriteAction(() -> {
             try {
                 virtualFile.setBinaryContent(fileContent);
-                fileHandler.fileSync();
+                binaryDocument.fileSync();
                 BinedModule binedModule = App.getModule(BinedModule.class);
-                BinEdIntelliJEditorProvider editorProvider = ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider());
-                editorProvider.setActiveFile(fileHandler);
+                BinEdIntelliJDocking editorProvider = ((BinEdIntelliJDocking) binedModule.getEditorProvider());
+                editorProvider.setActiveFile(binaryDocument);
                 editorProvider.updateStatus();
             } catch (IOException e) {
                 throw createBrokenVirtualFileException(e);
@@ -172,7 +173,7 @@ public class BinEdNativeFile {
     }
 
     private void updateModified() {
-        boolean modified = fileHandler.isModified();
+        boolean modified = binaryDocument.isModified();
 //        // TODO: Trying to force "modified behavior"
         Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
         if (document instanceof DocumentEx) {

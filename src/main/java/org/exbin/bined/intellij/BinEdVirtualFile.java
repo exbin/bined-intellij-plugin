@@ -25,12 +25,13 @@ import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
-import org.exbin.framework.bined.BinEdDocumentView;
-import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.editor.settings.BinaryEditorOptions;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
+import org.exbin.framework.document.api.DocumentSource;
+import org.exbin.framework.file.api.FileDocumentSource;
 import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.jetbrains.annotations.Nullable;
@@ -59,12 +60,12 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     private final VirtualFile parentFile;
     private final BinEdFilePanel filePanel = new BinEdFilePanel();
-    private final BinEdFileHandler fileHandler;
+    private final BinaryFileDocument fileDocument;
     private String displayName;
     private boolean closing = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
-        fileHandler = BinEdVirtualFile.createBinEdFileHandler();
+        fileDocument = BinEdVirtualFile.createBinaryFileDocument();
         if (parentFile.getPath().startsWith(PATH_PREFIX)) {
             this.parentFile = LocalFileSystem.getInstance().findFileByPath(parentFile.getPath().substring(PATH_PREFIX.length()));
         } else {
@@ -78,25 +79,25 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             this.displayName = "";
         }
 
-        fileHandler.registerUndoHandler();
+        fileDocument.registerUndoHandler();
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
-        fileManager.initFileHandler(fileHandler);
-        fileManager.initCommandHandler(fileHandler.getComponent());
+        fileManager.initFileHandler(fileDocument);
+        fileManager.initCommandHandler(fileDocument.getComponent());
 
-        filePanel.setFileHandler(fileHandler);
+        filePanel.setFileHandler(fileDocument);
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         OptionsStorage optionsStorage = optionsModule.getAppOptions();
         // TODO fileHandler.onInitFromOptions(binaryEditorOptions);
-        fileHandler.setNewData(new BinaryEditorOptions(optionsStorage).getFileHandlingMode());
+        fileDocument.setNewData(new BinaryEditorOptions(optionsStorage).getFileHandlingMode());
 
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
-        toolbarPanel.setUndoHandler(fileHandler.getCodeAreaUndoHandler().get());
+        toolbarPanel.setUndoHandler(fileDocument.getCodeAreaUndoHandler().get());
         toolbarPanel.setSaveAction(e -> {
-            fileHandler.saveFile();
-            fileHandler.fileSync();
-            BinEdIntelliJEditorProvider editorProvider = ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider());
-            editorProvider.setActiveFile(fileHandler);
+            fileDocument.saveFile();
+            fileDocument.fileSync();
+            BinEdIntelliJDocking editorProvider = ((BinEdIntelliJDocking) binedModule.getEditorProvider());
+            editorProvider.setActiveFile(fileDocument);
             editorProvider.updateStatus();
         });
 
@@ -104,8 +105,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     }
 
     @Nonnull
-    public static BinEdFileHandler createBinEdFileHandler() {
-        return new BinEdFileHandler() {
+    public static BinaryFileDocument createBinaryFileDocument() {
+        return new BinaryFileDocument() {
             @Nonnull
             @Override
             protected BinEdDocumentView createEditorComponent() {
@@ -163,8 +164,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     }
 
     @Nonnull
-    public BinEdFileHandler getEditorFile() {
-        return fileHandler;
+    public BinaryFileDocument getEditorFile() {
+        return fileDocument;
     }
 
     @Nonnull
@@ -292,8 +293,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     public void dispose() {
         BinedModule binedModule = App.getModule(BinedModule.class);
-        ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider()).removeFile(fileHandler);
-        fileHandler.closeData();
+        ((BinEdIntelliJDocking) binedModule.getEditorProvider()).removeFile(fileDocument);
+        fileDocument.closeData();
     }
 
     @Nonnull
@@ -301,25 +302,29 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return getEditorFile().getCodeArea();
     }
 
-    public void openFile(BinEdFileHandler fileHandler) {
+    public void openFile(BinaryFileDocument fileDocument) {
         if (!isDirectory() && isValid()) {
             File file = extractFile(this);
-            fileHandler.clearFile();
+            fileDocument.clearFile();
             if (file.isFile() && file.exists()) {
-                fileHandler.loadFromFile(file.toURI(), null);
-                fileHandler.fileSync();
+                fileDocument.loadFrom(new FileDocumentSource(file));
+                fileDocument.fileSync();
             } else {
                 try (InputStream stream = getInputStream()) {
-                    fileHandler.loadFromStream(stream);
-                    fileHandler.fileSync();
+                    fileDocument.loadFrom(new VirtualFileDocumentSource());
+                    fileDocument.fileSync();
                 } catch (IOException ex) {
-                    Logger.getLogger(BinEdFileHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BinEdVirtualFile.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
         BinedModule binedModule = App.getModule(BinedModule.class);
-        BinEdIntelliJEditorProvider editorProvider = ((BinEdIntelliJEditorProvider) binedModule.getEditorProvider());
-        editorProvider.setActiveFile(fileHandler);
+        BinEdIntelliJDocking editorProvider = ((BinEdIntelliJDocking) binedModule.getEditorProvider());
+        editorProvider.setActiveFile(fileDocument);
         editorProvider.updateStatus();
+    }
+
+    public static class VirtualFileDocumentSource implements DocumentSource {
+        // TODO
     }
 }

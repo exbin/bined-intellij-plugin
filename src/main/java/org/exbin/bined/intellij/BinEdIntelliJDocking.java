@@ -30,9 +30,13 @@ import org.exbin.framework.action.api.clipboard.TextClipboardController;
 import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdEditorProvider;
 import org.exbin.framework.bined.BinEdFileHandler;
+import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.context.api.ActiveContextManagement;
+import org.exbin.framework.docking.api.SidePanelDocking;
+import org.exbin.framework.docking.multi.api.MultiDocking;
+import org.exbin.framework.document.api.Document;
 import org.exbin.framework.editor.api.EditorModuleApi;
 import org.exbin.framework.editor.api.MultiEditorProvider;
 import org.exbin.framework.file.api.EditableFileHandler;
@@ -61,15 +65,15 @@ import java.util.Optional;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEditorProvider {
+public class BinEdIntelliJDocking implements MultiDocking, SidePanelDocking {
 
-    protected final List<FileHandler> fileHandlers = new ArrayList<>();
+    protected final List<Document> openDocuments = new ArrayList<>();
     @Nullable
-    protected BinEdFileHandler activeFile = null;
+    protected Document activeFile = null;
     private BinaryStatusApi binaryStatus;
     private TextEncodingStatusApi textEncodingStatusApi;
 
-    public BinEdIntelliJEditorProvider() {
+    public BinEdIntelliJDocking() {
         super();
     }
 
@@ -85,7 +89,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
     }
 
     public void addFile(BinEdFileHandler fileHandler) {
-        fileHandlers.add(fileHandler);
+        openDocuments.add(fileHandler);
 
         SectCodeArea codeArea = fileHandler.getCodeArea();
         codeArea.addDataChangedListener(() -> {
@@ -115,7 +119,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
     }
 
     public void removeFile(BinEdFileHandler fileHandler) {
-        boolean removed = fileHandlers.remove(fileHandler);
+        boolean removed = openDocuments.remove(fileHandler);
         if (!removed) {
             throw new IllegalStateException("Attempt to remove invalid file handler");
         }
@@ -167,9 +171,9 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
         return Optional.ofNullable(activeFile);
     }
 
-    public void setActiveFile(@Nullable FileHandler fileHandler) {
-        if (activeFile != fileHandler) {
-            activeFile = (BinEdFileHandler) fileHandler;
+    public void setActiveFile(@Nullable BinaryFileDocument fileDocument) {
+        if (activeFile != fileDocument) {
+            activeFile = (BinEdFileHandler) fileDocument;
             activeFileChanged();
         }
     }
@@ -305,7 +309,7 @@ public class BinEdIntelliJEditorProvider implements MultiEditorProvider, BinEdEd
     @Nonnull
     @Override
     public List<FileHandler> getFileHandlers() {
-        return fileHandlers;
+        return openDocuments;
     }
 
     @Override

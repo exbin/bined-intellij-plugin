@@ -18,7 +18,7 @@
 <ul><li>-</li></ul>
 
 <h1>Preview</h1>
-<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.12.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
+<p><img src="https://bined.exbin.org/images/bined-intellij-plugin-preview-0.2.13.png" alt="[bined-intellij-plugin-preview]" width="382" height="65"/></p>
 
 <h1>Features</h1>
 <ul><li>Visualize data as numerical (hexadecimal) codes and text representation</li>
@@ -38,11 +38,10 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Minor fixes</li>
-<li>Added status bars to binary diff</li>
-<li>Fixed NPE when moving hex viewer to its own window (issue #66)</li>
-<li>Fixed issue with pasting over selection (issue #64)</li>
-<li>Fixed height for one-diff view (issue #65)</li></ul>
+<ul><li>Added copy as / paste from dialogs</li>
+<li>Added copy/paste formats for C, Java and Python (by mengnankkkk)</li>
+<li>Added convert data: date time and compression (by mengnankkkk)</li>
+<li>Fixed overflow in the binary checkboxes in data inspector (issue #67)</li></ul>
     ]]>
     </change-notes>
 
