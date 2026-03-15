@@ -67,7 +67,7 @@ tasks {
 }
 
 val exbinFrameworkLibraryVersion = "0.3.0-SNAPSHOT"
-val binedAppLibraryVersion = "0.2.5-SNAPSHOT"
+val binedAppLibraryVersion = "0.3.0-SNAPSHOT"
 val binedLibraryVersion = "0.3.0-SNAPSHOT"
 val binaryDataLibraryVersion = "0.3.0-SNAPSHOT"
 

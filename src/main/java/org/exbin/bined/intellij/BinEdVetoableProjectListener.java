@@ -19,6 +19,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.exbin.framework.document.api.ComponentDocument;
 import org.exbin.framework.file.api.FileDocument;
 import org.exbin.framework.utils.WindowUtils;
 
@@ -54,7 +55,8 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         }
 
         if (!fileDocuments.isEmpty()) {
-            boolean discardRest = showAskForSaveDialog(fileDocuments, fileDocuments.get(0).getComponent());
+            ComponentDocument document = (ComponentDocument) fileDocuments.get(0);
+            boolean discardRest = showAskForSaveDialog(fileDocuments, document.getComponent());
             if (discardRest) {
                 // Mark rest as already processed
                 for (VirtualFile file : openFiles) {

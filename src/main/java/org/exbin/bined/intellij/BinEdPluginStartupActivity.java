@@ -77,6 +77,7 @@ import org.exbin.framework.action.ActionModule;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
 import org.exbin.framework.bined.compare.BinedCompareModule;
@@ -109,6 +110,9 @@ import org.exbin.framework.contribution.api.GroupSequenceContributionRule;
 import org.exbin.framework.contribution.api.PositionSequenceContributionRule;
 import org.exbin.framework.contribution.api.SeparationSequenceContributionRule;
 import org.exbin.framework.contribution.api.SequenceContribution;
+import org.exbin.framework.docking.DockingModule;
+import org.exbin.framework.docking.api.ContextDocking;
+import org.exbin.framework.docking.api.DockingModuleApi;
 import org.exbin.framework.file.FileModule;
 import org.exbin.framework.file.api.FileModuleApi;
 import org.exbin.framework.frame.FrameModule;
@@ -420,16 +424,16 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             @Override
             public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
-                BinEdIntelliJDocking editorProvider =
-                        (BinEdIntelliJDocking) binedModule.getEditorProvider();
-                BinEdFileHandler activeFile = null;
+                FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+                BinaryFileDocument activeFile = null;
                 FileEditor fileEditor = event.getNewEditor();
                 if (fileEditor instanceof BinEdFileEditor) {
                     activeFile = ((BinEdFileEditor) fileEditor).getVirtualFile().getEditorFile();
                 } else if (fileEditor instanceof BinEdNativeFileEditor) {
-                    activeFile = ((BinEdNativeFileEditor) fileEditor).getNativeFile().getEditorFile();
+                    activeFile = ((BinEdNativeFileEditor) fileEditor).getNativeFile().getDocument();
                 }
-                editorProvider.setActiveFile(activeFile);
+                docking.setActiveFile(activeFile);
             }
         });
 
@@ -446,10 +450,12 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
                 if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isClosing()) {
                     ((BinEdVirtualFile) file).setClosing(true);
-                    BinEdFileHandler fileHandler = ((BinEdVirtualFile) file).getEditorFile();
-                    if (fileHandler.isModified()) {
+                    BinaryFileDocument binaryDocument = ((BinEdVirtualFile) file).getEditorFile();
+                    if (binaryDocument.isModified()) {
                         ApplicationManager.getApplication().invokeLater(() -> {
-                            boolean released = binedModule.getEditorProvider().releaseFile(fileHandler);
+                            FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+                            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+                            boolean released = docking.releaseDocument(binaryDocument);
                             ((BinEdVirtualFile) file).setClosing(false);
                             if (released) {
                                 passNext = true;
@@ -582,7 +588,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(WindowModuleApi.class, new WindowModule());
             modules.put(FrameModuleApi.class, new FrameModule());
             modules.put(FileModuleApi.class, new FileModule());
-            modules.put(EditorModuleApi.class, new EditorModule());
+            modules.put(DockingModuleApi.class, new DockingModule());
             modules.put(HelpOnlineModule.class, new HelpOnlineModule());
             modules.put(BinedModule.class, new BinedModule());
             modules.put(BinedViewerModule.class, new BinedViewerModule());
@@ -706,19 +712,13 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 Logger.getLogger(BinEdPluginStartupActivity.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            BinEdIntelliJDocking editorProvider = new BinEdIntelliJDocking();
-            EditorModuleApi editorModule = App.getModule(EditorModuleApi.class);
-            editorModule.registerEditor(BINARY_PLUGIN_ID, editorProvider);
+            BinEdIntelliJDocking docking = new BinEdIntelliJDocking();
             BinedModule binedModule = App.getModule(BinedModule.class);
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
             BinedEditorModule binedEditorModule = App.getModule(BinedEditorModule.class);
             BinedThemeModule binedThemeModule = App.getModule(BinedThemeModule.class);
-            binedModule.setEditorProvider(editorProvider);
-            binedBookmarksModule.getBookmarksManager().setEditorProvider(editorProvider);
-            binedMacroModule.setEditorProvider(editorProvider);
 
             BinedSearchModule binedSearchModule = App.getModule(BinedSearchModule.class);
-            binedSearchModule.setEditorProvider(editorProvider);
             BinEdFileManager fileManager = binedModule.getFileManager();
             fileManager.addBinEdComponentExtension(component -> Optional.of(new BinEdIntelliJComponentSearch()));
 
@@ -729,7 +729,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             BinedInspectorModule binedInspectorModule = App.getModule(BinedInspectorModule.class);
             BinEdInspectorManager binEdInspectorManager = binedInspectorModule.getBinEdInspectorManager();
-            binedInspectorModule.setEditorProvider(editorProvider, new BinEdInspectorComponentExtension.ComponentsProvider() {
+            // TODO
+            /* binedInspectorModule.setEditorProvider(docking, new BinEdInspectorComponentExtension.ComponentsProvider() {
                 @Nonnull
                 public InspectorPanel createInspectorPanel() {
                     return new InspectorPanel() {
@@ -761,9 +762,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 public JScrollPane createScrollPane() {
                     return new JBScrollPane();
                 }
-            });
+            }); */
             binEdInspectorManager.removeAllInspectors();
-            binEdInspectorManager.addInspector(new BasicValuesInspectorProvider() {
+            binEdInspectorManager.addInspector(new BasicValuesInspectorProvider(null) { // TODO resourceBundle
                 @Nonnull
                 @Override
                 public BinEdInspector createInspector() {
@@ -896,7 +897,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedModule.registerCodeAreaPopupMenu();
             binedViewerModule.registerCodeAreaPopupMenu();
             binedEditorModule.registerCodeAreaPopupMenu();
-            editorModule.registerSettings();
             binedViewerModule.registerSettings();
             binedViewerModule.registerViewModeMenu();
             binedViewerModule.registerCodeTypeMenu();
@@ -940,7 +940,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             ActiveContextManagement contextManager =
                     frameModule.getFrameHandler().getContextManager();
-            contextManager.changeActiveState(EditorProvider.class, editorProvider);
+            contextManager.changeActiveState(ContextDocking.class, docking);
             contextManager.changeActiveState(DialogParentComponent.class, () -> frameModule.getFrame());
         }
 

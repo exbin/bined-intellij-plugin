@@ -19,6 +19,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
 import org.exbin.framework.App;
+import org.exbin.framework.frame.api.ComponentFrame;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.options.settings.OptionsSettingsModule;
 import org.exbin.framework.options.settings.SettingsPage;
@@ -96,7 +97,7 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
         for (SettingsPage page : pages) {
             try {
-                page.loadFromOptions(settingsOptionsProvider, null);
+                page.loadAll(settingsOptionsProvider, null);
             } catch (Exception ex) {
                 Logger.getLogger(BinEdSettingsConfigurable.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -110,7 +111,7 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
         for (SettingsPage page : pages) {
             try {
-                page.saveAndApply(settingsOptionsProvider, null);
+                page.saveAll(settingsOptionsProvider, null);
             } catch (Exception ex) {
                 Logger.getLogger(BinEdSettingsConfigurable.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -118,7 +119,7 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
         // TODO Run in top context
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ApplicationFrameHandler frameHandler = frameModule.getFrameHandler();
-        mainSettingsManager.applyAllOptions(frameHandler.getContextManager(), mainSettingsManager.getSettingsOptionsProvider());
+        ComponentFrame componentFrame = frameModule.getFrameHandler();
+        mainSettingsManager.applyAllOptions(componentFrame.getContextManager(), mainSettingsManager.getSettingsOptionsProvider());
     }
 }

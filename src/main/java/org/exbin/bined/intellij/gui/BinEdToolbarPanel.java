@@ -56,7 +56,8 @@ import java.util.logging.Logger;
 public class BinEdToolbarPanel extends JBPanel {
 
     private final java.util.ResourceBundle resourceBundle;
-    private final java.util.ResourceBundle fileResourceBundle;
+    private final java.util.ResourceBundle viewerResourceBundle;
+    private final java.util.ResourceBundle dockingResourceBundle;
     private final java.util.ResourceBundle optionsSettingsResourceBundle;
     private final java.util.ResourceBundle onlineHelpResourceBundle;
     private final java.util.ResourceBundle operationUndoResourceBundle;
@@ -85,7 +86,8 @@ public class BinEdToolbarPanel extends JBPanel {
     public BinEdToolbarPanel() {
         LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
         resourceBundle = languageModule.getBundle(org.exbin.framework.bined.BinedModule.class);
-        fileResourceBundle = languageModule.getBundle(org.exbin.framework.file.FileModule.class);
+        viewerResourceBundle = languageModule.getBundle(org.exbin.framework.bined.viewer.BinedViewerModule.class);
+        dockingResourceBundle = languageModule.getBundle(org.exbin.framework.docking.DockingModule.class);
         optionsSettingsResourceBundle = languageModule.getBundle(org.exbin.framework.options.settings.OptionsSettingsModule.class);
         onlineHelpResourceBundle = languageModule.getBundle(org.exbin.framework.help.online.action.OnlineHelpAction.class);
         operationUndoResourceBundle = languageModule.getBundle(org.exbin.framework.operation.undo.OperationUndoModule.class);
@@ -130,8 +132,8 @@ public class BinEdToolbarPanel extends JBPanel {
         };
 
         binaryCodeTypeAction = new AnAction(
-                resourceBundle.getString("binaryCodeTypeAction.text"),
-                resourceBundle.getString("binaryCodeTypeAction.shortDescription"),
+                viewerResourceBundle.getString("binaryCodeTypeAction.text"),
+                viewerResourceBundle.getString("binaryCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-bin.png")
         ) {
             @NotNull
@@ -148,8 +150,8 @@ public class BinEdToolbarPanel extends JBPanel {
         };
 
         octalCodeTypeAction = new AnAction(
-                resourceBundle.getString("octalCodeTypeAction.text"),
-                resourceBundle.getString("octalCodeTypeAction.shortDescription"),
+                viewerResourceBundle.getString("octalCodeTypeAction.text"),
+                viewerResourceBundle.getString("octalCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-oct.png")
         ) {
             @NotNull
@@ -165,8 +167,8 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
         decimalCodeTypeAction = new AnAction(
-                resourceBundle.getString("decimalCodeTypeAction.text"),
-                resourceBundle.getString("decimalCodeTypeAction.shortDescription"),
+                viewerResourceBundle.getString("decimalCodeTypeAction.text"),
+                viewerResourceBundle.getString("decimalCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-dec.png")
         ) {
             @NotNull
@@ -182,8 +184,8 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
         hexadecimalCodeTypeAction = new AnAction(
-                resourceBundle.getString("hexadecimalCodeTypeAction.text"),
-                resourceBundle.getString("hexadecimalCodeTypeAction.shortDescription"),
+                viewerResourceBundle.getString("hexadecimalCodeTypeAction.text"),
+                viewerResourceBundle.getString("hexadecimalCodeTypeAction.shortDescription"),
                 load("/org/exbin/bined/intellij/resources/icons/codetype-hex.png")
         ) {
             @NotNull
@@ -199,7 +201,7 @@ public class BinEdToolbarPanel extends JBPanel {
             }
         };
 
-        cycleActionGroup = new ActionGroup(resourceBundle.getString("cycleCodeTypesAction.shortDescription"), false) {
+        cycleActionGroup = new ActionGroup(viewerResourceBundle.getString("cycleCodeTypesAction.shortDescription"), false) {
             @NotNull
             @Override
             public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
@@ -298,9 +300,9 @@ public class BinEdToolbarPanel extends JBPanel {
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         saveFileButton = new AnAction(
-                fileResourceBundle.getString("saveFileAction.text"),
-                fileResourceBundle.getString("saveFileAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource(fileResourceBundle.getString("saveFileAction.smallIcon")))
+                dockingResourceBundle.getString("saveFileAction.text"),
+                dockingResourceBundle.getString("saveFileAction.shortDescription"),
+                new javax.swing.ImageIcon(getClass().getResource(dockingResourceBundle.getString("saveFileAction.smallIcon")))
         ) {
             @NotNull
             @Override

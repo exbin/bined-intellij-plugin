@@ -31,8 +31,8 @@ import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.bined.BinEdDataComponent;
-import org.exbin.framework.bined.BinEdDocumentView;
 import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.BinaryStatus;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.action.GoToPositionAction;
@@ -47,7 +47,6 @@ import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.text.encoding.EncodingsManager;
-import org.exbin.framework.text.encoding.TextEncodingStatusApi;
 import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
 import org.exbin.framework.action.api.ContextComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
@@ -84,14 +83,14 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
     private final JPanel panel;
     private BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
-    private BinaryStatusPanel statusPanel = new BinaryStatusPanel();
-    private final BinEdDocumentView editorComponent;
+    private BinaryStatus binaryStatus = new BinaryStatus();
+    private final BinEdDataComponent dataComponent;
     private EncodingsManager encodingsManager;
     private long documentOriginalSize = 0;
 
     public DebugViewPanel() {
         panel = new JPanel(new BorderLayout());
-        editorComponent = new BinEdDocumentView();
+        dataComponent = new BinEdDataComponent(new BinEdComponentPanel());
 
         initComponents();
         init();
@@ -100,12 +99,12 @@ public class DebugViewPanel extends javax.swing.JPanel {
     private void init() {
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
-        BinEdComponentPanel componentPanel = (BinEdComponentPanel) editorComponent.getComponent();
-        fileManager.initComponentPanel(componentPanel);
+        fileManager.initDataComponent(dataComponent);
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         // TODO editorComponent.onInitFromOptions(new BinaryEditorOptions(preferencesModule.getAppPreferences()));
 
+        BinEdComponentPanel componentPanel = (BinEdComponentPanel) dataComponent.getComponent();
         SectCodeArea codeArea = componentPanel.getCodeArea();
         BinEdDataComponent binEdDataComponent = new BinEdDataComponent(codeArea);
         codeArea.setEditMode(EditMode.READ_ONLY);
@@ -154,7 +153,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 settingsAction.actionPerformed(e);
                 toolbarPanel.applyFromCodeArea();
-                statusPanel.updateStatus();
+                binaryStatus.updateStatus();
             }
         };
         toolbarPanel.setOptionsAction(wrapperAction);
@@ -202,7 +201,8 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
         encodingsManager = new EncodingsManager();
         encodingsManager.init();
-        encodingsManager.setTextEncodingStatus(new TextEncodingStatusApi() {
+        // TODO
+        /* encodingsManager.setTextEncodingStatus(new TextEncodingStatusApi() {
             @Nonnull
             @Override
             public String getEncoding() {
@@ -214,16 +214,16 @@ public class DebugViewPanel extends javax.swing.JPanel {
                 codeArea.setCharset(Charset.forName(encodingName));
                 statusPanel.setEncoding(encodingName);
             }
-        });
-        encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
-        statusPanel.setController(new BinaryStatusController());
-        statusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
-        statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
-        registerBinaryStatus();
+        }); */
+        // encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
+        binaryStatus.setBinaryStatusController(new BinaryStatusController());
+        // statusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
+        // statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
+        binaryStatus.attachCodeArea(dataComponent);
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
-        panel.add(statusPanel, BorderLayout.SOUTH);
-        panel.add(editorComponent.getComponent(), BorderLayout.CENTER);
+        panel.add(binaryStatus.getBinaryStatusPanel(), BorderLayout.SOUTH);
+        panel.add(dataComponent.getComponent(), BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
 
@@ -275,10 +275,10 @@ public class DebugViewPanel extends javax.swing.JPanel {
     }
 
     public void setContentData(@Nullable BinaryData data) {
-        editorComponent.setContentData(data);
+        dataComponent.getCodeArea().setContentData(data);
         long dataSize = data == null ? 0 : data.getDataSize();
         documentOriginalSize = dataSize;
-        statusPanel.setCurrentDocumentSize(dataSize, documentOriginalSize);
+        binaryStatus.getBinaryStatusPanel().setCurrentDocumentSize(dataSize, documentOriginalSize);
     }
 
     @Nonnull
@@ -292,69 +292,17 @@ public class DebugViewPanel extends javax.swing.JPanel {
         };
     }
 
-    public void registerBinaryStatus() {
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        codeArea.addDataChangedListener(() -> {
-            updateCurrentDocumentSize();
-        });
-
-        codeArea.addSelectionChangedListener(() -> {
-            statusPanel.setSelectionRange(codeArea.getSelection());
-        });
-
-        codeArea.addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
-            statusPanel.setCursorPosition(caretPosition);
-        });
-
-        codeArea.addEditModeChangedListener((EditMode mode, EditOperation operation) -> {
-            statusPanel.setEditMode(mode, operation);
-        });
-
-        updateStatus();
-    }
-
-    public void updateStatus() {
-        updateCurrentDocumentSize();
-        updateCurrentCaretPosition();
-        updateCurrentSelectionRange();
-        // updateCurrentMemoryMode();
-        updateCurrentEditMode();
-    }
-
-    private void updateCurrentDocumentSize() {
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        long dataSize = codeArea.getDataSize();
-        statusPanel.setCurrentDocumentSize(dataSize, documentOriginalSize);
-    }
-
-    private void updateCurrentCaretPosition() {
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        CodeAreaCaretPosition caretPosition = codeArea.getActiveCaretPosition();
-        statusPanel.setCursorPosition(caretPosition);
-    }
-
-    private void updateCurrentSelectionRange() {
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        SelectionRange selectionRange = codeArea.getSelection();
-        statusPanel.setSelectionRange(selectionRange);
-    }
-
-    private void updateCurrentEditMode() {
-        SectCodeArea codeArea = editorComponent.getCodeArea();
-        statusPanel.setEditMode(codeArea.getEditMode(), codeArea.getActiveOperation());
-    }
-
     @ParametersAreNonnullByDefault
     private class BinaryStatusController implements BinaryStatusPanel.Controller, BinaryStatusPanel.EncodingsController, BinaryStatusPanel.MemoryModeController {
         @Override
         public void changeEditOperation(EditOperation editOperation) {
-            SectCodeArea codeArea = editorComponent.getCodeArea();
+            SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
             codeArea.setEditOperation(editOperation);
         }
 
         @Override
         public void changeCursorPosition() {
-            SectCodeArea codeArea = editorComponent.getCodeArea();
+            SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
             GoToPositionAction action = new GoToPositionAction();
             action.setCodeArea(codeArea);
             action.actionPerformed(null);

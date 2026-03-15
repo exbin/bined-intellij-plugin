@@ -193,9 +193,9 @@ public final class DataDialog extends DialogWrapper {
         });
 
         EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-        encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
+        // encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
         binaryStatus.setBinaryStatusController(new BinaryStatusController());
-        binaryStatus.applySettings(optionsModule.getAppOptions());
+        // binaryStatus.applySettings(optionsModule.getAppOptions());
         binaryStatus.attachCodeArea(dataComponent);
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
@@ -207,7 +207,7 @@ public final class DataDialog extends DialogWrapper {
         dataComponent.getCodeArea().setContentData(binaryData);
         long dataSize = dataComponent.getCodeArea().getContentData().getDataSize();
         documentOriginalSize = dataSize;
-        binaryStatus.setCurrentDocumentSize(dataSize, documentOriginalSize);
+        binaryStatus.getBinaryStatusPanel().setCurrentDocumentSize(dataSize, documentOriginalSize);
         if (!editable) {
             codeArea.setEditMode(EditMode.READ_ONLY);
         }

@@ -30,11 +30,12 @@ import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
-import org.exbin.framework.bined.BinEdFileHandler;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.FileHandlingMode;
+import org.exbin.framework.bined.FileProcessingMode;
+import org.exbin.framework.docking.api.ContextDocking;
+import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
 
 import javax.annotation.Nonnull;
@@ -62,7 +63,7 @@ public class BinEdNativeFile {
         BinEdFileManager fileManager = binedModule.getFileManager();
 
         binaryDocument = BinEdVirtualFile.createBinaryFileDocument();
-        fileManager.initFileHandler(binaryDocument);
+        fileManager.initDataComponent(binaryDocument.getDataComponent());
 
         filePanel.setFileHandler(binaryDocument);
         BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler();
@@ -82,15 +83,15 @@ public class BinEdNativeFile {
         // TODO filePanel.getToolbarPanel().documentOriginalSize = virtualFile.getLength();
 //        binedModule.getFileManager().initCommandHandler(componentPanel.getComponentPanel());
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
-        toolbarPanel.setUndoHandler(binaryDocument.getCodeAreaUndoHandler().get());
+        toolbarPanel.setUndoHandler(binaryDocument.getUndoHandler().get());
 
         toolbarPanel.loadFromOptions(optionsModule.getAppOptions());
     }
 
     public void registerUndoRedo(BinaryUndoIntelliJHandler undoIntelliJHandler) {
-        binaryDocument.registerUndoHandler();
+        // TODO binaryDocument.registerUndoHandler();
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
-        toolbarPanel.setUndoHandler(binaryDocument.getCodeAreaUndoHandler().get());
+        toolbarPanel.setUndoHandler(binaryDocument.getUndoHandler().get());
         // TODO fileHandler.setUndoHandler(undoIntelliJHandler);
     }
 
@@ -106,7 +107,7 @@ public class BinEdNativeFile {
     }
 
     @Nonnull
-    public BinEdFileHandler getEditorFile() {
+    public BinaryFileDocument getDocument() {
         return binaryDocument;
     }
 
@@ -128,16 +129,16 @@ public class BinEdNativeFile {
                 throw createBrokenVirtualFileException(e);
             }
         });
-        SectCodeArea codeArea = binaryDocument.getCodeArea();
+        SectCodeArea codeArea = (SectCodeArea) binaryDocument.getCodeArea();
         codeArea.addDataChangedListener(this::saveDocument);
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
         opened = true;
         binaryDocument.fileSync();
-        BinedModule binedModule = App.getModule(BinedModule.class);
-        BinEdIntelliJDocking editorProvider = ((BinEdIntelliJDocking) binedModule.getEditorProvider());
-        editorProvider.setActiveFile(binaryDocument);
-        editorProvider.updateStatus();
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+        docking.setActiveFile(binaryDocument);
+        docking.updateStatus();
         updateModified();
     }
 
@@ -153,10 +154,10 @@ public class BinEdNativeFile {
             try {
                 virtualFile.setBinaryContent(fileContent);
                 binaryDocument.fileSync();
-                BinedModule binedModule = App.getModule(BinedModule.class);
-                BinEdIntelliJDocking editorProvider = ((BinEdIntelliJDocking) binedModule.getEditorProvider());
-                editorProvider.setActiveFile(binaryDocument);
-                editorProvider.updateStatus();
+                FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+                docking.setActiveFile(binaryDocument);
+                docking.updateStatus();
             } catch (IOException e) {
                 throw createBrokenVirtualFileException(e);
             }
@@ -164,8 +165,8 @@ public class BinEdNativeFile {
     }
 
     @Nonnull
-    public FileHandlingMode getFileHandlingMode() {
-        return FileHandlingMode.DIRECT;
+    public FileProcessingMode getFileProcessingMode() {
+        return FileProcessingMode.DIRECT;
     }
 
     public void reloadFile() {

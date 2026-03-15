@@ -25,13 +25,15 @@ import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.editor.settings.BinaryEditorOptions;
-import org.exbin.framework.bined.gui.BinEdComponentPanel;
+import org.exbin.framework.bined.editor.settings.BinaryFileProcessingOptions;
+import org.exbin.framework.docking.api.ContextDocking;
 import org.exbin.framework.document.api.DocumentSource;
 import org.exbin.framework.file.api.FileDocumentSource;
+import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.jetbrains.annotations.Nullable;
@@ -79,26 +81,28 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             this.displayName = "";
         }
 
-        fileDocument.registerUndoHandler();
+        // fileDocument.registerUndoHandler();
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
-        fileManager.initFileHandler(fileDocument);
-        fileManager.initCommandHandler(fileDocument.getComponent());
+        fileManager.initDataComponent(fileDocument.getDataComponent());
+        fileManager.initCommandHandler(fileDocument.getDataComponent());
 
         filePanel.setFileHandler(fileDocument);
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         OptionsStorage optionsStorage = optionsModule.getAppOptions();
         // TODO fileHandler.onInitFromOptions(binaryEditorOptions);
-        fileDocument.setNewData(new BinaryEditorOptions(optionsStorage).getFileHandlingMode());
+        fileDocument.setInitialFileProcessing(new BinaryFileProcessingOptions(optionsStorage).getFileProcessingMode());
 
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
-        toolbarPanel.setUndoHandler(fileDocument.getCodeAreaUndoHandler().get());
+        toolbarPanel.setUndoHandler(fileDocument.getUndoHandler().get());
         toolbarPanel.setSaveAction(e -> {
-            fileDocument.saveFile();
+            fileDocument.saveTo(fileDocument.getDocumentSource().get());
             fileDocument.fileSync();
-            BinEdIntelliJDocking editorProvider = ((BinEdIntelliJDocking) binedModule.getEditorProvider());
-            editorProvider.setActiveFile(fileDocument);
-            editorProvider.updateStatus();
+            FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(
+                    ContextDocking.class);
+            docking.setActiveFile(fileDocument);
+            docking.updateStatus();
         });
 
         toolbarPanel.loadFromOptions(optionsStorage);
@@ -106,52 +110,32 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     @Nonnull
     public static BinaryFileDocument createBinaryFileDocument() {
-        return new BinaryFileDocument() {
+        return new BinaryFileDocument(new BinEdDataComponent(new SectCodeArea() {
+
+            private Graphics2DDelegate graphicsCache = null;
+
             @Nonnull
             @Override
-            protected BinEdDocumentView createEditorComponent() {
-                return new BinEdDocumentView() {
-                    @Nonnull
-                    @Override
-                    protected BinEdComponentPanel createComponentPanel() {
-                        return new BinEdComponentPanel() {
-                            @Nonnull
-                            @Override
-                            protected SectCodeArea createCodeArea() {
-                                SectCodeArea codeArea = new SectCodeArea() {
+            protected Graphics getComponentGraphics(Graphics g) {
+                if (g instanceof Graphics2DDelegate) {
+                    return g;
+                }
 
-                                    private Graphics2DDelegate graphicsCache = null;
+                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                    return graphicsCache;
+                }
 
-                                    @Nonnull
-                                    @Override
-                                    protected Graphics getComponentGraphics(Graphics g) {
-                                        if (g instanceof Graphics2DDelegate) {
-                                            return g;
-                                        }
+                if (graphicsCache != null) {
+                    graphicsCache.dispose();
+                }
 
-                                        if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                                            return graphicsCache;
-                                        }
-
-                                        if (graphicsCache != null) {
-                                            graphicsCache.dispose();
-                                        }
-
-                                        Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                                        graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
-                                                (Graphics2DDelegate) editorGraphics :
-                                                new Graphics2DDelegate(editorGraphics);
-                                        return graphicsCache;
-                                    }
-                                };
-
-                                return codeArea;
-                            }
-                        };
-                    }
-                };
+                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                        (Graphics2DDelegate) editorGraphics :
+                        new Graphics2DDelegate(editorGraphics);
+                return graphicsCache;
             }
-        };
+        }));
     }
 
     @Nonnull
@@ -292,9 +276,10 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     }
 
     public void dispose() {
-        BinedModule binedModule = App.getModule(BinedModule.class);
-        ((BinEdIntelliJDocking) binedModule.getEditorProvider()).removeFile(fileDocument);
-        fileDocument.closeData();
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+        docking.removeFile(fileDocument);
+        // TODO fileDocument.closeData();
     }
 
     @Nonnull
@@ -318,10 +303,10 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
                 }
             }
         }
-        BinedModule binedModule = App.getModule(BinedModule.class);
-        BinEdIntelliJDocking editorProvider = ((BinEdIntelliJDocking) binedModule.getEditorProvider());
-        editorProvider.setActiveFile(fileDocument);
-        editorProvider.updateStatus();
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+        docking.setActiveFile(fileDocument);
+        docking.updateStatus();
     }
 
     public static class VirtualFileDocumentSource implements DocumentSource {
