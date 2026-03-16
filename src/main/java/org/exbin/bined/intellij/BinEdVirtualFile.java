@@ -30,15 +30,16 @@ import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.editor.settings.BinaryFileProcessingOptions;
+import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.docking.api.ContextDocking;
 import org.exbin.framework.document.api.DocumentSource;
 import org.exbin.framework.file.api.FileDocumentSource;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.api.OptionsModuleApi;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
 import java.awt.Graphics;
@@ -84,10 +85,11 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         // fileDocument.registerUndoHandler();
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
+        fileManager.getBinaryStatus().setBinaryStatusPanel(filePanel.getStatusPanel());
         fileManager.initDataComponent(fileDocument.getDataComponent());
         fileManager.initCommandHandler(fileDocument.getDataComponent());
 
-        filePanel.setFileHandler(fileDocument);
+        filePanel.setDocument(fileDocument);
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         OptionsStorage optionsStorage = optionsModule.getAppOptions();
         // TODO fileHandler.onInitFromOptions(binaryEditorOptions);
@@ -110,30 +112,35 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     @Nonnull
     public static BinaryFileDocument createBinaryFileDocument() {
-        return new BinaryFileDocument(new BinEdDataComponent(new SectCodeArea() {
-
-            private Graphics2DDelegate graphicsCache = null;
-
+        return new BinaryFileDocument(new BinEdDataComponent(new BinEdComponentPanel() {
             @Nonnull
             @Override
-            protected Graphics getComponentGraphics(Graphics g) {
-                if (g instanceof Graphics2DDelegate) {
-                    return g;
-                }
+            protected SectCodeArea createCodeArea() {
+                return new SectCodeArea() {
+                    private Graphics2DDelegate graphicsCache = null;
 
-                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                    return graphicsCache;
-                }
+                    @Nonnull
+                    @Override
+                    protected Graphics getComponentGraphics(Graphics g) {
+                        if (g instanceof Graphics2DDelegate) {
+                            return g;
+                        }
 
-                if (graphicsCache != null) {
-                    graphicsCache.dispose();
-                }
+                        if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                            return graphicsCache;
+                        }
 
-                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
-                        (Graphics2DDelegate) editorGraphics :
-                        new Graphics2DDelegate(editorGraphics);
-                return graphicsCache;
+                        if (graphicsCache != null) {
+                            graphicsCache.dispose();
+                        }
+
+                        Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                        graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                                (Graphics2DDelegate) editorGraphics :
+                                new Graphics2DDelegate(editorGraphics);
+                        return graphicsCache;
+                    }
+                };
             }
         }));
     }

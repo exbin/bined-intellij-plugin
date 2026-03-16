@@ -25,7 +25,6 @@ import org.exbin.bined.EditOperation;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.BinEdIntelliJDocking;
 import org.exbin.bined.intellij.utils.ActionUtils;
-import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
@@ -35,6 +34,7 @@ import org.exbin.framework.action.api.ActionManagement;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
+import org.exbin.framework.bined.BinaryStatus;
 import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileProcessingMode;
@@ -55,11 +55,9 @@ import org.exbin.framework.document.api.ContextDocument;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
-import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.settings.action.SettingsAction;
 import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.framework.text.encoding.EncodingsManager;
-import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -100,9 +98,60 @@ public class BinEdFilePanel extends JPanel {
     public BinEdFilePanel() {
         super(new BorderLayout());
         add(toolbarPanel, BorderLayout.NORTH);
+
+        statusPanel = new BinaryStatusPanel() {
+
+            private Graphics2DDelegate graphicsCache = null;
+
+            @Nonnull
+            @Override
+            protected Graphics getComponentGraphics(Graphics g) {
+                if (g instanceof Graphics2DDelegate) {
+                    return g;
+                }
+
+                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                    return graphicsCache;
+                }
+
+                if (graphicsCache != null) {
+                    graphicsCache.dispose();
+                }
+
+                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
+                return graphicsCache;
+            }
+
+            @Nonnull
+            @Override
+            protected JLabel createLabel() {
+                return new JBLabel();
+            }
+
+            @Nonnull
+            @Override
+            protected JLabel createEncodingLabel() {
+                return new JBLabel() {
+                    private final BasicArrowButton basicArrowButton = new BasicArrowButton(SwingConstants.NORTH);
+
+                    @Override
+                    protected void paintComponent(Graphics g) {
+                        super.paintComponent(g);
+                        Dimension areaSize = getSize();
+
+                        int h = areaSize.height;
+                        int w = areaSize.width;
+                        int size = Math.min(Math.max((h - 4) / 4, 2), 10);
+                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 - (h / 5), size, SwingConstants.NORTH, true);
+                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 + (h / 5), size, SwingConstants.SOUTH, true);
+                    }
+                };
+            }
+        };
     }
 
-    public void setFileHandler(BinaryFileDocument fileDocument) {
+    public void setDocument(BinaryFileDocument fileDocument) {
         this.fileDocument = fileDocument;
         BinEdComponentPanel componentPanel = fileDocument.getComponent();
         SectCodeArea codeArea = (SectCodeArea) fileDocument.getCodeArea();
@@ -244,62 +293,11 @@ public class BinEdFilePanel extends JPanel {
 
         BinEdFileManager fileManager = binedModule.getFileManager();
         EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-        fileManager.registerStatusBar(new BinaryStatusPanel() {
-
-            private Graphics2DDelegate graphicsCache = null;
-
-            @Nonnull
-            @Override
-            protected Graphics getComponentGraphics(Graphics g) {
-                if (g instanceof Graphics2DDelegate) {
-                    return g;
-                }
-
-                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                    return graphicsCache;
-                }
-
-                if (graphicsCache != null) {
-                    graphicsCache.dispose();
-                }
-
-                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
-                return graphicsCache;
-            }
-
-            @Nonnull
-            @Override
-            protected JLabel createLabel() {
-                return new JBLabel();
-            }
-
-            @Nonnull
-            @Override
-            protected JLabel createEncodingLabel() {
-                return new JBLabel() {
-                    private final BasicArrowButton basicArrowButton = new BasicArrowButton(SwingConstants.NORTH);
-
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        super.paintComponent(g);
-                        Dimension areaSize = getSize();
-
-                        int h = areaSize.height;
-                        int w = areaSize.width;
-                        int size = Math.min(Math.max((h - 4) / 4, 2), 10);
-                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 - (h / 5), size, SwingConstants.NORTH, true);
-                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 + (h / 5), size, SwingConstants.SOUTH, true);
-                    }
-                };
-            }
-
-        });
+        fileManager.registerStatusBar();
         fileManager.setBinaryStatusController(new BinaryStatusController());
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         // TODO encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
-        // TODO statusPanel = fileManager.getBinaryStatusPanel();
         statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
         // TODO encodingsManager.setTextEncodingStatus(statusPanel);
         add(statusPanel, BorderLayout.SOUTH);

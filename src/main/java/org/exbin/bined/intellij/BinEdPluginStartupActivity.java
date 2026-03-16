@@ -113,6 +113,8 @@ import org.exbin.framework.contribution.api.SequenceContribution;
 import org.exbin.framework.docking.DockingModule;
 import org.exbin.framework.docking.api.ContextDocking;
 import org.exbin.framework.docking.api.DockingModuleApi;
+import org.exbin.framework.document.DocumentModule;
+import org.exbin.framework.document.api.DocumentModuleApi;
 import org.exbin.framework.file.FileModule;
 import org.exbin.framework.file.api.FileModuleApi;
 import org.exbin.framework.frame.FrameModule;
@@ -587,6 +589,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(ComponentModuleApi.class, new ComponentModule());
             modules.put(WindowModuleApi.class, new WindowModule());
             modules.put(FrameModuleApi.class, new FrameModule());
+            modules.put(DocumentModuleApi.class, new DocumentModule());
             modules.put(FileModuleApi.class, new FileModule());
             modules.put(DockingModuleApi.class, new DockingModule());
             modules.put(HelpOnlineModule.class, new HelpOnlineModule());
@@ -624,6 +627,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         }
 
         private void init() {
+            App.setAppBundle(ResourceBundle.getBundle("org.exbin.bined.intellij.resources.BinEdIntelliJApp", Locale.ROOT));
+
             OptionsModule optionsModule = (OptionsModule) App.getModule(OptionsModuleApi.class);
             optionsModule.setAppOptions(new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
             convertIncorrectPreferences();
@@ -728,128 +733,10 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             BinedToolContentModule binedToolContentModule = App.getModule(BinedToolContentModule.class);
 
             BinedInspectorModule binedInspectorModule = App.getModule(BinedInspectorModule.class);
-            BinEdInspectorManager binEdInspectorManager = binedInspectorModule.getBinEdInspectorManager();
-            // TODO
-            /* binedInspectorModule.setEditorProvider(docking, new BinEdInspectorComponentExtension.ComponentsProvider() {
-                @Nonnull
-                public InspectorPanel createInspectorPanel() {
-                    return new InspectorPanel() {
-                        private Graphics2DDelegate graphicsCache = null;
-
-                        @Nonnull
-                        @Override
-                        protected Graphics getComponentGraphics(Graphics g) {
-                            if (g instanceof Graphics2DDelegate) {
-                                return g;
-                            }
-
-                            if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                                return graphicsCache;
-                            }
-
-                            if (graphicsCache != null) {
-                                graphicsCache.dispose();
-                            }
-
-                            Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                            graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
-                            return graphicsCache;
-                        }
-                    };
-                }
-
-                @Nonnull
-                public JScrollPane createScrollPane() {
-                    return new JBScrollPane();
-                }
-            }); */
-            binEdInspectorManager.removeAllInspectors();
-            binEdInspectorManager.addInspector(new BasicValuesInspectorProvider(null) { // TODO resourceBundle
-                @Nonnull
-                @Override
-                public BinEdInspector createInspector() {
-                    return new BasicValuesInspector() {
-
-                        @Nonnull
-                        @Override
-                        protected BasicValuesPanel createComponent() {
-                            return new BasicValuesPanel() {
-                                @Nonnull
-                                @Override
-                                protected JTextField createTextField() {
-                                    return new JBTextField();
-                                }
-
-                                @Nonnull
-                                @Override
-                                protected JRadioButton createRadioButton() {
-                                    return new JBRadioButton() {
-                                        private Graphics2DDelegate graphicsCache = null;
-
-                                        @Nonnull
-                                        @Override
-                                        protected Graphics getComponentGraphics(Graphics g) {
-                                            if (g instanceof Graphics2DDelegate) {
-                                                return g;
-                                            }
-
-                                            if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                                                return graphicsCache;
-                                            }
-
-                                            if (graphicsCache != null) {
-                                                graphicsCache.dispose();
-                                            }
-
-                                            Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                                            graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
-                                                    (Graphics2DDelegate) editorGraphics :
-                                                    new Graphics2DDelegate(editorGraphics);
-                                            return graphicsCache;
-                                        }
-                                    };
-                                }
-
-                                @Nonnull
-                                @Override
-                                protected JLabel createLabel() {
-                                    return new JBLabel();
-                                }
-
-                                @Nonnull
-                                @Override
-                                protected JCheckBox createCheckBox() {
-                                    return new JBCheckBox() {
-                                        private Graphics2DDelegate graphicsCache = null;
-
-                                        @Nonnull
-                                        @Override
-                                        protected Graphics getComponentGraphics(Graphics g) {
-                                            if (g instanceof Graphics2DDelegate) {
-                                                return g;
-                                            }
-
-                                            if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                                                return graphicsCache;
-                                            }
-
-                                            if (graphicsCache != null) {
-                                                graphicsCache.dispose();
-                                            }
-
-                                            Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                                            graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
-                                                    (Graphics2DDelegate) editorGraphics :
-                                                    new Graphics2DDelegate(editorGraphics);
-                                            return graphicsCache;
-                                        }
-                                    };
-                                }
-                            };
-                        }
-                    };
-                }
-            });
+            binedInspectorModule.registerBasicInspector();
+            BinEdInspectorManager inspectorManager = binedInspectorModule.getBinEdInspectorManager();
+            inspectorManager.removeAllInspectors();
+            inspectorManager.addInspector(new BasicValuesInspectorProviderWrapper(binedInspectorModule.getResourceBundle()));
             binedInspectorModule.registerShowParsingPanelMenuActions();
             binedInspectorModule.registerShowParsingPanelPopupMenuActions();
 
@@ -895,6 +782,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                         }
                     });
             binedModule.registerCodeAreaPopupMenu();
+            binedModule.registerDocument();
             binedViewerModule.registerCodeAreaPopupMenu();
             binedEditorModule.registerCodeAreaPopupMenu();
             binedViewerModule.registerSettings();
@@ -1006,5 +894,126 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
     private interface CodeAreaCommanderAction {
         void perform(CodeAreaCommandHandler commandHandler);
+    }
+
+    /**
+     * Wrapper forcing background image painting for data inspector.
+     */
+    private static class BasicValuesInspectorProviderWrapper extends BasicValuesInspectorProvider {
+
+        public BasicValuesInspectorProviderWrapper(ResourceBundle resourceBundle) {
+            super(resourceBundle);
+        }
+
+        @Nonnull
+        @Override
+        public BinEdInspector createInspector() {
+            return new BasicValuesInspector() {
+                @Nonnull
+                @Override
+                protected BasicValuesPanel createComponent() {
+                    return new BasicValuesPanel() {
+                        private Graphics2DDelegate graphicsCache = null;
+
+                        @Nonnull
+                        @Override
+                        protected Graphics getComponentGraphics(Graphics g) {
+                            if (g instanceof Graphics2DDelegate) {
+                                return g;
+                            }
+
+                            if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                return graphicsCache;
+                            }
+
+                            if (graphicsCache != null) {
+                                graphicsCache.dispose();
+                            }
+
+                            Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                            graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
+                            return graphicsCache;
+                        }
+
+                        @Nonnull
+                        public JScrollPane createScrollPane() {
+                            return new JBScrollPane();
+                        }
+
+                        @Nonnull
+                        @Override
+                        protected JTextField createTextField() {
+                            return new JBTextField();
+                        }
+
+                        @Nonnull
+                        @Override
+                        protected JRadioButton createRadioButton() {
+                            return new JBRadioButton() {
+                                private Graphics2DDelegate graphicsCache = null;
+
+                                @Nonnull
+                                @Override
+                                protected Graphics getComponentGraphics(Graphics g) {
+                                    if (g instanceof Graphics2DDelegate) {
+                                        return g;
+                                    }
+
+                                    if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                        return graphicsCache;
+                                    }
+
+                                    if (graphicsCache != null) {
+                                        graphicsCache.dispose();
+                                    }
+
+                                    Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                                    graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                                            (Graphics2DDelegate) editorGraphics :
+                                            new Graphics2DDelegate(editorGraphics);
+                                    return graphicsCache;
+                                }
+                            };
+                        }
+
+                        @Nonnull
+                        @Override
+                        protected JLabel createLabel() {
+                            return new JBLabel();
+                        }
+
+                        @Nonnull
+                        @Override
+                        protected JCheckBox createCheckBox() {
+                            return new JBCheckBox() {
+                                private Graphics2DDelegate graphicsCache = null;
+
+                                @Nonnull
+                                @Override
+                                protected Graphics getComponentGraphics(Graphics g) {
+                                    if (g instanceof Graphics2DDelegate) {
+                                        return g;
+                                    }
+
+                                    if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                                        return graphicsCache;
+                                    }
+
+                                    if (graphicsCache != null) {
+                                        graphicsCache.dispose();
+                                    }
+
+                                    Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                                    graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                                            (Graphics2DDelegate) editorGraphics :
+                                            new Graphics2DDelegate(editorGraphics);
+                                    return graphicsCache;
+                                }
+                            };
+                        }
+                    };
+                }
+            };
+        }
     }
 }

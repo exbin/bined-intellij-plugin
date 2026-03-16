@@ -141,7 +141,7 @@ public class BinEdIntelliJDocking implements MultiDocking {
         TextClipboardController clipboardController = null;
         UndoRedoState undoHandler = null;
         if (activeFile != null) {
-//            extCodeArea = activeFile.getCodeArea();
+            extCodeArea = (SectCodeArea) ((BinaryFileDocument) activeFile).getCodeArea();
             binEdDataComponent = new BinEdDataComponent(extCodeArea);
 //            undoHandler = activeFile.getUndoRedo().orElse(null);
 //            clipboardController = activeFile.getClipboardActionsController();

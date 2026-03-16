@@ -65,7 +65,7 @@ public class BinEdNativeFile {
         binaryDocument = BinEdVirtualFile.createBinaryFileDocument();
         fileManager.initDataComponent(binaryDocument.getDataComponent());
 
-        filePanel.setFileHandler(binaryDocument);
+        filePanel.setDocument(binaryDocument);
         BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler();
         binaryDocument.setUndoHandler(undoHandler);
 
