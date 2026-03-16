@@ -23,6 +23,7 @@ import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
 import com.intellij.ui.Graphics2DDelegate;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdDataComponent;
@@ -112,37 +113,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     @Nonnull
     public static BinaryFileDocument createBinaryFileDocument() {
-        return new BinaryFileDocument(new BinEdDataComponent(new BinEdComponentPanel() {
-            @Nonnull
-            @Override
-            protected SectCodeArea createCodeArea() {
-                return new SectCodeArea() {
-                    private Graphics2DDelegate graphicsCache = null;
-
-                    @Nonnull
-                    @Override
-                    protected Graphics getComponentGraphics(Graphics g) {
-                        if (g instanceof Graphics2DDelegate) {
-                            return g;
-                        }
-
-                        if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                            return graphicsCache;
-                        }
-
-                        if (graphicsCache != null) {
-                            graphicsCache.dispose();
-                        }
-
-                        Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                        graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
-                                (Graphics2DDelegate) editorGraphics :
-                                new Graphics2DDelegate(editorGraphics);
-                        return graphicsCache;
-                    }
-                };
-            }
-        }));
+        return new BinaryFileDocument(new BinEdDataComponent(new BinEdComponentPanelWrapper()));
     }
 
     @Nonnull
@@ -318,5 +289,41 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     public static class VirtualFileDocumentSource implements DocumentSource {
         // TODO
+    }
+
+    /**
+     * Wrapper forcing background image painting for component panel.
+     */
+    private static class BinEdComponentPanelWrapper extends BinEdComponentPanel {
+
+        @Nonnull
+        @Override
+        protected SectCodeArea createCodeArea() {
+            return new SectCodeArea() {
+                private Graphics2DDelegate graphicsCache = null;
+
+                @Nonnull
+                @Override
+                protected Graphics getComponentGraphics(Graphics g) {
+                    if (g instanceof Graphics2DDelegate) {
+                        return g;
+                    }
+
+                    if (graphicsCache != null && graphicsCache.getDelegate() == g) {
+                        return graphicsCache;
+                    }
+
+                    if (graphicsCache != null) {
+                        graphicsCache.dispose();
+                    }
+
+                    Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
+                    graphicsCache = editorGraphics instanceof Graphics2DDelegate ?
+                            (Graphics2DDelegate) editorGraphics :
+                            new Graphics2DDelegate(editorGraphics);
+                    return graphicsCache;
+                }
+            };
+        }
     }
 }

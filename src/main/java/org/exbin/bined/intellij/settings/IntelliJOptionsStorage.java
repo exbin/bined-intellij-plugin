@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exbin.bined.intellij.preferences;
+package org.exbin.bined.intellij.settings;
 
 import com.intellij.ide.util.PropertiesComponent;
 import org.exbin.framework.options.api.OptionsStorage;
@@ -30,66 +30,66 @@ import java.util.Optional;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class IntelliJPreferencesWrapper implements OptionsStorage {
+public class IntelliJOptionsStorage implements OptionsStorage {
 
-    private final PropertiesComponent preferences;
+    private final PropertiesComponent properties;
     private final String prefix;
 
-    public IntelliJPreferencesWrapper(PropertiesComponent preferences, String prefix) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public IntelliJOptionsStorage(PropertiesComponent properties, String prefix) {
+        this.properties = Objects.requireNonNull(properties);
         this.prefix = Objects.requireNonNull(prefix);
     }
 
     @Override
     public boolean exists(String key) {
-        return preferences.isValueSet(prefix + key);
+        return properties.isValueSet(prefix + key);
     }
 
     @Nonnull
     @Override
     public Optional<String> get(String key) {
-        return exists(key) ? Optional.ofNullable(preferences.getValue(prefix + key)) : Optional.empty();
+        return exists(key) ? Optional.ofNullable(properties.getValue(prefix + key)) : Optional.empty();
     }
 
     @Nonnull
     @Override
     public String get(String key, String def) {
-        return preferences.getValue(prefix + key, Objects.requireNonNull(def));
+        return properties.getValue(prefix + key, Objects.requireNonNull(def));
     }
 
     @Override
     public void put(String key, @Nullable String value) {
         if (value == null) {
-            preferences.unsetValue(prefix + key);
+            properties.unsetValue(prefix + key);
         } else {
-            preferences.setValue(prefix + key, value);
+            properties.setValue(prefix + key, value);
         }
     }
 
     @Override
     public void remove(String key) {
-        preferences.unsetValue(prefix + key);
+        properties.unsetValue(prefix + key);
     }
 
     @Override
     public void putInt(String key, int value) {
-        preferences.setValue(prefix + key, value, value + 1);
+        properties.setValue(prefix + key, value, value + 1);
     }
 
     @Override
     public int getInt(String key, int def) {
-        return preferences.getInt(prefix + key, def);
+        return properties.getInt(prefix + key, def);
     }
 
     @Override
     public void putLong(String key, long value) {
-        preferences.setValue(prefix + key, String.valueOf(value));
+        properties.setValue(prefix + key, String.valueOf(value));
     }
 
     @Override
     public long getLong(String key, long defaultValue) {
         try {
-            String value = preferences.getValue(prefix + key);
+            String value = properties.getValue(prefix + key);
             return value == null ? defaultValue : Long.parseLong(value);
         }
         catch (NumberFormatException e) {
@@ -99,32 +99,32 @@ public class IntelliJPreferencesWrapper implements OptionsStorage {
 
     @Override
     public void putBoolean(String key, boolean value) {
-        preferences.setValue(prefix + key, value, !value);
+        properties.setValue(prefix + key, value, !value);
     }
 
     @Override
     public boolean getBoolean(String key, boolean def) {
-        return preferences.getBoolean(prefix + key, def);
+        return properties.getBoolean(prefix + key, def);
     }
 
     @Override
     public void putFloat(String key, float value) {
-        preferences.setValue(prefix + key, value, value + 1);
+        properties.setValue(prefix + key, value, value + 1);
     }
 
     @Override
     public float getFloat(String key, float def) {
-        return preferences.getFloat(prefix + key, def);
+        return properties.getFloat(prefix + key, def);
     }
 
     @Override
     public void putDouble(String key, double value) {
-        preferences.setValue(prefix + key, (float) value, (float) (value + 1));
+        properties.setValue(prefix + key, (float) value, (float) (value + 1));
     }
 
     @Override
     public double getDouble(String key, double def) {
-        return preferences.getFloat(prefix + key, (float) def);
+        return properties.getFloat(prefix + key, (float) def);
     }
 
     @Override

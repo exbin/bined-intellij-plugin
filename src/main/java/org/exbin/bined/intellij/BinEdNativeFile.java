@@ -66,7 +66,7 @@ public class BinEdNativeFile {
         fileManager.initDataComponent(binaryDocument.getDataComponent());
 
         filePanel.setDocument(binaryDocument);
-        BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler();
+        BinaryIntelliJUndoRedo undoHandler = new BinaryIntelliJUndoRedo();
         binaryDocument.setUndoHandler(undoHandler);
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
@@ -88,7 +88,7 @@ public class BinEdNativeFile {
         toolbarPanel.loadFromOptions(optionsModule.getAppOptions());
     }
 
-    public void registerUndoRedo(BinaryUndoIntelliJHandler undoIntelliJHandler) {
+    public void registerUndoRedo(BinaryIntelliJUndoRedo undoIntelliJHandler) {
         // TODO binaryDocument.registerUndoHandler();
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
         toolbarPanel.setUndoHandler(binaryDocument.getUndoHandler().get());

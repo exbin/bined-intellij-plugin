@@ -98,20 +98,22 @@ public class BinarySearch {
             }
 
             @Override
-            public void setProgress(int i) {
-                // TODO
+            public void setProgress(int progress) {
+                binarySearchPanel.setProgress(progress);
             }
 
             @Override
             public void clearStatus() {
                 binarySearchPanel.setInfoLabel("");
-                BinarySearch.this.foundMatches = new FoundMatches();
+                BinarySearch.this.foundMatches = new BinarySearchService.FoundMatches();
                 updateMatchStatus();
             }
 
             @Override
             public void setCancelled() {
-                // TODO
+                binarySearchPanel.setInfoLabel(resourceBundle.getString("searchStatus.cancelled"));
+                BinarySearch.this.foundMatches = new BinarySearchService.FoundMatches();
+                updateMatchStatus();
             }
 
             private void updateMatchStatus() {
@@ -161,6 +163,11 @@ public class BinarySearch {
             public void performReplaceAll() {
                 invokeSearch(SearchOperation.REPLACE_ALL);
                 binarySearchPanel.updateSearchHistory(currentSearchParameters.getCondition());
+            }
+
+            @Override
+            public void cancelSearch() {
+                BinarySearch.this.cancelSearch();
             }
 
             @Override

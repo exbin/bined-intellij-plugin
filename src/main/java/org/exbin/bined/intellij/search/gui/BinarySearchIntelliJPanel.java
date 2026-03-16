@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.ex.DefaultCustomComponentAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.components.JBPanel;
@@ -57,7 +58,6 @@ import javax.swing.AbstractAction;
 import javax.swing.ComboBoxEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -88,6 +88,7 @@ public class BinarySearchIntelliJPanel extends JPanel {
     private final SectCodeArea searchCodeArea = new SectCodeArea();
 
     private BinarySearchPanel.PanelMode panelMode = BinarySearchPanel.PanelMode.REPLACE;
+    private StatusPanelMode statusPanelMode = StatusPanelMode.EMPTY;
     private ComboBoxEditor findComboBoxEditor;
     private BinarySearchComboBoxPanel findComboBoxEditorComponent;
     private ComboBoxEditor replaceComboBoxEditor;
@@ -100,10 +101,13 @@ public class BinarySearchIntelliJPanel extends JPanel {
     private final ActionToolbar closeToolbar;
     private final DefaultActionGroup replaceToolbarActionGroup;
     private final ActionToolbar replaceToolbar;
+    private final DefaultActionGroup progressToolbarActionGroup;
+    private final ActionToolbar progressToolbar;
 
     private final DefaultCustomComponentAction optionsAction;
     private final AnActionButton prevMatchAction;
     private final AnActionButton nextMatchAction;
+    private final AnActionButton cancelSearchAction;
     private final ToggleAction matchCaseToggleAction;
     private boolean matchCase = false;
     private boolean matchCaseEnabled = true;
@@ -124,6 +128,9 @@ public class BinarySearchIntelliJPanel extends JPanel {
         replaceToolbarActionGroup = new DefaultActionGroup();
         replaceToolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".replace",
                 replaceToolbarActionGroup, true);
+        progressToolbarActionGroup = new DefaultActionGroup();
+        progressToolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".progress",
+                progressToolbarActionGroup, true);
 
         optionsAction = new DefaultCustomComponentAction(
                 () -> new JButton(new AbstractAction(resourceBundle.getString("optionsButton.text")) {
@@ -175,6 +182,23 @@ public class BinarySearchIntelliJPanel extends JPanel {
             }
         };
         nextMatchAction.setEnabled(false);
+
+        cancelSearchAction = new AnActionButton(
+                resourceBundle.getString("cancelSearchButton.toolTipText"),
+                null,
+                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("cancelSearchButton.icon")))
+        ) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                controller.cancelSearch();
+            }
+
+            @Nonnull
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+        };
 
         replaceButton = new JButton(new AbstractAction(resourceBundle.getString("replaceButton.text")) {
             @Override
@@ -270,11 +294,10 @@ public class BinarySearchIntelliJPanel extends JPanel {
         findToolbar.setTargetComponent(targetComponent);
         closeToolbar.setTargetComponent(targetComponent);
         replaceToolbar.setTargetComponent(targetComponent);
+        progressToolbar.setTargetComponent(targetComponent);
     }
 
     private void init() {
-        findToolbarActionGroup.addSeparator();
-        findToolbarActionGroup.addAction(optionsAction);
         findPanel.add(findToolbar.getComponent(), BorderLayout.CENTER);
 
         closeToolbarActionGroup.addAction(new AnAction(
@@ -491,6 +514,49 @@ public class BinarySearchIntelliJPanel extends JPanel {
 
     public void setInfoLabel(String text) {
         infoLabel.setText(text);
+        setStatusPanelMode(StatusPanelMode.INFO);
+    }
+
+    /**
+     * Sets progress of 0 to 1000.
+     *
+     * @param progress progress value
+     */
+    public void setProgress(int progress) {
+        progressBar.setValue(progress);
+        progressBar.setString(String.format(resourceBundle.getString("searchProgress"), ((float) progress) / 10));
+        setStatusPanelMode(StatusPanelMode.PROGRESS);
+    }
+
+    private void setStatusPanelMode(StatusPanelMode statusPanelMode) {
+        if (statusPanelMode == this.statusPanelMode) {
+            return;
+        }
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            switch (this.statusPanelMode) {
+            case INFO:
+                statusPanel.remove(infoLabel);
+                break;
+            case PROGRESS:
+                statusPanel.remove(progressBar);
+                statusPanel.remove(progressToolbar.getComponent());
+                break;
+            }
+
+            switch (statusPanelMode) {
+            case INFO:
+                statusPanel.add(infoLabel, BorderLayout.CENTER);
+                break;
+            case PROGRESS:
+                statusPanel.add(progressBar, BorderLayout.CENTER);
+                statusPanel.add(progressToolbar.getComponent(), BorderLayout.EAST);
+                break;
+            }
+            this.statusPanelMode = statusPanelMode;
+            statusPanel.revalidate();
+            statusPanel.repaint();
+        });
     }
 
     @Nonnull
@@ -555,6 +621,7 @@ public class BinarySearchIntelliJPanel extends JPanel {
                 remove(replacePanel);
             }
             revalidate();
+            repaint();
         }
     }
 
@@ -567,18 +634,26 @@ public class BinarySearchIntelliJPanel extends JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        infoLabel = new javax.swing.JLabel();
+        progressBar = new javax.swing.JProgressBar();
         topSeparator = new javax.swing.JSeparator();
         findPanel = new JBPanel<>();
         findPanel.setLayout(new BorderLayout());
         findLabel = new javax.swing.JLabel();
         findTypeButton = new javax.swing.JButton();
         findComboBox = new ComboBox<>();
-        infoLabel = new javax.swing.JLabel();
         replacePanel = new JBPanel<>();
         replacePanel.setLayout(new BorderLayout());
         replaceLabel = new javax.swing.JLabel();
         replaceTypeButton = new javax.swing.JButton();
         replaceComboBox = new ComboBox<>();
+
+        infoLabel.setEnabled(false);
+        infoLabel.setName("infoLabel"); // NOI18N
+
+        progressBar.setMaximum(1000);
+        progressBar.setName("progressBar"); // NOI18N
+        progressBar.setStringPainted(true);
 
         setName("Form"); // NOI18N
         setLayout(new java.awt.BorderLayout());
@@ -614,10 +689,16 @@ public class BinarySearchIntelliJPanel extends JPanel {
         findToolbarActionGroup.addAction(matchCaseToggleAction);
         findToolbarActionGroup.addAction(multipleMatchesToggle);
 
-        infoLabel.setEnabled(false);
-        infoLabel.setName("infoLabel"); // NOI18N
-        infoLabel.setMinimumSize(new Dimension(50, 27));
-        findToolbarActionGroup.addAction(new DefaultCustomComponentAction(() -> infoLabel));
+        progressToolbarActionGroup.addAction(cancelSearchAction);
+
+        statusPanel = new JBPanel<>();
+        statusPanel.setLayout(new BorderLayout());
+        statusPanel.setName("statusPanel"); // NOI18N
+        statusPanel.setLayout(new java.awt.BorderLayout());
+
+        findToolbarActionGroup.addAction(optionsAction);
+        findToolbarActionGroup.addSeparator();
+        findToolbarActionGroup.addAction(new DefaultCustomComponentAction(() -> statusPanel));
 
         add(findPanel, java.awt.BorderLayout.CENTER);
 
@@ -675,14 +756,20 @@ public class BinarySearchIntelliJPanel extends JPanel {
     }//GEN-LAST:event_findTypeButtonActionPerformed
 
     public void updateFindStatus() {
-        SearchCondition condition = findComboBoxEditorComponent.getItem();
-        if (condition.getSearchMode() == SearchCondition.SearchMode.TEXT) {
-            findTypeButton.setText(resourceBundle.getString("inputType.text"));
-            matchCaseEnabled = true;
-        } else {
-            findTypeButton.setText(resourceBundle.getString("inputType.binary"));
-            matchCaseEnabled = false;
-        }
+        SearchCondition condition = (SearchCondition) findComboBoxEditor.getItem();
+        SearchCondition.SearchMode searchMode = condition.getSearchMode();
+        // TODO searchTypeUtils.updateSearchType(findTypeButton, searchMode);
+//        switch (searchMode) {
+//        case TEXT:
+//            matchCaseToggleButton.setEnabled(true);
+//            break;
+//        case REGEX:
+//            matchCaseToggleButton.setEnabled(true);
+//            break;
+//        default:
+//            matchCaseToggleButton.setEnabled(false);
+//            break;
+//        }
     }
 
     private void updateReplaceStatus() {
@@ -723,15 +810,17 @@ public class BinarySearchIntelliJPanel extends JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JComboBox<SearchCondition> findComboBox;
+    private javax.swing.JComboBox<SearchCondition> findComboBox;
     private javax.swing.JLabel findLabel;
-    private JPanel findPanel;
+    private javax.swing.JPanel findPanel;
     private javax.swing.JButton findTypeButton;
     private javax.swing.JLabel infoLabel;
-    private JComboBox<SearchCondition> replaceComboBox;
+    private javax.swing.JProgressBar progressBar;
+    private javax.swing.JComboBox<SearchCondition> replaceComboBox;
     private javax.swing.JLabel replaceLabel;
-    private JPanel replacePanel;
+    private javax.swing.JPanel replacePanel;
     private javax.swing.JButton replaceTypeButton;
+    private javax.swing.JPanel statusPanel;
     private javax.swing.JSeparator topSeparator;
     // End of variables declaration//GEN-END:variables
 
@@ -766,6 +855,8 @@ public class BinarySearchIntelliJPanel extends JPanel {
 
         void performReplaceAll();
 
+        void cancelSearch();
+
         /**
          * Parameters of search have changed.
          */
@@ -785,5 +876,9 @@ public class BinarySearchIntelliJPanel extends JPanel {
         void searchOptions();
 
         void close();
+    }
+
+    private enum StatusPanelMode {
+        EMPTY, INFO, PROGRESS
     }
 }

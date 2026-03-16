@@ -2,6 +2,9 @@
 - Added copy as / paste from dialogs
 - Added copy/paste formats for C, Java and Python (by mengnankkkk)
 - Added convert data: date time and compression (by mengnankkkk)
+- Added font zoom actions (by mengnankkkk)
+- Added search progress bar + cancel button (assisted by Tanyajain2006)
+- Added basic regex search support (assisted by Tanyajain2006)
 - Fixed overflow in the binary checkboxes in data inspector (issue #67)
 
 0.2.12 (2025-09-17)

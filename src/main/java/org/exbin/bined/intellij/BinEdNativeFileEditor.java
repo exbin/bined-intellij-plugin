@@ -28,7 +28,6 @@ import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.docking.api.ContextDocking;
-import org.exbin.framework.docking.api.DockingModuleApi;
 import org.exbin.framework.frame.api.FrameModuleApi;
 
 import javax.annotation.Nonnull;
@@ -58,7 +57,7 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
         this.project = project;
         this.nativeFile = new BinEdNativeFile();
         nativeFile.openFile(virtualFile);
-        BinaryUndoIntelliJHandler undoHandler = new BinaryUndoIntelliJHandler();
+        BinaryIntelliJUndoRedo undoHandler = new BinaryIntelliJUndoRedo();
         undoHandler.setFileEditor(this);
         nativeFile.registerUndoRedo(undoHandler);
 

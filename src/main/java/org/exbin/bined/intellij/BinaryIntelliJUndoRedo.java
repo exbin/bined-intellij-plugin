@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
-public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
+public class BinaryIntelliJUndoRedo implements BinaryDataUndoRedo {
 
     private final List<BinaryDataUndoRedoChangeListener> listeners = new ArrayList<>();
     private UndoManager undoManager = null;
@@ -52,10 +52,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
     private int commandPosition;
     private int syncPointPosition = -1;
 
-    /**
-     * Creates a new instance.
-     */
-    public BinaryUndoIntelliJHandler() {
+    public BinaryIntelliJUndoRedo() {
         init();
     }
 
@@ -90,7 +87,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
                 try {
                     command.undo();
                 } catch (Exception ex) {
-                    Logger.getLogger(BinaryUndoIntelliJHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BinaryIntelliJUndoRedo.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 undoUpdated();
             }
@@ -101,7 +98,7 @@ public class BinaryUndoIntelliJHandler implements BinaryDataUndoRedo {
                 try {
                     command.redo();
                 } catch (Exception ex) {
-                    Logger.getLogger(BinaryUndoIntelliJHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BinaryIntelliJUndoRedo.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 undoUpdated();
             }

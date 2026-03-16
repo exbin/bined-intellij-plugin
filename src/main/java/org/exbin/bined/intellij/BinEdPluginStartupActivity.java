@@ -62,10 +62,11 @@ import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.objectdata.MainBinaryViewHandler;
-import org.exbin.bined.intellij.settings.IntegrationOptions;
-import org.exbin.bined.intellij.settings.gui.IntegrationSettingsPanel;
-import org.exbin.bined.intellij.preferences.IntelliJPreferencesWrapper;
+import org.exbin.bined.intellij.settings.IntelliJOptionsStorage;
 import org.exbin.bined.intellij.search.BinEdIntelliJComponentSearch;
+import org.exbin.bined.intellij.settings.IntegrationOptions;
+import org.exbin.bined.intellij.settings.IntegrationSettingsComponent;
+import org.exbin.bined.intellij.settings.gui.IntegrationSettingsPanel;
 import org.exbin.bined.swing.CodeAreaCommandHandler;
 import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.framework.App;
@@ -85,11 +86,9 @@ import org.exbin.framework.bined.editor.BinedEditorModule;
 import org.exbin.framework.bined.inspector.BasicValuesInspector;
 import org.exbin.framework.bined.inspector.BasicValuesInspectorProvider;
 import org.exbin.framework.bined.inspector.BinEdInspector;
-import org.exbin.framework.bined.inspector.BinEdInspectorComponentExtension;
 import org.exbin.framework.bined.inspector.BinEdInspectorManager;
 import org.exbin.framework.bined.inspector.BinedInspectorModule;
 import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
-import org.exbin.framework.bined.inspector.gui.InspectorPanel;
 import org.exbin.framework.bined.macro.BinedMacroModule;
 import org.exbin.framework.bined.objectdata.BinedObjectDataModule;
 import org.exbin.framework.bined.operation.BinedOperationModule;
@@ -123,7 +122,6 @@ import org.exbin.framework.help.HelpModule;
 import org.exbin.framework.help.api.HelpModuleApi;
 import org.exbin.framework.help.online.HelpOnlineModule;
 import org.exbin.framework.language.LanguageModule;
-import org.exbin.framework.language.api.IconSetProvider;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.language.api.LanguageProvider;
 import org.exbin.framework.menu.MenuModule;
@@ -132,13 +130,12 @@ import org.exbin.framework.menu.api.MenuModuleApi;
 import org.exbin.framework.operation.undo.OperationUndoModule;
 import org.exbin.framework.operation.undo.api.OperationUndoModuleApi;
 import org.exbin.framework.options.OptionsModule;
+import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.preferences.FilePreferencesFactory;
 import org.exbin.framework.options.settings.OptionsSettingsModule;
 import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
-import org.exbin.framework.options.settings.api.SettingsComponent;
-import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
-import org.exbin.framework.options.settings.api.SettingsComponentProvider;
 import org.exbin.framework.options.settings.api.SettingsPanelType;
 import org.exbin.framework.plugin.language.cs_CZ.LanguageCsCzModule;
 import org.exbin.framework.plugin.language.de_DE.LanguageDeDeModule;
@@ -152,13 +149,10 @@ import org.exbin.framework.plugin.language.ru_RU.LanguageRuRuModule;
 import org.exbin.framework.plugin.language.zh_Hans.LanguageZhHansModule;
 import org.exbin.framework.plugin.language.zh_Hant.LanguageZhHantModule;
 import org.exbin.framework.plugins.iconset.material.IconSetMaterialModule;
-import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.toolbar.ToolBarModule;
 import org.exbin.framework.toolbar.api.ToolBarModuleApi;
 import org.exbin.framework.ui.UiModule;
 import org.exbin.framework.ui.api.UiModuleApi;
-import org.exbin.framework.ui.settings.gui.LanguageSettingsPanel;
-import org.exbin.framework.ui.model.LanguageRecord;
 import org.exbin.framework.ui.theme.UiThemeModule;
 import org.exbin.framework.ui.theme.api.UiThemeModuleApi;
 import org.exbin.framework.utils.UiUtils;
@@ -171,7 +165,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -630,7 +623,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             App.setAppBundle(ResourceBundle.getBundle("org.exbin.bined.intellij.resources.BinEdIntelliJApp", Locale.ROOT));
 
             OptionsModule optionsModule = (OptionsModule) App.getModule(OptionsModuleApi.class);
-            optionsModule.setAppOptions(new IntelliJPreferencesWrapper(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
+            optionsModule.setAppOptions(new IntelliJOptionsStorage(PropertiesComponent.getInstance(), BinEdIntelliJPlugin.PLUGIN_PREFIX));
             convertIncorrectPreferences();
 
             OptionsStorage preferences = optionsModule.getAppOptions();
@@ -745,42 +738,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
             settingsManager.registerSettingsOptions(IntegrationOptions.class, IntegrationOptions::new);
-            settingsManager.registerComponent("integration",
-                    new SettingsComponentProvider() {
-                        @Nonnull
-                        @Override
-                        public SettingsComponent createComponent() {
-                            IntegrationSettingsPanel panel = new IntegrationSettingsPanel();
-                            ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(LanguageSettingsPanel.class);
-                            panel.setDefaultLocaleName("<" + resourceBundle.getString("locale.defaultLanguage") + ">");
-                            List<LanguageRecord> languageLocales = new ArrayList<>();
-                            languageLocales.add(new LanguageRecord(Locale.ROOT, null));
-                            languageLocales.add(new LanguageRecord(Locale.forLanguageTag("en-US"), new ImageIcon(getClass().getResource(resourceBundle.getString("locale.englishFlag")))));
-
-                            List<LanguageRecord> languageRecords = new ArrayList<>();
-                            List<LanguageProvider> languagePlugins = languageModule.getLanguagePlugins();
-                            for (LanguageProvider languageProvider : languagePlugins) {
-                                languageRecords.add(new LanguageRecord(languageProvider.getLocale(), languageProvider.getFlag().orElse(null)));
-                            }
-                            languageLocales.addAll(languageRecords);
-
-                            List<String> iconSets = new ArrayList<>();
-                            iconSets.add("");
-                            List<String> iconSetNames = new ArrayList<>();
-                            UiThemeModule themeModule = (UiThemeModule) App.getModule(UiThemeModuleApi.class);
-                            ResourceBundle themeResourceBundle = themeModule.getResourceBundle();
-                            iconSetNames.add(themeResourceBundle.getString("iconset.defaultTheme"));
-                            List<IconSetProvider> providers = App.getModule(LanguageModuleApi.class).getIconSets();
-                            for (IconSetProvider provider : providers) {
-                                iconSets.add(provider.getId());
-                                iconSetNames.add(provider.getName());
-                            }
-
-                            panel.setLanguageLocales(languageLocales);
-                            panel.setIconSets(iconSets, iconSetNames);
-                            return panel;
-                        }
-                    });
+            settingsManager.registerComponent("integration", new IntegrationSettingsComponent());
             binedModule.registerCodeAreaPopupMenu();
             binedModule.registerDocument();
             binedViewerModule.registerCodeAreaPopupMenu();
