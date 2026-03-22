@@ -46,10 +46,12 @@ import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.text.encoding.ContextEncoding;
 import org.exbin.framework.text.encoding.EncodingsManager;
 import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
 import org.exbin.framework.action.api.ContextComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
+import org.exbin.framework.text.font.ContextFont;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -168,6 +170,8 @@ public class DebugViewPanel extends javax.swing.JPanel {
                         frameModule.getFrameHandler().getContextManager();
 
                 contextManager.changeActiveState(ContextComponent.class, binEdDataComponent);
+                contextManager.changeActiveState(ContextFont.class, dataComponent);
+                contextManager.changeActiveState(ContextEncoding.class, dataComponent);
                 contextManager.changeActiveState(DialogParentComponent.class, () -> binEdDataComponent.getCodeArea());
                 contextManager.changeActiveState(ClipboardController.class, binEdDataComponent);
 

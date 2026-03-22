@@ -292,11 +292,11 @@ public class BinEdFilePanel extends JPanel {
         docking.setActiveFile(fileDocument);
 
         BinEdFileManager fileManager = binedModule.getFileManager();
-        EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-        fileManager.registerStatusBar();
+        // EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
+        // fileManager.registerStatusBar();
         fileManager.setBinaryStatusController(new BinaryStatusController());
 
-        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+        // OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         // TODO encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
         statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
         // TODO encodingsManager.setTextEncodingStatus(statusPanel);

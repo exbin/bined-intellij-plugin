@@ -52,8 +52,10 @@ import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.text.encoding.ContextEncoding;
 import org.exbin.framework.text.encoding.EncodingsManager;
 import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
+import org.exbin.framework.text.font.ContextFont;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
@@ -161,6 +163,8 @@ public final class DataDialog extends DialogWrapper {
                 ActiveContextManagement contextManager =
                         frameModule.getFrameHandler().getContextManager();
 
+                contextManager.changeActiveState(ContextFont.class, binEdDataComponent);
+                contextManager.changeActiveState(ContextEncoding.class, binEdDataComponent);
                 contextManager.changeActiveState(ContextComponent.class, binEdDataComponent);
                 contextManager.changeActiveState(DialogParentComponent.class, () -> codeArea);
                 contextManager.changeActiveState(ClipboardController.class, binEdDataComponent);

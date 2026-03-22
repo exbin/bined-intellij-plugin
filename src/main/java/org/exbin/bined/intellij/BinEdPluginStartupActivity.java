@@ -136,6 +136,7 @@ import org.exbin.framework.options.preferences.FilePreferencesFactory;
 import org.exbin.framework.options.settings.OptionsSettingsModule;
 import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
 import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.framework.options.settings.api.SettingsPageContribution;
 import org.exbin.framework.options.settings.api.SettingsPanelType;
 import org.exbin.framework.plugin.language.cs_CZ.LanguageCsCzModule;
 import org.exbin.framework.plugin.language.de_DE.LanguageDeDeModule;
@@ -711,6 +712,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             }
 
             BinEdIntelliJDocking docking = new BinEdIntelliJDocking();
+            DocumentModule documentModule = (DocumentModule) App.getModule(DocumentModuleApi.class);
             BinedModule binedModule = App.getModule(BinedModule.class);
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
             BinedEditorModule binedEditorModule = App.getModule(BinedEditorModule.class);
@@ -739,6 +741,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
             settingsManager.registerSettingsOptions(IntegrationOptions.class, IntegrationOptions::new);
             settingsManager.registerComponent("integration", new IntegrationSettingsComponent());
+            SettingsPageContribution pageContribution = new SettingsPageContribution("document", documentModule.getResourceBundle());
+            settingsManager.registerPage(pageContribution);
+
             binedModule.registerCodeAreaPopupMenu();
             binedModule.registerDocument();
             binedViewerModule.registerCodeAreaPopupMenu();

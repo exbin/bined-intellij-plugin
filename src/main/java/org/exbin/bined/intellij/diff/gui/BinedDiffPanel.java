@@ -73,8 +73,10 @@ import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.settings.action.SettingsAction;
 import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.framework.text.encoding.ContextEncoding;
 import org.exbin.framework.text.encoding.EncodingsManager;
 import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
+import org.exbin.framework.text.font.ContextFont;
 import org.exbin.framework.text.font.settings.TextFontOptions;
 import org.exbin.framework.utils.DesktopUtils;
 
@@ -360,6 +362,8 @@ public class BinedDiffPanel extends JBPanel {
                             frameModule.getFrameHandler().getContextManager();
 
                     BinEdDataComponent leftBinEdDataComponent = new BinEdDataComponent(leftCodeArea);
+                    contextManager.changeActiveState(ContextFont.class, leftBinEdDataComponent);
+                    contextManager.changeActiveState(ContextEncoding.class, leftBinEdDataComponent);
                     contextManager.changeActiveState(ContextComponent.class, leftBinEdDataComponent);
                     contextManager.changeActiveState(DialogParentComponent.class, () -> leftCodeArea);
                     contextManager.changeActiveState(ClipboardController.class, leftBinEdDataComponent);
@@ -407,6 +411,8 @@ public class BinedDiffPanel extends JBPanel {
                             frameModule.getFrameHandler().getContextManager();
 
                     BinEdDataComponent rightBinEdDataComponent = new BinEdDataComponent(rightCodeArea);
+                    contextManager.changeActiveState(ContextFont.class, rightBinEdDataComponent);
+                    contextManager.changeActiveState(ContextEncoding.class, rightBinEdDataComponent);
                     contextManager.changeActiveState(ContextComponent.class, rightBinEdDataComponent);
                     contextManager.changeActiveState(DialogParentComponent.class, () -> rightCodeArea);
                     contextManager.changeActiveState(ClipboardController.class, rightBinEdDataComponent);

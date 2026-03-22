@@ -30,6 +30,8 @@ import org.exbin.framework.docking.multi.api.MultiDocking;
 import org.exbin.framework.document.api.Document;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.operation.undo.api.UndoRedoState;
+import org.exbin.framework.text.encoding.ContextEncoding;
+import org.exbin.framework.text.font.ContextFont;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -148,10 +150,18 @@ public class BinEdIntelliJDocking implements MultiDocking {
 //            updateStatus();
         }
 
-//        contextManager.changeActiveState(FileHandler.class, activeFile);
-//        contextManager.changeActiveState(FileOperations.class, this);
+        final Component parentComponent = binEdDataComponent == null ? null : binEdDataComponent.getCodeArea();
+
+        contextManager.changeActiveState(ContextFont.class, binEdDataComponent);
+        contextManager.changeActiveState(ContextEncoding.class, binEdDataComponent);
         contextManager.changeActiveState(ContextComponent.class, binEdDataComponent);
-//        contextManager.changeActiveState(DialogParentComponent.class, binEdDataComponent == null ? () -> frameModule.getFrame() : binEdDataComponent::getCodeArea);
+        contextManager.changeActiveState(DialogParentComponent.class, new DialogParentComponent() {
+            @Nonnull
+            @Override
+            public Component getComponent() {
+                return parentComponent;
+            }
+        });
         contextManager.changeActiveState(UndoRedoState.class, undoHandler);
         contextManager.changeActiveState(ClipboardController.class, clipboardController);
 
