@@ -23,7 +23,6 @@ import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
 import com.intellij.ui.Graphics2DDelegate;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
-import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.bined.BinEdDataComponent;
@@ -38,6 +37,9 @@ import org.exbin.framework.file.api.FileDocumentSource;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
+import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.framework.options.settings.api.SettingsOptionsProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -83,17 +85,15 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             this.displayName = "";
         }
 
-        // fileDocument.registerUndoHandler();
         BinedModule binedModule = App.getModule(BinedModule.class);
         BinEdFileManager fileManager = binedModule.getFileManager();
         fileManager.getBinaryStatus().setBinaryStatusPanel(filePanel.getStatusPanel());
+        filePanel.setDocument(fileDocument);
         fileManager.initDataComponent(fileDocument.getDataComponent());
         fileManager.initCommandHandler(fileDocument.getDataComponent());
 
-        filePanel.setDocument(fileDocument);
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         OptionsStorage optionsStorage = optionsModule.getAppOptions();
-        // TODO fileHandler.onInitFromOptions(binaryEditorOptions);
         fileDocument.setInitialFileProcessing(new BinaryFileProcessingOptions(optionsStorage).getFileProcessingMode());
 
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
@@ -104,11 +104,14 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
             BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(
                     ContextDocking.class);
-            docking.setActiveFile(fileDocument);
-            docking.updateStatus();
+            docking.setActiveDocument(fileDocument);
         });
-
         toolbarPanel.loadFromOptions(optionsStorage);
+
+        OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
+        OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
+        SettingsOptionsProvider settingsOptionsProvider = settingsManager.getSettingsOptionsProvider();
+        fileDocument.applySettings(settingsOptionsProvider);
     }
 
     @Nonnull
@@ -283,7 +286,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         }
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
-        docking.setActiveFile(fileDocument);
+        docking.setActiveDocument(fileDocument);
         docking.updateStatus();
     }
 

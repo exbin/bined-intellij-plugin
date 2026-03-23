@@ -27,7 +27,8 @@ import org.exbin.framework.bined.search.gui.BinaryMultilinePanel;
 import org.exbin.framework.bined.search.gui.BinarySearchPanel;
 import org.exbin.framework.bined.search.gui.FindBinaryPanel;
 import org.exbin.framework.bined.search.service.BinarySearchService;
-import org.exbin.framework.bined.search.service.BinarySearchService.FoundMatches;
+import org.exbin.framework.help.api.HelpLink;
+import org.exbin.framework.help.api.HelpModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.utils.WindowUtils;
 import org.exbin.framework.window.api.WindowHandler;
@@ -39,7 +40,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import java.awt.Dialog;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +53,8 @@ import java.util.ResourceBundle;
 @ParametersAreNonnullByDefault
 public class BinarySearch {
 
+    public static final String HELP_ID = "find-or-replace-data";
+
     private final ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(org.exbin.framework.bined.search.BinarySearch.class);
     private static final int DEFAULT_DELAY = 500;
 
@@ -63,7 +65,7 @@ public class BinarySearch {
     private SearchParameters.SearchDirection currentSearchDirection = SearchParameters.SearchDirection.FORWARD;
     private final SearchParameters currentSearchParameters = new SearchParameters();
     private final ReplaceParameters currentReplaceParameters = new ReplaceParameters();
-    private FoundMatches foundMatches = new FoundMatches();
+    private BinarySearchService.FoundMatches foundMatches = new BinarySearchService.FoundMatches();
 
     private final List<SearchCondition> searchHistory = new ArrayList<>();
     private final List<SearchCondition> replaceHistory = new ArrayList<>();
@@ -77,7 +79,7 @@ public class BinarySearch {
     public BinarySearch() {
         searchStatusListener = new BinarySearchService.SearchStatusListener() {
             @Override
-            public void setStatus(@Nonnull FoundMatches foundMatches, @Nonnull SearchParameters.MatchMode matchMode) {
+            public void setStatus(@Nonnull BinarySearchService.FoundMatches foundMatches, @Nonnull SearchParameters.MatchMode matchMode) {
                 BinarySearch.this.foundMatches = foundMatches;
                 switch (foundMatches.getMatchesCount()) {
                     case 0:
@@ -103,25 +105,25 @@ public class BinarySearch {
             }
 
             @Override
-            public void clearStatus() {
-                binarySearchPanel.setInfoLabel("");
-                BinarySearch.this.foundMatches = new BinarySearchService.FoundMatches();
-                updateMatchStatus();
-            }
-
-            @Override
             public void setCancelled() {
                 binarySearchPanel.setInfoLabel(resourceBundle.getString("searchStatus.cancelled"));
                 BinarySearch.this.foundMatches = new BinarySearchService.FoundMatches();
                 updateMatchStatus();
             }
 
+            @Override
+            public void clearStatus() {
+                binarySearchPanel.setInfoLabel("");
+                BinarySearch.this.foundMatches = new BinarySearchService.FoundMatches();
+                updateMatchStatus();
+            }
+
             private void updateMatchStatus() {
                 int matchesCount = foundMatches.getMatchesCount();
-                int matchPosition = foundMatches.getMatchIndex();
+                int matchIndex = foundMatches.getMatchIndex();
                 binarySearchPanel.updateMatchStatus(matchesCount > 0,
-                        matchesCount > 1 && matchPosition > 0,
-                        matchPosition < matchesCount - 1
+                        matchesCount > 1 && matchIndex > 0,
+                        matchIndex < matchesCount - 1
                 );
             }
         };
@@ -187,6 +189,7 @@ public class BinarySearch {
                 SearchCondition updatedSearchCondition = binarySearchPanel.getSearchParameters().getCondition();
 
                 switch (updatedSearchCondition.getSearchMode()) {
+                    case REGEX:
                     case TEXT: {
                         String searchText = updatedSearchCondition.getSearchText();
                         if (searchText.isEmpty()) {
@@ -234,6 +237,8 @@ public class BinarySearch {
                 findBinaryPanel.setReplaceParameters(currentReplaceParameters);
                 findBinaryPanel.setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler);
                 DefaultControlPanel controlPanel = new DefaultControlPanel(findBinaryPanel.getResourceBundle());
+                HelpModuleApi helpModule = App.getModule(HelpModuleApi.class);
+                helpModule.addLinkToControlPanel(controlPanel, new HelpLink(HELP_ID));
                 final WindowHandler dialog = windowModule.createDialog(findBinaryPanel, controlPanel);
                 windowModule.setWindowTitle(dialog, findBinaryPanel.getResourceBundle());
                 windowModule.addHeaderPanel(dialog.getWindow(), findBinaryPanel.getClass(), findBinaryPanel.getResourceBundle());
@@ -244,9 +249,8 @@ public class BinarySearch {
                         multilinePanel.setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler);
                         multilinePanel.setCondition(condition);
                         DefaultControlPanel controlPanel = new DefaultControlPanel();
-                        JPanel dialogPanel = windowModule.createDialogPanel(multilinePanel, controlPanel);
                         WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
-                        final WindowHandler multilineDialog = windowModule.createDialog(dialog.getWindow(), Dialog.ModalityType.APPLICATION_MODAL, dialogPanel);
+                        final WindowHandler multilineDialog = windowModule.createDialog(dialog.getWindow(), Dialog.ModalityType.APPLICATION_MODAL, multilinePanel, controlPanel);
                         windowModule.addHeaderPanel(multilineDialog.getWindow(), multilinePanel.getClass(), multilinePanel.getResourceBundle());
                         windowModule.setWindowTitle(multilineDialog, multilinePanel.getResourceBundle());
                         final SearchConditionResult result = new SearchConditionResult();
@@ -348,7 +352,9 @@ public class BinarySearch {
         invokeSearchThread.delay = delay;
         currentSearchOperation = searchOperation;
         currentSearchParameters.setFromParameters(searchParameters);
-        currentReplaceParameters.setFromParameters(replaceParameters);
+        if (replaceParameters != null) {
+            currentReplaceParameters.setFromParameters(replaceParameters);
+        }
         invokeSearchThread.start();
     }
 

@@ -21,7 +21,6 @@ import com.intellij.ui.Graphics2DDelegate;
 import com.intellij.ui.components.JBLabel;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeType;
-import org.exbin.bined.EditOperation;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.BinEdIntelliJDocking;
 import org.exbin.bined.intellij.utils.ActionUtils;
@@ -34,13 +33,8 @@ import org.exbin.framework.action.api.ActionManagement;
 import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
-import org.exbin.framework.bined.BinaryStatus;
-import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.FileProcessingMode;
-import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
-import org.exbin.framework.bined.editor.settings.BinaryEditorOptions;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
@@ -54,7 +48,6 @@ import org.exbin.framework.docking.api.ContextDocking;
 import org.exbin.framework.document.api.ContextDocument;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.options.settings.action.SettingsAction;
 import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.framework.text.encoding.EncodingsManager;
@@ -81,7 +74,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 
 /**
  * Binary editor file panel.
@@ -288,13 +280,13 @@ public class BinEdFilePanel extends JPanel {
             }
         });
 
-        docking.addFile(fileDocument);
-        docking.setActiveFile(fileDocument);
+        docking.addFile(fileDocument, statusPanel);
+        docking.setActiveDocument(fileDocument);
 
         BinEdFileManager fileManager = binedModule.getFileManager();
-        // EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-        // fileManager.registerStatusBar();
-        fileManager.setBinaryStatusController(new BinaryStatusController());
+        EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
+        fileManager.getBinaryStatus().setBinaryStatusPanel(statusPanel);
+        fileManager.setBinaryStatusController(new org.exbin.framework.bined.viewer.BinaryStatusController(fileManager.getBinaryStatus(), encodingsManager));
 
         // OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         // TODO encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
@@ -337,58 +329,4 @@ public class BinEdFilePanel extends JPanel {
         fileDocument.getComponent().onInitFromPreferences(appPreferences);
         toolbarPanel.applyFromCodeArea();
     } */
-
-    @ParametersAreNonnullByDefault
-    private class BinaryStatusController implements BinaryStatusPanel.Controller, BinaryStatusPanel.EncodingsController, BinaryStatusPanel.MemoryModeController {
-        @Override
-        public void changeEditOperation(EditOperation editOperation) {
-            ((SectCodeArea) fileDocument.getCodeArea()).setEditOperation(editOperation);
-        }
-
-        @Override
-        public void changeCursorPosition() {
-            GoToPositionAction action = new GoToPositionAction();
-            action.setCodeArea(fileDocument.getCodeArea());
-            action.actionPerformed(null);
-        }
-
-        @Override
-        public void cycleNextEncoding() {
-            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-            encodingsManager.cycleNextEncoding();
-        }
-
-        @Override
-        public void cyclePreviousEncoding() {
-            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-            encodingsManager.cyclePreviousEncoding();
-        }
-
-        @Override
-        public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
-            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-            encodingsManager.popupEncodingsMenu(mouseEvent);
-        }
-
-        @Override
-        public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
-            BinedModule binedModule = App.getModule(BinedModule.class);
-            BinEdIntelliJDocking docking = null; // TODO (BinEdIntelliJDocking) binedModule.getEditorProvider();
-            FileProcessingMode fileProcessingMode = fileDocument.getFileProcessingMode();
-            FileProcessingMode newProcessingMode = memoryMode == BinaryStatusApi.MemoryMode.DELTA_MODE ? FileProcessingMode.DELTA : FileProcessingMode.MEMORY;
-            if (newProcessingMode != fileProcessingMode) {
-                OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-                BinaryEditorOptions options = new BinaryEditorOptions(optionsModule.getAppOptions());
-                if (docking.releaseDocument(fileDocument)) {
-                    // TODO fileDocument.switchFileHandlingMode(newProcessingMode);
-                    // TODO options.setFileHandlingMode(newProcessingMode);
-                }
-                docking.setActiveFile(fileDocument);
-                docking.updateStatus();
-            }
-        }
-    }
 }

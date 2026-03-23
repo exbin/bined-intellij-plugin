@@ -25,6 +25,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.Toggleable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
@@ -307,7 +308,7 @@ public class BinEdToolbarPanel extends JBPanel {
             @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
+                return ActionUpdateThread.EDT;
             }
 
             @Override
@@ -334,7 +335,7 @@ public class BinEdToolbarPanel extends JBPanel {
             @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
+                return ActionUpdateThread.EDT;
             }
 
             @Override
@@ -359,7 +360,7 @@ public class BinEdToolbarPanel extends JBPanel {
             @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
+                return ActionUpdateThread.EDT;
             }
 
             @Override
@@ -384,7 +385,7 @@ public class BinEdToolbarPanel extends JBPanel {
             @NotNull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
+                return ActionUpdateThread.EDT;
             }
 
             @Override

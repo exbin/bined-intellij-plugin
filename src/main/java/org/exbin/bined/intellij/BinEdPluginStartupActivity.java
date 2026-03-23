@@ -89,6 +89,8 @@ import org.exbin.framework.bined.inspector.BinEdInspector;
 import org.exbin.framework.bined.inspector.BinEdInspectorManager;
 import org.exbin.framework.bined.inspector.BinedInspectorModule;
 import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
+import org.exbin.framework.bined.inspector.settings.DataInspectorFontContextInference;
+import org.exbin.framework.bined.inspector.settings.DataInspectorFontInference;
 import org.exbin.framework.bined.macro.BinedMacroModule;
 import org.exbin.framework.bined.objectdata.BinedObjectDataModule;
 import org.exbin.framework.bined.operation.BinedOperationModule;
@@ -150,6 +152,14 @@ import org.exbin.framework.plugin.language.ru_RU.LanguageRuRuModule;
 import org.exbin.framework.plugin.language.zh_Hans.LanguageZhHansModule;
 import org.exbin.framework.plugin.language.zh_Hant.LanguageZhHantModule;
 import org.exbin.framework.plugins.iconset.material.IconSetMaterialModule;
+import org.exbin.framework.text.encoding.EncodingsManager;
+import org.exbin.framework.text.encoding.settings.TextEncodingContextInference;
+import org.exbin.framework.text.encoding.settings.TextEncodingInference;
+import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
+import org.exbin.framework.text.encoding.settings.TextEncodingsContextInference;
+import org.exbin.framework.text.encoding.settings.TextEncodingsInference;
+import org.exbin.framework.text.font.settings.TextFontContextInference;
+import org.exbin.framework.text.font.settings.TextFontInference;
 import org.exbin.framework.toolbar.ToolBarModule;
 import org.exbin.framework.toolbar.api.ToolBarModuleApi;
 import org.exbin.framework.ui.UiModule;
@@ -429,7 +439,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 } else if (fileEditor instanceof BinEdNativeFileEditor) {
                     activeFile = ((BinEdNativeFileEditor) fileEditor).getNativeFile().getDocument();
                 }
-                docking.setActiveFile(activeFile);
+                docking.setActiveDocument(activeFile);
             }
         });
 
@@ -762,6 +772,13 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedToolContentModule.registerDragDropContentMenu();
             binedInspectorModule.registerSettings();
 
+            FrameModuleApi frameModuleApi = App.getModule(FrameModuleApi.class);
+            ActiveContextManagement contextManagement = frameModuleApi.getFrameHandler().getContextManager();
+            settingsManager.registerInferenceOptions(TextEncodingInference.class, new TextEncodingContextInference(contextManagement));
+            settingsManager.registerInferenceOptions(TextEncodingsInference.class, new TextEncodingsContextInference(contextManagement));
+            settingsManager.registerInferenceOptions(TextFontInference.class, new TextFontContextInference((contextManagement)));
+            settingsManager.registerInferenceOptions(DataInspectorFontInference.class, new DataInspectorFontContextInference(contextManagement));
+
             String toolsSubMenuId = BinEdIntelliJPlugin.PLUGIN_PREFIX + "toolsMenu";
             MenuDefinitionManagement menuManagement = menuModule.getMenuManager(BinedModule.CODE_AREA_POPUP_MENU_ID, BinedModule.MODULE_ID);
             Action toolsSubMenuAction = new AbstractAction(((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.text")) {
@@ -793,6 +810,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     frameModule.getFrameHandler().getContextManager();
             contextManager.changeActiveState(ContextDocking.class, docking);
             contextManager.changeActiveState(DialogParentComponent.class, () -> frameModule.getFrame());
+
+            optionsSettingsModule.initialLoadFromPreferences();
         }
 
         /**

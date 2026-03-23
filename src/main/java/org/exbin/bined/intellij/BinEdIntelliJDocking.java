@@ -22,11 +22,14 @@ import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.action.api.clipboard.TextClipboardController;
 import org.exbin.framework.bined.BinEdDataComponent;
+import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
-import org.exbin.framework.bined.BinaryStatusApi;
-import org.exbin.framework.bined.gui.BinEdComponentPanel;
+import org.exbin.framework.bined.BinaryStatus;
+import org.exbin.framework.bined.BinedModule;
+import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.docking.multi.api.MultiDocking;
+import org.exbin.framework.document.api.ContextDocument;
 import org.exbin.framework.document.api.Document;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.operation.undo.api.UndoRedoState;
@@ -38,7 +41,9 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.Component;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -51,8 +56,9 @@ public class BinEdIntelliJDocking implements MultiDocking {
 
     protected final List<Document> openDocuments = new ArrayList<>();
     @Nullable
-    protected Document activeFile = null;
-    // protected BinaryStatusApi binaryStatus;
+    protected Document activeDocument = null;
+    // TODO Temporary status panel map until status bar registration is available
+    protected final Map<Document, BinaryStatusPanel> statusPanels = new HashMap<>();
 
     public BinEdIntelliJDocking() {
         super();
@@ -104,26 +110,29 @@ public class BinEdIntelliJDocking implements MultiDocking {
         return null;
     }
 
-    public void addFile(BinaryFileDocument binaryDocument) {
+    public void addFile(BinaryFileDocument binaryDocument, BinaryStatusPanel statusPanel) {
         openDocuments.add(binaryDocument);
+        statusPanels.put(binaryDocument, statusPanel);
     }
 
     public void removeFile(BinaryFileDocument binaryDocument) {
         boolean removed = openDocuments.remove(binaryDocument);
         if (!removed) {
-            throw new IllegalStateException("Attempt to remove invalid file handler");
+            throw new IllegalStateException("Attempt to remove invalid document");
+        } else {
+            statusPanels.remove(binaryDocument);
         }
     }
 
     @Nonnull
     @Override
     public Optional<Document> getActiveDocument() {
-        return Optional.ofNullable(activeFile);
+        return Optional.ofNullable(activeDocument);
     }
 
-    public void setActiveFile(@Nullable BinaryFileDocument fileDocument) {
-        if (activeFile != fileDocument) {
-            activeFile = fileDocument;
+    public void setActiveDocument(@Nullable BinaryFileDocument fileDocument) {
+        if (activeDocument != fileDocument) {
+            activeDocument = fileDocument;
             activeFileChanged();
         }
     }
@@ -142,16 +151,16 @@ public class BinEdIntelliJDocking implements MultiDocking {
         BinEdDataComponent binEdDataComponent = null;
         TextClipboardController clipboardController = null;
         UndoRedoState undoHandler = null;
-        if (activeFile != null) {
-            extCodeArea = (SectCodeArea) ((BinaryFileDocument) activeFile).getCodeArea();
+        if (activeDocument != null) {
+            extCodeArea = (SectCodeArea) ((BinaryFileDocument) activeDocument).getCodeArea();
             binEdDataComponent = new BinEdDataComponent(extCodeArea);
 //            undoHandler = activeFile.getUndoRedo().orElse(null);
 //            clipboardController = activeFile.getClipboardActionsController();
-//            updateStatus();
         }
 
         final Component parentComponent = binEdDataComponent == null ? null : binEdDataComponent.getCodeArea();
 
+        contextManager.changeActiveState(ContextDocument.class, (ContextDocument) activeDocument);
         contextManager.changeActiveState(ContextFont.class, binEdDataComponent);
         contextManager.changeActiveState(ContextEncoding.class, binEdDataComponent);
         contextManager.changeActiveState(ContextComponent.class, binEdDataComponent);
@@ -164,6 +173,7 @@ public class BinEdIntelliJDocking implements MultiDocking {
         });
         contextManager.changeActiveState(UndoRedoState.class, undoHandler);
         contextManager.changeActiveState(ClipboardController.class, clipboardController);
+        updateStatus();
 
         /* if (this.undoHandler != null) {
             this.undoHandler.setActiveFile(this.activeFile);
@@ -171,7 +181,14 @@ public class BinEdIntelliJDocking implements MultiDocking {
     }
 
     public void updateStatus() {
-        // TODO
+        BinaryStatusPanel binaryStatusPanel = statusPanels.get(activeDocument);
+        if (binaryStatusPanel != null) {
+            BinedModule binedModule = App.getModule(BinedModule.class);
+            BinEdFileManager fileManager = binedModule.getFileManager();
+            BinaryStatus binaryStatus = fileManager.getBinaryStatus();
+            binaryStatus.setBinaryStatusPanel(binaryStatusPanel);
+            binaryStatus.updateStatus();
+        }
     }
 
     @Nonnull
