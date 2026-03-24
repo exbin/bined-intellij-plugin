@@ -253,14 +253,14 @@ public class BinEdFilePanel extends JPanel {
                 }
 
                 // TODO Temporary workaround for unfinished rework of actions
+                JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
                 ActionManagement actionContext = frameModule.getFrameHandler().getActionManager();
                 BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
                 actionContext.requestUpdateForAction(binedBookmarksModule.getManageBookmarksAction());
                 BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
-                actionContext.requestUpdateForAction(binedMacroModule.getMacroManager().getManageMacrosAction());
+                actionContext.requestUpdateForAction(binedMacroModule.getMacroManager().getMacrosMenu().getAction());
 
-                JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
                 popupMenu.addPopupMenuListener(new PopupMenuListener() {
                     @Override
                     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
