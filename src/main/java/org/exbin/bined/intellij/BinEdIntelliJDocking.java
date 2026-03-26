@@ -31,6 +31,11 @@ import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.docking.multi.api.MultiDocking;
 import org.exbin.framework.document.api.ContextDocument;
 import org.exbin.framework.document.api.Document;
+import org.exbin.framework.document.api.DocumentModuleApi;
+import org.exbin.framework.document.api.DocumentSource;
+import org.exbin.framework.document.api.EditableDocument;
+import org.exbin.framework.file.api.FileModuleApi;
+import org.exbin.framework.file.api.SaveModifiedResult;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.operation.undo.api.UndoRedoState;
 import org.exbin.framework.text.encoding.ContextEncoding;
@@ -47,7 +52,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Documents docking mapping for IntelliJ BinEd.
+ * Documents docking mapping for IntelliJ BinEd plugin.
  *
  * @author ExBin Project (https://exbin.org)
  */
@@ -101,7 +106,28 @@ public class BinEdIntelliJDocking implements MultiDocking {
 
     @Override
     public boolean releaseDocument(Document document) {
-        throw new UnsupportedOperationException();
+        if (document instanceof EditableDocument && ((EditableDocument) document).isModified()) {
+            FileModuleApi fileModule = App.getModule(FileModuleApi.class);
+            SaveModifiedResult result = fileModule.showSaveModified(((BinaryFileDocument) document).getComponent());
+            switch (result) {
+            case SAVE:
+                DocumentModuleApi documentModule = App.getModule(DocumentModuleApi.class);
+                Optional<DocumentSource> documentSource = documentModule.getMainDocumentManager().saveDocumentAs(document);
+                if (documentSource.isPresent()) {
+                    ((EditableDocument) document).saveTo(documentSource.get());
+                    return true;
+                }
+                return false;
+            case DISCARD:
+                return true;
+            case CANCEL:
+                return false;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     @Nonnull
@@ -110,12 +136,12 @@ public class BinEdIntelliJDocking implements MultiDocking {
         return null;
     }
 
-    public void addFile(BinaryFileDocument binaryDocument, BinaryStatusPanel statusPanel) {
+    public void addDocument(BinaryFileDocument binaryDocument, BinaryStatusPanel statusPanel) {
         openDocuments.add(binaryDocument);
         statusPanels.put(binaryDocument, statusPanel);
     }
 
-    public void removeFile(BinaryFileDocument binaryDocument) {
+    public void removeDocument(BinaryFileDocument binaryDocument) {
         boolean removed = openDocuments.remove(binaryDocument);
         if (!removed) {
             throw new IllegalStateException("Attempt to remove invalid document");
@@ -152,10 +178,7 @@ public class BinEdIntelliJDocking implements MultiDocking {
         TextClipboardController clipboardController = null;
         UndoRedoState undoHandler = null;
         if (activeDocument != null) {
-            extCodeArea = (SectCodeArea) ((BinaryFileDocument) activeDocument).getCodeArea();
-            binEdDataComponent = new BinEdDataComponent(extCodeArea);
-//            undoHandler = activeFile.getUndoRedo().orElse(null);
-//            clipboardController = activeFile.getClipboardActionsController();
+            binEdDataComponent = ((BinaryFileDocument) activeDocument).getDataComponent();
         }
 
         final Component parentComponent = binEdDataComponent == null ? null : binEdDataComponent.getCodeArea();

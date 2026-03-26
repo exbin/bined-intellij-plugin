@@ -259,8 +259,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     public void dispose() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
-        docking.removeFile(fileDocument);
-        // TODO fileDocument.closeData();
+        docking.removeDocument(fileDocument);
     }
 
     @Nonnull

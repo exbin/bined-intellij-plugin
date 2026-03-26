@@ -19,17 +19,24 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.exbin.framework.App;
+import org.exbin.framework.bined.BinaryFileDocument;
+import org.exbin.framework.docking.multi.gui.ModifiedDocumentsPanel;
 import org.exbin.framework.document.api.ComponentDocument;
-import org.exbin.framework.file.api.FileDocument;
-import org.exbin.framework.utils.WindowUtils;
+import org.exbin.framework.document.api.Document;
+import org.exbin.framework.document.api.DocumentModuleApi;
+import org.exbin.framework.document.api.DocumentSource;
+import org.exbin.framework.document.api.EditableDocument;
+import org.exbin.framework.document.api.MemoryDocumentSource;
+import org.exbin.framework.window.api.WindowHandler;
+import org.exbin.framework.window.api.WindowModuleApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.Component;
-import java.awt.Dialog;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Optional;
 
 /**
  * Vetoable variant of project listener for BinEd plugin.
@@ -42,15 +49,14 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
     @Override
     public boolean canClose(Project project) {
         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-        List<FileDocument> fileDocuments = new ArrayList<>();
+        List<Document> fileDocuments = new ArrayList<>();
         VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
         for (VirtualFile file : openFiles) {
             if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isClosing()) {
-                FileDocument fileDocument = ((BinEdVirtualFile) file).getEditorFile();
-                // TODO
-//                if (fileDocument.isModified()) {
-//                    fileDocuments.add(fileDocument);
-//                }
+                BinaryFileDocument fileDocument = ((BinEdVirtualFile) file).getEditorFile();
+                if (fileDocument.isModified()) {
+                    fileDocuments.add(fileDocument);
+                }
             }
         }
 
@@ -74,28 +80,35 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         return true;
     }
 
-    public static boolean showAskForSaveDialog(@Nonnull List<FileDocument> fileDocuments,
+    public static boolean showAskForSaveDialog(@Nonnull List<Document> fileDocuments,
             @Nonnull Component parentComponent) {
-        return false;
-        // TODO
-        /*
-        UnsavedFilesPanel unsavedFilesPanel = new UnsavedFilesPanel();
-        unsavedFilesPanel.setUnsavedFiles(fileDocuments);
-        ResourceBundle resourceBundle = unsavedFilesPanel.getResourceBundle();
+        ModifiedDocumentsPanel modifiedDocumentsPanel = new ModifiedDocumentsPanel ();
+        modifiedDocumentsPanel.setDocuments(fileDocuments);
+        WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
         final boolean[] result = new boolean[1];
-        final WindowUtils.DialogWrapper dialog = WindowUtils.createDialog(unsavedFilesPanel,
-                parentComponent,
-                resourceBundle.getString("dialog.title"),
-                Dialog.ModalityType.APPLICATION_MODAL);
-        unsavedFilesPanel.setController(new UnsavedFilesPanel.Controller() {
+        final WindowHandler dialog = windowModule.createDialog(modifiedDocumentsPanel);
+        windowModule.setWindowTitle(dialog, modifiedDocumentsPanel.getResourceBundle());
+        modifiedDocumentsPanel.setController(new ModifiedDocumentsPanel.Controller() {
             @Override
-            public boolean saveFile(@Nonnull FileHandler fileHandler) {
-                fileHandler.saveFile();
-                return !fileHandler.isModified();
+            public boolean saveFile(@Nonnull Document document) {
+                EditableDocument editableDocument = (EditableDocument) document;
+                Optional<DocumentSource> optDocumentSource = editableDocument.getDocumentSource();
+                if (optDocumentSource.isPresent() && !(optDocumentSource.get() instanceof MemoryDocumentSource)) {
+                    editableDocument.saveTo(optDocumentSource.get());
+                    return true;
+                } else {
+                    DocumentModuleApi documentModule = App.getModule(DocumentModuleApi.class);
+                    Optional<DocumentSource> documentSource = documentModule.getMainDocumentManager().saveDocumentAs(document);
+                    if (documentSource.isPresent()) {
+                        editableDocument.saveTo(documentSource.get());
+                        return true;
+                    }
+                }
+                return false;
             }
 
             @Override
-            public void discardAll(@Nonnull List<FileHandler> fileDocuments) {
+            public void discardAll(@Nonnull List<Document> fileDocuments) {
                 result[0] = true;
                 dialog.close();
             }
@@ -107,9 +120,9 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
             }
         });
 
-        unsavedFilesPanel.assignGlobalKeys();
-        dialog.show();
+        modifiedDocumentsPanel.assignGlobalKeys();
+        dialog.showCentered(parentComponent);
 
-        return result[0]; */
+        return result[0];
     }
 }

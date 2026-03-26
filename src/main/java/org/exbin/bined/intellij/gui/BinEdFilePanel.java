@@ -280,7 +280,7 @@ public class BinEdFilePanel extends JPanel {
             }
         });
 
-        docking.addFile(fileDocument, statusPanel);
+        docking.addDocument(fileDocument, statusPanel);
         docking.setActiveDocument(fileDocument);
 
         BinEdFileManager fileManager = binedModule.getFileManager();
@@ -288,10 +288,7 @@ public class BinEdFilePanel extends JPanel {
         fileManager.getBinaryStatus().setBinaryStatusPanel(statusPanel);
         fileManager.setBinaryStatusController(new org.exbin.framework.bined.viewer.BinaryStatusController(fileManager.getBinaryStatus(), encodingsManager));
 
-        // OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-        // TODO encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
         statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
-        // TODO encodingsManager.setTextEncodingStatus(statusPanel);
         add(statusPanel, BorderLayout.SOUTH);
 
         add(componentPanel, BorderLayout.CENTER);
@@ -324,9 +321,4 @@ public class BinEdFilePanel extends JPanel {
             }
         };
     }
-
-    /* public void loadFromOptions(OptionsStorage appPreferences) {
-        fileDocument.getComponent().onInitFromPreferences(appPreferences);
-        toolbarPanel.applyFromCodeArea();
-    } */
 }

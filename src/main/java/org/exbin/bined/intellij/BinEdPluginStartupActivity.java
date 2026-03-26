@@ -426,9 +426,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         MessageBus messageBus = project.getMessageBus();
         MessageBusConnection connect = messageBus.connect();
 
-        BinedModule binedModule = App.getModule(BinedModule.class);
         connect.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
-            @Override
+/*            @Override
             public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
                 if (file instanceof BinEdVirtualFile) {
                     // TODO: FileEditorManagerKeys.CLOSING_TO_REOPEN not available yet
@@ -437,7 +436,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                         ((BinEdVirtualFile) file).dispose();
                     }
                 }
-            }
+            } */
 
             @Override
             public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
@@ -456,16 +455,26 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
         connect.subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, new FileEditorManagerListener.Before() {
 
-            private boolean passNext = false;
+            private boolean discardAllowed = false;
 
             @Override
             public void beforeFileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile file) {
-                if (passNext) {
-                    passNext = false;
+                Boolean userData = file.getUserData(FileEditorManagerImpl.CLOSING_TO_REOPEN);
+                if (userData != null && userData) {
                     return;
                 }
 
-                if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isClosing()) {
+                if (!(file instanceof BinEdVirtualFile)) {
+                    return;
+                }
+
+                if (discardAllowed) {
+                    discardAllowed = false;
+                    ((BinEdVirtualFile) file).dispose();
+                    return;
+                }
+
+                if (!((BinEdVirtualFile) file).isClosing()) {
                     ((BinEdVirtualFile) file).setClosing(true);
                     BinaryFileDocument binaryDocument = ((BinEdVirtualFile) file).getEditorFile();
                     if (binaryDocument.isModified()) {
@@ -475,13 +484,15 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                             boolean released = docking.releaseDocument(binaryDocument);
                             ((BinEdVirtualFile) file).setClosing(false);
                             if (released) {
-                                passNext = true;
+                                discardAllowed = true;
+                                // Invoke closing
                                 FileEditorManager.getInstance(project).closeFile(file);
                             }
                         });
                         throw new ProcessCanceledException();
                     }
                 }
+                ((BinEdVirtualFile) file).dispose();
             }
         });
         connect.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
@@ -773,13 +784,13 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedModule.registerDocument();
             binedViewerModule.registerCodeAreaPopupMenu();
             binedEditorModule.registerCodeAreaPopupMenu();
-            binedViewerModule.registerSettings();
             binedViewerModule.registerEncodings();
             binedViewerModule.registerViewModeMenu();
             binedViewerModule.registerCodeTypeMenu();
             binedViewerModule.registerPositionCodeTypeMenu();
             binedViewerModule.registerHexCharactersCaseHandlerMenu();
             binedViewerModule.registerLayoutMenu();
+            binedViewerModule.registerSettings();
             binedEditorModule.registerSettings();
             binedThemeModule.registerSettings();
             binedSearchModule.registerEditFindPopupMenuActions();
@@ -788,12 +799,12 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedToolContentModule.registerDragDropContentMenu();
             binedInspectorModule.registerSettings();
 
-            // Section from binedViewerModule.registerStatusBar
+            // Section from BinedViewerModule.registerStatusBar
             {
                 EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
                 ComponentFrame frameHandler = frameModule.getFrameHandler();
                 ActionManagement actionManager = frameHandler.getActionManager();
-                ActionModuleApi actionModuleApi = (ActionModuleApi) App.getModule(ActionModuleApi.class);
+                ActionModuleApi actionModuleApi = App.getModule(ActionModuleApi.class);
                 ActionContextRegistration actionContextRegistrar =
                         actionModuleApi.createActionContextRegistrar(actionManager);
                 Action action = new AbstractAction() {
@@ -818,6 +829,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     });
                 });
                 actionContextRegistrar.registerActionContext(action);
+                actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
+                actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
             }
 
             FrameModuleApi frameModuleApi = App.getModule(FrameModuleApi.class);
