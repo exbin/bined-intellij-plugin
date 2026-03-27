@@ -21,40 +21,40 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
-import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditMode;
-import org.exbin.bined.EditOperation;
-import org.exbin.bined.SelectionRange;
-import org.exbin.bined.capability.EditModeCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.action.api.ActionContextRegistration;
+import org.exbin.framework.action.api.ActionManagement;
+import org.exbin.framework.action.api.ActionModuleApi;
 import org.exbin.framework.action.api.ContextComponent;
 import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinaryStatus;
-import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.settings.CodeAreaStatusOptions;
+import org.exbin.framework.bined.viewer.BinaryStatusController;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
+import org.exbin.framework.context.ActiveContextManager;
 import org.exbin.framework.context.api.ActiveContextManagement;
+import org.exbin.framework.docking.api.DocumentDocking;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.text.encoding.ContextEncoding;
 import org.exbin.framework.text.encoding.EncodingsManager;
-import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
 import org.exbin.framework.text.font.ContextFont;
 import org.exbin.framework.utils.DesktopUtils;
 
@@ -72,7 +72,6 @@ import javax.swing.event.PopupMenuListener;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 
 /**
@@ -119,7 +118,6 @@ public final class DataDialog extends DialogWrapper {
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
 
         SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
-        BinEdDataComponent binEdDataComponent = new BinEdDataComponent(codeArea);
         toolbarPanel.setTargetComponent(componentPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
             @Nonnull
@@ -163,11 +161,11 @@ public final class DataDialog extends DialogWrapper {
                 ActiveContextManagement contextManager =
                         frameModule.getFrameHandler().getContextManager();
 
-                contextManager.changeActiveState(ContextFont.class, binEdDataComponent);
-                contextManager.changeActiveState(ContextEncoding.class, binEdDataComponent);
-                contextManager.changeActiveState(ContextComponent.class, binEdDataComponent);
+                contextManager.changeActiveState(ContextFont.class, dataComponent);
+                contextManager.changeActiveState(ContextEncoding.class, dataComponent);
+                contextManager.changeActiveState(ContextComponent.class, dataComponent);
                 contextManager.changeActiveState(DialogParentComponent.class, () -> codeArea);
-                contextManager.changeActiveState(ClipboardController.class, binEdDataComponent);
+                contextManager.changeActiveState(ClipboardController.class, dataComponent);
 
                 String popupMenuId = "DataDialog.popup";
                 int clickedX = x;
@@ -196,14 +194,47 @@ public final class DataDialog extends DialogWrapper {
             }
         });
 
-        EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-        // encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
-        binaryStatus.setBinaryStatusController(new BinaryStatusController());
-        // binaryStatus.applySettings(optionsModule.getAppOptions());
+        EncodingsManager encodingsManager = new EncodingsManager();
+        encodingsManager.init();
+
+        {
+            ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+            ActiveContextManagement contextManagement = new ActiveContextManager();
+            contextManagement.changeActiveState(ContextEncoding.class, dataComponent);
+            ActionManagement actionManager = actionModule.createActionManager(contextManagement);
+            ActionContextRegistration actionContextRegistrar = actionModule.createActionContextRegistrar(actionManager);
+            actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
+            actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
+        }
+
+        binaryStatus = new BinaryStatus() {
+            @Nullable
+            @Override
+            public BinaryFileDocument getActiveDocument() {
+                return null;
+            }
+
+            @Nullable
+            @Override
+            public BinEdDataComponent getActiveComponent() {
+                return dataComponent;
+            }
+
+            @Nullable
+            @Override
+            public DocumentDocking getActiveDocking() {
+                return null;
+            }
+        };
+        BinaryStatusPanel binaryStatusPanel = new BinaryStatusPanel();
+        binaryStatus.setBinaryStatusPanel(binaryStatusPanel);
+        binaryStatus.setBinaryStatusController(new BinaryStatusController(binaryStatus, encodingsManager));
+
+        binaryStatusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
         binaryStatus.attachCodeArea(dataComponent);
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
-        panel.add(binaryStatus.getBinaryStatusPanel(), BorderLayout.SOUTH);
+        panel.add(binaryStatusPanel, BorderLayout.SOUTH);
         panel.add(dataComponent.getComponent(), BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
@@ -277,46 +308,5 @@ public final class DataDialog extends DialogWrapper {
     public interface SetDataListener {
 
         void setData(@Nullable BinaryData data);
-    }
-
-    @ParametersAreNonnullByDefault
-    private class BinaryStatusController implements BinaryStatusPanel.Controller, BinaryStatusPanel.EncodingsController, BinaryStatusPanel.MemoryModeController {
-        @Override
-        public void changeEditOperation(EditOperation editOperation) {
-            ((EditModeCapable) dataComponent.getCodeArea()).setEditOperation(editOperation);
-        }
-
-        @Override
-        public void changeCursorPosition() {
-            GoToPositionAction action = new GoToPositionAction();
-            action.setCodeArea(dataComponent.getCodeArea());
-            action.actionPerformed(null);
-        }
-
-        @Override
-        public void cycleNextEncoding() {
-            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-            encodingsManager.cycleNextEncoding();
-        }
-
-        @Override
-        public void cyclePreviousEncoding() {
-            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-            encodingsManager.cyclePreviousEncoding();
-        }
-
-        @Override
-        public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
-            BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-            EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-            encodingsManager.popupEncodingsMenu(mouseEvent);
-        }
-
-        @Override
-        public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
-            // Ignore
-        }
     }
 }

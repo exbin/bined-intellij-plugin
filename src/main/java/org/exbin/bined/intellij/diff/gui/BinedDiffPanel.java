@@ -313,22 +313,6 @@ public class BinedDiffPanel extends JBPanel {
         this.add(toolbarPanel, BorderLayout.NORTH);
         encodingsManager = new EncodingsManager();
         encodingsManager.init();
-        /* encodingsManager.setTextEncodingStatus(new TextEncodingStatusApi() {
-            @Nonnull
-            @Override
-            public String getEncoding() {
-                return leftStatusPanel.getEncoding();
-            }
-
-            @Override
-            public void setEncoding(String encodingName) {
-                diffPanel.getLeftCodeArea().setCharset(Charset.forName(encodingName));
-                diffPanel.getRightCodeArea().setCharset(Charset.forName(encodingName));
-                leftStatusPanel.setEncoding(encodingName);
-                rightStatusPanel.setEncoding(encodingName);
-                new TextEncodingOptions(preferences).setSelectedEncoding(encodingName);
-            }
-        }); */
         goToPositionAction.setup(App.getModule(LanguageModuleApi.class).getBundle(BinedModule.class));
 
         registerBinaryStatus(leftStatusPanel, diffPanel.getLeftCodeArea());

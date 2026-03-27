@@ -16,12 +16,9 @@
 package org.exbin.bined.intellij.debug.gui;
 
 import org.exbin.auxiliary.binary_data.BinaryData;
-import org.exbin.bined.CodeAreaCaretPosition;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditMode;
-import org.exbin.bined.EditOperation;
-import org.exbin.bined.SelectionRange;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
@@ -29,28 +26,33 @@ import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.action.api.ActionContextRegistration;
+import org.exbin.framework.action.api.ActionManagement;
+import org.exbin.framework.action.api.ActionModuleApi;
+import org.exbin.framework.action.api.ContextComponent;
 import org.exbin.framework.action.api.DialogParentComponent;
+import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdFileManager;
+import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinaryStatus;
-import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.action.GoToPositionAction;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.settings.CodeAreaStatusOptions;
+import org.exbin.framework.bined.viewer.BinaryStatusController;
+import org.exbin.framework.bined.viewer.BinedViewerModule;
+import org.exbin.framework.context.ActiveContextManager;
 import org.exbin.framework.context.api.ActiveContextManagement;
-import org.exbin.framework.options.settings.action.SettingsAction;
-import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.framework.docking.api.DocumentDocking;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.options.settings.action.SettingsAction;
+import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.framework.text.encoding.ContextEncoding;
 import org.exbin.framework.text.encoding.EncodingsManager;
-import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
-import org.exbin.framework.action.api.ContextComponent;
-import org.exbin.framework.action.api.clipboard.ClipboardController;
 import org.exbin.framework.text.font.ContextFont;
 import org.exbin.framework.utils.DesktopUtils;
 
@@ -65,10 +67,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,15 +79,13 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class DebugViewPanel extends javax.swing.JPanel {
 
-    private final List<DebugViewDataProvider> providers = new ArrayList<>();
-    private int selectedProvider = 0;
+    protected final List<DebugViewDataProvider> providers = new ArrayList<>();
+    protected int selectedProvider = 0;
 
-    private final JPanel panel;
-    private BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
-    private BinaryStatus binaryStatus = new BinaryStatus();
-    private final BinEdDataComponent dataComponent;
-    private EncodingsManager encodingsManager;
-    private long documentOriginalSize = 0;
+    protected final JPanel panel;
+    protected BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
+    protected BinaryStatus binaryStatus;
+    protected final BinEdDataComponent dataComponent;
 
     public DebugViewPanel() {
         panel = new JPanel(new BorderLayout());
@@ -103,12 +100,8 @@ public class DebugViewPanel extends javax.swing.JPanel {
         BinEdFileManager fileManager = binedModule.getFileManager();
         fileManager.initDataComponent(dataComponent);
 
-        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-        // TODO editorComponent.onInitFromOptions(new BinaryEditorOptions(preferencesModule.getAppPreferences()));
-
         BinEdComponentPanel componentPanel = (BinEdComponentPanel) dataComponent.getComponent();
         SectCodeArea codeArea = componentPanel.getCodeArea();
-        BinEdDataComponent binEdDataComponent = new BinEdDataComponent(codeArea);
         codeArea.setEditMode(EditMode.READ_ONLY);
 
         toolbarPanel.setTargetComponent(componentPanel);
@@ -127,14 +120,16 @@ public class DebugViewPanel extends javax.swing.JPanel {
             @Override
             public boolean isShowNonprintables() {
                 ColorAssessorPainterCapable painter = (ColorAssessorPainterCapable) codeArea.getPainter();
-                NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
+                NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor =
+                        CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
                 return CodeAreaUtils.requireNonNull(nonprintablesCodeAreaAssessor).isShowNonprintables();
             }
 
             @Override
             public void setShowNonprintables(boolean showNonprintables) {
                 ColorAssessorPainterCapable painter = (ColorAssessorPainterCapable) codeArea.getPainter();
-                NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
+                NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor =
+                        CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
                 CodeAreaUtils.requireNonNull(nonprintablesCodeAreaAssessor).setShowNonprintables(showNonprintables);
             }
 
@@ -149,6 +144,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
         SettingsAction settingsAction = (SettingsAction) optionsSettingsModule.createSettingsAction();
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         settingsAction.setDialogParentComponent(() -> frameModule.getFrame());
+        BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
 
         AbstractAction wrapperAction = new AbstractAction() {
             @Override
@@ -169,11 +165,11 @@ public class DebugViewPanel extends javax.swing.JPanel {
                 ActiveContextManagement contextManager =
                         frameModule.getFrameHandler().getContextManager();
 
-                contextManager.changeActiveState(ContextComponent.class, binEdDataComponent);
+                contextManager.changeActiveState(ContextComponent.class, dataComponent);
                 contextManager.changeActiveState(ContextFont.class, dataComponent);
                 contextManager.changeActiveState(ContextEncoding.class, dataComponent);
-                contextManager.changeActiveState(DialogParentComponent.class, () -> binEdDataComponent.getCodeArea());
-                contextManager.changeActiveState(ClipboardController.class, binEdDataComponent);
+                contextManager.changeActiveState(DialogParentComponent.class, () -> dataComponent.getCodeArea());
+                contextManager.changeActiveState(ClipboardController.class, dataComponent);
 
                 String popupMenuId = "DebugViewPanel.popup";
                 int clickedX = x;
@@ -183,7 +179,8 @@ public class DebugViewPanel extends javax.swing.JPanel {
                     clickedY += invoker.getParent().getY();
                 }
 
-                JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
+                JPopupMenu popupMenu =
+                        codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
                 popupMenu.addPopupMenuListener(new PopupMenuListener() {
                     @Override
                     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
@@ -203,30 +200,49 @@ public class DebugViewPanel extends javax.swing.JPanel {
             }
         });
 
-        encodingsManager = new EncodingsManager();
+        EncodingsManager encodingsManager = new EncodingsManager();
         encodingsManager.init();
-        // TODO
-        /* encodingsManager.setTextEncodingStatus(new TextEncodingStatusApi() {
-            @Nonnull
+
+        {
+            ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+            ActiveContextManagement contextManagement = new ActiveContextManager();
+            contextManagement.changeActiveState(ContextEncoding.class, dataComponent);
+            ActionManagement actionManager = actionModule.createActionManager(contextManagement);
+            ActionContextRegistration actionContextRegistrar = actionModule.createActionContextRegistrar(actionManager);
+            actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
+            actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
+        }
+
+        binaryStatus = new BinaryStatus() {
+            @Nullable
             @Override
-            public String getEncoding() {
-                return codeArea.getCharset().name();
+            public BinaryFileDocument getActiveDocument() {
+                return null;
             }
 
+            @Nullable
             @Override
-            public void setEncoding(String encodingName) {
-                codeArea.setCharset(Charset.forName(encodingName));
-                statusPanel.setEncoding(encodingName);
+            public BinEdDataComponent getActiveComponent() {
+                return dataComponent;
             }
-        }); */
-        // encodingsManager.loadFromOptions(new TextEncodingOptions(optionsModule.getAppOptions()));
-        binaryStatus.setBinaryStatusController(new BinaryStatusController());
-        // statusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
+
+            @Nullable
+            @Override
+            public DocumentDocking getActiveDocking() {
+                return null;
+            }
+        };
+        BinaryStatusPanel binaryStatusPanel = new BinaryStatusPanel();
+        binaryStatus.setBinaryStatusPanel(binaryStatusPanel);
+        binaryStatus.setBinaryStatusController(new BinaryStatusController(binaryStatus, encodingsManager));
+
+        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+        binaryStatusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
         // statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
         binaryStatus.attachCodeArea(dataComponent);
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
-        panel.add(binaryStatus.getBinaryStatusPanel(), BorderLayout.SOUTH);
+        panel.add(binaryStatusPanel, BorderLayout.SOUTH);
         panel.add(dataComponent.getComponent(), BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
@@ -281,8 +297,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
     public void setContentData(@Nullable BinaryData data) {
         dataComponent.getCodeArea().setContentData(data);
         long dataSize = data == null ? 0 : data.getDataSize();
-        documentOriginalSize = dataSize;
-        binaryStatus.getBinaryStatusPanel().setCurrentDocumentSize(dataSize, documentOriginalSize);
+        binaryStatus.getBinaryStatusPanel().setCurrentDocumentSize(dataSize, dataSize);
     }
 
     @Nonnull
@@ -294,42 +309,5 @@ public class DebugViewPanel extends javax.swing.JPanel {
                 DesktopUtils.openDesktopURL(languageModuleApi.getAppBundle().getString("online_help_url"));
             }
         };
-    }
-
-    @ParametersAreNonnullByDefault
-    private class BinaryStatusController implements BinaryStatusPanel.Controller, BinaryStatusPanel.EncodingsController, BinaryStatusPanel.MemoryModeController {
-        @Override
-        public void changeEditOperation(EditOperation editOperation) {
-            SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
-            codeArea.setEditOperation(editOperation);
-        }
-
-        @Override
-        public void changeCursorPosition() {
-            SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
-            GoToPositionAction action = new GoToPositionAction();
-            action.setCodeArea(codeArea);
-            action.actionPerformed(null);
-        }
-
-        @Override
-        public void cycleNextEncoding() {
-            encodingsManager.cycleNextEncoding();
-        }
-
-        @Override
-        public void cyclePreviousEncoding() {
-            encodingsManager.cyclePreviousEncoding();
-        }
-
-        @Override
-        public void encodingsPopupEncodingsMenu(MouseEvent mouseEvent) {
-            encodingsManager.popupEncodingsMenu(mouseEvent);
-        }
-
-        @Override
-        public void changeMemoryMode(BinaryStatusApi.MemoryMode memoryMode) {
-            // Ignore
-        }
     }
 }

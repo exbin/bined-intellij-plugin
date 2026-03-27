@@ -38,19 +38,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * TODO: Undo handler for binary editor using IntelliJ Idea's undo.
+ * TODO: Undo handler for binary editor using IntelliJ Idea's undo manager. Doesn't work ATM.
  *
  * @author ExBin Project (https://exbin.org)
  */
 @ParametersAreNonnullByDefault
 public class BinaryIntelliJUndoRedo implements BinaryDataUndoRedo {
 
-    private final List<BinaryDataUndoRedoChangeListener> listeners = new ArrayList<>();
-    private UndoManager undoManager = null;
-    private BinEdNativeFileEditor fileEditor;
-    private DocumentReference documentReference;
-    private int commandPosition;
-    private int syncPointPosition = -1;
+    protected final List<BinaryDataUndoRedoChangeListener> listeners = new ArrayList<>();
+    protected UndoManager undoManager = null;
+    protected BinEdNativeFileEditor fileEditor;
+    protected DocumentReference documentReference;
+    protected int commandPosition;
+    protected int syncPointPosition = -1;
 
     public BinaryIntelliJUndoRedo() {
         init();
@@ -195,8 +195,8 @@ public class BinaryIntelliJUndoRedo implements BinaryDataUndoRedo {
     }
 
     @Override
-    public void setSyncPosition(int syncPoint) {
-        this.syncPointPosition = syncPoint;
+    public void setSyncPosition(int syncPointPosition) {
+        this.syncPointPosition = syncPointPosition;
     }
 
     @Override

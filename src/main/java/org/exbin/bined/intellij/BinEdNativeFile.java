@@ -28,15 +28,21 @@ import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
+import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileProcessingMode;
 import org.exbin.framework.bined.editor.settings.BinaryFileProcessingOptions;
+import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.docking.api.ContextDocking;
+import org.exbin.framework.document.api.ContextDocument;
 import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.framework.operation.undo.api.ContextUndoRedo;
+import org.exbin.framework.operation.undo.api.UndoRedoState;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
@@ -48,6 +54,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * File editor wrapper using BinEd editor component.
@@ -73,7 +80,7 @@ public class BinEdNativeFile {
         fileManager.initCommandHandler(fileDocument.getDataComponent());
 
 //        BinaryIntelliJUndoRedo undoHandler = new BinaryIntelliJUndoRedo();
-//        binaryDocument.setUndoHandler(undoHandler);
+//        fileDocument.setUndoHandler(undoHandler);
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         OptionsStorage optionsStorage = optionsModule.getAppOptions();
@@ -89,9 +96,9 @@ public class BinEdNativeFile {
         // TODO filePanel.getToolbarPanel().documentOriginalSize = virtualFile.getLength();
 //        binedModule.getFileManager().initCommandHandler(componentPanel.getComponentPanel());
 
-        BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
-        toolbarPanel.setUndoHandler(fileDocument.getUndoHandler().get());
-        toolbarPanel.loadFromOptions(optionsModule.getAppOptions());
+//        BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
+//        toolbarPanel.setUndoHandler(fileDocument.getUndoHandler().get());
+//        toolbarPanel.loadFromOptions(optionsModule.getAppOptions());
 
         OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
         OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
@@ -100,11 +107,18 @@ public class BinEdNativeFile {
     }
 
     public void registerUndoRedo(BinaryIntelliJUndoRedo undoIntelliJHandler) {
+        // TODO Doesn't work ATM
+        /* FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        ActiveContextManagement contextManager = frameModule.getFrameHandler().getContextManager();
         fileDocument.setUndoHandler(undoIntelliJHandler);
-        // TODO binaryDocument.registerUndoHandler();
+        undoIntelliJHandler.addChangeListener(() -> {
+            ContextDocument document = contextManager.getActiveState(ContextDocument.class);
+            if (document == fileDocument) {
+                contextManager.notifyActiveStateChange(ContextUndoRedo.class, fileDocument.getDataComponent(), UndoRedoState.ChangeType.UNDO_REDO_STATE);
+            }
+        }); */
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
         toolbarPanel.setUndoHandler(fileDocument.getUndoHandler().get());
-        // TODO fileHandler.setUndoHandler(undoIntelliJHandler);
     }
 
     public boolean isModified() {
