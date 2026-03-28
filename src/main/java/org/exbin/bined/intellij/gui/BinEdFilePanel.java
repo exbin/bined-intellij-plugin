@@ -29,8 +29,11 @@ import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
 import org.exbin.framework.action.api.ActionConsts;
+import org.exbin.framework.action.api.ActionContextRegistration;
 import org.exbin.framework.action.api.ActionManagement;
 import org.exbin.framework.action.api.ActionModuleApi;
+import org.exbin.framework.action.api.ContextComponent;
+import org.exbin.framework.action.api.DialogParentComponent;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinedModule;
@@ -42,6 +45,7 @@ import org.exbin.framework.bined.macro.BinedMacroModule;
 import org.exbin.framework.bined.search.BinedSearchModule;
 import org.exbin.framework.bined.search.action.FindReplaceActions;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
+import org.exbin.framework.context.ActiveContextManager;
 import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.context.api.ContextModuleApi;
 import org.exbin.framework.docking.api.ContextDocking;
@@ -188,7 +192,8 @@ public class BinEdFilePanel extends JPanel {
         toolbarPanel.setTargetComponent(componentPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
             @Nonnull
-            @Override public CodeType getCodeType() {
+            @Override
+            public CodeType getCodeType() {
                 return codeArea.getCodeType();
             }
 
@@ -253,11 +258,23 @@ public class BinEdFilePanel extends JPanel {
                 }
 
                 // TODO Temporary workaround for unfinished rework of actions
+                {
+                    BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
+                    AbstractAction manageBookmarksAction = binedBookmarksModule.getManageBookmarksAction();
+                    ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+                    ActiveContextManagement contextManagement = new ActiveContextManager();
+                    contextManagement.changeActiveState(ContextComponent.class, fileDocument.getDataComponent());
+                    contextManagement.changeActiveState(DialogParentComponent.class, () -> frameModule.getFrame());
+                    ActionManagement actionManager = actionModule.createActionManager(contextManagement);
+                    ActionContextRegistration actionContextRegistrar =
+                            actionModule.createActionContextRegistrar(actionManager);
+                    actionContextRegistrar.registerActionContext(manageBookmarksAction);
+                }
+
                 JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
                 ActionManagement actionContext = frameModule.getFrameHandler().getActionManager();
-                BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
-                actionContext.requestUpdateForAction(binedBookmarksModule.getManageBookmarksAction());
+
                 BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
                 actionContext.requestUpdateForAction(binedMacroModule.getMacroManager().getMacrosMenu().getAction());
 

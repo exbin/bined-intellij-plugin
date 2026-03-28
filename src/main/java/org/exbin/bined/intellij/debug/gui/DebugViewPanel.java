@@ -19,13 +19,21 @@ import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.EditMode;
+import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
+import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
+import org.exbin.bined.swing.basic.color.CodeAreaColorsProfile;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
+import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
+import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.framework.App;
+import org.exbin.framework.action.api.ActionConsts;
+import org.exbin.framework.action.api.ActionContextChange;
 import org.exbin.framework.action.api.ActionContextRegistration;
 import org.exbin.framework.action.api.ActionManagement;
 import org.exbin.framework.action.api.ActionModuleApi;
@@ -36,30 +44,45 @@ import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinaryStatus;
+import org.exbin.framework.bined.BinaryStatusApi;
 import org.exbin.framework.bined.BinedModule;
+import org.exbin.framework.bined.editor.settings.BinaryEditorOptions;
 import org.exbin.framework.bined.gui.BinEdComponentPanel;
 import org.exbin.framework.bined.gui.BinaryStatusPanel;
 import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
 import org.exbin.framework.bined.settings.CodeAreaStatusOptions;
+import org.exbin.framework.bined.theme.settings.CodeAreaColorOptions;
+import org.exbin.framework.bined.theme.settings.CodeAreaLayoutOptions;
+import org.exbin.framework.bined.theme.settings.CodeAreaThemeOptions;
 import org.exbin.framework.bined.viewer.BinaryStatusController;
 import org.exbin.framework.bined.viewer.BinedViewerModule;
+import org.exbin.framework.bined.viewer.settings.BinaryEncodingSettingsApplier;
+import org.exbin.framework.bined.viewer.settings.CodeAreaOptions;
+import org.exbin.framework.bined.viewer.settings.CodeAreaViewerSettingsApplier;
 import org.exbin.framework.context.ActiveContextManager;
 import org.exbin.framework.context.api.ActiveContextManagement;
+import org.exbin.framework.context.api.ContextChangeRegistration;
+import org.exbin.framework.context.api.StateChangeType;
 import org.exbin.framework.docking.api.DocumentDocking;
 import org.exbin.framework.frame.api.FrameModuleApi;
 import org.exbin.framework.language.api.LanguageModuleApi;
 import org.exbin.framework.options.api.OptionsModuleApi;
+import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.settings.action.SettingsAction;
 import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.framework.text.encoding.CharsetEncodingState;
 import org.exbin.framework.text.encoding.ContextEncoding;
 import org.exbin.framework.text.encoding.EncodingsManager;
+import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
 import org.exbin.framework.text.font.ContextFont;
+import org.exbin.framework.text.font.settings.TextFontOptions;
 import org.exbin.framework.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
@@ -67,7 +90,9 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,6 +107,11 @@ public class DebugViewPanel extends javax.swing.JPanel {
     protected final List<DebugViewDataProvider> providers = new ArrayList<>();
     protected int selectedProvider = 0;
 
+    private final Font defaultFont;
+    private final SectionCodeAreaLayoutProfile defaultLayoutProfile;
+    private final SectionCodeAreaThemeProfile defaultThemeProfile;
+    private final CodeAreaColorsProfile defaultColorProfile;
+
     protected final JPanel panel;
     protected BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
     protected BinaryStatus binaryStatus;
@@ -90,6 +120,12 @@ public class DebugViewPanel extends javax.swing.JPanel {
     public DebugViewPanel() {
         panel = new JPanel(new BorderLayout());
         dataComponent = new BinEdDataComponent(new BinEdComponentPanel());
+
+        SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
+        defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+        defaultLayoutProfile = codeArea.getLayoutProfile();
+        defaultThemeProfile = codeArea.getThemeProfile();
+        defaultColorProfile = codeArea.getColorsProfile();
 
         initComponents();
         init();
@@ -203,16 +239,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
         EncodingsManager encodingsManager = new EncodingsManager();
         encodingsManager.init();
 
-        {
-            ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
-            ActiveContextManagement contextManagement = new ActiveContextManager();
-            contextManagement.changeActiveState(ContextEncoding.class, dataComponent);
-            ActionManagement actionManager = actionModule.createActionManager(contextManagement);
-            ActionContextRegistration actionContextRegistrar = actionModule.createActionContextRegistrar(actionManager);
-            actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
-            actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
-        }
-
         binaryStatus = new BinaryStatus() {
             @Nullable
             @Override
@@ -235,11 +261,44 @@ public class DebugViewPanel extends javax.swing.JPanel {
         BinaryStatusPanel binaryStatusPanel = new BinaryStatusPanel();
         binaryStatus.setBinaryStatusPanel(binaryStatusPanel);
         binaryStatus.setBinaryStatusController(new BinaryStatusController(binaryStatus, encodingsManager));
-
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         binaryStatusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
         // statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
         binaryStatus.attachCodeArea(dataComponent);
+
+        // TODO Temporary workaround for unfinished rework of actions
+        {
+            ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+            ActiveContextManagement contextManagement = new ActiveContextManager();
+            contextManagement.changeActiveState(ContextComponent.class, dataComponent);
+            contextManagement.changeActiveState(ContextEncoding.class, dataComponent);
+            ActionManagement actionManager = actionModule.createActionManager(contextManagement);
+            ActionContextRegistration actionContextRegistrar = actionModule.createActionContextRegistrar(actionManager);
+
+            Action action = new AbstractAction() {
+                public void actionPerformed(ActionEvent ae) {
+                    // ignore
+                }
+            };
+            action.putValue(ActionConsts.ACTION_CONTEXT_CHANGE, (ActionContextChange) (ContextChangeRegistration registrar) -> {
+                registrar.registerStateChangeListener(ContextEncoding.class, (ContextEncoding instance, StateChangeType changeType) -> {
+                    if (CharsetEncodingState.ChangeType.ENCODING.equals(changeType)) {
+                        binaryStatus.updateEncodingState();
+                    }
+                });
+            });
+            actionContextRegistrar.registerActionContext(action);
+            actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
+            actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
+            dataComponent.setContextProvider(contextManagement);
+
+            BinaryEncodingSettingsApplier settingsApplier = new BinaryEncodingSettingsApplier();
+            settingsApplier.applySettings(
+                    contextManagement,
+                    optionsSettingsModule.getMainSettingsManager().getSettingsOptionsProvider());
+        }
+
+        initialLoadFromPreferences();
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
         panel.add(binaryStatusPanel, BorderLayout.SOUTH);
@@ -250,6 +309,66 @@ public class DebugViewPanel extends javax.swing.JPanel {
         this.add(panel, BorderLayout.CENTER);
         revalidate();
         repaint();
+    }
+
+    private void initialLoadFromPreferences() {
+        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+        OptionsStorage preferences = optionsModule.getAppOptions();
+        SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
+
+        applyOptions(preferences, codeArea);
+
+        BinaryStatusPanel statusPanel = binaryStatus.getBinaryStatusPanel();
+        CodeAreaStatusOptions statusOptions = new CodeAreaStatusOptions(preferences);
+        statusPanel.loadFromOptions(statusOptions);
+        toolbarPanel.applyFromCodeArea();
+        toolbarPanel.loadFromOptions(preferences);
+
+        BinaryStatusApi.MemoryMode memoryMode = BinaryStatusApi.MemoryMode.READ_ONLY;
+        statusPanel.setMemoryMode(memoryMode);
+    }
+
+    private void applyOptions(OptionsStorage optionsStorage, SectCodeArea codeArea) {
+        CodeAreaViewerSettingsApplier.applyToCodeArea(new CodeAreaOptions(optionsStorage), codeArea);
+
+        TextEncodingOptions encodingOptions = new TextEncodingOptions(optionsStorage);
+        ((CharsetCapable) codeArea).setCharset(Charset.forName(encodingOptions
+                .getSelectedEncoding()));
+        // TODO encodingsManager.setEncodings(optionsSettings.getEncodingOptions().getEncodings());
+        TextFontOptions fontOptions = new TextFontOptions(optionsStorage);
+        ((FontCapable) codeArea).setCodeFont(fontOptions.isUseDefaultFont() ?
+                defaultFont :
+                fontOptions.getFont(defaultFont));
+
+        BinaryEditorOptions editorOptions = new BinaryEditorOptions(optionsStorage);
+        //        switchShowValuesPanel(editorOptions.isShowValuesPanel());
+        if (codeArea.getCommandHandler() instanceof CodeAreaOperationCommandHandler) {
+            ((CodeAreaOperationCommandHandler) codeArea.getCommandHandler()).setEnterKeyHandlingMode(editorOptions.getEnterKeyHandlingMode());
+        }
+
+        CodeAreaLayoutOptions layoutOptions = new CodeAreaLayoutOptions(optionsStorage);
+        int selectedLayoutProfile = layoutOptions.getSelectedProfile();
+        if (selectedLayoutProfile >= 0) {
+            codeArea.setLayoutProfile(layoutOptions.getLayoutProfile(selectedLayoutProfile));
+        } else {
+            codeArea.setLayoutProfile(defaultLayoutProfile);
+        }
+
+        CodeAreaThemeOptions themeOptions = new CodeAreaThemeOptions(optionsStorage);
+        int selectedThemeProfile = themeOptions.getSelectedProfile();
+        if (selectedThemeProfile >= 0) {
+            codeArea.setThemeProfile(themeOptions.getThemeProfile(selectedThemeProfile));
+        } else {
+            codeArea.setThemeProfile(defaultThemeProfile);
+        }
+
+        CodeAreaColorOptions colorOptions = new CodeAreaColorOptions(optionsStorage);
+        int selectedColorProfile = colorOptions.getSelectedProfile();
+        if (selectedColorProfile >= 0) {
+            codeArea.setColorsProfile(colorOptions.getColorsProfile(selectedColorProfile));
+        } else {
+            codeArea.setColorsProfile(defaultColorProfile);
+        }
     }
 
     /**

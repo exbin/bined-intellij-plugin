@@ -45,7 +45,6 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
 <ul><li>Added copy as / paste from dialogs</li>
 <li>Added copy/paste formats for C, Java and Python (by mengnankkkk)</li>
 <li>Added convert data: date time and compression (by mengnankkkk)</li>
-<li>Added font zoom actions (by mengnankkkk)</li>
 <li>Added search progress bar + cancel button (assisted by Tanyajain2006)</li>
 <li>Added basic regex search support (assisted by Tanyajain2006)</li>
 <li>Fixed overflow in the binary checkboxes in data inspector (issue #67)</li></ul>
