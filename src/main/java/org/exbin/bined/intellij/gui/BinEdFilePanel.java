@@ -257,6 +257,8 @@ public class BinEdFilePanel extends JPanel {
                     clickedY += invoker.getParent().getY();
                 }
 
+                docking.setActiveDocument(fileDocument);
+
                 // TODO Temporary workaround for unfinished rework of actions
                 {
                     BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);

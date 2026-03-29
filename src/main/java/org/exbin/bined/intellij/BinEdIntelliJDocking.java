@@ -173,20 +173,17 @@ public class BinEdIntelliJDocking implements MultiDocking {
         ActiveContextManagement contextManager =
                 frameModule.getFrameHandler().getContextManager();
 
-        SectCodeArea extCodeArea = null;
-        BinEdDataComponent binEdDataComponent = null;
-        TextClipboardController clipboardController = null;
-        UndoRedoState undoHandler = null;
+        BinEdDataComponent dataComponent = null;
         if (activeDocument != null) {
-            binEdDataComponent = ((BinaryFileDocument) activeDocument).getDataComponent();
+            dataComponent = ((BinaryFileDocument) activeDocument).getDataComponent();
         }
 
-        final Component parentComponent = binEdDataComponent == null ? null : binEdDataComponent.getCodeArea();
+        final Component parentComponent = dataComponent == null ? null : dataComponent.getCodeArea();
 
         contextManager.changeActiveState(ContextDocument.class, (ContextDocument) activeDocument);
-        contextManager.changeActiveState(ContextFont.class, binEdDataComponent);
-        contextManager.changeActiveState(ContextEncoding.class, binEdDataComponent);
-        contextManager.changeActiveState(ContextComponent.class, binEdDataComponent);
+        contextManager.changeActiveState(ContextFont.class, dataComponent);
+        contextManager.changeActiveState(ContextEncoding.class, dataComponent);
+        contextManager.changeActiveState(ContextComponent.class, dataComponent);
         contextManager.changeActiveState(DialogParentComponent.class, new DialogParentComponent() {
             @Nonnull
             @Override
@@ -194,8 +191,6 @@ public class BinEdIntelliJDocking implements MultiDocking {
                 return parentComponent;
             }
         });
-        contextManager.changeActiveState(UndoRedoState.class, undoHandler);
-        contextManager.changeActiveState(ClipboardController.class, clipboardController);
         updateStatus();
 
         /* if (this.undoHandler != null) {

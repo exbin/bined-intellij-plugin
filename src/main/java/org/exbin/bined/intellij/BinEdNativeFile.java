@@ -28,21 +28,15 @@ import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
-import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.framework.App;
-import org.exbin.framework.bined.BinEdDataComponent;
 import org.exbin.framework.bined.BinEdFileManager;
 import org.exbin.framework.bined.BinaryFileDocument;
 import org.exbin.framework.bined.BinedModule;
 import org.exbin.framework.bined.FileProcessingMode;
 import org.exbin.framework.bined.editor.settings.BinaryFileProcessingOptions;
-import org.exbin.framework.context.api.ActiveContextManagement;
 import org.exbin.framework.docking.api.ContextDocking;
-import org.exbin.framework.document.api.ContextDocument;
 import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.operation.undo.api.ContextUndoRedo;
-import org.exbin.framework.operation.undo.api.UndoRedoState;
 import org.exbin.framework.options.api.OptionsModuleApi;
 import org.exbin.framework.options.api.OptionsStorage;
 import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
@@ -53,8 +47,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * File editor wrapper using BinEd editor component.
@@ -145,6 +140,9 @@ public class BinEdNativeFile {
         this.virtualFile = virtualFile;
         boolean editable = virtualFile.isWritable();
 
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+
         ApplicationManager.getApplication().runReadAction(() -> {
             try {
                 byte[] fileContent = virtualFile.contentsToByteArray();
@@ -159,10 +157,17 @@ public class BinEdNativeFile {
         codeArea.addDataChangedListener(this::saveDocument);
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
+        // TODO Temporary workaround for unfinished status bar messaging
+        codeArea.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                docking.setActiveDocument(fileDocument);
+            }
+        });
+
+
         opened = true;
         fileDocument.fileSync();
-        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
         docking.setActiveDocument(fileDocument);
         docking.updateStatus();
         updateModified();
@@ -179,7 +184,7 @@ public class BinEdNativeFile {
         application.runWriteAction(() -> {
             try {
                 virtualFile.setBinaryContent(fileContent);
-                fileDocument.fileSync();
+                // fileDocument.fileSync();
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
                 BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
                 docking.setActiveDocument(fileDocument);

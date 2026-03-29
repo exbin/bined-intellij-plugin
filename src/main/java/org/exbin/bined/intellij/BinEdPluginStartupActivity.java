@@ -124,6 +124,7 @@ import org.exbin.framework.docking.api.ContextDocking;
 import org.exbin.framework.docking.api.DockingModuleApi;
 import org.exbin.framework.document.DocumentModule;
 import org.exbin.framework.document.api.ContextDocument;
+import org.exbin.framework.document.api.Document;
 import org.exbin.framework.document.api.DocumentModuleApi;
 import org.exbin.framework.file.FileModule;
 import org.exbin.framework.file.api.FileModuleApi;
@@ -448,6 +449,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     activeFile = ((BinEdFileEditor) fileEditor).getVirtualFile().getEditorFile();
                 } else if (fileEditor instanceof BinEdNativeFileEditor) {
                     activeFile = ((BinEdNativeFileEditor) fileEditor).getNativeFile().getDocument();
+                } else if (fileEditor != null) {
+                    // Ignore for now
+                    return;
                 }
                 docking.setActiveDocument(activeFile);
             }
