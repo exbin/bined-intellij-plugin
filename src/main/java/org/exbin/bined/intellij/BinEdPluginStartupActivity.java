@@ -62,10 +62,10 @@ import org.exbin.bined.intellij.api.BinaryViewData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.diff.BinEdDiffTool;
 import org.exbin.bined.intellij.objectdata.MainBinaryViewHandler;
-import org.exbin.bined.intellij.settings.IntelliJOptionsStorage;
 import org.exbin.bined.intellij.search.BinEdIntelliJComponentSearch;
 import org.exbin.bined.intellij.settings.IntegrationOptions;
 import org.exbin.bined.intellij.settings.IntegrationSettingsComponent;
+import org.exbin.bined.intellij.settings.IntelliJOptionsStorage;
 import org.exbin.bined.intellij.settings.gui.IntegrationSettingsPanel;
 import org.exbin.bined.swing.CodeAreaCommandHandler;
 import org.exbin.bined.swing.CodeAreaCore;
@@ -124,7 +124,6 @@ import org.exbin.framework.docking.api.ContextDocking;
 import org.exbin.framework.docking.api.DockingModuleApi;
 import org.exbin.framework.document.DocumentModule;
 import org.exbin.framework.document.api.ContextDocument;
-import org.exbin.framework.document.api.Document;
 import org.exbin.framework.document.api.DocumentModuleApi;
 import org.exbin.framework.file.FileModule;
 import org.exbin.framework.file.api.FileModuleApi;
@@ -463,6 +462,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             @Override
             public void beforeFileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile file) {
+                // TODO: FileEditorManagerKeys.CLOSING_TO_REOPEN not available yet
                 Boolean userData = file.getUserData(FileEditorManagerImpl.CLOSING_TO_REOPEN);
                 if (userData != null && userData) {
                     return;
@@ -728,6 +728,9 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             uiModule.executePostInitActions();
             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
             frameModule.init();
+
+            FileModuleApi fileModule = App.getModule(FileModuleApi.class);
+            fileModule.registerFileProviders();
             ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
             MenuModuleApi menuModule = App.getModule(MenuModuleApi.class);
 
