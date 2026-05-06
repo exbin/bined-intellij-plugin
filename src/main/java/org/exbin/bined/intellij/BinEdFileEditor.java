@@ -27,9 +27,9 @@ import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import org.exbin.framework.App;
-import org.exbin.framework.docking.api.ContextDocking;
-import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.docking.api.ContextDocking;
+import org.exbin.jaguif.frame.api.FrameModuleApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -106,7 +106,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
     @Override
     public void selectNotify() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(
                 ContextDocking.class);
         docking.setActiveDocument(virtualFile.getEditorFile());
     }

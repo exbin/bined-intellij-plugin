@@ -6,7 +6,7 @@
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
     <name>BinEd - Binary/Hex Editor</name>
-    <version>0.2.13</version>
+    <version>0.2.14-snapshot</version>
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="exbinproject@gmail.com" url="https://exbin.org">ExBin Project</vendor>
 
@@ -42,12 +42,7 @@ Sources: <a href="https://github.com/exbin/bined-intellij-plugin">https://github
     ]]></description>
 
     <change-notes><![CDATA[
-<ul><li>Added copy as / paste from dialogs</li>
-<li>Added copy/paste formats for C, Java and Python (by mengnankkkk)</li>
-<li>Added convert data: date time and compression (by mengnankkkk)</li>
-<li>Added search progress bar + cancel button (assisted by Tanyajain2006)</li>
-<li>Added basic regex search support (assisted by Tanyajain2006)</li>
-<li>Fixed overflow in the binary checkboxes in data inspector (issue #67)</li></ul>
+<ul><li>-</li></ul>
     ]]>
     </change-notes>
 

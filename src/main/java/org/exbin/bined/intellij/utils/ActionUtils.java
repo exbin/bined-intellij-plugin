@@ -20,9 +20,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import org.exbin.framework.App;
-import org.exbin.framework.action.api.ActionConsts;
-import org.exbin.framework.action.api.ActionModuleApi;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.action.api.ActionConsts;
+import org.exbin.jaguif.menu.api.MenuModuleApi;
 
 /**
  * Utilities for action manipulations.
@@ -37,7 +37,7 @@ public final class ActionUtils {
                 Action componentAction = ((JMenuItem) component).getAction();
                 if (componentAction != null && actionId.equals(componentAction.getValue(ActionConsts.ACTION_ID))) {
                     menu.remove(i);
-                    ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+                    MenuModuleApi actionModule = App.getModule(MenuModuleApi.class);
                     menu.add(actionModule.actionToMenuItem(action), i);
                     break;
                 }

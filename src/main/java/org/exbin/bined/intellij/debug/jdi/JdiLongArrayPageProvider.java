@@ -16,9 +16,9 @@
 package org.exbin.bined.intellij.debug.jdi;
 
 import com.sun.jdi.*;
-import org.exbin.framework.bined.objectdata.PageProvider;
-import org.exbin.framework.bined.objectdata.PageProviderBinaryData;
-import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
+import org.exbin.bined.jaguif.objectdata.PageProvider;
+import org.exbin.bined.jaguif.objectdata.PageProviderBinaryData;
+import org.exbin.bined.jaguif.inspector.gui.BasicValuesPanel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;

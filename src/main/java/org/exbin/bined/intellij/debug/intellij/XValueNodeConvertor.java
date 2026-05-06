@@ -46,7 +46,7 @@ import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.array.ByteArrayData;
-import org.exbin.framework.bined.objectdata.PageProviderBinaryData;
+import org.exbin.bined.jaguif.objectdata.PageProviderBinaryData;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.debug.DefaultDebugViewDataProvider;
 import org.exbin.bined.intellij.debug.jdi.JdiBooleanArrayPageProvider;
@@ -59,7 +59,7 @@ import org.exbin.bined.intellij.debug.jdi.JdiLongArrayPageProvider;
 import org.exbin.bined.intellij.debug.jdi.JdiShortArrayPageProvider;
 import org.exbin.bined.intellij.debug.php.PhpByteArrayPageProvider;
 import org.exbin.bined.intellij.debug.python.PythonByteArrayPageProvider;
-import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
+import org.exbin.bined.jaguif.inspector.gui.BasicValuesPanel;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.debugger.VariableView;
 

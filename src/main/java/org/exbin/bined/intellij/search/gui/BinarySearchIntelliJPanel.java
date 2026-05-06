@@ -38,17 +38,16 @@ import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.bined.swing.section.SectionCodeAreaPainter;
 import org.exbin.bined.swing.section.color.SectionCodeAreaColorProfile;
 import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
-import org.exbin.framework.App;
-import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.search.ReplaceParameters;
-import org.exbin.framework.bined.search.SearchCondition;
-import org.exbin.framework.bined.search.SearchHistoryModel;
-import org.exbin.framework.bined.search.SearchParameters;
-import org.exbin.framework.bined.search.gui.BinarySearchComboBoxPanel;
-import org.exbin.framework.bined.search.gui.BinarySearchPanel;
-import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.utils.TestApplication;
-import org.exbin.framework.utils.WindowUtils;
+import org.exbin.jaguif.App;
+import org.exbin.bined.jaguif.search.ReplaceParameters;
+import org.exbin.bined.jaguif.search.SearchCondition;
+import org.exbin.bined.jaguif.search.SearchHistoryModel;
+import org.exbin.bined.jaguif.search.SearchParameters;
+import org.exbin.bined.jaguif.search.gui.BinarySearchComboBoxPanel;
+import org.exbin.bined.jaguif.search.gui.BinarySearchPanel;
+import org.exbin.jaguif.language.api.LanguageModuleApi;
+import org.exbin.jaguif.utils.TestApplication;
+import org.exbin.jaguif.utils.WindowUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -61,6 +60,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.ListCellRenderer;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -831,8 +831,8 @@ public class BinarySearchIntelliJPanel extends JPanel {
         findComboBoxEditorComponent.requestFocus();
     }
 
-    public void setCodeAreaPopupMenuHandler(CodeAreaPopupMenuHandler codeAreaPopupMenuHandler) {
-        findComboBoxEditorComponent.setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler, "");
+    public void setCodeAreaPopupMenu(JPopupMenu popupMenu) {
+        findComboBoxEditorComponent.setCodeAreaPopupMenu(popupMenu);
     }
 
     public void updateSearchHistory(SearchCondition condition) {

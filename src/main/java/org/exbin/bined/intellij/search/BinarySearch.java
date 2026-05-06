@@ -18,28 +18,28 @@ package org.exbin.bined.intellij.search;
 import org.exbin.auxiliary.binary_data.array.ByteArrayEditableData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.intellij.search.gui.BinarySearchIntelliJPanel;
-import org.exbin.framework.App;
-import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.search.ReplaceParameters;
-import org.exbin.framework.bined.search.SearchCondition;
-import org.exbin.framework.bined.search.SearchParameters;
-import org.exbin.framework.bined.search.gui.BinaryMultilinePanel;
-import org.exbin.framework.bined.search.gui.BinarySearchPanel;
-import org.exbin.framework.bined.search.gui.FindBinaryPanel;
-import org.exbin.framework.bined.search.service.BinarySearchService;
-import org.exbin.framework.help.api.HelpLink;
-import org.exbin.framework.help.api.HelpModuleApi;
-import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.utils.WindowUtils;
-import org.exbin.framework.window.api.WindowHandler;
-import org.exbin.framework.window.api.WindowModuleApi;
-import org.exbin.framework.window.api.gui.DefaultControlPanel;
-import org.exbin.framework.window.api.controller.DefaultControlController;
+import org.exbin.jaguif.App;
+import org.exbin.bined.jaguif.search.ReplaceParameters;
+import org.exbin.bined.jaguif.search.SearchCondition;
+import org.exbin.bined.jaguif.search.SearchParameters;
+import org.exbin.bined.jaguif.search.gui.BinaryMultilinePanel;
+import org.exbin.bined.jaguif.search.gui.BinarySearchPanel;
+import org.exbin.bined.jaguif.search.gui.FindBinaryPanel;
+import org.exbin.bined.jaguif.search.service.BinarySearchService;
+import org.exbin.jaguif.help.api.HelpLink;
+import org.exbin.jaguif.help.api.HelpModuleApi;
+import org.exbin.jaguif.language.api.LanguageModuleApi;
+import org.exbin.jaguif.utils.WindowUtils;
+import org.exbin.jaguif.window.api.WindowHandler;
+import org.exbin.jaguif.window.api.WindowModuleApi;
+import org.exbin.jaguif.window.api.gui.DefaultControlPanel;
+import org.exbin.jaguif.window.api.controller.DefaultControlController;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
 import java.awt.Dialog;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public class BinarySearch {
 
     public static final String HELP_ID = "find-or-replace-data";
 
-    private final ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(org.exbin.framework.bined.search.BinarySearch.class);
+    private final ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(org.exbin.bined.jaguif.search.BinarySearch.class);
     private static final int DEFAULT_DELAY = 500;
 
     private InvokeSearchThread invokeSearchThread;
@@ -68,7 +68,7 @@ public class BinarySearch {
     private final List<SearchCondition> searchHistory = new ArrayList<>();
     private final List<SearchCondition> replaceHistory = new ArrayList<>();
 
-    private CodeAreaPopupMenuHandler codeAreaPopupMenuHandler;
+    private JPopupMenu codeAreaPopupMenu;
     private PanelClosingListener panelClosingListener = null;
     private BinarySearchService binarySearchService;
     private final BinarySearchService.SearchStatusListener searchStatusListener;
@@ -233,7 +233,7 @@ public class BinarySearch {
                 findBinaryPanel.setSearchHistory(searchHistory);
                 findBinaryPanel.setSearchParameters(currentSearchParameters);
                 findBinaryPanel.setReplaceParameters(currentReplaceParameters);
-                findBinaryPanel.setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler);
+                findBinaryPanel.setCodeAreaPopupMenu(codeAreaPopupMenu);
                 DefaultControlPanel controlPanel = new DefaultControlPanel(findBinaryPanel.getResourceBundle());
                 HelpModuleApi helpModule = App.getModule(HelpModuleApi.class);
                 helpModule.addLinkToControlPanel(controlPanel, new HelpLink(HELP_ID));
@@ -244,7 +244,7 @@ public class BinarySearch {
                     @Override
                     public SearchCondition multilineEdit(SearchCondition condition) {
                         final BinaryMultilinePanel multilinePanel = new BinaryMultilinePanel();
-                        multilinePanel.setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler);
+                        multilinePanel.setCodeAreaPopupMenu(codeAreaPopupMenu);
                         multilinePanel.setCondition(condition);
                         DefaultControlPanel controlPanel = new DefaultControlPanel();
                         WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
@@ -262,7 +262,6 @@ public class BinarySearch {
                             multilineDialog.dispose();
                         });
                         multilineDialog.showCentered(dialog.getWindow());
-                        multilinePanel.detachMenu();
                         return result.searchCondition;
                     }
 
@@ -283,7 +282,6 @@ public class BinarySearch {
                         binarySearchPanel.switchPanelMode(performReplace ? BinarySearchPanel.PanelMode.REPLACE : BinarySearchPanel.PanelMode.FIND);
                         invokeSearch(performReplace ? SearchOperation.REPLACE : SearchOperation.FIND, dialogSearchParameters, dialogReplaceParameters);
                     }
-                    findBinaryPanel.detachMenu();
                     dialog.close();
                     dialog.dispose();
                 });
@@ -320,9 +318,9 @@ public class BinarySearch {
         this.panelClosingListener = panelClosingListener;
     }
 
-    public void setCodeAreaPopupMenuHandler(CodeAreaPopupMenuHandler codeAreaPopupMenuHandler) {
-        this.codeAreaPopupMenuHandler = codeAreaPopupMenuHandler;
-        binarySearchPanel.setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler);
+    public void setCodeAreaPopupMenu(JPopupMenu codeAreaPopupMenu) {
+        this.codeAreaPopupMenu = codeAreaPopupMenu;
+        binarySearchPanel.setCodeAreaPopupMenu(codeAreaPopupMenu);
     }
 
     @Nonnull

@@ -22,8 +22,8 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.debug.intellij.XValueNodeConvertor;
-import org.exbin.framework.App;
-import org.exbin.framework.language.api.LanguageModuleApi;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;

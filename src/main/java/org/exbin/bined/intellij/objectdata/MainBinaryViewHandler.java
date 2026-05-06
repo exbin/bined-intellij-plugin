@@ -23,7 +23,7 @@ import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.bined.intellij.api.BinaryViewHandler;
 import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.objectdata.gui.DataDialog;
-import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
+import org.exbin.bined.jaguif.objectdata.ObjectValueConvertor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

@@ -23,23 +23,23 @@ import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
 import com.intellij.ui.Graphics2DDelegate;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.jaguif.document.BinedDocumentModule;
 import org.exbin.bined.swing.section.SectCodeArea;
-import org.exbin.framework.App;
-import org.exbin.framework.bined.BinEdDataComponent;
-import org.exbin.framework.bined.BinEdFileManager;
-import org.exbin.framework.bined.BinaryFileDocument;
-import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.editor.settings.BinaryFileProcessingOptions;
-import org.exbin.framework.bined.gui.BinEdComponentPanel;
-import org.exbin.framework.docking.api.ContextDocking;
-import org.exbin.framework.document.api.DocumentSource;
-import org.exbin.framework.file.api.FileDocumentSource;
-import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.options.api.OptionsStorage;
-import org.exbin.framework.options.api.OptionsModuleApi;
-import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
-import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
-import org.exbin.framework.options.settings.api.SettingsOptionsProvider;
+import org.exbin.jaguif.App;
+import org.exbin.bined.jaguif.component.BinEdDataComponent;
+import org.exbin.bined.jaguif.document.BinEdFileManager;
+import org.exbin.bined.jaguif.document.BinaryFileDocument;
+import org.exbin.bined.jaguif.document.settings.BinaryFileProcessingOptions;
+import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
+import org.exbin.jaguif.docking.api.ContextDocking;
+import org.exbin.jaguif.document.api.DocumentSource;
+import org.exbin.jaguif.file.api.FileDocumentSource;
+import org.exbin.jaguif.frame.api.FrameModuleApi;
+import org.exbin.jaguif.options.api.OptionsStorage;
+import org.exbin.jaguif.options.api.OptionsModuleApi;
+import org.exbin.jaguif.options.settings.api.OptionsSettingsManagement;
+import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.jaguif.options.settings.api.SettingsOptionsProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -83,16 +83,15 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             this.displayName = "";
         }
 
-        BinedModule binedModule = App.getModule(BinedModule.class);
-        BinEdFileManager fileManager = binedModule.getFileManager();
-        fileManager.getBinaryStatus().setBinaryStatusPanel(filePanel.getStatusPanel());
+        BinedDocumentModule binedDocumentModule = App.getModule(BinedDocumentModule.class);
+        BinEdFileManager fileManager = binedDocumentModule.getFileManager();
         filePanel.setDocument(fileDocument);
         fileManager.initDataComponent(fileDocument.getDataComponent());
         fileManager.initCommandHandler(fileDocument.getDataComponent());
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         OptionsStorage optionsStorage = optionsModule.getAppOptions();
-        fileDocument.setInitialFileProcessing(new BinaryFileProcessingOptions(optionsStorage).getFileProcessingMode());
+        fileDocument.setInitialProcessingMode(new BinaryFileProcessingOptions(optionsStorage).getFileProcessingMode());
 
         BinEdToolbarPanel toolbarPanel = filePanel.getToolbarPanel();
         toolbarPanel.setUndoHandler(fileDocument.getUndoHandler().get());
@@ -100,7 +99,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             fileDocument.saveTo(fileDocument.getDocumentSource().get());
             fileDocument.fileSync();
             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(
+            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(
                     ContextDocking.class);
             docking.setActiveDocument(fileDocument);
         });
@@ -256,7 +255,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     public void dispose() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
         docking.removeDocument(fileDocument);
     }
 
@@ -282,9 +281,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             }
         }
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
         docking.setActiveDocument(fileDocument);
-        docking.updateStatus();
     }
 
     public static class VirtualFileDocumentSource implements DocumentSource {

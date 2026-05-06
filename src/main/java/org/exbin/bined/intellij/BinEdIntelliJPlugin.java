@@ -18,8 +18,8 @@ package org.exbin.bined.intellij;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.extensions.PluginId;
-import org.exbin.framework.language.LanguageModule;
-import org.exbin.framework.language.api.IconSetProvider;
+import org.exbin.jaguif.language.LanguageModule;
+import org.exbin.jaguif.language.api.IconSetProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

@@ -15,31 +15,24 @@
  */
 package org.exbin.bined.intellij;
 
-import org.exbin.bined.swing.section.SectCodeArea;
-import org.exbin.framework.App;
-import org.exbin.framework.action.api.ContextComponent;
-import org.exbin.framework.action.api.DialogParentComponent;
-import org.exbin.framework.action.api.clipboard.ClipboardController;
-import org.exbin.framework.action.api.clipboard.TextClipboardController;
-import org.exbin.framework.bined.BinEdDataComponent;
-import org.exbin.framework.bined.BinEdFileManager;
-import org.exbin.framework.bined.BinaryFileDocument;
-import org.exbin.framework.bined.BinaryStatus;
-import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.gui.BinaryStatusPanel;
-import org.exbin.framework.context.api.ActiveContextManagement;
-import org.exbin.framework.docking.multi.api.MultiDocking;
-import org.exbin.framework.document.api.ContextDocument;
-import org.exbin.framework.document.api.Document;
-import org.exbin.framework.document.api.DocumentModuleApi;
-import org.exbin.framework.document.api.DocumentSource;
-import org.exbin.framework.document.api.EditableDocument;
-import org.exbin.framework.file.api.FileModuleApi;
-import org.exbin.framework.file.api.SaveModifiedResult;
-import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.operation.undo.api.UndoRedoState;
-import org.exbin.framework.text.encoding.ContextEncoding;
-import org.exbin.framework.text.font.ContextFont;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.context.api.ContextComponent;
+import org.exbin.jaguif.action.api.DialogParentComponent;
+import org.exbin.bined.jaguif.component.BinEdDataComponent;
+import org.exbin.bined.jaguif.document.BinaryFileDocument;
+import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.docking.multi.api.MultiDocking;
+import org.exbin.jaguif.document.api.ContextDocument;
+import org.exbin.jaguif.document.api.Document;
+import org.exbin.jaguif.document.api.DocumentModuleApi;
+import org.exbin.jaguif.document.api.DocumentSource;
+import org.exbin.jaguif.document.api.EditableDocument;
+import org.exbin.jaguif.file.api.FileModuleApi;
+import org.exbin.jaguif.file.api.SaveModifiedResult;
+import org.exbin.jaguif.frame.api.FrameModuleApi;
+import org.exbin.jaguif.statusbar.api.StatusBar;
+import org.exbin.jaguif.text.encoding.ContextEncoding;
+import org.exbin.jaguif.text.font.ContextFont;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -61,7 +54,7 @@ public class BinEdIntelliJDocking implements MultiDocking {
     @Nullable
     protected Document activeDocument = null;
     // TODO Temporary status panel map until status bar registration is available
-    protected final Map<Document, BinaryStatusPanel> statusPanels = new HashMap<>();
+    protected final Map<Document, StatusBar> statusBars = new HashMap<>();
 
     public BinEdIntelliJDocking() {
         super();
@@ -97,8 +90,9 @@ public class BinEdIntelliJDocking implements MultiDocking {
         throw new UnsupportedOperationException();
     }
 
+    @Nonnull
     @Override
-    public void openNewDocument() {
+    public Optional<Document> openNewDocument() {
         throw new UnsupportedOperationException();
     }
 
@@ -134,9 +128,9 @@ public class BinEdIntelliJDocking implements MultiDocking {
         return null;
     }
 
-    public void addDocument(BinaryFileDocument binaryDocument, BinaryStatusPanel statusPanel) {
+    public void addDocument(BinaryFileDocument binaryDocument, StatusBar statusBar) {
         openDocuments.add(binaryDocument);
-        statusPanels.put(binaryDocument, statusPanel);
+        statusBars.put(binaryDocument, statusBar);
     }
 
     public void removeDocument(BinaryFileDocument binaryDocument) {
@@ -144,7 +138,7 @@ public class BinEdIntelliJDocking implements MultiDocking {
         if (!removed) {
             throw new IllegalStateException("Attempt to remove invalid document");
         } else {
-            statusPanels.remove(binaryDocument);
+            statusBars.remove(binaryDocument);
         }
     }
 
@@ -169,7 +163,7 @@ public class BinEdIntelliJDocking implements MultiDocking {
 
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         ActiveContextManagement contextManager =
-                frameModule.getFrameHandler().getContextManager();
+                frameModule.getFrameController().getContextManager();
 
         BinEdDataComponent dataComponent = null;
         if (activeDocument != null) {
@@ -189,22 +183,10 @@ public class BinEdIntelliJDocking implements MultiDocking {
                 return parentComponent;
             }
         });
-        updateStatus();
 
         /* if (this.undoHandler != null) {
             this.undoHandler.setActiveFile(this.activeFile);
         } */
-    }
-
-    public void updateStatus() {
-        BinaryStatusPanel binaryStatusPanel = statusPanels.get(activeDocument);
-        if (binaryStatusPanel != null) {
-            BinedModule binedModule = App.getModule(BinedModule.class);
-            BinEdFileManager fileManager = binedModule.getFileManager();
-            BinaryStatus binaryStatus = fileManager.getBinaryStatus();
-            binaryStatus.setBinaryStatusPanel(binaryStatusPanel);
-            binaryStatus.updateStatus();
-        }
     }
 
     @Nonnull

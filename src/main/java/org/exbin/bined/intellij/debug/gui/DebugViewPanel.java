@@ -23,6 +23,8 @@ import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.jaguif.component.BinedComponentModule;
+import org.exbin.bined.jaguif.document.BinedDocumentModule;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
@@ -31,52 +33,44 @@ import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
-import org.exbin.framework.App;
-import org.exbin.framework.action.api.ActionConsts;
-import org.exbin.framework.action.api.ActionContextChange;
-import org.exbin.framework.action.api.ActionContextRegistration;
-import org.exbin.framework.action.api.ActionManagement;
-import org.exbin.framework.action.api.ActionModuleApi;
-import org.exbin.framework.action.api.ContextComponent;
-import org.exbin.framework.action.api.DialogParentComponent;
-import org.exbin.framework.action.api.clipboard.ClipboardController;
-import org.exbin.framework.bined.BinEdDataComponent;
-import org.exbin.framework.bined.BinEdFileManager;
-import org.exbin.framework.bined.BinaryFileDocument;
-import org.exbin.framework.bined.BinaryStatus;
-import org.exbin.framework.bined.BinaryStatusApi;
-import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.editor.settings.BinaryEditorOptions;
-import org.exbin.framework.bined.gui.BinEdComponentPanel;
-import org.exbin.framework.bined.gui.BinaryStatusPanel;
-import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.settings.CodeAreaStatusOptions;
-import org.exbin.framework.bined.theme.settings.CodeAreaColorOptions;
-import org.exbin.framework.bined.theme.settings.CodeAreaLayoutOptions;
-import org.exbin.framework.bined.theme.settings.CodeAreaThemeOptions;
-import org.exbin.framework.bined.viewer.BinaryStatusController;
-import org.exbin.framework.bined.viewer.BinedViewerModule;
-import org.exbin.framework.bined.viewer.settings.BinaryEncodingSettingsApplier;
-import org.exbin.framework.bined.viewer.settings.CodeAreaOptions;
-import org.exbin.framework.bined.viewer.settings.CodeAreaViewerSettingsApplier;
-import org.exbin.framework.context.ActiveContextManager;
-import org.exbin.framework.context.api.ActiveContextManagement;
-import org.exbin.framework.context.api.ContextChangeRegistration;
-import org.exbin.framework.context.api.StateChangeType;
-import org.exbin.framework.docking.api.DocumentDocking;
-import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.options.api.OptionsModuleApi;
-import org.exbin.framework.options.api.OptionsStorage;
-import org.exbin.framework.options.settings.action.SettingsAction;
-import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
-import org.exbin.framework.text.encoding.CharsetEncodingState;
-import org.exbin.framework.text.encoding.ContextEncoding;
-import org.exbin.framework.text.encoding.EncodingsManager;
-import org.exbin.framework.text.encoding.settings.TextEncodingOptions;
-import org.exbin.framework.text.font.ContextFont;
-import org.exbin.framework.text.font.settings.TextFontOptions;
-import org.exbin.framework.utils.DesktopUtils;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.action.api.ActionConsts;
+import org.exbin.jaguif.action.api.ActionContextChange;
+import org.exbin.jaguif.action.api.ActionContextRegistration;
+import org.exbin.jaguif.action.api.ActionModuleApi;
+import org.exbin.jaguif.context.api.ContextComponent;
+import org.exbin.jaguif.action.api.DialogParentComponent;
+import org.exbin.jaguif.action.api.clipboard.ClipboardController;
+import org.exbin.bined.jaguif.component.BinEdDataComponent;
+import org.exbin.bined.jaguif.document.BinEdFileManager;
+import org.exbin.bined.jaguif.editor.settings.BinaryEditorOptions;
+import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
+import org.exbin.bined.jaguif.viewer.settings.CodeAreaStatusOptions;
+import org.exbin.bined.jaguif.theme.settings.CodeAreaColorOptions;
+import org.exbin.bined.jaguif.theme.settings.CodeAreaLayoutOptions;
+import org.exbin.bined.jaguif.theme.settings.CodeAreaThemeOptions;
+import org.exbin.bined.jaguif.viewer.BinedViewerModule;
+import org.exbin.bined.jaguif.viewer.settings.BinaryEncodingSettingsApplier;
+import org.exbin.bined.jaguif.viewer.settings.CodeAreaOptions;
+import org.exbin.bined.jaguif.viewer.settings.CodeAreaViewerSettingsApplier;
+import org.exbin.jaguif.context.ActiveContextManager;
+import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.api.ContextChangeRegistration;
+import org.exbin.jaguif.context.api.StateUpdateType;
+import org.exbin.jaguif.frame.api.FrameModuleApi;
+import org.exbin.jaguif.language.api.LanguageModuleApi;
+import org.exbin.jaguif.options.api.OptionsModuleApi;
+import org.exbin.jaguif.options.api.OptionsStorage;
+import org.exbin.jaguif.options.settings.action.SettingsAction;
+import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.jaguif.statusbar.api.StatusBar;
+import org.exbin.jaguif.text.encoding.CharsetEncodingState;
+import org.exbin.jaguif.text.encoding.ContextEncoding;
+import org.exbin.jaguif.text.encoding.EncodingsManager;
+import org.exbin.jaguif.text.encoding.settings.TextEncodingOptions;
+import org.exbin.jaguif.text.font.ContextFont;
+import org.exbin.jaguif.text.font.settings.TextFontOptions;
+import org.exbin.jaguif.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -112,7 +106,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
     protected final JPanel panel;
     protected BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
-    protected BinaryStatus binaryStatus;
+    protected StatusBar statusBar;
     protected final BinEdDataComponent dataComponent;
 
     public DebugViewPanel() {
@@ -130,8 +124,8 @@ public class DebugViewPanel extends javax.swing.JPanel {
     }
 
     private void init() {
-        BinedModule binedModule = App.getModule(BinedModule.class);
-        BinEdFileManager fileManager = binedModule.getFileManager();
+        BinedDocumentModule binedDocumentModule = App.getModule(BinedDocumentModule.class);
+        BinEdFileManager fileManager = binedDocumentModule.getFileManager();
         fileManager.initDataComponent(dataComponent);
 
         BinEdComponentPanel componentPanel = (BinEdComponentPanel) dataComponent.getComponent();
@@ -185,87 +179,24 @@ public class DebugViewPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 settingsAction.actionPerformed(e);
                 toolbarPanel.applyFromCodeArea();
-                binaryStatus.updateStatus();
             }
         };
         toolbarPanel.setOptionsAction(wrapperAction);
 
-        CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
-                binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
-        codeArea.setComponentPopupMenu(new JPopupMenu() {
-            @Override
-            public void show(Component invoker, int x, int y) {
-                FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                ActiveContextManagement contextManager =
-                        frameModule.getFrameHandler().getContextManager();
-
-                contextManager.changeActiveState(ContextComponent.class, dataComponent);
-                contextManager.changeActiveState(ContextFont.class, dataComponent);
-                contextManager.changeActiveState(ContextEncoding.class, dataComponent);
-                contextManager.changeActiveState(DialogParentComponent.class, () -> dataComponent.getCodeArea());
-                contextManager.changeActiveState(ClipboardController.class, dataComponent);
-
-                String popupMenuId = "DebugViewPanel.popup";
-                int clickedX = x;
-                int clickedY = y;
-                if (invoker instanceof JViewport) {
-                    clickedX += invoker.getParent().getX();
-                    clickedY += invoker.getParent().getY();
-                }
-
-                JPopupMenu popupMenu =
-                        codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
-                popupMenu.addPopupMenuListener(new PopupMenuListener() {
-                    @Override
-                    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                    }
-
-                    @Override
-                    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                        codeAreaPopupMenuHandler.dropPopupMenu(popupMenuId);
-                    }
-
-                    @Override
-                    public void popupMenuCanceled(PopupMenuEvent e) {
-                    }
-                });
-
-                popupMenu.show(invoker, x, y);
-            }
-        });
+        BinedComponentModule binedComponentModule = App.getModule(BinedComponentModule.class);
+        JPopupMenu codeAreaPopupMenu = binedComponentModule.createCodeAreaPopupMenu();
+        codeArea.setComponentPopupMenu(codeAreaPopupMenu);
 
         EncodingsManager encodingsManager = new EncodingsManager();
         encodingsManager.init();
 
-        binaryStatus = new BinaryStatus() {
-            @Nullable
-            @Override
-            public BinaryFileDocument getActiveDocument() {
-                return null;
-            }
-
-            @Nullable
-            @Override
-            public BinEdDataComponent getActiveComponent() {
-                return dataComponent;
-            }
-
-            @Nullable
-            @Override
-            public DocumentDocking getActiveDocking() {
-                return null;
-            }
-        };
-        BinaryStatusPanel binaryStatusPanel = new BinaryStatusPanel();
-        binaryStatus.setBinaryStatusPanel(binaryStatusPanel);
-        binaryStatus.setBinaryStatusController(new BinaryStatusController(binaryStatus, encodingsManager));
-        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-        binaryStatusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
+//        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
+//        binaryStatusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
         // statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
-        binaryStatus.attachCodeArea(dataComponent);
+//        binaryStatus.attachCodeArea(dataComponent);
 
         // TODO Temporary workaround for unfinished rework of actions
-        {
+        /* {
             ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
             ActiveContextManagement contextManagement = new ActiveContextManager();
             contextManagement.changeActiveState(ContextComponent.class, dataComponent);
@@ -279,9 +210,9 @@ public class DebugViewPanel extends javax.swing.JPanel {
                 }
             };
             action.putValue(ActionConsts.ACTION_CONTEXT_CHANGE, (ActionContextChange) (ContextChangeRegistration registrar) -> {
-                registrar.registerStateChangeListener(ContextEncoding.class, (ContextEncoding instance, StateChangeType changeType) -> {
+                registrar.registerStateChangeListener(ContextEncoding.class, (ContextEncoding instance, StateUpdateType changeType) -> {
                     if (CharsetEncodingState.ChangeType.ENCODING.equals(changeType)) {
-                        binaryStatus.updateEncodingState();
+                        statusBar.updateEncodingState();
                     }
                 });
             });
@@ -294,12 +225,12 @@ public class DebugViewPanel extends javax.swing.JPanel {
             settingsApplier.applySettings(
                     contextManagement,
                     optionsSettingsModule.getMainSettingsManager().getSettingsOptionsProvider());
-        }
+        } */
 
         initialLoadFromPreferences();
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
-        panel.add(binaryStatusPanel, BorderLayout.SOUTH);
+        panel.add(statusBar.getComponent(), BorderLayout.SOUTH);
         panel.add(dataComponent.getComponent(), BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
@@ -316,14 +247,14 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
         applyOptions(preferences, codeArea);
 
-        BinaryStatusPanel statusPanel = binaryStatus.getBinaryStatusPanel();
-        CodeAreaStatusOptions statusOptions = new CodeAreaStatusOptions(preferences);
-        statusPanel.loadFromOptions(statusOptions);
+//        BinaryStatusPanel statusPanel = statusBar.getBinaryStatusPanel();
+//        CodeAreaStatusOptions statusOptions = new CodeAreaStatusOptions(preferences);
+//        statusPanel.loadFromOptions(statusOptions);
         toolbarPanel.applyFromCodeArea();
         toolbarPanel.loadFromOptions(preferences);
 
-        BinaryStatusApi.MemoryMode memoryMode = BinaryStatusApi.MemoryMode.READ_ONLY;
-        statusPanel.setMemoryMode(memoryMode);
+//        BinaryStatusApi.MemoryMode memoryMode = BinaryStatusApi.MemoryMode.READ_ONLY;
+//        statusPanel.setMemoryMode(memoryMode);
     }
 
     private void applyOptions(OptionsStorage optionsStorage, SectCodeArea codeArea) {
@@ -414,7 +345,7 @@ public class DebugViewPanel extends javax.swing.JPanel {
     public void setContentData(@Nullable BinaryData data) {
         dataComponent.getCodeArea().setContentData(data);
         long dataSize = data == null ? 0 : data.getDataSize();
-        binaryStatus.getBinaryStatusPanel().setCurrentDocumentSize(dataSize, dataSize);
+        // TODO statusBar.getBinaryStatusPanel().setCurrentDocumentSize(dataSize, dataSize);
     }
 
     @Nonnull

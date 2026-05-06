@@ -18,17 +18,17 @@ package org.exbin.bined.intellij;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
-import org.exbin.framework.App;
-import org.exbin.framework.frame.api.ComponentFrame;
-import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.options.settings.OptionsSettingsModule;
-import org.exbin.framework.options.settings.SettingsPage;
-import org.exbin.framework.options.settings.SettingsPageReceiver;
-import org.exbin.framework.options.settings.action.SettingsAction;
-import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
-import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
-import org.exbin.framework.options.settings.api.SettingsOptionsProvider;
-import org.exbin.framework.options.settings.gui.SettingsListPanel;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.frame.api.FrameController;
+import org.exbin.jaguif.frame.api.FrameModuleApi;
+import org.exbin.jaguif.options.settings.OptionsSettingsModule;
+import org.exbin.jaguif.options.settings.SettingsPage;
+import org.exbin.jaguif.options.settings.SettingsPageReceiver;
+import org.exbin.jaguif.options.settings.action.SettingsAction;
+import org.exbin.jaguif.options.settings.api.OptionsSettingsManagement;
+import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.jaguif.options.settings.api.SettingsOptionsProvider;
+import org.exbin.jaguif.options.settings.gui.SettingsListPanel;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -117,7 +117,7 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
         // TODO Run in top context
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ComponentFrame componentFrame = frameModule.getFrameHandler();
-        mainSettingsManager.applyAllOptions(componentFrame.getContextManager(), mainSettingsManager.getSettingsOptionsProvider());
+        FrameController frameController = frameModule.getFrameController();
+        mainSettingsManager.applyAllOptions(frameController.getContextManager(), mainSettingsManager.getSettingsOptionsProvider());
     }
 }

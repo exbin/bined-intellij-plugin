@@ -24,11 +24,11 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.exbin.framework.App;
-import org.exbin.framework.bined.BinEdFileManager;
-import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.docking.api.ContextDocking;
-import org.exbin.framework.frame.api.FrameModuleApi;
+import org.exbin.bined.jaguif.document.BinedDocumentModule;
+import org.exbin.jaguif.App;
+import org.exbin.bined.jaguif.document.BinEdFileManager;
+import org.exbin.jaguif.docking.api.ContextDocking;
+import org.exbin.jaguif.frame.api.FrameModuleApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -59,8 +59,8 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
         undoHandler.setFileEditor(this);
         nativeFile.registerUndoRedo(undoHandler);
 
-        BinedModule binedModule = App.getModule(BinedModule.class);
-        BinEdFileManager fileManager = binedModule.getFileManager();
+        BinedDocumentModule binedDocumentModule = App.getModule(BinedDocumentModule.class);
+        BinEdFileManager fileManager = binedDocumentModule.getFileManager();
         fileManager.initCommandHandler(nativeFile.getDocument().getDataComponent());
 
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -107,7 +107,7 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
     @Override
     public void selectNotify() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
         docking.setActiveDocument(nativeFile.getDocument());
     }
 

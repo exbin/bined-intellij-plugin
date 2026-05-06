@@ -24,38 +24,37 @@ import org.exbin.bined.CodeType;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.BinEdIntelliJDocking;
 import org.exbin.bined.intellij.utils.ActionUtils;
+import org.exbin.bined.jaguif.component.BinedComponentModule;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
-import org.exbin.framework.App;
-import org.exbin.framework.action.api.ActionConsts;
-import org.exbin.framework.action.api.ActionContextRegistration;
-import org.exbin.framework.action.api.ActionManagement;
-import org.exbin.framework.action.api.ActionModuleApi;
-import org.exbin.framework.action.api.ContextComponent;
-import org.exbin.framework.action.api.DialogParentComponent;
-import org.exbin.framework.bined.BinEdFileManager;
-import org.exbin.framework.bined.BinaryFileDocument;
-import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
-import org.exbin.framework.bined.gui.BinEdComponentPanel;
-import org.exbin.framework.bined.gui.BinaryStatusPanel;
-import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.macro.BinedMacroModule;
-import org.exbin.framework.bined.search.BinedSearchModule;
-import org.exbin.framework.bined.search.action.FindReplaceActions;
-import org.exbin.framework.bined.viewer.BinedViewerModule;
-import org.exbin.framework.context.ActiveContextManager;
-import org.exbin.framework.context.api.ActiveContextManagement;
-import org.exbin.framework.context.api.ContextModuleApi;
-import org.exbin.framework.docking.api.ContextDocking;
-import org.exbin.framework.document.api.ContextDocument;
-import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.options.settings.action.SettingsAction;
-import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
-import org.exbin.framework.text.encoding.EncodingsManager;
-import org.exbin.framework.utils.DesktopUtils;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.action.api.ActionConsts;
+import org.exbin.jaguif.action.api.ActionContextRegistration;
+import org.exbin.jaguif.action.api.ActionModuleApi;
+import org.exbin.jaguif.context.api.ContextComponent;
+import org.exbin.jaguif.action.api.DialogParentComponent;
+import org.exbin.bined.jaguif.document.BinEdFileManager;
+import org.exbin.bined.jaguif.document.BinaryFileDocument;
+import org.exbin.bined.jaguif.bookmarks.BinedBookmarksModule;
+import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
+import org.exbin.bined.jaguif.macro.BinedMacroModule;
+import org.exbin.bined.jaguif.search.BinedSearchModule;
+import org.exbin.bined.jaguif.search.action.FindReplaceActions;
+import org.exbin.bined.jaguif.viewer.BinedViewerModule;
+import org.exbin.jaguif.context.ActiveContextManager;
+import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.api.ContextModuleApi;
+import org.exbin.jaguif.docking.api.ContextDocking;
+import org.exbin.jaguif.document.api.ContextDocument;
+import org.exbin.jaguif.frame.api.FrameModuleApi;
+import org.exbin.jaguif.language.api.LanguageModuleApi;
+import org.exbin.jaguif.options.settings.action.SettingsAction;
+import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.jaguif.statusbar.api.StatusBar;
+import org.exbin.jaguif.statusbar.gui.DefaultStatusBar;
+import org.exbin.jaguif.text.encoding.EncodingsManager;
+import org.exbin.jaguif.utils.DesktopUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -87,13 +86,14 @@ public class BinEdFilePanel extends JPanel {
 
     private BinaryFileDocument fileDocument;
     private BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
-    private BinaryStatusPanel statusPanel;
+    private StatusBar statusBar;
 
     public BinEdFilePanel() {
         super(new BorderLayout());
         add(toolbarPanel, BorderLayout.NORTH);
 
-        statusPanel = new BinaryStatusPanel() {
+        statusBar = new DefaultStatusBar(); //statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, leftContextRegistrator);
+        /* statusBar = new BinaryStatusPanel() {
 
             private Graphics2DDelegate graphicsCache = null;
 
@@ -142,7 +142,7 @@ public class BinEdFilePanel extends JPanel {
                     }
                 };
             }
-        };
+        }; */
     }
 
     public void setDocument(BinaryFileDocument fileDocument) {
@@ -162,9 +162,9 @@ public class BinEdFilePanel extends JPanel {
                 ActiveContextManagement contextManager = contextModule.createContextManager();
                 contextManager.changeActiveState(ContextDocument.class, fileDocument);
                 ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
-                ActionManagement actionManager = actionModule.createActionManager(contextManager);
-                actionManager.registerAction(editFindAction);
-                actionManager.initAction(editFindAction);
+//                ActionManagement actionManager = actionModule.createActionManager(contextManager);
+//                actionManager.registerAction(editFindAction);
+//                actionManager.initAction(editFindAction);
                 editFindAction.actionPerformed(e);
             }
         });
@@ -178,9 +178,9 @@ public class BinEdFilePanel extends JPanel {
                 ActiveContextManagement contextManager = contextModule.createContextManager();
                 contextManager.changeActiveState(ContextDocument.class, fileDocument);
                 ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
-                ActionManagement actionManager = actionModule.createActionManager(contextManager);
-                actionManager.registerAction(editReplaceAction);
-                actionManager.initAction(editReplaceAction);
+//                ActionManagement actionManager = actionModule.createActionManager(contextManager);
+//                actionManager.registerAction(editReplaceAction);
+//                actionManager.initAction(editReplaceAction);
                 editReplaceAction.actionPerformed(e);
             }
         });
@@ -230,19 +230,18 @@ public class BinEdFilePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 settingsAction.actionPerformed(e);
                 toolbarPanel.applyFromCodeArea();
-                statusPanel.updateStatus();
             }
         };
         LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
-        java.util.ResourceBundle optionsSettingsResourceBundle = languageModule.getBundle(org.exbin.framework.options.settings.OptionsSettingsModule.class);
+        java.util.ResourceBundle optionsSettingsResourceBundle = languageModule.getBundle(org.exbin.jaguif.options.settings.OptionsSettingsModule.class);
         ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
         actionModule.initAction(wrapperAction, optionsSettingsResourceBundle, SettingsAction.ACTION_ID);
         wrapperAction.putValue(ActionConsts.ACTION_DIALOG_MODE, true);
         toolbarPanel.setOptionsAction(wrapperAction);
 
-        BinedModule binedModule = App.getModule(BinedModule.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
+        /* BinedModule binedModule = App.getModule(BinedModule.class);
         BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
         CodeAreaPopupMenuHandler codeAreaPopupMenuHandler = binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.EDITOR);
         codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
@@ -273,7 +272,7 @@ public class BinEdFilePanel extends JPanel {
 
                 JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                ActionManagement actionContext = frameModule.getFrameHandler().getActionManager();
+                ActionManagement actionContext = frameModule.getFrameController().getActionManager();
 
                 BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
                 actionContext.requestUpdateForAction(binedMacroModule.getMacroManager().getMacrosMenu().getAction());
@@ -295,18 +294,12 @@ public class BinEdFilePanel extends JPanel {
                 ActionUtils.replaceAction(popupMenu, SettingsAction.ACTION_ID, wrapperAction);
                 popupMenu.show(invoker, x, y);
             }
-        });
+        }); */
 
-        docking.addDocument(fileDocument, statusPanel);
+        docking.addDocument(fileDocument, statusBar);
         docking.setActiveDocument(fileDocument);
 
-        BinEdFileManager fileManager = binedModule.getFileManager();
-        EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-        fileManager.getBinaryStatus().setBinaryStatusPanel(statusPanel);
-        fileManager.setBinaryStatusController(new org.exbin.framework.bined.viewer.BinaryStatusController(fileManager.getBinaryStatus(), encodingsManager));
-
-        statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
-        add(statusPanel, BorderLayout.SOUTH);
+        add(statusBar.getComponent(), BorderLayout.SOUTH);
 
         add(componentPanel, BorderLayout.CENTER);
         revalidate();
@@ -316,11 +309,6 @@ public class BinEdFilePanel extends JPanel {
     @Nonnull
     public BinEdToolbarPanel getToolbarPanel() {
         return toolbarPanel;
-    }
-
-    @Nonnull
-    public BinaryStatusPanel getStatusPanel() {
-        return statusPanel;
     }
 
     @Nonnull

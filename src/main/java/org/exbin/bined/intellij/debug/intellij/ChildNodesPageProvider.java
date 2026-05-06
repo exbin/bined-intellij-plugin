@@ -26,7 +26,7 @@ import com.intellij.xdebugger.impl.ui.tree.nodes.XValueGroupNodeImpl;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.array.ByteArrayEditableData;
-import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
+import org.exbin.bined.jaguif.inspector.gui.BasicValuesPanel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;

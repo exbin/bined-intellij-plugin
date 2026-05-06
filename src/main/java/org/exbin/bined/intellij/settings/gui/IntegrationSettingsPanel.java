@@ -30,15 +30,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 
 import org.exbin.bined.intellij.settings.IntegrationOptions;
-import org.exbin.framework.App;
-import org.exbin.framework.context.api.ActiveContextProvider;
-import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.options.settings.api.SettingsComponent;
-import org.exbin.framework.options.settings.api.SettingsModifiedListener;
-import org.exbin.framework.options.settings.api.SettingsOptionsProvider;
-import org.exbin.framework.ui.model.LanguageRecord;
-import org.exbin.framework.utils.TestApplication;
-import org.exbin.framework.utils.WindowUtils;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.language.api.LanguageModuleApi;
+import org.exbin.jaguif.options.settings.api.SettingsComponent;
+import org.exbin.jaguif.options.settings.api.SettingsModifiedListener;
+import org.exbin.jaguif.options.settings.api.SettingsOptionsProvider;
+import org.exbin.jaguif.ui.model.LanguageRecord;
+import org.exbin.jaguif.utils.TestApplication;
+import org.exbin.jaguif.utils.WindowUtils;
 
 /**
  * Integration settings options panel.

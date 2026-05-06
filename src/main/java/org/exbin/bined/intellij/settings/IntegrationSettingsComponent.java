@@ -16,16 +16,16 @@
 package org.exbin.bined.intellij.settings;
 
 import org.exbin.bined.intellij.settings.gui.IntegrationSettingsPanel;
-import org.exbin.framework.App;
-import org.exbin.framework.language.api.IconSetProvider;
-import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.language.api.LanguageProvider;
-import org.exbin.framework.options.settings.api.SettingsComponent;
-import org.exbin.framework.options.settings.api.SettingsComponentProvider;
-import org.exbin.framework.ui.model.LanguageRecord;
-import org.exbin.framework.ui.settings.gui.LanguageSettingsPanel;
-import org.exbin.framework.ui.theme.UiThemeModule;
-import org.exbin.framework.ui.theme.api.UiThemeModuleApi;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.language.api.IconSetProvider;
+import org.exbin.jaguif.language.api.LanguageModuleApi;
+import org.exbin.jaguif.language.api.LanguageProvider;
+import org.exbin.jaguif.options.settings.api.SettingsComponent;
+import org.exbin.jaguif.options.settings.api.SettingsComponentProvider;
+import org.exbin.jaguif.ui.model.LanguageRecord;
+import org.exbin.jaguif.ui.settings.gui.LanguageSettingsPanel;
+import org.exbin.jaguif.ui.theme.UiThemeModule;
+import org.exbin.jaguif.ui.theme.api.UiThemeModuleApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;

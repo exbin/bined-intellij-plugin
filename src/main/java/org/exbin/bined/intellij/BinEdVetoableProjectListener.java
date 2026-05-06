@@ -19,17 +19,17 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.VetoableProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.exbin.framework.App;
-import org.exbin.framework.bined.BinaryFileDocument;
-import org.exbin.framework.docking.multi.gui.ModifiedDocumentsPanel;
-import org.exbin.framework.document.api.ComponentDocument;
-import org.exbin.framework.document.api.Document;
-import org.exbin.framework.document.api.DocumentModuleApi;
-import org.exbin.framework.document.api.DocumentSource;
-import org.exbin.framework.document.api.EditableDocument;
-import org.exbin.framework.document.api.MemoryDocumentSource;
-import org.exbin.framework.window.api.WindowHandler;
-import org.exbin.framework.window.api.WindowModuleApi;
+import org.exbin.jaguif.App;
+import org.exbin.bined.jaguif.document.BinaryFileDocument;
+import org.exbin.jaguif.docking.multi.gui.ModifiedDocumentsPanel;
+import org.exbin.jaguif.document.api.ComponentDocument;
+import org.exbin.jaguif.document.api.Document;
+import org.exbin.jaguif.document.api.DocumentModuleApi;
+import org.exbin.jaguif.document.api.DocumentSource;
+import org.exbin.jaguif.document.api.EditableDocument;
+import org.exbin.jaguif.document.api.EmptyDocumentSource;
+import org.exbin.jaguif.window.api.WindowHandler;
+import org.exbin.jaguif.window.api.WindowModuleApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -91,7 +91,7 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
             public boolean saveFile(@Nonnull Document document) {
                 EditableDocument editableDocument = (EditableDocument) document;
                 Optional<DocumentSource> optDocumentSource = editableDocument.getDocumentSource();
-                if (optDocumentSource.isPresent() && !(optDocumentSource.get() instanceof MemoryDocumentSource)) {
+                if (optDocumentSource.isPresent() && !(optDocumentSource.get() instanceof EmptyDocumentSource)) {
                     editableDocument.saveTo(optDocumentSource.get());
                     return true;
                 } else {

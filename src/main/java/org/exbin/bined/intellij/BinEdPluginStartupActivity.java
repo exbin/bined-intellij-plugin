@@ -67,119 +67,128 @@ import org.exbin.bined.intellij.settings.IntegrationOptions;
 import org.exbin.bined.intellij.settings.IntegrationSettingsComponent;
 import org.exbin.bined.intellij.settings.IntelliJOptionsStorage;
 import org.exbin.bined.intellij.settings.gui.IntegrationSettingsPanel;
+import org.exbin.bined.jaguif.compare.action.CompareFilesAction;
+import org.exbin.bined.jaguif.component.BinedComponentModule;
+import org.exbin.bined.jaguif.document.BinedDocumentModule;
+import org.exbin.bined.jaguif.tool.content.action.ClipboardContentAction;
+import org.exbin.bined.jaguif.tool.content.action.DragDropContentAction;
 import org.exbin.bined.swing.CodeAreaCommandHandler;
 import org.exbin.bined.swing.CodeAreaCore;
-import org.exbin.framework.App;
-import org.exbin.framework.Module;
-import org.exbin.framework.ModuleProvider;
-import org.exbin.framework.about.AboutModule;
-import org.exbin.framework.about.api.AboutModuleApi;
-import org.exbin.framework.action.ActionModule;
-import org.exbin.framework.action.api.ActionConsts;
-import org.exbin.framework.action.api.ActionContextChange;
-import org.exbin.framework.action.api.ActionContextRegistration;
-import org.exbin.framework.action.api.ActionManagement;
-import org.exbin.framework.action.api.ActionModuleApi;
-import org.exbin.framework.action.api.DialogParentComponent;
-import org.exbin.framework.bined.BinEdFileManager;
-import org.exbin.framework.bined.BinaryDocument;
-import org.exbin.framework.bined.BinaryFileDocument;
-import org.exbin.framework.bined.BinaryStatus;
-import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.bookmarks.BinedBookmarksModule;
-import org.exbin.framework.bined.compare.BinedCompareModule;
-import org.exbin.framework.bined.editor.BinedEditorModule;
-import org.exbin.framework.bined.inspector.BasicValuesInspector;
-import org.exbin.framework.bined.inspector.BasicValuesInspectorProvider;
-import org.exbin.framework.bined.inspector.BinEdInspector;
-import org.exbin.framework.bined.inspector.BinEdInspectorManager;
-import org.exbin.framework.bined.inspector.BinedInspectorModule;
-import org.exbin.framework.bined.inspector.gui.BasicValuesPanel;
-import org.exbin.framework.bined.inspector.settings.DataInspectorFontContextInference;
-import org.exbin.framework.bined.inspector.settings.DataInspectorFontInference;
-import org.exbin.framework.bined.macro.BinedMacroModule;
-import org.exbin.framework.bined.objectdata.BinedObjectDataModule;
-import org.exbin.framework.bined.operation.BinedOperationModule;
-import org.exbin.framework.bined.operation.bouncycastle.BinedOperationBouncycastleModule;
-import org.exbin.framework.bined.operation.code.BinedOperationCodeModule;
-import org.exbin.framework.bined.search.BinedSearchModule;
-import org.exbin.framework.bined.theme.BinedThemeModule;
-import org.exbin.framework.bined.tool.content.BinedToolContentModule;
-import org.exbin.framework.bined.viewer.BinedViewerModule;
-import org.exbin.framework.component.ComponentModule;
-import org.exbin.framework.component.api.ComponentModuleApi;
-import org.exbin.framework.context.ContextModule;
-import org.exbin.framework.context.api.ActiveContextManagement;
-import org.exbin.framework.context.api.ContextChangeRegistration;
-import org.exbin.framework.context.api.ContextModuleApi;
-import org.exbin.framework.context.api.StateChangeType;
-import org.exbin.framework.contribution.ContributionModule;
-import org.exbin.framework.contribution.api.ContributionModuleApi;
-import org.exbin.framework.contribution.api.GroupSequenceContributionRule;
-import org.exbin.framework.contribution.api.PositionSequenceContributionRule;
-import org.exbin.framework.contribution.api.SeparationSequenceContributionRule;
-import org.exbin.framework.contribution.api.SequenceContribution;
-import org.exbin.framework.docking.DockingModule;
-import org.exbin.framework.docking.api.ContextDocking;
-import org.exbin.framework.docking.api.DockingModuleApi;
-import org.exbin.framework.document.DocumentModule;
-import org.exbin.framework.document.api.ContextDocument;
-import org.exbin.framework.document.api.DocumentModuleApi;
-import org.exbin.framework.file.FileModule;
-import org.exbin.framework.file.api.FileModuleApi;
-import org.exbin.framework.frame.FrameModule;
-import org.exbin.framework.frame.api.ComponentFrame;
-import org.exbin.framework.frame.api.FrameModuleApi;
-import org.exbin.framework.help.HelpModule;
-import org.exbin.framework.help.api.HelpModuleApi;
-import org.exbin.framework.help.online.HelpOnlineModule;
-import org.exbin.framework.language.LanguageModule;
-import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.language.api.LanguageProvider;
-import org.exbin.framework.menu.MenuModule;
-import org.exbin.framework.menu.api.MenuDefinitionManagement;
-import org.exbin.framework.menu.api.MenuModuleApi;
-import org.exbin.framework.operation.undo.OperationUndoModule;
-import org.exbin.framework.operation.undo.api.OperationUndoModuleApi;
-import org.exbin.framework.options.OptionsModule;
-import org.exbin.framework.options.api.OptionsModuleApi;
-import org.exbin.framework.options.api.OptionsStorage;
-import org.exbin.framework.options.preferences.FilePreferencesFactory;
-import org.exbin.framework.options.settings.OptionsSettingsModule;
-import org.exbin.framework.options.settings.api.OptionsSettingsManagement;
-import org.exbin.framework.options.settings.api.OptionsSettingsModuleApi;
-import org.exbin.framework.options.settings.api.SettingsPageContribution;
-import org.exbin.framework.options.settings.api.SettingsPanelType;
-import org.exbin.framework.plugin.language.cs_CZ.LanguageCsCzModule;
-import org.exbin.framework.plugin.language.de_DE.LanguageDeDeModule;
-import org.exbin.framework.plugin.language.es_ES.LanguageEsEsModule;
-import org.exbin.framework.plugin.language.fr_FR.LanguageFrFrModule;
-import org.exbin.framework.plugin.language.it_IT.LanguageItItModule;
-import org.exbin.framework.plugin.language.ja_JP.LanguageJaJpModule;
-import org.exbin.framework.plugin.language.ko_KR.LanguageKoKrModule;
-import org.exbin.framework.plugin.language.pl_PL.LanguagePlPlModule;
-import org.exbin.framework.plugin.language.ru_RU.LanguageRuRuModule;
-import org.exbin.framework.plugin.language.zh_Hans.LanguageZhHansModule;
-import org.exbin.framework.plugin.language.zh_Hant.LanguageZhHantModule;
-import org.exbin.framework.plugins.iconset.material.IconSetMaterialModule;
-import org.exbin.framework.text.encoding.CharsetEncodingState;
-import org.exbin.framework.text.encoding.ContextEncoding;
-import org.exbin.framework.text.encoding.EncodingsManager;
-import org.exbin.framework.text.encoding.settings.TextEncodingContextInference;
-import org.exbin.framework.text.encoding.settings.TextEncodingInference;
-import org.exbin.framework.text.encoding.settings.TextEncodingsContextInference;
-import org.exbin.framework.text.encoding.settings.TextEncodingsInference;
-import org.exbin.framework.text.font.settings.TextFontContextInference;
-import org.exbin.framework.text.font.settings.TextFontInference;
-import org.exbin.framework.toolbar.ToolBarModule;
-import org.exbin.framework.toolbar.api.ToolBarModuleApi;
-import org.exbin.framework.ui.UiModule;
-import org.exbin.framework.ui.api.UiModuleApi;
-import org.exbin.framework.ui.theme.UiThemeModule;
-import org.exbin.framework.ui.theme.api.UiThemeModuleApi;
-import org.exbin.framework.utils.UiUtils;
-import org.exbin.framework.window.WindowModule;
-import org.exbin.framework.window.api.WindowModuleApi;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.Module;
+import org.exbin.jaguif.ModuleProvider;
+import org.exbin.jaguif.about.AboutModule;
+import org.exbin.jaguif.about.action.AboutAction;
+import org.exbin.jaguif.about.api.AboutModuleApi;
+import org.exbin.jaguif.action.ActionModule;
+import org.exbin.jaguif.action.api.ActionConsts;
+import org.exbin.jaguif.action.api.ActionContextChange;
+import org.exbin.jaguif.action.api.ActionContextRegistration;
+import org.exbin.jaguif.action.api.ActionModuleApi;
+import org.exbin.jaguif.action.api.DialogParentComponent;
+import org.exbin.bined.jaguif.document.BinEdFileManager;
+import org.exbin.bined.jaguif.document.BinaryDocument;
+import org.exbin.bined.jaguif.document.BinaryFileDocument;
+import org.exbin.bined.jaguif.bookmarks.BinedBookmarksModule;
+import org.exbin.bined.jaguif.compare.BinedCompareModule;
+import org.exbin.bined.jaguif.editor.BinedEditorModule;
+import org.exbin.bined.jaguif.inspector.BasicValuesInspector;
+import org.exbin.bined.jaguif.inspector.BasicValuesInspectorProvider;
+import org.exbin.bined.jaguif.inspector.BinEdInspector;
+import org.exbin.bined.jaguif.inspector.BinEdInspectorManager;
+import org.exbin.bined.jaguif.inspector.BinedInspectorModule;
+import org.exbin.bined.jaguif.inspector.gui.BasicValuesPanel;
+import org.exbin.bined.jaguif.inspector.settings.DataInspectorFontContextInference;
+import org.exbin.bined.jaguif.inspector.settings.DataInspectorFontInference;
+import org.exbin.bined.jaguif.macro.BinedMacroModule;
+import org.exbin.bined.jaguif.objectdata.BinedObjectDataModule;
+import org.exbin.bined.jaguif.operation.method.BinedOperationMethodModule;
+import org.exbin.bined.jaguif.operation.bouncycastle.BinedOperationBouncycastleModule;
+import org.exbin.bined.jaguif.operation.code.BinedOperationCodeModule;
+import org.exbin.bined.jaguif.search.BinedSearchModule;
+import org.exbin.bined.jaguif.theme.BinedThemeModule;
+import org.exbin.bined.jaguif.tool.content.BinedToolContentModule;
+import org.exbin.bined.jaguif.viewer.BinedViewerModule;
+import org.exbin.jaguif.component.ComponentModule;
+import org.exbin.jaguif.component.api.ComponentModuleApi;
+import org.exbin.jaguif.context.ContextModule;
+import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.api.ContextChangeRegistration;
+import org.exbin.jaguif.context.api.ContextModuleApi;
+import org.exbin.jaguif.context.api.ContextRegistration;
+import org.exbin.jaguif.context.api.StateUpdateType;
+import org.exbin.jaguif.contribution.ContributionModule;
+import org.exbin.jaguif.contribution.api.ContributionModuleApi;
+import org.exbin.jaguif.contribution.api.GroupSequenceContributionRule;
+import org.exbin.jaguif.contribution.api.PositionSequenceContributionRule;
+import org.exbin.jaguif.contribution.api.SeparationSequenceContributionRule;
+import org.exbin.jaguif.contribution.api.SequenceContribution;
+import org.exbin.jaguif.docking.DockingModule;
+import org.exbin.jaguif.docking.api.ContextDocking;
+import org.exbin.jaguif.docking.api.DockingModuleApi;
+import org.exbin.jaguif.document.DocumentModule;
+import org.exbin.jaguif.document.api.ContextDocument;
+import org.exbin.jaguif.document.api.DocumentModuleApi;
+import org.exbin.jaguif.file.FileModule;
+import org.exbin.jaguif.file.api.FileModuleApi;
+import org.exbin.jaguif.frame.FrameModule;
+import org.exbin.jaguif.frame.api.FrameController;
+import org.exbin.jaguif.frame.api.FrameModuleApi;
+import org.exbin.jaguif.help.HelpModule;
+import org.exbin.jaguif.help.api.HelpModuleApi;
+import org.exbin.jaguif.help.online.HelpOnlineModule;
+import org.exbin.jaguif.help.online.action.OnlineHelpAction;
+import org.exbin.jaguif.language.LanguageModule;
+import org.exbin.jaguif.language.api.LanguageModuleApi;
+import org.exbin.jaguif.language.api.LanguageProvider;
+import org.exbin.jaguif.menu.MenuModule;
+import org.exbin.jaguif.menu.api.DefaultActionMenuContribution;
+import org.exbin.jaguif.menu.api.MenuBuilder;
+import org.exbin.jaguif.menu.api.MenuDefinitionManagement;
+import org.exbin.jaguif.menu.api.MenuModuleApi;
+import org.exbin.jaguif.menu.api.MenuShowMethod;
+import org.exbin.jaguif.operation.undo.OperationUndoModule;
+import org.exbin.jaguif.operation.undo.api.OperationUndoModuleApi;
+import org.exbin.jaguif.options.OptionsModule;
+import org.exbin.jaguif.options.api.OptionsModuleApi;
+import org.exbin.jaguif.options.api.OptionsStorage;
+import org.exbin.jaguif.options.preferences.FilePreferencesFactory;
+import org.exbin.jaguif.options.settings.OptionsSettingsModule;
+import org.exbin.jaguif.options.settings.api.OptionsSettingsManagement;
+import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.jaguif.options.settings.api.SettingsPageContribution;
+import org.exbin.jaguif.options.settings.api.SettingsPanelType;
+import org.exbin.jaguif.plugin.language.cs_CZ.LanguageCsCzModule;
+import org.exbin.jaguif.plugin.language.de_DE.LanguageDeDeModule;
+import org.exbin.jaguif.plugin.language.es_ES.LanguageEsEsModule;
+import org.exbin.jaguif.plugin.language.fr_FR.LanguageFrFrModule;
+import org.exbin.jaguif.plugin.language.it_IT.LanguageItItModule;
+import org.exbin.jaguif.plugin.language.ja_JP.LanguageJaJpModule;
+import org.exbin.jaguif.plugin.language.ko_KR.LanguageKoKrModule;
+import org.exbin.jaguif.plugin.language.pl_PL.LanguagePlPlModule;
+import org.exbin.jaguif.plugin.language.ru_RU.LanguageRuRuModule;
+import org.exbin.jaguif.plugin.language.zh_Hans.LanguageZhHansModule;
+import org.exbin.jaguif.plugin.language.zh_Hant.LanguageZhHantModule;
+import org.exbin.jaguif.plugins.iconset.material.IconSetMaterialModule;
+import org.exbin.jaguif.statusbar.StatusBarModule;
+import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
+import org.exbin.jaguif.text.encoding.CharsetEncodingState;
+import org.exbin.jaguif.text.encoding.ContextEncoding;
+import org.exbin.jaguif.text.encoding.EncodingsManager;
+import org.exbin.jaguif.text.encoding.settings.TextEncodingContextInference;
+import org.exbin.jaguif.text.encoding.settings.TextEncodingInference;
+import org.exbin.jaguif.text.encoding.settings.TextEncodingsContextInference;
+import org.exbin.jaguif.text.encoding.settings.TextEncodingsInference;
+import org.exbin.jaguif.text.font.settings.TextFontContextInference;
+import org.exbin.jaguif.text.font.settings.TextFontInference;
+import org.exbin.jaguif.toolbar.ToolBarModule;
+import org.exbin.jaguif.toolbar.api.ToolBarModuleApi;
+import org.exbin.jaguif.ui.UiModule;
+import org.exbin.jaguif.ui.api.UiModuleApi;
+import org.exbin.jaguif.ui.theme.UiThemeModule;
+import org.exbin.jaguif.ui.theme.api.UiThemeModuleApi;
+import org.exbin.jaguif.window.WindowModule;
+import org.exbin.jaguif.window.api.WindowModuleApi;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -198,6 +207,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -439,7 +449,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             @Override
             public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
                 BinaryFileDocument activeFile = null;
                 FileEditor fileEditor = event.getNewEditor();
                 if (fileEditor instanceof BinEdFileEditor) {
@@ -482,7 +492,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     if (binaryDocument.isModified()) {
                         ApplicationManager.getApplication().invokeLater(() -> {
                             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameHandler().getContextManager().getActiveState(ContextDocking.class);
+                            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
                             boolean released = docking.releaseDocument(binaryDocument);
                             ((BinEdVirtualFile) file).setClosing(false);
                             if (released) {
@@ -607,13 +617,14 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(ContextModuleApi.class, new ContextModule());
             modules.put(ActionModuleApi.class, new ActionModule());
             modules.put(OperationUndoModuleApi.class, new OperationUndoModule());
-            modules.put(OptionsModuleApi.class, new org.exbin.framework.options.OptionsModule());
+            modules.put(OptionsModuleApi.class, new org.exbin.jaguif.options.OptionsModule());
             modules.put(OptionsSettingsModuleApi.class, new OptionsSettingsModule());
             modules.put(UiModuleApi.class, new UiModule());
             modules.put(UiThemeModuleApi.class, new UiThemeModule());
             modules.put(HelpModuleApi.class, new HelpModule());
             modules.put(MenuModuleApi.class, new MenuModule());
             modules.put(ToolBarModuleApi.class, new ToolBarModule());
+            modules.put(StatusBarModuleApi.class, new StatusBarModule());
             modules.put(ComponentModuleApi.class, new ComponentModule());
             modules.put(WindowModuleApi.class, new WindowModule());
             modules.put(FrameModuleApi.class, new FrameModule());
@@ -621,12 +632,13 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(FileModuleApi.class, new FileModule());
             modules.put(DockingModuleApi.class, new DockingModule());
             modules.put(HelpOnlineModule.class, new HelpOnlineModule());
-            modules.put(BinedModule.class, new BinedModule());
+            modules.put(BinedComponentModule.class, new BinedComponentModule());
             modules.put(BinedViewerModule.class, new BinedViewerModule());
             modules.put(BinedEditorModule.class, new BinedEditorModule());
+            modules.put(BinedDocumentModule.class, new BinedDocumentModule());
             modules.put(BinedThemeModule.class, new BinedThemeModule());
             modules.put(BinedSearchModule.class, new BinedSearchModule());
-            modules.put(BinedOperationModule.class, new BinedOperationModule());
+            modules.put(BinedOperationMethodModule.class, new BinedOperationMethodModule());
             modules.put(BinedOperationCodeModule.class, new BinedOperationCodeModule());
             modules.put(BinedOperationBouncycastleModule.class, new BinedOperationBouncycastleModule());
             modules.put(BinedObjectDataModule.class, new BinedObjectDataModule());
@@ -665,30 +677,47 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             OptionsStorage preferences = optionsModule.getAppOptions();
 
-            UiUtils.setMenuBuilder(new UiUtils.MenuBuilder() {
+            MenuModuleApi menuModule = App.getModule(MenuModuleApi.class);
+            menuModule.setMenuBuilder(new MenuBuilder() {
                 @Nonnull
-                public JMenu buildMenu() {
+                @Override
+                public JMenu createMenu() {
                     return new JBMenu();
                 }
 
                 @Nonnull
-                public JPopupMenu buildPopupMenu() {
+                @Override
+                public JPopupMenu createPopupMenu() {
                     return new JBPopupMenu();
                 }
 
                 @Nonnull
-                public JMenuItem buildMenuItem() {
+                @Override
+                public JMenuItem createMenuItem() {
                     return new JBMenuItem("");
                 }
 
                 @Nonnull
-                public JCheckBoxMenuItem buildCheckBoxMenuItem() {
+                @Override
+                public JCheckBoxMenuItem createCheckBoxMenuItem() {
                     return new JBCheckBoxMenuItem();
                 }
 
                 @Nonnull
-                public JRadioButtonMenuItem buildRadioButtonMenuItem() {
+                @Override
+                public JRadioButtonMenuItem createRadioButtonMenuItem() {
                     return new JRadioButtonMenuItem();
+                }
+
+                @Nonnull
+                @Override
+                public JPopupMenu createPopupMenu(MenuShowMethod showMethod) {
+                    return new JBPopupMenu() {
+                        @Override
+                        public void show(@Nullable Component invoker, int x, int y) {
+                            showMethod.show(invoker, x, y);
+                        }
+                    };
                 }
             });
 
@@ -730,7 +759,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             FileModuleApi fileModule = App.getModule(FileModuleApi.class);
             fileModule.registerFileProviders();
             ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
-            MenuModuleApi menuModule = App.getModule(MenuModuleApi.class);
 
             WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
             windowModule.setHideHeaderPanels(true);
@@ -753,16 +781,17 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             BinEdIntelliJDocking docking = new BinEdIntelliJDocking();
             DocumentModule documentModule = (DocumentModule) App.getModule(DocumentModuleApi.class);
-            BinedModule binedModule = App.getModule(BinedModule.class);
+            BinedComponentModule binedComponentModule = App.getModule(BinedComponentModule.class);
             BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
             BinedEditorModule binedEditorModule = App.getModule(BinedEditorModule.class);
+            BinedDocumentModule binedDocumentModule = App.getModule(BinedDocumentModule.class);
             BinedThemeModule binedThemeModule = App.getModule(BinedThemeModule.class);
 
             BinedSearchModule binedSearchModule = App.getModule(BinedSearchModule.class);
-            BinEdFileManager fileManager = binedModule.getFileManager();
+            BinEdFileManager fileManager = binedDocumentModule.getFileManager();
             fileManager.addBinEdComponentExtension(component -> Optional.of(new BinEdIntelliJComponentSearch()));
 
-            BinedOperationModule binedOperationModule = App.getModule(BinedOperationModule.class);
+            BinedOperationMethodModule binedOperationModule = App.getModule(BinedOperationMethodModule.class);
             binedOperationModule.addBasicMethods();
 
             BinedToolContentModule binedToolContentModule = App.getModule(BinedToolContentModule.class);
@@ -785,11 +814,12 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     new SettingsPageContribution("document", documentModule.getResourceBundle());
             settingsManager.registerPage(pageContribution);
 
-            binedModule.registerCodeAreaPopupMenu();
-            binedModule.registerDocument();
+            binedComponentModule.registerCodeAreaPopupMenu();
             binedViewerModule.registerCodeAreaPopupMenu();
             binedEditorModule.registerCodeAreaPopupMenu();
-            binedViewerModule.registerEncodings();
+            binedDocumentModule.registerDocument();
+            binedDocumentModule.registerStatusBar();
+            binedDocumentModule.registerEncodings();
             binedViewerModule.registerViewModeMenu();
             binedViewerModule.registerCodeTypeMenu();
             binedViewerModule.registerPositionCodeTypeMenu();
@@ -806,47 +836,47 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             // Section from BinedViewerModule.registerStatusBar
             {
-                EncodingsManager encodingsManager = binedViewerModule.getEncodingsManager();
-                ComponentFrame frameHandler = frameModule.getFrameHandler();
-                ActionManagement actionManager = frameHandler.getActionManager();
-                ActionModuleApi actionModuleApi = App.getModule(ActionModuleApi.class);
-                ActionContextRegistration actionContextRegistrar =
-                        actionModuleApi.createActionContextRegistrar(actionManager);
+                EncodingsManager encodingsManager = binedDocumentModule.getEncodingsManager();
+                FrameController frameController = frameModule.getFrameController();
+                ActiveContextManagement contextManager = frameController.getContextManager();
+                ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
+                ContextRegistration actionContextRegistrar =
+                        contextModule.createContextRegistrator(contextManager);
                 Action action = new AbstractAction() {
                     public void actionPerformed(ActionEvent ae) {
                         // ignore
                     }
                 };
                 action.putValue(ActionConsts.ACTION_CONTEXT_CHANGE, (ActionContextChange) (ContextChangeRegistration registrar) -> {
-                    registrar.registerStateChangeListener(ContextEncoding.class, (ContextEncoding instance, StateChangeType changeType) -> {
-                        if (CharsetEncodingState.ChangeType.ENCODING.equals(changeType)) {
-                            fileManager.updateTextEncodingStatus(encodingsManager);
+                    registrar.registerStateUpdateListener(ContextEncoding.class, (ContextEncoding instance, StateUpdateType changeType) -> {
+                        if (CharsetEncodingState.UpdateType.ENCODING.equals(changeType)) {
+                            // TODO fileManager.updateTextEncodingStatus(encodingsManager);
                         }
                     });
-                    registrar.registerUpdateListener(ContextEncoding.class, (instance) -> {
-                        fileManager.updateTextEncodingStatus(encodingsManager);
+                    registrar.registerChangeListener(ContextEncoding.class, (instance) -> {
+                        // TODO fileManager.updateTextEncodingStatus(encodingsManager);
                     });
-                    registrar.registerUpdateListener(ContextDocument.class, (instance) -> {
+                    registrar.registerChangeListener(ContextDocument.class, (instance) -> {
                         if (instance instanceof BinaryDocument) {
-                            BinaryStatus binaryStatus = fileManager.getBinaryStatus();
-                            binaryStatus.updateStatus();
+//                            BinaryStatus binaryStatus = fileManager.getBinaryStatus();
+//                            binaryStatus.updateStatus();
                         }
                     });
                 });
-                actionContextRegistrar.registerActionContext(action);
-                actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
-                actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
+//                actionContextRegistrar.registerActionContext(action);
+//                actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
+//                actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
             }
 
             FrameModuleApi frameModuleApi = App.getModule(FrameModuleApi.class);
-            ActiveContextManagement contextManagement = frameModuleApi.getFrameHandler().getContextManager();
+            ActiveContextManagement contextManagement = frameModuleApi.getFrameController().getContextManager();
             settingsManager.registerInferenceOptions(TextEncodingInference.class, new TextEncodingContextInference(contextManagement));
             settingsManager.registerInferenceOptions(TextEncodingsInference.class, new TextEncodingsContextInference(contextManagement));
             settingsManager.registerInferenceOptions(TextFontInference.class, new TextFontContextInference((contextManagement)));
             settingsManager.registerInferenceOptions(DataInspectorFontInference.class, new DataInspectorFontContextInference(contextManagement));
 
             String toolsSubMenuId = BinEdIntelliJPlugin.PLUGIN_PREFIX + "toolsMenu";
-            MenuDefinitionManagement menuManagement = menuModule.getMenuManager(BinedModule.CODE_AREA_POPUP_MENU_ID, BinedModule.MODULE_ID);
+            MenuDefinitionManagement menuManagement = menuModule.getMainMenuDefinition(BinedComponentModule.CODE_AREA_POPUP_MENU_ID, BinedComponentModule.MODULE_ID);
             Action toolsSubMenuAction = new AbstractAction(((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.text")) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -856,24 +886,29 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             SequenceContribution contribution = menuManagement.registerMenuItem(toolsSubMenuId, toolsSubMenuAction);
             menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.BOTTOM_LAST));
             MenuDefinitionManagement subMenu = menuManagement.getSubMenu(toolsSubMenuId);
-            contribution = subMenu.registerMenuItem(binedCompareModule.createCompareFilesAction());
+            contribution = new DefaultActionMenuContribution(CompareFilesAction.ACTION_ID, binedCompareModule::createCompareFilesAction);
+            subMenu.registerMenuContribution(contribution);
             menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.TOP));
-            contribution = subMenu.registerMenuItem(binedToolContentModule.createClipboardContentAction());
+            contribution = new DefaultActionMenuContribution(ClipboardContentAction.ACTION_ID, binedToolContentModule::createClipboardContentAction);
+            subMenu.registerMenuContribution(contribution);
             menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.TOP));
-            contribution = subMenu.registerMenuItem(binedToolContentModule.createDragDropContentAction());
+            contribution = new DefaultActionMenuContribution(DragDropContentAction.ACTION_ID, binedToolContentModule::createDragDropContentAction);
+            subMenu.registerMenuContribution(contribution);
             menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.TOP));
 
             String aboutMenuGroup = BinEdIntelliJPlugin.PLUGIN_PREFIX + "helpAboutMenuGroup";
             contribution = menuManagement.registerMenuGroup(aboutMenuGroup);
             menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.BOTTOM_LAST));
             menuManagement.registerMenuRule(contribution, new SeparationSequenceContributionRule(SeparationSequenceContributionRule.SeparationMode.ABOVE));
-            contribution = menuManagement.registerMenuItem(helpOnlineModule.createOnlineHelpAction());
+            contribution = new DefaultActionMenuContribution(OnlineHelpAction.ACTION_ID, helpOnlineModule::createOnlineHelpAction);
+            menuManagement.registerMenuContribution(contribution);
             menuManagement.registerMenuRule(contribution, new GroupSequenceContributionRule(aboutMenuGroup));
-            contribution = menuManagement.registerMenuItem(aboutModule.createAboutAction());
+            contribution = new DefaultActionMenuContribution(AboutAction.ACTION_ID, aboutModule::createAboutAction);
+            menuManagement.registerMenuContribution(contribution);
             menuManagement.registerMenuRule(contribution, new GroupSequenceContributionRule(aboutMenuGroup));
 
             ActiveContextManagement contextManager =
-                    frameModule.getFrameHandler().getContextManager();
+                    frameModule.getFrameController().getContextManager();
             contextManager.changeActiveState(ContextDocking.class, docking);
             contextManager.changeActiveState(DialogParentComponent.class, () -> frameModule.getFrame());
 

@@ -38,7 +38,7 @@ import org.exbin.auxiliary.binary_data.array.ByteArrayEditableData;
 import org.exbin.auxiliary.binary_data.EditableBinaryData;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.objectdata.gui.DataDialog;
-import org.exbin.framework.bined.objectdata.ObjectValueConvertor;
+import org.exbin.bined.jaguif.objectdata.ObjectValueConvertor;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;

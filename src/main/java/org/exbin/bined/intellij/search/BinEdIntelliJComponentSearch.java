@@ -15,20 +15,20 @@
  */
 package org.exbin.bined.intellij.search;
 
+import org.exbin.bined.jaguif.component.BinaryDataComponent;
+import org.exbin.bined.jaguif.component.BinedComponentModule;
+import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
+import org.exbin.bined.jaguif.search.BinEdComponentSearch;
+import org.exbin.bined.jaguif.search.SearchCondition;
+import org.exbin.bined.jaguif.search.SearchParameters;
+import org.exbin.bined.jaguif.search.gui.BinarySearchPanel;
+import org.exbin.bined.jaguif.search.service.BinarySearchService;
+import org.exbin.bined.jaguif.search.service.impl.BinarySearchServiceImpl;
 import org.exbin.bined.swing.section.SectCodeArea;
-import org.exbin.framework.App;
-import org.exbin.framework.bined.BinaryDataComponent;
-import org.exbin.framework.bined.BinedModule;
-import org.exbin.framework.bined.gui.BinEdComponentPanel;
-import org.exbin.framework.bined.handler.CodeAreaPopupMenuHandler;
-import org.exbin.framework.bined.search.BinEdComponentSearch;
-import org.exbin.framework.bined.search.SearchCondition;
-import org.exbin.framework.bined.search.SearchParameters;
-import org.exbin.framework.bined.search.gui.BinarySearchPanel;
-import org.exbin.framework.bined.search.service.BinarySearchService;
-import org.exbin.framework.bined.search.service.impl.BinarySearchServiceImpl;
+import org.exbin.jaguif.App;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.swing.JPopupMenu;
 import java.awt.BorderLayout;
 
 /**
@@ -52,9 +52,8 @@ public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
         binarySearch.setPanelClosingListener(this::hideSearchPanel);
         binarySearch.setTargetComponent(componentPanel);
 
-        BinedModule binedModule = App.getModule(BinedModule.class);
-
-        binarySearch.setCodeAreaPopupMenuHandler(binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL));
+        BinedComponentModule binedComponentModule = App.getModule(BinedComponentModule.class);
+        binarySearch.setCodeAreaPopupMenu(binedComponentModule.createCodeAreaPopupMenu());
     }
 
     @Override
@@ -109,7 +108,7 @@ public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
     }
 
     @Override
-    public void setCodeAreaPopupMenuHandler(CodeAreaPopupMenuHandler codeAreaPopupMenuHandler) {
-        binarySearch.getPanel().setCodeAreaPopupMenuHandler(codeAreaPopupMenuHandler);
+    public void setCodeAreaPopupMenu(JPopupMenu popupMenu) {
+        binarySearch.getPanel().setCodeAreaPopupMenu(popupMenu);
     }
 }

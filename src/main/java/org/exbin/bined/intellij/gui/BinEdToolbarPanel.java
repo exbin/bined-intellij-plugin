@@ -25,17 +25,16 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.Toggleable;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Key;
 import com.intellij.ui.components.JBPanel;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.intellij.action.CodeTypeSplitAction;
 import org.exbin.bined.operation.command.BinaryDataUndoRedo;
-import org.exbin.framework.App;
-import org.exbin.framework.bined.viewer.settings.CodeAreaOptions;
-import org.exbin.framework.language.api.LanguageModuleApi;
-import org.exbin.framework.options.api.OptionsStorage;
+import org.exbin.jaguif.App;
+import org.exbin.bined.jaguif.viewer.settings.CodeAreaOptions;
+import org.exbin.jaguif.language.api.LanguageModuleApi;
+import org.exbin.jaguif.options.api.OptionsStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +53,7 @@ import java.util.logging.Logger;
 @ParametersAreNonnullByDefault
 public class BinEdToolbarPanel extends JBPanel {
 
-    private final java.util.ResourceBundle resourceBundle;
+    private final java.util.ResourceBundle componentResourceBundle;
     private final java.util.ResourceBundle viewerResourceBundle;
     private final java.util.ResourceBundle dockingResourceBundle;
     private final java.util.ResourceBundle optionsSettingsResourceBundle;
@@ -84,12 +83,12 @@ public class BinEdToolbarPanel extends JBPanel {
 
     public BinEdToolbarPanel() {
         LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
-        resourceBundle = languageModule.getBundle(org.exbin.framework.bined.BinedModule.class);
-        viewerResourceBundle = languageModule.getBundle(org.exbin.framework.bined.viewer.BinedViewerModule.class);
-        dockingResourceBundle = languageModule.getBundle(org.exbin.framework.docking.DockingModule.class);
-        optionsSettingsResourceBundle = languageModule.getBundle(org.exbin.framework.options.settings.OptionsSettingsModule.class);
-        onlineHelpResourceBundle = languageModule.getBundle(org.exbin.framework.help.online.action.OnlineHelpAction.class);
-        operationUndoResourceBundle = languageModule.getBundle(org.exbin.framework.operation.undo.OperationUndoModule.class);
+        componentResourceBundle = languageModule.getBundle(org.exbin.bined.jaguif.component.BinedComponentModule.class);
+        viewerResourceBundle = languageModule.getBundle(org.exbin.bined.jaguif.viewer.BinedViewerModule.class);
+        dockingResourceBundle = languageModule.getBundle(org.exbin.jaguif.docking.DockingModule.class);
+        optionsSettingsResourceBundle = languageModule.getBundle(org.exbin.jaguif.options.settings.OptionsSettingsModule.class);
+        onlineHelpResourceBundle = languageModule.getBundle(org.exbin.jaguif.help.online.action.OnlineHelpAction.class);
+        operationUndoResourceBundle = languageModule.getBundle(org.exbin.jaguif.operation.undo.OperationUndoModule.class);
 
         setLayout(new java.awt.BorderLayout());
         actionGroup = new DefaultActionGroup();
@@ -376,9 +375,9 @@ public class BinEdToolbarPanel extends JBPanel {
         actionGroup.addAction(redoEditButton);
 
         showNonprintablesToggleButton = new ToggleAction(
-                resourceBundle.getString("viewNonprintablesAction.text"),
-                resourceBundle.getString("viewNonprintablesAction.shortDescription"),
-                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("viewNonprintablesToolbarAction.smallIcon")))
+                componentResourceBundle.getString("viewNonprintablesAction.text"),
+                componentResourceBundle.getString("viewNonprintablesAction.shortDescription"),
+                new javax.swing.ImageIcon(getClass().getResource(componentResourceBundle.getString("toggleNonprintablesAction.smallIcon")))
         ) {
             @NotNull
             @Override
