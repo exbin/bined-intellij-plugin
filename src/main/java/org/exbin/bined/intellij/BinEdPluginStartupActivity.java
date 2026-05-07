@@ -67,30 +67,13 @@ import org.exbin.bined.intellij.settings.IntegrationOptions;
 import org.exbin.bined.intellij.settings.IntegrationSettingsComponent;
 import org.exbin.bined.intellij.settings.IntelliJOptionsStorage;
 import org.exbin.bined.intellij.settings.gui.IntegrationSettingsPanel;
-import org.exbin.bined.jaguif.compare.action.CompareFilesAction;
-import org.exbin.bined.jaguif.component.BinedComponentModule;
-import org.exbin.bined.jaguif.document.BinedDocumentModule;
-import org.exbin.bined.jaguif.tool.content.action.ClipboardContentAction;
-import org.exbin.bined.jaguif.tool.content.action.DragDropContentAction;
-import org.exbin.bined.swing.CodeAreaCommandHandler;
-import org.exbin.bined.swing.CodeAreaCore;
-import org.exbin.jaguif.App;
-import org.exbin.jaguif.Module;
-import org.exbin.jaguif.ModuleProvider;
-import org.exbin.jaguif.about.AboutModule;
-import org.exbin.jaguif.about.action.AboutAction;
-import org.exbin.jaguif.about.api.AboutModuleApi;
-import org.exbin.jaguif.action.ActionModule;
-import org.exbin.jaguif.action.api.ActionConsts;
-import org.exbin.jaguif.action.api.ActionContextChange;
-import org.exbin.jaguif.action.api.ActionContextRegistration;
-import org.exbin.jaguif.action.api.ActionModuleApi;
-import org.exbin.jaguif.action.api.DialogParentComponent;
-import org.exbin.bined.jaguif.document.BinEdFileManager;
-import org.exbin.bined.jaguif.document.BinaryDocument;
-import org.exbin.bined.jaguif.document.BinaryFileDocument;
 import org.exbin.bined.jaguif.bookmarks.BinedBookmarksModule;
 import org.exbin.bined.jaguif.compare.BinedCompareModule;
+import org.exbin.bined.jaguif.compare.action.CompareFilesAction;
+import org.exbin.bined.jaguif.component.BinedComponentModule;
+import org.exbin.bined.jaguif.document.BinEdFileManager;
+import org.exbin.bined.jaguif.document.BinaryFileDocument;
+import org.exbin.bined.jaguif.document.BinedDocumentModule;
 import org.exbin.bined.jaguif.editor.BinedEditorModule;
 import org.exbin.bined.jaguif.inspector.BasicValuesInspector;
 import org.exbin.bined.jaguif.inspector.BasicValuesInspectorProvider;
@@ -102,21 +85,31 @@ import org.exbin.bined.jaguif.inspector.settings.DataInspectorFontContextInferen
 import org.exbin.bined.jaguif.inspector.settings.DataInspectorFontInference;
 import org.exbin.bined.jaguif.macro.BinedMacroModule;
 import org.exbin.bined.jaguif.objectdata.BinedObjectDataModule;
-import org.exbin.bined.jaguif.operation.method.BinedOperationMethodModule;
 import org.exbin.bined.jaguif.operation.bouncycastle.BinedOperationBouncycastleModule;
 import org.exbin.bined.jaguif.operation.code.BinedOperationCodeModule;
+import org.exbin.bined.jaguif.operation.method.BinedOperationMethodModule;
 import org.exbin.bined.jaguif.search.BinedSearchModule;
 import org.exbin.bined.jaguif.theme.BinedThemeModule;
 import org.exbin.bined.jaguif.tool.content.BinedToolContentModule;
+import org.exbin.bined.jaguif.tool.content.action.ClipboardContentAction;
+import org.exbin.bined.jaguif.tool.content.action.DragDropContentAction;
 import org.exbin.bined.jaguif.viewer.BinedViewerModule;
+import org.exbin.bined.swing.CodeAreaCommandHandler;
+import org.exbin.bined.swing.CodeAreaCore;
+import org.exbin.jaguif.App;
+import org.exbin.jaguif.Module;
+import org.exbin.jaguif.ModuleProvider;
+import org.exbin.jaguif.about.AboutModule;
+import org.exbin.jaguif.about.action.AboutAction;
+import org.exbin.jaguif.about.api.AboutModuleApi;
+import org.exbin.jaguif.action.ActionModule;
+import org.exbin.jaguif.action.api.ActionModuleApi;
+import org.exbin.jaguif.action.api.DialogParentComponent;
 import org.exbin.jaguif.component.ComponentModule;
 import org.exbin.jaguif.component.api.ComponentModuleApi;
 import org.exbin.jaguif.context.ContextModule;
 import org.exbin.jaguif.context.api.ActiveContextManagement;
-import org.exbin.jaguif.context.api.ContextChangeRegistration;
 import org.exbin.jaguif.context.api.ContextModuleApi;
-import org.exbin.jaguif.context.api.ContextRegistration;
-import org.exbin.jaguif.context.api.StateUpdateType;
 import org.exbin.jaguif.contribution.ContributionModule;
 import org.exbin.jaguif.contribution.api.ContributionModuleApi;
 import org.exbin.jaguif.contribution.api.GroupSequenceContributionRule;
@@ -127,12 +120,10 @@ import org.exbin.jaguif.docking.DockingModule;
 import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.docking.api.DockingModuleApi;
 import org.exbin.jaguif.document.DocumentModule;
-import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.document.api.DocumentModuleApi;
 import org.exbin.jaguif.file.FileModule;
 import org.exbin.jaguif.file.api.FileModuleApi;
 import org.exbin.jaguif.frame.FrameModule;
-import org.exbin.jaguif.frame.api.FrameController;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 import org.exbin.jaguif.help.HelpModule;
 import org.exbin.jaguif.help.api.HelpModuleApi;
@@ -172,9 +163,6 @@ import org.exbin.jaguif.plugin.language.zh_Hant.LanguageZhHantModule;
 import org.exbin.jaguif.plugins.iconset.material.IconSetMaterialModule;
 import org.exbin.jaguif.statusbar.StatusBarModule;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
-import org.exbin.jaguif.text.encoding.CharsetEncodingState;
-import org.exbin.jaguif.text.encoding.ContextEncoding;
-import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingContextInference;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingInference;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingsContextInference;
@@ -818,6 +806,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedViewerModule.registerCodeAreaPopupMenu();
             binedEditorModule.registerCodeAreaPopupMenu();
             binedDocumentModule.registerDocument();
+            binedViewerModule.registerFrameStatusBar();
             binedDocumentModule.registerStatusBar();
             binedDocumentModule.registerEncodings();
             binedViewerModule.registerViewModeMenu();
@@ -827,46 +816,13 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedViewerModule.registerLayoutMenu();
             binedViewerModule.registerSettings();
             binedEditorModule.registerSettings();
+            binedDocumentModule.registerSettings();
             binedThemeModule.registerSettings();
             binedSearchModule.registerEditFindPopupMenuActions();
             binedOperationModule.registerBlockEditPopupMenuActions();
             binedToolContentModule.registerClipboardContentMenu();
             binedToolContentModule.registerDragDropContentMenu();
             binedInspectorModule.registerSettings();
-
-            // Section from BinedViewerModule.registerStatusBar
-            {
-                EncodingsManager encodingsManager = binedDocumentModule.getEncodingsManager();
-                FrameController frameController = frameModule.getFrameController();
-                ActiveContextManagement contextManager = frameController.getContextManager();
-                ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-                ContextRegistration actionContextRegistrar =
-                        contextModule.createContextRegistrator(contextManager);
-                Action action = new AbstractAction() {
-                    public void actionPerformed(ActionEvent ae) {
-                        // ignore
-                    }
-                };
-                action.putValue(ActionConsts.ACTION_CONTEXT_CHANGE, (ActionContextChange) (ContextChangeRegistration registrar) -> {
-                    registrar.registerStateUpdateListener(ContextEncoding.class, (ContextEncoding instance, StateUpdateType changeType) -> {
-                        if (CharsetEncodingState.UpdateType.ENCODING.equals(changeType)) {
-                            // TODO fileManager.updateTextEncodingStatus(encodingsManager);
-                        }
-                    });
-                    registrar.registerChangeListener(ContextEncoding.class, (instance) -> {
-                        // TODO fileManager.updateTextEncodingStatus(encodingsManager);
-                    });
-                    registrar.registerChangeListener(ContextDocument.class, (instance) -> {
-                        if (instance instanceof BinaryDocument) {
-//                            BinaryStatus binaryStatus = fileManager.getBinaryStatus();
-//                            binaryStatus.updateStatus();
-                        }
-                    });
-                });
-//                actionContextRegistrar.registerActionContext(action);
-//                actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
-//                actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
-            }
 
             FrameModuleApi frameModuleApi = App.getModule(FrameModuleApi.class);
             ActiveContextManagement contextManagement = frameModuleApi.getFrameController().getContextManager();

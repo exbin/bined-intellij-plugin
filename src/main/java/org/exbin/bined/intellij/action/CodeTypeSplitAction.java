@@ -47,8 +47,6 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -70,7 +68,6 @@ import java.util.logging.Logger;
 /**
  * Split button action derived from {@link com.intellij.openapi.actionSystem.SplitButtonAction}.
  */
-@ParametersAreNonnullByDefault
 public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomComponentAction {
 
     private static final Key<AnAction> FIRST_ACTION = Key.create("firstAction");
@@ -82,7 +79,7 @@ public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomCom
         setPopup(true);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
@@ -92,7 +89,6 @@ public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomCom
         return getDelegate();
     }
 
-    @Nonnull
     @Override
     public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
         splitButton = new CodeTypeSplitAction.SplitButton(this, presentation, place, getDelegate());
@@ -141,7 +137,6 @@ public class CodeTypeSplitAction extends ActionGroupWrapper implements CustomCom
         return firstEnabled != null ? firstEnabled : ContainerUtil.getFirstItem(children);
     }
 
-    @ParametersAreNonnullByDefault
     private static class SplitButton extends ActionButton implements AnActionListener {
         private enum MousePressType {
             Action, Popup, None

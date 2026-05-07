@@ -53,8 +53,8 @@ You can try to run following commands. Start at parent directory to "bined" repo
     cd bined-lib-java
     gradlew build publish
     cd ..
-    git clone https://github.com/exbin/exbin-framework-java.git
-    cd exbin-framework-java
+    git clone https://github.com/exbin/jaguif.git
+    cd jaguif
     gradlew build publish
     cd .. 
     git clone https://github.com/exbin/bined.git

@@ -30,6 +30,7 @@ import org.exbin.jaguif.document.api.EditableDocument;
 import org.exbin.jaguif.file.api.FileModuleApi;
 import org.exbin.jaguif.file.api.SaveModifiedResult;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
+import org.exbin.jaguif.operation.undo.api.ContextUndoRedo;
 import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.text.encoding.ContextEncoding;
 import org.exbin.jaguif.text.font.ContextFont;
@@ -176,6 +177,7 @@ public class BinEdIntelliJDocking implements MultiDocking {
         contextManager.changeActiveState(ContextFont.class, dataComponent);
         contextManager.changeActiveState(ContextEncoding.class, dataComponent);
         contextManager.changeActiveState(ContextComponent.class, dataComponent);
+        contextManager.changeActiveState(ContextUndoRedo.class, dataComponent);
         contextManager.changeActiveState(DialogParentComponent.class, new DialogParentComponent() {
             @Nonnull
             @Override

@@ -45,6 +45,8 @@ import org.exbin.bined.jaguif.viewer.BinedViewerModule;
 import org.exbin.jaguif.context.ActiveContextManager;
 import org.exbin.jaguif.context.api.ActiveContextManagement;
 import org.exbin.jaguif.context.api.ContextModuleApi;
+import org.exbin.jaguif.context.api.ContextRegistration;
+import org.exbin.jaguif.context.api.ContextUpdateManagement;
 import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
@@ -52,6 +54,7 @@ import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
+import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.statusbar.gui.DefaultStatusBar;
 import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.utils.DesktopUtils;
@@ -84,15 +87,21 @@ import java.awt.event.KeyEvent;
 @ParametersAreNonnullByDefault
 public class BinEdFilePanel extends JPanel {
 
-    private BinaryFileDocument fileDocument;
-    private BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
-    private StatusBar statusBar;
+    protected BinaryFileDocument fileDocument;
+    protected BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
+    protected StatusBar statusBar;
 
     public BinEdFilePanel() {
         super(new BorderLayout());
         add(toolbarPanel, BorderLayout.NORTH);
 
-        statusBar = new DefaultStatusBar(); //statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, leftContextRegistrator);
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
+        ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
+        ActiveContextManagement contextManager = frameModule.getFrameController().getContextManager();
+        ContextUpdateManagement updateManager = frameModule.getFrameController().getUpdateManager();
+        ContextRegistration contextRegistrator = contextModule.createContextRegistrator(FrameModuleApi.MAIN_STATUS_BAR_ID,  updateManager, contextManager);
+        statusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, contextRegistrator);
         /* statusBar = new BinaryStatusPanel() {
 
             private Graphics2DDelegate graphicsCache = null;
@@ -240,9 +249,8 @@ public class BinEdFilePanel extends JPanel {
         toolbarPanel.setOptionsAction(wrapperAction);
 
         BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
-        /* BinedModule binedModule = App.getModule(BinedModule.class);
+        BinedComponentModule binedComponentModule = App.getModule(BinedComponentModule.class);
         BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);
-        CodeAreaPopupMenuHandler codeAreaPopupMenuHandler = binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.EDITOR);
         codeArea.setComponentPopupMenu(new JPopupMenu() {
             @Override
             public void show(Component invoker, int x, int y) {
@@ -258,43 +266,31 @@ public class BinEdFilePanel extends JPanel {
 
                 // TODO Temporary workaround for unfinished rework of actions
                 {
-                    BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
-                    AbstractAction manageBookmarksAction = binedBookmarksModule.getManageBookmarksAction();
-                    ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+                    ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
                     ActiveContextManagement contextManagement = new ActiveContextManager();
+                    ContextUpdateManagement updateManagement = contextModule.createContextUpdateManagement(contextManagement);
                     contextManagement.changeActiveState(ContextComponent.class, fileDocument.getDataComponent());
                     contextManagement.changeActiveState(DialogParentComponent.class, () -> frameModule.getFrame());
-                    ActionManagement actionManager = actionModule.createActionManager(contextManagement);
-                    ActionContextRegistration actionContextRegistrar =
-                            actionModule.createActionContextRegistrar(actionManager);
-                    actionContextRegistrar.registerActionContext(manageBookmarksAction);
+
+                    BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
+                    AbstractAction manageBookmarksAction = binedBookmarksModule.getManageBookmarksAction();
+//                    ActionManagement actionManager = actionModule.createActionManager(contextManagement);
+//                    ActionContextRegistration actionContextRegistrar =
+//                            actionModule.createActionContextRegistrar(actionManager);
+//                    actionContextRegistrar.registerActionContext(manageBookmarksAction);
                 }
 
-                JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
+                JPopupMenu popupMenu = binedComponentModule.createBinaryDocumentPopupMenu(); // codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                ActionManagement actionContext = frameModule.getFrameController().getActionManager();
+                ContextUpdateManagement updateManagement = frameModule.getFrameController().getUpdateManager();
 
-                BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
-                actionContext.requestUpdateForAction(binedMacroModule.getMacroManager().getMacrosMenu().getAction());
+//                BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
+//                updateManagement.requestUpdateForAction(binedMacroModule.getMacroManager().getMacrosMenu().getAction());
 
-                popupMenu.addPopupMenuListener(new PopupMenuListener() {
-                    @Override
-                    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                    }
-
-                    @Override
-                    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                        codeAreaPopupMenuHandler.dropPopupMenu(popupMenuId);
-                    }
-
-                    @Override
-                    public void popupMenuCanceled(PopupMenuEvent e) {
-                    }
-                });
                 ActionUtils.replaceAction(popupMenu, SettingsAction.ACTION_ID, wrapperAction);
                 popupMenu.show(invoker, x, y);
             }
-        }); */
+        });
 
         docking.addDocument(fileDocument, statusBar);
         docking.setActiveDocument(fileDocument);

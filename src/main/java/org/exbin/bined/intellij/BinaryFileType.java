@@ -35,7 +35,7 @@ public class BinaryFileType implements FileType, DumbAware {
     public static final String NAME = "Binary File"; // NO NLS
     public static final String DEFAULT_EXTENSION = "bin";
     public static final BinaryFileType INSTANCE = new BinaryFileType();
-    private ResourceBundle resourceBundle = BinEdIntelliJPlugin.getResourceBundle();
+    protected ResourceBundle resourceBundle = BinEdIntelliJPlugin.getResourceBundle();
 
     private BinaryFileType() {
     }
