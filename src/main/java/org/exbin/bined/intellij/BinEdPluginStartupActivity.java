@@ -99,9 +99,9 @@ import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.jaguif.App;
 import org.exbin.jaguif.Module;
 import org.exbin.jaguif.ModuleProvider;
-import org.exbin.jaguif.about.AboutModule;
-import org.exbin.jaguif.about.action.AboutAction;
-import org.exbin.jaguif.about.api.AboutModuleApi;
+import org.exbin.jaguif.license.LicenseModule;
+import org.exbin.jaguif.license.action.AboutAction;
+import org.exbin.jaguif.license.api.LicenseModuleApi;
 import org.exbin.jaguif.action.ActionModule;
 import org.exbin.jaguif.action.api.ActionModuleApi;
 import org.exbin.jaguif.action.api.DialogParentComponent;
@@ -163,6 +163,8 @@ import org.exbin.jaguif.plugin.language.zh_Hant.LanguageZhHantModule;
 import org.exbin.jaguif.plugins.iconset.material.IconSetMaterialModule;
 import org.exbin.jaguif.statusbar.StatusBarModule;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
+import org.exbin.jaguif.tabpages.TabPagesModule;
+import org.exbin.jaguif.tabpages.api.TabPagesModuleApi;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingContextInference;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingInference;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingsContextInference;
@@ -616,6 +618,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(ComponentModuleApi.class, new ComponentModule());
             modules.put(WindowModuleApi.class, new WindowModule());
             modules.put(FrameModuleApi.class, new FrameModule());
+            modules.put(TabPagesModuleApi.class, new TabPagesModule());
+            modules.put(LicenseModuleApi.class, new LicenseModule());
             modules.put(DocumentModuleApi.class, new DocumentModule());
             modules.put(FileModuleApi.class, new FileModule());
             modules.put(DockingModuleApi.class, new DockingModule());
@@ -635,7 +639,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(BinedInspectorModule.class, new BinedInspectorModule());
             modules.put(BinedBookmarksModule.class, new BinedBookmarksModule());
             modules.put(BinedMacroModule.class, new BinedMacroModule());
-            modules.put(AboutModuleApi.class, new AboutModule());
 
             // Language plugins
             modules.put(LanguageCsCzModule.class, new LanguageCsCzModule());
@@ -751,7 +754,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
             windowModule.setHideHeaderPanels(true);
 
-            AboutModuleApi aboutModule = App.getModule(AboutModuleApi.class);
+            LicenseModuleApi licenseModule = App.getModule(LicenseModuleApi.class);
+            licenseModule.registerBasicPages();
             OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
             optionsSettingsModule.setSettingsPanelType(SettingsPanelType.LIST);
             optionsSettingsModule.setOptionsRootCaption(App.getModule(LanguageModuleApi.class).getBundle(
@@ -859,7 +863,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             contribution = new DefaultActionMenuContribution(OnlineHelpAction.ACTION_ID, helpOnlineModule::createOnlineHelpAction);
             menuManagement.registerMenuContribution(contribution);
             menuManagement.registerMenuRule(contribution, new GroupSequenceContributionRule(aboutMenuGroup));
-            contribution = new DefaultActionMenuContribution(AboutAction.ACTION_ID, aboutModule::createAboutAction);
+            contribution = new DefaultActionMenuContribution(AboutAction.ACTION_ID, licenseModule::createAboutAction);
             menuManagement.registerMenuContribution(contribution);
             menuManagement.registerMenuRule(contribution, new GroupSequenceContributionRule(aboutMenuGroup));
 

@@ -48,6 +48,7 @@ import org.exbin.bined.jaguif.editor.settings.BinaryEditorOptions;
 import org.exbin.bined.jaguif.theme.settings.CodeAreaColorOptions;
 import org.exbin.bined.jaguif.theme.settings.CodeAreaLayoutOptions;
 import org.exbin.bined.jaguif.theme.settings.CodeAreaThemeOptions;
+import org.exbin.bined.jaguif.viewer.settings.BinaryEncodingSettingsApplier;
 import org.exbin.bined.jaguif.viewer.settings.CodeAreaOptions;
 import org.exbin.bined.jaguif.viewer.settings.CodeAreaStatusOptions;
 import org.exbin.bined.jaguif.viewer.settings.CodeAreaViewerSettingsApplier;
@@ -64,6 +65,7 @@ import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.jaguif.App;
+import org.exbin.jaguif.context.ActiveContextManager;
 import org.exbin.jaguif.context.api.ActiveContextManagement;
 import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.context.api.ContextModuleApi;
@@ -78,6 +80,7 @@ import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.text.encoding.CharsetEncodingState;
+import org.exbin.jaguif.text.encoding.ContextEncoding;
 import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingOptions;
 import org.exbin.jaguif.text.font.settings.TextFontOptions;
@@ -321,24 +324,6 @@ public class BinedDiffPanel extends JBPanel {
         encodingsManager.init();
         goToPositionAction.init(App.getModule(LanguageModuleApi.class).getBundle(BinedComponentModule.class));
 
-        // TODO Temporary workaround for unfinished rework of actions
-        /* {
-            ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
-            ActiveContextManagement contextManagement = new ActiveContextManager();
-            contextManagement.changeActiveState(ContextEncoding.class, new DiffContextEncoding());
-            ActionManagement actionManager = actionModule.createActionManager(contextManagement);
-            ActionContextRegistration actionContextRegistrar = actionModule.createActionContextRegistrar(actionManager);
-
-            actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
-            actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
-
-            OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
-            BinaryEncodingSettingsApplier settingsApplier = new BinaryEncodingSettingsApplier();
-            settingsApplier.applySettings(
-                    contextManagement,
-                    optionsSettingsModule.getMainSettingsManager().getSettingsOptionsProvider());
-        } */
-
         initialLoadFromPreferences();
         BinedComponentModule binedComponentModule = App.getModule(BinedComponentModule.class);
         JPopupMenu codeAreaPopupMenu = binedComponentModule.createCodeAreaPopupMenu();
@@ -496,6 +481,12 @@ public class BinedDiffPanel extends JBPanel {
         ((EditModeCapable) codeArea).addEditModeChangedListener((EditMode mode, EditOperation operation) -> {
             contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.EDIT_MODE_CHANGED);
         });
+
+        OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
+        BinaryEncodingSettingsApplier settingsApplier = new BinaryEncodingSettingsApplier();
+        settingsApplier.applySettings(
+                contextManagement,
+                optionsSettingsModule.getMainSettingsManager().getSettingsOptionsProvider());
     }
 
     private void initialLoadFromPreferences() {

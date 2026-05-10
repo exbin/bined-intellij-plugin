@@ -32,15 +32,28 @@ import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
 import org.exbin.bined.jaguif.document.BinEdFileManager;
 import org.exbin.bined.jaguif.document.BinedDocumentModule;
 import org.exbin.bined.jaguif.viewer.BinedViewerModule;
+import org.exbin.bined.jaguif.viewer.settings.BinaryEncodingSettingsApplier;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.jaguif.App;
+import org.exbin.jaguif.action.api.ActionConsts;
+import org.exbin.jaguif.action.api.ActionContextChange;
+import org.exbin.jaguif.context.ActiveContextManager;
+import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.api.ContextChangeRegistration;
+import org.exbin.jaguif.context.api.ContextComponent;
+import org.exbin.jaguif.context.api.ContextModuleApi;
 import org.exbin.jaguif.context.api.ContextRegistration;
+import org.exbin.jaguif.context.api.ContextUpdateManagement;
+import org.exbin.jaguif.context.api.StateUpdateType;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.options.api.OptionsModuleApi;
+import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
+import org.exbin.jaguif.text.encoding.CharsetEncodingState;
+import org.exbin.jaguif.text.encoding.ContextEncoding;
 import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.utils.DesktopUtils;
 
@@ -144,13 +157,13 @@ public final class DataDialog extends DialogWrapper {
         statusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, contextRegistrator);
 
         // TODO Temporary workaround for unfinished rework of actions
-        /* {
-            ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+        {
+            ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
             ActiveContextManagement contextManagement = new ActiveContextManager();
+            ContextUpdateManagement updateManagement = contextModule.createContextUpdateManagement(contextManagement);
             contextManagement.changeActiveState(ContextComponent.class, dataComponent);
             contextManagement.changeActiveState(ContextEncoding.class, dataComponent);
-            ActionManagement actionManager = actionModule.createActionManager(contextManagement);
-            ActionContextRegistration actionContextRegistrar = actionModule.createActionContextRegistrar(actionManager);
+            /* ContextRegistration contextRegistrar = contextModule.createContextRegistrator("", updateManagement, contextManagement);
 
             Action action = new AbstractAction() {
                 public void actionPerformed(ActionEvent ae) {
@@ -158,23 +171,23 @@ public final class DataDialog extends DialogWrapper {
                 }
             };
             action.putValue(ActionConsts.ACTION_CONTEXT_CHANGE, (ActionContextChange) (ContextChangeRegistration registrar) -> {
-                registrar.registerStateChangeListener(ContextEncoding.class, (ContextEncoding instance, StateUpdateType changeType) -> {
-                    if (CharsetEncodingState.ChangeType.ENCODING.equals(changeType)) {
+                registrar.registerStateUpdateListener(ContextEncoding.class, (ContextEncoding instance, StateUpdateType changeType) -> {
+                    if (CharsetEncodingState.UpdateType.ENCODING.equals(changeType)) {
                         statusBar.updateEncodingState();
                     }
                 });
             });
-            actionContextRegistrar.registerActionContext(action);
-            actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
-            actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
-            dataComponent.setContextProvider(contextManagement);
+            contextRegistrar.registerActionContext(action);
+            contextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
+            contextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction()); */
+            dataComponent.setContextManager(contextManagement);
 
             OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
             BinaryEncodingSettingsApplier settingsApplier = new BinaryEncodingSettingsApplier();
             settingsApplier.applySettings(
                     contextManagement,
                     optionsSettingsModule.getMainSettingsManager().getSettingsOptionsProvider());
-        } */
+        }
 
         panel.add(toolbarPanel, BorderLayout.NORTH);
         panel.add(statusBar.getComponent(), BorderLayout.SOUTH);

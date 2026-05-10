@@ -56,6 +56,9 @@ import org.exbin.bined.jaguif.viewer.settings.CodeAreaViewerSettingsApplier;
 import org.exbin.jaguif.context.ActiveContextManager;
 import org.exbin.jaguif.context.api.ActiveContextManagement;
 import org.exbin.jaguif.context.api.ContextChangeRegistration;
+import org.exbin.jaguif.context.api.ContextModuleApi;
+import org.exbin.jaguif.context.api.ContextRegistration;
+import org.exbin.jaguif.context.api.ContextUpdateManagement;
 import org.exbin.jaguif.context.api.StateUpdateType;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
@@ -64,6 +67,7 @@ import org.exbin.jaguif.options.api.OptionsStorage;
 import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
+import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.text.encoding.CharsetEncodingState;
 import org.exbin.jaguif.text.encoding.ContextEncoding;
 import org.exbin.jaguif.text.encoding.EncodingsManager;
@@ -194,15 +198,18 @@ public class DebugViewPanel extends javax.swing.JPanel {
 //        binaryStatusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
         // statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
 //        binaryStatus.attachCodeArea(dataComponent);
+        StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
 
         // TODO Temporary workaround for unfinished rework of actions
-        /* {
-            ActionModuleApi actionModule = App.getModule(ActionModuleApi.class);
+        {
+            ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
             ActiveContextManagement contextManagement = new ActiveContextManager();
+            ContextUpdateManagement updateManagement = contextModule.createContextUpdateManagement(contextManagement);
+            ContextRegistration contextRegistrar = contextModule.createContextRegistrator("", updateManagement, contextManagement);
             contextManagement.changeActiveState(ContextComponent.class, dataComponent);
             contextManagement.changeActiveState(ContextEncoding.class, dataComponent);
-            ActionManagement actionManager = actionModule.createActionManager(contextManagement);
-            ActionContextRegistration actionContextRegistrar = actionModule.createActionContextRegistrar(actionManager);
+            statusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, contextRegistrar);
+            /* ActionManagement actionManager = actionModule.createActionManager(contextManagement);
 
             Action action = new AbstractAction() {
                 public void actionPerformed(ActionEvent ae) {
@@ -218,14 +225,14 @@ public class DebugViewPanel extends javax.swing.JPanel {
             });
             actionContextRegistrar.registerActionContext(action);
             actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
-            actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction());
-            dataComponent.setContextProvider(contextManagement);
+            actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction()); */
+            dataComponent.setContextManager(contextManagement);
 
             BinaryEncodingSettingsApplier settingsApplier = new BinaryEncodingSettingsApplier();
             settingsApplier.applySettings(
                     contextManagement,
                     optionsSettingsModule.getMainSettingsManager().getSettingsOptionsProvider());
-        } */
+        }
 
         initialLoadFromPreferences();
 

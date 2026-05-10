@@ -32,6 +32,7 @@ import org.exbin.jaguif.App;
 import org.exbin.jaguif.action.api.ActionConsts;
 import org.exbin.jaguif.action.api.ActionContextRegistration;
 import org.exbin.jaguif.action.api.ActionModuleApi;
+import org.exbin.jaguif.context.api.ContextChange;
 import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.action.api.DialogParentComponent;
 import org.exbin.bined.jaguif.document.BinEdFileManager;
@@ -274,18 +275,17 @@ public class BinEdFilePanel extends JPanel {
 
                     BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
                     AbstractAction manageBookmarksAction = binedBookmarksModule.getManageBookmarksAction();
-//                    ActionManagement actionManager = actionModule.createActionManager(contextManagement);
-//                    ActionContextRegistration actionContextRegistrar =
-//                            actionModule.createActionContextRegistrar(actionManager);
-//                    actionContextRegistrar.registerActionContext(manageBookmarksAction);
+                    ContextRegistration contextRegistrar = contextModule.createContextRegistrator("", updateManagement, contextManagement);
+                    contextRegistrar.registerContextChange((ContextChange) manageBookmarksAction.getValue(ActionConsts.ACTION_CONTEXT_CHANGE));
+
+                    BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
+                    // ContextUpdateManagement updateManagement = frameModule.getFrameController().getUpdateManager();
+                    contextRegistrar.registerContextChange((ContextChange) binedMacroModule.getMacroManager().getMacrosMenu().getAction().getValue(ActionConsts.ACTION_CONTEXT_CHANGE));
+                    contextRegistrar.finish();
                 }
 
                 JPopupMenu popupMenu = binedComponentModule.createBinaryDocumentPopupMenu(); // codeAreaPopupMenuHandler.createPopupMenu(codeArea, popupMenuId, clickedX, clickedY);
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                ContextUpdateManagement updateManagement = frameModule.getFrameController().getUpdateManager();
-
-//                BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
-//                updateManagement.requestUpdateForAction(binedMacroModule.getMacroManager().getMacrosMenu().getAction());
 
                 ActionUtils.replaceAction(popupMenu, SettingsAction.ACTION_ID, wrapperAction);
                 popupMenu.show(invoker, x, y);

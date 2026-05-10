@@ -152,16 +152,11 @@ public class BinEdIntelliJDocking implements MultiDocking {
     public void setActiveDocument(@Nullable BinaryFileDocument fileDocument) {
         if (activeDocument != fileDocument) {
             activeDocument = fileDocument;
-            activeFileChanged();
+            activeDocumentChanged();
         }
     }
 
-    public void activeFileChanged() {
-/*        contextManager.updated(FileHandler.class, activeFile);
-        if (activeFile instanceof EditorFileHandler) {
-            ((EditorFileHandler) activeFile).componentActivated(contextManager);
-        } */
-
+    public void activeDocumentChanged() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         ActiveContextManagement contextManager =
                 frameModule.getFrameController().getContextManager();
