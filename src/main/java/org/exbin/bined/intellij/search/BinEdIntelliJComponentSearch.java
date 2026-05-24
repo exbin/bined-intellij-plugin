@@ -23,7 +23,7 @@ import org.exbin.bined.jaguif.search.SearchCondition;
 import org.exbin.bined.jaguif.search.SearchParameters;
 import org.exbin.bined.jaguif.search.gui.BinarySearchPanel;
 import org.exbin.bined.jaguif.search.service.BinarySearchService;
-import org.exbin.bined.jaguif.search.service.impl.BinarySearchServiceImpl;
+import org.exbin.bined.jaguif.search.service.DefaultBinarySearchService;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.jaguif.App;
 
@@ -47,7 +47,7 @@ public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
         this.componentPanel = (BinEdComponentPanel) dataComponent.getComponent();
         SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
 
-        binarySearchService = new BinarySearchServiceImpl(codeArea);
+        binarySearchService = new DefaultBinarySearchService(codeArea);
         binarySearch.setBinarySearchService(binarySearchService);
         binarySearch.setPanelClosingListener(this::hideSearchPanel);
         binarySearch.setTargetComponent(componentPanel);
