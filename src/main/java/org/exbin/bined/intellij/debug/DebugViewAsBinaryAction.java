@@ -23,13 +23,18 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
+import com.intellij.xdebugger.impl.ui.tree.actions.XDebuggerTreeActionBase;
 import com.intellij.xdebugger.impl.ui.tree.actions.XFetchValueActionBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.debug.intellij.XValueNodeConvertor;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Show debugger value in binary editor action.
@@ -38,9 +43,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class DebugViewAsBinaryAction extends XFetchValueActionBase implements DumbAware {
 
     private boolean actionVisible = true;
+    private DebugViewDataDialog dialog = null;
+    private AnActionEvent event;
 
     public DebugViewAsBinaryAction() {
-        BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterDebugViewAsBinary());
+        BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible =
+                integrationOptions.isRegisterDebugViewAsBinary());
     }
 
     @Nonnull
@@ -51,30 +59,27 @@ public class DebugViewAsBinaryAction extends XFetchValueActionBase implements Du
 
     @Override
     protected void handle(Project project, String value, XDebuggerTree tree) {
+        XValueNodeImpl node = XValueNodeConvertor.getDataNode(event).orElse(null);
+        String text = StringUtil.unquoteString(value);
+        if (dialog == null) {
+            ApplicationManager.getApplication().invokeLater(() -> {
+                dialog = new DebugViewDataDialog(project, text, node);
+                dialog.setTitle(dialog.getResourceBundle().getString("dialog.title"));
+                dialog.setText(text);
+                dialog.show();
+            });
+        } else {
+            dialog.setText(text);
+        }
     }
 
-    @Nonnull
     @Override
-    protected ValueCollector createCollector(AnActionEvent e) {
-        XValueNodeImpl node = XValueNodeConvertor.getDataNode(e).orElse(null);
-        return new ValueCollector(XDebuggerTree.getTree(e.getDataContext())) {
-            DebugViewDataDialog dialog = null;
-
-            @Override
-            public void handleInCollector(Project project, String value, XDebuggerTree tree) {
-                String text = StringUtil.unquoteString(value);
-                if (dialog == null) {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        dialog = new DebugViewDataDialog(project, text, node);
-                        dialog.setTitle(dialog.getResourceBundle().getString("dialog.title"));
-                        dialog.setText(text);
-                        dialog.show();
-                    });
-                } else {
-                    dialog.setText(text);
-                }
-            }
-        };
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        this.event = event;
+        dialog = null;
+        // TODO: Behavior changed due to remote development mode changes for IntelliJ platform
+        // See https://github.com/JetBrains/intellij-community/blob/master/platform/xdebugger-impl/src/com/intellij/xdebugger/impl/ui/tree/actions/XFetchValueActionBase.java#L20
+        super.actionPerformed(event);
     }
 
     @Override
@@ -84,7 +89,7 @@ public class DebugViewAsBinaryAction extends XFetchValueActionBase implements Du
         presentation.setVisible(actionVisible);
 
         //        if (XValueNodeConvertor.getDataNode(event).isPresent()) {
-//            event.getPresentation().setText("View as Binary");
-//        }
+        //            event.getPresentation().setText("View as Binary");
+        //        }
     }
 }
