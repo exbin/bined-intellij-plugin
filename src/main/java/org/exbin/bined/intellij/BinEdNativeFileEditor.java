@@ -30,9 +30,8 @@ import org.exbin.bined.jaguif.document.BinEdFileManager;
 import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JComponent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -40,7 +39,7 @@ import java.beans.PropertyChangeSupport;
 /**
  * Native file editor using BinEd editor component.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdNativeFileEditor implements FileEditor, DumbAware {
 
     private final Project project;
@@ -66,7 +65,6 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
-    @Nonnull
     @Override
     public JComponent getComponent() {
         return nativeFile.getComponent();
@@ -78,13 +76,11 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
         return nativeFile.getPreferredFocusedComponent();
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return displayName;
     }
 
-    @Nonnull
     @Override
     public FileEditorState getState(FileEditorStateLevel level) {
         return fileEditorState;
@@ -145,7 +141,6 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
         this.displayName = displayName;
     }
 
-    @Nonnull
     public BinEdNativeFile getNativeFile() {
         return nativeFile;
     }
@@ -156,7 +151,6 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
         return nativeFile.getVirtualFile();
     }
 
-    @Nonnull
     public Project getProject() {
         return project;
     }

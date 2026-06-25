@@ -21,9 +21,8 @@ import com.intellij.openapi.extensions.PluginId;
 import org.exbin.jaguif.language.LanguageModule;
 import org.exbin.jaguif.language.api.IconSetProvider;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -43,7 +42,6 @@ public class BinEdIntelliJPlugin {
     private BinEdIntelliJPlugin() {
     }
 
-    @Nonnull
     public static ResourceBundle getResourceBundle() {
         if (resourceBundle == null) {
             // LanguageModuleApi languageModule = App.getModule(LanguageModuleApi.class);
@@ -62,7 +60,7 @@ public class BinEdIntelliJPlugin {
         resourceBundle.setLocale(locale);
     }
 
-    @ParametersAreNonnullByDefault
+    @NullMarked
     private static class LanguageResourceBundle extends ResourceBundle {
         private final ResourceBundle mainResourceBundle;
         private ResourceBundle languageResourceBundle;
@@ -99,7 +97,6 @@ public class BinEdIntelliJPlugin {
             return object;
         }
 
-        @Nonnull
         public Enumeration<String> getKeys() {
             Set<String> keys = new HashSet<>();
             keys.addAll(Collections.list(this.languageResourceBundle.getKeys()));

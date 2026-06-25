@@ -20,15 +20,14 @@ import com.intellij.openapi.ui.DialogWrapper;
 import org.exbin.auxiliary.binary_data.BinaryData;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JComponent;
 import java.util.Optional;
 
 /**
  * BinEd View Data Handler.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public interface BinaryViewHandler extends PluginAware {
 
     /**
@@ -37,7 +36,6 @@ public interface BinaryViewHandler extends PluginAware {
      * @param instance instance
      * @return binary data if supported
      */
-    @Nonnull
     Optional<BinaryData> instanceToBinaryData(Object instance);
 
     /**
@@ -46,7 +44,6 @@ public interface BinaryViewHandler extends PluginAware {
      * @param binaryData binary data
      * @return binary view panel
      */
-    @Nonnull
     JComponent createBinaryViewPanel(@Nullable BinaryData binaryData);
 
     /**
@@ -55,7 +52,6 @@ public interface BinaryViewHandler extends PluginAware {
      * @param instance class instance
      * @return binary view panel if instance supported
      */
-    @Nonnull
     Optional<JComponent> createBinaryViewPanel(Object instance);
 
     /**
@@ -64,7 +60,6 @@ public interface BinaryViewHandler extends PluginAware {
      * @param binaryData binary data
      * @return binary view dialog
      */
-    @Nonnull
     DialogWrapper createBinaryViewDialog(@Nullable BinaryData binaryData);
 
     /**
@@ -73,6 +68,5 @@ public interface BinaryViewHandler extends PluginAware {
      * @param instance class instance
      * @return binary view dialog
      */
-    @Nonnull
     DialogWrapper createBinaryViewDialog(Object instance);
 }

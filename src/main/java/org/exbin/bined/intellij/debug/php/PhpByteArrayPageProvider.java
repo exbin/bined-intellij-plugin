@@ -19,14 +19,13 @@ import org.exbin.bined.jaguif.objectdata.PageProvider;
 import org.exbin.bined.jaguif.objectdata.PageProviderBinaryData;
 import org.exbin.auxiliary.binary_data.OutOfBoundsException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.util.Map;
 
 /**
  * PHP bytearray data source for debugger view.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class PhpByteArrayPageProvider implements PageProvider {
 
     private final Map<String, String> value;
@@ -48,7 +47,6 @@ public class PhpByteArrayPageProvider implements PageProvider {
         } while (true);
     }
 
-    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         long documentSize = getDocumentSize();

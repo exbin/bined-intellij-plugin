@@ -15,19 +15,16 @@
  */
 package org.exbin.bined.intellij.debug;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import org.exbin.auxiliary.binary_data.BinaryData;
 
 /**
  * Data source for debugging.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public interface DebugViewDataProvider {
 
-    @Nonnull
     String getName();
 
-    @Nonnull
     BinaryData getData();
 }

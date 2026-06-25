@@ -15,14 +15,13 @@
  */
 package org.exbin.bined.intellij.debug;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import org.exbin.auxiliary.binary_data.BinaryData;
 
 /**
  * Data source for debugging.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class DefaultDebugViewDataProvider implements DebugViewDataProvider {
 
     private final String name;
@@ -33,13 +32,11 @@ public class DefaultDebugViewDataProvider implements DebugViewDataProvider {
         this.data = data;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return name;
     }
 
-    @Nonnull
     @Override
     public BinaryData getData() {
         return data;

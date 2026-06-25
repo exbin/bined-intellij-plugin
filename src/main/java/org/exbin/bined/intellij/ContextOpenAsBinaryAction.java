@@ -20,12 +20,12 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.fileTypes.DirectoryFileType;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Open file in binary editor action.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class ContextOpenAsBinaryAction extends OpenAsBinaryAction {
 
     private boolean actionVisible = true;

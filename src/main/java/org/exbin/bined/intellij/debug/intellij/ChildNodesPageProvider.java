@@ -28,8 +28,7 @@ import org.exbin.auxiliary.binary_data.BinaryData;
 import org.exbin.auxiliary.binary_data.array.ByteArrayEditableData;
 import org.exbin.bined.jaguif.inspector.gui.BasicValuesPanel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JButton;
 import javax.swing.tree.TreeNode;
 import java.awt.event.MouseEvent;
@@ -41,7 +40,7 @@ import java.math.BigInteger;
 /**
  * Generic reader for debugger view child nodes.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class ChildNodesPageProvider implements BinaryData {
 
     private final XValueNodeImpl valueNode;
@@ -59,7 +58,6 @@ public class ChildNodesPageProvider implements BinaryData {
         this.valueExtractor = valueExtractor;
     }
 
-    @Nonnull
     private XValue getValueNode(int position) {
         int childCount = valueNode.getChildCount();
         TreeNode firstChild = valueNode.getChildAt(0);
@@ -88,11 +86,10 @@ public class ChildNodesPageProvider implements BinaryData {
             } catch (IndexOutOfBoundsException | ClassCastException ex) {
                 return new XValue() {
                     @Override
-                    public void computePresentation(@Nonnull XValueNode xValueNode, @Nonnull XValuePlace xValuePlace) {
+                    public void computePresentation(XValueNode xValueNode, XValuePlace xValuePlace) {
                         xValueNode.setPresentation(null, "0", "0", false);
                     }
 
-                    @Nonnull
                     @Override
                     public String toString() {
                         return "0";
@@ -134,11 +131,10 @@ public class ChildNodesPageProvider implements BinaryData {
             } catch (IndexOutOfBoundsException | ClassCastException ex) {
                 return new XValue() {
                     @Override
-                    public void computePresentation(@Nonnull XValueNode xValueNode, @Nonnull XValuePlace xValuePlace) {
+                    public void computePresentation(XValueNode xValueNode, XValuePlace xValuePlace) {
                         xValueNode.setPresentation(null, "0", "0", false);
                     }
 
-                    @Nonnull
                     @Override
                     public String toString() {
                         return "0";
@@ -234,13 +230,11 @@ public class ChildNodesPageProvider implements BinaryData {
         return dataCache[offset];
     }
 
-    @Nonnull
     @Override
     public BinaryData copy() {
         return copy(0, getDataSize());
     }
 
-    @Nonnull
     @Override
     public BinaryData copy(long startFrom, long length) {
         ByteArrayEditableData result = new ByteArrayEditableData();
@@ -263,7 +257,6 @@ public class ChildNodesPageProvider implements BinaryData {
         throw new UnsupportedOperationException();
     }
 
-    @Nonnull
     @Override
     public InputStream getDataInputStream() {
         throw new UnsupportedOperationException();
@@ -273,7 +266,6 @@ public class ChildNodesPageProvider implements BinaryData {
     public void dispose() {
     }
 
-    @Nonnull
     public static String getValueText(XValue valueContainer) {
         try {
             return ((XValueTextProvider) valueContainer).getValueText();
@@ -283,7 +275,6 @@ public class ChildNodesPageProvider implements BinaryData {
     }
 
     public interface ValueExtractor {
-        @Nonnull
         String getValueText(XValue valueContainer);
     }
 
@@ -300,93 +291,4 @@ public class ChildNodesPageProvider implements BinaryData {
             this.valueByteSize = valueByteSize;
         }
     }
-
-//    private static class ValueNodeSegment implements XCompositeNode {
-//        public static final int TIMEOUT_MS = 25_000;
-//
-//        private final int targetPosition;
-//        private final XValueNodeImpl valueNode;
-//        private int position = 0;
-//        private List<XValue> childrenList = new SmartList<>();
-//        private String myErrorMessage;
-//        private final Semaphore myFinished = new Semaphore(0);
-//
-//        public ValueNodeSegment(XValueNodeImpl valueNode, int targetPosition) {
-//            this.valueNode = valueNode;
-//            this.targetPosition = targetPosition;
-//        }
-//
-//        public int getTargetPosition() {
-//            return targetPosition;
-//        }
-//
-//        @Override
-//        public void addChildren(@NotNull XValueChildrenList valueChildrenList, boolean b) {
-//            int listSize = valueChildrenList.size();
-//            for (int i = 0; i < listSize; i++) {
-//                if (position >= targetPosition) {
-//                    childrenList.add(valueChildrenList.getValue(i));
-//                }
-//                position++;
-//            }
-//        }
-//
-//        public void tooManyChildren(int remaining) {
-//            myFinished.release();
-//        }
-//
-//        @Override
-//        public void tooManyChildren(int remaining, @NotNull Runnable addNextChildren) {
-//            XCompositeNode.super.tooManyChildren(remaining, addNextChildren);
-//        }
-//
-//        @Override
-//        public void setAlreadySorted(boolean b) {
-//        }
-//
-//        public void setMessage(@NotNull String message, Icon icon, @NotNull final SimpleTextAttributes attributes, @Nullable XDebuggerTreeNodeHyperlink link) {
-//        }
-//
-//        public void setErrorMessage(@NotNull String message, @Nullable XDebuggerTreeNodeHyperlink link) {
-//            setErrorMessage(message);
-//        }
-//
-//        public void setErrorMessage(@NotNull String errorMessage) {
-//            myErrorMessage = errorMessage;
-//            myFinished.release();
-//        }
-//
-//        @NotNull
-//        public Pair<List<XValue>, String> waitFor() {
-//            return waitFor(TIMEOUT_MS);
-//        }
-//
-//        @NotNull
-//        public Pair<List<XValue>, String> waitFor(long timeoutMs) {
-//            return waitFor(timeoutMs, (semaphore, timeout) -> waitFor(myFinished, timeout));
-//        }
-//
-//        @NotNull
-//        public Pair<List<XValue>, String> waitFor(long timeoutMs, BiFunction<? super Semaphore, ? super Long, Boolean> waitFunction) {
-//            if (!waitFunction.apply(myFinished, timeoutMs)) {
-//                throw new AssertionError("Waiting timed out");
-//            }
-//
-//            return Pair.create(childrenList, myErrorMessage);
-//        }
-//
-//        public static boolean waitFor(Semaphore semaphore, long timeoutInMillis) {
-//            long end = System.currentTimeMillis() + timeoutInMillis;
-//            long remaining = timeoutInMillis;
-//            do {
-//                try {
-//                    return semaphore.tryAcquire(remaining, TimeUnit.MILLISECONDS);
-//                }
-//                catch (InterruptedException ignored) {
-//                    remaining = end - System.currentTimeMillis();
-//                }
-//            } while (remaining > 0);
-//            return false;
-//        }
-//    }
 }

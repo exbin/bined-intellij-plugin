@@ -30,8 +30,7 @@ import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.exbin.bined.intellij.debug.intellij.XValueNodeConvertor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +38,7 @@ import java.util.logging.Logger;
 /**
  * Show debugger value in binary editor action.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class DebugViewAsBinaryAction extends XFetchValueActionBase implements DumbAware {
 
     private boolean actionVisible = true;
@@ -51,7 +50,6 @@ public class DebugViewAsBinaryAction extends XFetchValueActionBase implements Du
                 integrationOptions.isRegisterDebugViewAsBinary());
     }
 
-    @Nonnull
     @Override
     public ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;

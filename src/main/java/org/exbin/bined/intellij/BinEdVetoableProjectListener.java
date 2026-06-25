@@ -31,8 +31,7 @@ import org.exbin.jaguif.document.api.EmptyDocumentSource;
 import org.exbin.jaguif.window.api.WindowHandler;
 import org.exbin.jaguif.window.api.WindowModuleApi;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,7 @@ import java.util.Optional;
 /**
  * Vetoable variant of project listener for BinEd plugin.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdVetoableProjectListener implements VetoableProjectManagerListener {
 
     @Override
@@ -78,8 +77,8 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         return true;
     }
 
-    public static boolean showAskForSaveDialog(@Nonnull List<Document> fileDocuments,
-            @Nonnull Component parentComponent) {
+    public static boolean showAskForSaveDialog(List<Document> fileDocuments,
+            Component parentComponent) {
         ModifiedDocumentsPanel modifiedDocumentsPanel = new ModifiedDocumentsPanel ();
         modifiedDocumentsPanel.setDocuments(fileDocuments);
         WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
@@ -88,7 +87,7 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         windowModule.setWindowTitle(dialog, modifiedDocumentsPanel.getResourceBundle());
         modifiedDocumentsPanel.setController(new ModifiedDocumentsPanel.Controller() {
             @Override
-            public boolean saveFile(@Nonnull Document document) {
+            public boolean saveFile(Document document) {
                 EditableDocument editableDocument = (EditableDocument) document;
                 Optional<DocumentSource> optDocumentSource = editableDocument.getDocumentSource();
                 if (optDocumentSource.isPresent() && !(optDocumentSource.get() instanceof EmptyDocumentSource)) {
@@ -106,7 +105,7 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
             }
 
             @Override
-            public void discardAll(@Nonnull List<Document> fileDocuments) {
+            public void discardAll(List<Document> fileDocuments) {
                 result[0] = true;
                 dialog.close();
             }

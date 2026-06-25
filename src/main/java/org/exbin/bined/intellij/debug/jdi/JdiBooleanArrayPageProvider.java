@@ -23,14 +23,13 @@ import com.sun.jdi.Value;
 import org.exbin.bined.jaguif.objectdata.PageProvider;
 import org.exbin.bined.jaguif.objectdata.PageProviderBinaryData;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.util.List;
 
 /**
  * Boolean array data source for debugger view.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class JdiBooleanArrayPageProvider implements PageProvider {
 
     private final ArrayReference arrayRef;
@@ -39,7 +38,6 @@ public class JdiBooleanArrayPageProvider implements PageProvider {
         this.arrayRef = arrayRef;
     }
 
-    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         int startPos = (int) (pageIndex * PageProviderBinaryData.PAGE_SIZE * 8);

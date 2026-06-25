@@ -24,13 +24,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jdom.Element;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Native file editor provider for binary files.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAware {
 
     public static final String NATIVE_BINED_EDITOR_TYPE_ID = "org.exbin.bined.native";
@@ -55,7 +54,6 @@ public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAw
         return active && file.getFileType() == BinaryFileType.INSTANCE && !(file instanceof BinEdVirtualFile);
     }
 
-    @Nonnull
     @Override
     public FileEditor createEditor(Project project, VirtualFile virtualFile) {
         BinEdPluginStartupActivity.initialize();
@@ -65,19 +63,16 @@ public class BinEdNativeFileEditorProvider implements FileEditorProvider, DumbAw
         return fileEditor;
     }
 
-    @Nonnull
     @Override
     public String getEditorTypeId() {
         return NATIVE_BINED_EDITOR_TYPE_ID;
     }
 
-    @Nonnull
     @Override
     public FileEditorPolicy getPolicy() {
         return active ? FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR : FileEditorPolicy.NONE;
     }
 
-    @Nonnull
     @Override
     public FileEditorState readState(Element sourceElement, Project project, VirtualFile file) {
         return FileEditorState.INSTANCE;

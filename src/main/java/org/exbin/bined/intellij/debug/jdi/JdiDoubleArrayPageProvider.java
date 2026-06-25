@@ -19,15 +19,14 @@ import com.sun.jdi.*;
 import org.exbin.bined.jaguif.objectdata.PageProvider;
 import org.exbin.bined.jaguif.objectdata.PageProviderBinaryData;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
  * Double array data source for debugger view.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class JdiDoubleArrayPageProvider implements PageProvider {
 
     private final byte[] valuesCache = new byte[8];
@@ -39,7 +38,6 @@ public class JdiDoubleArrayPageProvider implements PageProvider {
         this.arrayRef = arrayRef;
     }
 
-    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         int pageSize = PageProviderBinaryData.PAGE_SIZE / 8;

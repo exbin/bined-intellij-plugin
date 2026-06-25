@@ -187,5 +187,6 @@ dependencies {
     compileOnly(":debugvalue-pycharm-2022.2.1")
     compileOnly(":debugvalue-rider-2022.2.1")
     compileOnly(":database-plugin-2022.2.1")
+    compileOnly("org.jspecify:jspecify:1.0.0")
     compileOnly(":jsr305-2.0.1")
 }

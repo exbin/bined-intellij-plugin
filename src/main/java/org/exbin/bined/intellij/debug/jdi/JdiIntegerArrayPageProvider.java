@@ -19,14 +19,13 @@ import com.sun.jdi.*;
 import org.exbin.bined.jaguif.objectdata.PageProvider;
 import org.exbin.bined.jaguif.objectdata.PageProviderBinaryData;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.util.List;
 
 /**
  * Integer array data source for debugger view.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class JdiIntegerArrayPageProvider implements PageProvider {
 
     private final ArrayReference arrayRef;
@@ -35,7 +34,6 @@ public class JdiIntegerArrayPageProvider implements PageProvider {
         this.arrayRef = arrayRef;
     }
 
-    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         int pageSize = PageProviderBinaryData.PAGE_SIZE / 4;

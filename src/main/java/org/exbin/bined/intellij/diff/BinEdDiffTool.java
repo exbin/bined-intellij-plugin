@@ -23,13 +23,12 @@ import com.intellij.openapi.project.DumbAware;
 import org.exbin.bined.intellij.BinEdPluginStartupActivity;
 import org.jetbrains.annotations.Nls;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * BinEd diff support provider to compare binary files.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdDiffTool implements FrameDiffTool, DumbAware {
 
     private boolean actionVisible = true;
@@ -40,7 +39,6 @@ public class BinEdDiffTool implements FrameDiffTool, DumbAware {
         );
     }
 
-    @Nonnull
     @Nls(capitalization = Nls.Capitalization.Sentence)
     @Override
     public String getName() {
@@ -52,7 +50,6 @@ public class BinEdDiffTool implements FrameDiffTool, DumbAware {
         return actionVisible && request instanceof ContentDiffRequest;
     }
 
-    @Nonnull
     @Override
     public DiffViewer createComponent(DiffContext context, DiffRequest request) {
         return new BinEdDiffViewer(context, (ContentDiffRequest) request);

@@ -19,12 +19,12 @@ import com.intellij.ide.scratch.RootType;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Scratch root type for binary files.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinaryRootType extends RootType {
 
     private static final String ID = "org.exbin.bined.intellij.BinaryRootType";

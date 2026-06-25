@@ -20,13 +20,13 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.*;
 
 /**
  * Editor listener for binary editor.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class EditorListener implements FileEditorManagerListener {
 
     private JPanel editor;

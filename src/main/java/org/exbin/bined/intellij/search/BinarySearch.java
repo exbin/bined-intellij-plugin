@@ -35,9 +35,8 @@ import org.exbin.jaguif.window.api.WindowModuleApi;
 import org.exbin.jaguif.window.api.gui.DefaultControlPanel;
 import org.exbin.jaguif.window.api.controller.DefaultControlController;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import java.awt.Dialog;
@@ -48,7 +47,7 @@ import java.util.ResourceBundle;
 /**
  * Binary search.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinarySearch {
 
     public static final String HELP_ID = "find-or-replace-data";
@@ -77,7 +76,7 @@ public class BinarySearch {
     public BinarySearch() {
         searchStatusListener = new BinarySearchService.SearchStatusListener() {
             @Override
-            public void setStatus(@Nonnull BinarySearchService.FoundMatches foundMatches, @Nonnull SearchParameters.MatchMode matchMode) {
+            public void setStatus(BinarySearchService.FoundMatches foundMatches, SearchParameters.MatchMode matchMode) {
                 BinarySearch.this.foundMatches = foundMatches;
                 switch (foundMatches.getMatchesCount()) {
                     case 0:
@@ -288,7 +287,6 @@ public class BinarySearch {
                 dialog.showCentered(WindowUtils.getWindow(binarySearchPanel));
             }
 
-            @Nonnull
             @Override
             public SearchParameters.SearchDirection getSearchDirection() {
                 return currentSearchDirection;
@@ -323,7 +321,6 @@ public class BinarySearch {
         binarySearchPanel.setCodeAreaPopupMenu(codeAreaPopupMenu);
     }
 
-    @Nonnull
     public BinarySearchService.SearchStatusListener getSearchStatusListener() {
         return searchStatusListener;
     }
@@ -371,7 +368,6 @@ public class BinarySearch {
         searchStatusListener.clearStatus();
     }
 
-    @Nonnull
     public BinarySearchIntelliJPanel getPanel() {
         return binarySearchPanel;
     }

@@ -32,8 +32,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.ArchiveFileSystem;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import java.util.List;
@@ -41,7 +40,7 @@ import java.util.List;
 /**
  * Open file in binary editor action.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class OpenAsBinaryAction extends AnAction implements DumbAware {
 
     public OpenAsBinaryAction() {
@@ -56,7 +55,6 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
         super(text, description, icon);
     }
 
-    @Nonnull
     @Override
     public ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
@@ -97,7 +95,6 @@ public class OpenAsBinaryAction extends AnAction implements DumbAware {
         }
     }
 
-    @Nonnull
     public static BinEdVirtualFile openValidVirtualFile(Project project, VirtualFile virtualFile) {
         BinEdVirtualFile binEdVirtualFile = new BinEdVirtualFile(virtualFile);
         OpenFileDescriptor descriptor = new OpenFileDescriptor(project, binEdVirtualFile, 0);

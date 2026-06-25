@@ -43,9 +43,8 @@ import org.exbin.jaguif.options.settings.api.OptionsSettingsManagement;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.options.settings.api.SettingsOptionsProvider;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JComponent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -54,7 +53,7 @@ import java.io.IOException;
 /**
  * File editor wrapper using BinEd editor component.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdNativeFile {
 
     private final BinEdFilePanel filePanel = new BinEdFilePanel();
@@ -117,14 +116,12 @@ public class BinEdNativeFile {
         return fileDocument.isModified();
     }
 
-    @Nonnull
     public JComponent getComponent() {
         // Beware: IntelliJ analysis component if it finds JTextComponent it overrides its document handling
         // Introduce component later
         return filePanel;
     }
 
-    @Nonnull
     public BinaryFileDocument getDocument() {
         return fileDocument;
     }
@@ -190,7 +187,6 @@ public class BinEdNativeFile {
         });
     }
 
-    @Nonnull
     public FileProcessingMode getFileProcessingMode() {
         return FileProcessingMode.DIRECT;
     }
@@ -209,7 +205,6 @@ public class BinEdNativeFile {
 //        propertyChangeSupport.firePropertyChange(FileEditor.PROP_MODIFIED, !modified, modified);
     }
 
-    @Nonnull
     private IllegalStateException createBrokenVirtualFileException(@Nullable Exception ex) {
         String filePath = virtualFile.getCanonicalPath();
         String message = "Broken virtual file" + (filePath != null ? ":" + filePath : "");

@@ -23,8 +23,19 @@ import org.exbin.bined.capability.CharsetCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.debug.DebugViewDataProvider;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.jaguif.component.BinEdDataComponent;
 import org.exbin.bined.jaguif.component.BinedComponentModule;
+import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
+import org.exbin.bined.jaguif.document.BinEdFileManager;
 import org.exbin.bined.jaguif.document.BinedDocumentModule;
+import org.exbin.bined.jaguif.editor.settings.BinaryEditorOptions;
+import org.exbin.bined.jaguif.theme.settings.CodeAreaColorOptions;
+import org.exbin.bined.jaguif.theme.settings.CodeAreaLayoutOptions;
+import org.exbin.bined.jaguif.theme.settings.CodeAreaThemeOptions;
+import org.exbin.bined.jaguif.viewer.BinedViewerModule;
+import org.exbin.bined.jaguif.viewer.settings.BinaryEncodingSettingsApplier;
+import org.exbin.bined.jaguif.viewer.settings.CodeAreaOptions;
+import org.exbin.bined.jaguif.viewer.settings.CodeAreaViewerSettingsApplier;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
@@ -34,32 +45,12 @@ import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.jaguif.App;
-import org.exbin.jaguif.action.api.ActionConsts;
-import org.exbin.jaguif.action.api.ActionContextChange;
-import org.exbin.jaguif.action.api.ActionContextRegistration;
-import org.exbin.jaguif.action.api.ActionModuleApi;
-import org.exbin.jaguif.context.api.ContextComponent;
-import org.exbin.jaguif.action.api.DialogParentComponent;
-import org.exbin.jaguif.action.api.clipboard.ClipboardController;
-import org.exbin.bined.jaguif.component.BinEdDataComponent;
-import org.exbin.bined.jaguif.document.BinEdFileManager;
-import org.exbin.bined.jaguif.editor.settings.BinaryEditorOptions;
-import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
-import org.exbin.bined.jaguif.viewer.settings.CodeAreaStatusOptions;
-import org.exbin.bined.jaguif.theme.settings.CodeAreaColorOptions;
-import org.exbin.bined.jaguif.theme.settings.CodeAreaLayoutOptions;
-import org.exbin.bined.jaguif.theme.settings.CodeAreaThemeOptions;
-import org.exbin.bined.jaguif.viewer.BinedViewerModule;
-import org.exbin.bined.jaguif.viewer.settings.BinaryEncodingSettingsApplier;
-import org.exbin.bined.jaguif.viewer.settings.CodeAreaOptions;
-import org.exbin.bined.jaguif.viewer.settings.CodeAreaViewerSettingsApplier;
 import org.exbin.jaguif.context.ActiveContextManager;
 import org.exbin.jaguif.context.api.ActiveContextManagement;
-import org.exbin.jaguif.context.api.ContextChangeRegistration;
+import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.context.api.ContextModuleApi;
 import org.exbin.jaguif.context.api.ContextRegistration;
 import org.exbin.jaguif.context.api.ContextUpdateManagement;
-import org.exbin.jaguif.context.api.StateUpdateType;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.options.api.OptionsModuleApi;
@@ -68,26 +59,18 @@ import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
-import org.exbin.jaguif.text.encoding.CharsetEncodingState;
 import org.exbin.jaguif.text.encoding.ContextEncoding;
 import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingOptions;
-import org.exbin.jaguif.text.font.ContextFont;
 import org.exbin.jaguif.text.font.settings.TextFontOptions;
 import org.exbin.jaguif.utils.DesktopUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JViewport;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.nio.charset.Charset;
@@ -97,16 +80,16 @@ import java.util.List;
 /**
  * Panel to show debug view.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class DebugViewPanel extends javax.swing.JPanel {
 
     protected final List<DebugViewDataProvider> providers = new ArrayList<>();
     protected int selectedProvider = 0;
 
-    private final Font defaultFont;
-    private final SectionCodeAreaLayoutProfile defaultLayoutProfile;
-    private final SectionCodeAreaThemeProfile defaultThemeProfile;
-    private final CodeAreaColorsProfile defaultColorProfile;
+    protected final Font defaultFont;
+    protected final SectionCodeAreaLayoutProfile defaultLayoutProfile;
+    protected final SectionCodeAreaThemeProfile defaultThemeProfile;
+    protected final CodeAreaColorsProfile defaultColorProfile;
 
     protected final JPanel panel;
     protected BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
@@ -138,7 +121,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
         toolbarPanel.setTargetComponent(componentPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
-            @Nonnull
             @Override
             public CodeType getCodeType() {
                 return codeArea.getCodeType();
@@ -209,23 +191,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
             contextManagement.changeActiveState(ContextComponent.class, dataComponent);
             contextManagement.changeActiveState(ContextEncoding.class, dataComponent);
             statusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, contextRegistrar);
-            /* ActionManagement actionManager = actionModule.createActionManager(contextManagement);
-
-            Action action = new AbstractAction() {
-                public void actionPerformed(ActionEvent ae) {
-                    // ignore
-                }
-            };
-            action.putValue(ActionConsts.ACTION_CONTEXT_CHANGE, (ActionContextChange) (ContextChangeRegistration registrar) -> {
-                registrar.registerStateChangeListener(ContextEncoding.class, (ContextEncoding instance, StateUpdateType changeType) -> {
-                    if (CharsetEncodingState.ChangeType.ENCODING.equals(changeType)) {
-                        statusBar.updateEncodingState();
-                    }
-                });
-            });
-            actionContextRegistrar.registerActionContext(action);
-            actionContextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
-            actionContextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction()); */
             dataComponent.setContextManager(contextManagement);
 
             BinaryEncodingSettingsApplier settingsApplier = new BinaryEncodingSettingsApplier();
@@ -355,7 +320,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
         // TODO statusBar.getBinaryStatusPanel().setCurrentDocumentSize(dataSize, dataSize);
     }
 
-    @Nonnull
     private AbstractAction createOnlineHelpAction() {
         return new AbstractAction() {
             @Override

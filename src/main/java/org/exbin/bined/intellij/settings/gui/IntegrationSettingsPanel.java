@@ -20,9 +20,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -42,7 +41,7 @@ import org.exbin.jaguif.utils.WindowUtils;
 /**
  * Integration settings options panel.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class IntegrationSettingsPanel extends javax.swing.JPanel implements SettingsComponent {
 
     private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(
@@ -54,7 +53,6 @@ public class IntegrationSettingsPanel extends javax.swing.JPanel implements Sett
         initComponents();
     }
 
-    @Nonnull
     @Override
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
@@ -141,7 +139,6 @@ public class IntegrationSettingsPanel extends javax.swing.JPanel implements Sett
         });
         iconSetComboBox.setModel(iconSetComboBoxModel);
         iconSetComboBox.setRenderer(new DefaultListCellRenderer() {
-            @Nonnull
             @Override
             public Component getListCellRendererComponent(JList<?> list, @Nullable Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 if (index >= 0) {

@@ -21,14 +21,13 @@ import com.intellij.diff.tools.util.base.DiffViewerBase;
 import com.intellij.openapi.progress.ProgressIndicator;
 import org.exbin.bined.intellij.diff.gui.BinedDiffPanel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JComponent;
 
 /**
  * BinEd diff support provider to compare binary files.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdDiffViewer extends DiffViewerBase {
 
     private final BinedDiffPanel diffPanel = new BinedDiffPanel();
@@ -38,7 +37,6 @@ public class BinEdDiffViewer extends DiffViewerBase {
 
     }
 
-    @Nonnull
     @Override
     protected Runnable performRediff(ProgressIndicator indicator) {
         return () -> {
@@ -46,14 +44,12 @@ public class BinEdDiffViewer extends DiffViewerBase {
         };
     }
 
-    @Nonnull
     @Override
     public JComponent getComponent() {
         diffPanel.setDiffContent(myRequest);
         return diffPanel;
     }
 
-    @Nonnull
     @Override
     public JComponent getPreferredFocusedComponent() {
         return diffPanel;

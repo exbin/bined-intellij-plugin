@@ -25,13 +25,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Open file in binary editor action.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class FileMenuOpenAsBinaryAction extends AnAction implements DumbAware {
 
     private boolean actionVisible = true;
@@ -41,7 +40,6 @@ public class FileMenuOpenAsBinaryAction extends AnAction implements DumbAware {
         BinEdPluginStartupActivity.addIntegrationOptionsListener(integrationOptions -> actionVisible = integrationOptions.isRegisterFileMenuOpenAsBinary());
     }
 
-    @Nonnull
     @Override
     public ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;

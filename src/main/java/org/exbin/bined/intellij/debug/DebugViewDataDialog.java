@@ -26,8 +26,7 @@ import org.exbin.jaguif.App;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import java.util.List;
@@ -36,7 +35,7 @@ import java.util.ResourceBundle;
 /**
  * Debugger value dual page data source.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class DebugViewDataDialog extends DialogWrapper {
 
     private final Project project;
@@ -66,7 +65,6 @@ public class DebugViewDataDialog extends DialogWrapper {
         init();
     }
 
-    @Nonnull
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
     }
@@ -85,7 +83,6 @@ public class DebugViewDataDialog extends DialogWrapper {
         super.doOKAction();
     }
 
-    @Nonnull
     @Override
     protected Action[] createActions() {
         return myDataNode != null ? new Action[]{getOKAction(), getCancelAction()} : new Action[]{getCancelAction()};
@@ -97,13 +94,11 @@ public class DebugViewDataDialog extends DialogWrapper {
         return viewPanel;
     }
 
-    @Nonnull
     @Override
     protected String getDimensionServiceKey() {
         return "#org.exbin.bined.intellij.debug.DebugViewBinaryAction";
     }
 
-    @Nonnull
     @Override
     protected JComponent createCenterPanel() {
         BorderLayoutPanel panel = JBUI.Panels.simplePanel(viewPanel);

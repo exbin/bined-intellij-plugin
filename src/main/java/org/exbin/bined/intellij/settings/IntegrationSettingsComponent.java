@@ -27,8 +27,7 @@ import org.exbin.jaguif.ui.settings.gui.LanguageSettingsPanel;
 import org.exbin.jaguif.ui.theme.UiThemeModule;
 import org.exbin.jaguif.ui.theme.api.UiThemeModuleApi;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.ImageIcon;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +37,8 @@ import java.util.ResourceBundle;
 /**
  * Integration settings component provider.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class IntegrationSettingsComponent implements SettingsComponentProvider {
-    @Nonnull
     @Override
     public SettingsComponent createComponent() {
         IntegrationSettingsPanel panel = new IntegrationSettingsPanel();

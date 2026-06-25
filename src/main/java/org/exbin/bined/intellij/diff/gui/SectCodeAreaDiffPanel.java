@@ -24,8 +24,7 @@ import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.bined.swing.section.SectionCodeAreaPainter;
 import org.exbin.bined.swing.section.diff.DiffHighlightCodeAreaColorAssessor;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -35,7 +34,7 @@ import java.awt.Graphics2D;
 /**
  * Panel for difference comparison of two code areas.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class SectCodeAreaDiffPanel extends javax.swing.JPanel {
 
     protected final SectCodeArea leftCodeArea;
@@ -51,7 +50,6 @@ public class SectCodeAreaDiffPanel extends javax.swing.JPanel {
 
             private Graphics2DDelegate graphicsCache = null;
 
-            @Nonnull
             @Override
             protected Graphics getComponentGraphics(Graphics g) {
                 if (g instanceof Graphics2DDelegate) {
@@ -77,7 +75,6 @@ public class SectCodeAreaDiffPanel extends javax.swing.JPanel {
 
             private Graphics2DDelegate graphicsCache = null;
 
-            @Nonnull
             @Override
             protected Graphics getComponentGraphics(Graphics g) {
                 if (g instanceof Graphics2DDelegate) {
@@ -187,22 +184,18 @@ public class SectCodeAreaDiffPanel extends javax.swing.JPanel {
     private javax.swing.JSplitPane splitPane;
     // End of variables declaration//GEN-END:variables
 
-    @Nonnull
     public JPanel getLeftPanel() {
         return leftPanel;
     }
 
-    @Nonnull
     public JPanel getRightPanel() {
         return rightPanel;
     }
 
-    @Nonnull
     public SectCodeArea getLeftCodeArea() {
         return leftCodeArea;
     }
 
-    @Nonnull
     public SectCodeArea getRightCodeArea() {
         return rightCodeArea;
     }

@@ -27,8 +27,7 @@ import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.operation.command.BinaryDataUndoableCommand;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ import java.util.logging.Logger;
 /**
  * TODO: Undo handler for binary editor using IntelliJ Idea's undo manager. Doesn't work ATM.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinaryIntelliJUndoRedo implements BinaryDataUndoRedo {
 
     protected final List<BinaryDataUndoRedoChangeListener> listeners = new ArrayList<>();
@@ -71,7 +70,6 @@ public class BinaryIntelliJUndoRedo implements BinaryDataUndoRedo {
         commandAdded((BinaryDataUndoableCommand) command);
     }
 
-    @Nonnull
     @Override
     public Optional<BinaryDataCommand> getTopUndoCommand() {
         throw new UnsupportedOperationException();
@@ -202,7 +200,6 @@ public class BinaryIntelliJUndoRedo implements BinaryDataUndoRedo {
         this.syncPointPosition = commandPosition;
     }
 
-    @Nonnull
     @Override
     public List<BinaryDataCommand> getCommandList() {
         throw new UnsupportedOperationException();

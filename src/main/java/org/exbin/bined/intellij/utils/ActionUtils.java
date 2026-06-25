@@ -16,7 +16,7 @@
 package org.exbin.bined.intellij.utils;
 
 import java.awt.Component;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -27,7 +27,7 @@ import org.exbin.jaguif.menu.api.MenuModuleApi;
 /**
  * Utilities for action manipulations.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public final class ActionUtils {
 
     public static void replaceAction(JPopupMenu menu, String actionId, Action action) {

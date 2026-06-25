@@ -86,9 +86,8 @@ import org.exbin.jaguif.text.encoding.settings.TextEncodingOptions;
 import org.exbin.jaguif.text.font.settings.TextFontOptions;
 import org.exbin.jaguif.utils.DesktopUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 import java.awt.BorderLayout;
@@ -105,7 +104,7 @@ import java.util.Optional;
 /**
  * BinEd diff support provider to compare binary files.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinedDiffPanel extends JBPanel {
 
     protected final SectCodeAreaDiffPanel diffPanel = new SectCodeAreaDiffPanel();
@@ -164,7 +163,6 @@ public class BinedDiffPanel extends JBPanel {
         rightStatusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, rightContextRegistrator);
         toolbarPanel.setTargetComponent(diffPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
-            @Nonnull
             @Override
             public CodeType getCodeType() {
                 return leftCodeArea.getCodeType();
@@ -216,7 +214,6 @@ public class BinedDiffPanel extends JBPanel {
 
             private Graphics2DDelegate graphicsCache = null;
 
-            @Nonnull
             @Override
             protected Graphics getComponentGraphics(Graphics g) {
                 if (g instanceof Graphics2DDelegate) {
@@ -236,13 +233,11 @@ public class BinedDiffPanel extends JBPanel {
                 return graphicsCache;
             }
 
-            @Nonnull
             @Override
             protected JLabel createLabel() {
                 return new JBLabel();
             }
 
-            @Nonnull
             @Override
             protected JLabel createEncodingLabel() {
                 return new JBLabel() {
@@ -267,7 +262,6 @@ public class BinedDiffPanel extends JBPanel {
 
             private Graphics2DDelegate graphicsCache = null;
 
-            @Nonnull
             @Override
             protected Graphics getComponentGraphics(Graphics g) {
                 if (g instanceof Graphics2DDelegate) {
@@ -287,13 +281,11 @@ public class BinedDiffPanel extends JBPanel {
                 return graphicsCache;
             }
 
-            @Nonnull
             @Override
             protected JLabel createLabel() {
                 return new JBLabel();
             }
 
-            @Nonnull
             @Override
             protected JLabel createEncodingLabel() {
                 return new JBLabel() {
@@ -550,7 +542,6 @@ public class BinedDiffPanel extends JBPanel {
         }
     }
 
-    @Nonnull
     private AbstractAction createOnlineHelpAction() {
         return new AbstractAction() {
             @Override
@@ -569,7 +560,6 @@ public class BinedDiffPanel extends JBPanel {
             this.codeArea = codeArea;
         }
 
-        @Nonnull
         @Override
         public CodeAreaCore getCodeArea() {
             return codeArea;
@@ -630,7 +620,6 @@ public class BinedDiffPanel extends JBPanel {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
-        @Nonnull
         @Override
         public String getEncoding() {
             return ((CharsetCapable) getCodeArea()).getCharset().toString();

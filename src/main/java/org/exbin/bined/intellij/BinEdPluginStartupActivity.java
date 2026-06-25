@@ -181,9 +181,8 @@ import org.exbin.jaguif.window.WindowModule;
 import org.exbin.jaguif.window.api.WindowModuleApi;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JCheckBox;
@@ -220,7 +219,7 @@ import java.util.prefs.Preferences;
 /**
  * Post startup activity.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public final class BinEdPluginStartupActivity implements ProjectActivity, StartupActivity, StartupActivity.DumbAware {
 
     private static final String BINARY_PLUGIN_ID = "binary";
@@ -437,7 +436,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             } */
 
             @Override
-            public void selectionChanged(@Nonnull FileEditorManagerEvent event) {
+            public void selectionChanged(FileEditorManagerEvent event) {
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
                 BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
                 BinaryFileDocument activeFile = null;
@@ -459,7 +458,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             private boolean discardAllowed = false;
 
             @Override
-            public void beforeFileClosed(@Nonnull FileEditorManager source, @Nonnull VirtualFile file) {
+            public void beforeFileClosed(FileEditorManager source, VirtualFile file) {
                 // TODO: FileEditorManagerKeys.CLOSING_TO_REOPEN not available yet
                 Boolean userData = file.getUserData(FileEditorManagerImpl.CLOSING_TO_REOPEN);
                 if (userData != null && userData) {
@@ -499,7 +498,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         });
         connect.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
             @Override
-            public void after(@Nonnull List<? extends VFileEvent> events) {
+            public void after(List<? extends VFileEvent> events) {
                 for (VFileEvent event : events) {
                     VirtualFile virtualFile = event.getFile();
                     if (event.isFromRefresh()) {
@@ -591,12 +590,12 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         }
     }
 
-    @ParametersAreNonnullByDefault
+    @NullMarked
     public interface IntegrationOptionsListener {
         void integrationInit(IntegrationOptions integrationOptions);
     }
 
-    @ParametersAreNonnullByDefault
+    @NullMarked
     private static class AppModuleProvider implements ModuleProvider {
 
         private final Map<Class<?>, Module> modules = new HashMap<>();
@@ -670,37 +669,31 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             MenuModuleApi menuModule = App.getModule(MenuModuleApi.class);
             menuModule.setMenuBuilder(new MenuBuilder() {
-                @Nonnull
                 @Override
                 public JMenu createMenu() {
                     return new JBMenu();
                 }
 
-                @Nonnull
                 @Override
                 public JPopupMenu createPopupMenu() {
                     return new JBPopupMenu();
                 }
 
-                @Nonnull
                 @Override
                 public JMenuItem createMenuItem() {
                     return new JBMenuItem("");
                 }
 
-                @Nonnull
                 @Override
                 public JCheckBoxMenuItem createCheckBoxMenuItem() {
                     return new JBCheckBoxMenuItem();
                 }
 
-                @Nonnull
                 @Override
                 public JRadioButtonMenuItem createRadioButtonMenuItem() {
                     return new JRadioButtonMenuItem();
                 }
 
-                @Nonnull
                 @Override
                 public JPopupMenu createPopupMenu(MenuShowMethod showMethod) {
                     return new JBPopupMenu() {
@@ -910,7 +903,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             }
         }
 
-        @Nonnull
         @Override
         public Class getManifestClass() {
             return BinEdIntelliJPlugin.class;
@@ -924,7 +916,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         public void launch(String launchModuleId, String[] args) {
         }
 
-        @Nonnull
         @Override
         public <T extends Module> T getModule(Class<T> moduleClass) {
             return (T) modules.get(moduleClass);
@@ -948,17 +939,14 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             super(resourceBundle);
         }
 
-        @Nonnull
         @Override
         public BinEdInspector createInspector() {
             return new BasicValuesInspector() {
-                @Nonnull
                 @Override
                 protected BasicValuesPanel createComponent() {
                     return new BasicValuesPanel() {
                         private Graphics2DDelegate graphicsCache = null;
 
-                        @Nonnull
                         @Override
                         protected Graphics getComponentGraphics(Graphics g) {
                             if (g instanceof Graphics2DDelegate) {
@@ -978,24 +966,20 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                             return graphicsCache;
                         }
 
-                        @Nonnull
                         public JScrollPane createScrollPane() {
                             return new JBScrollPane();
                         }
 
-                        @Nonnull
                         @Override
                         protected JTextField createTextField() {
                             return new JBTextField();
                         }
 
-                        @Nonnull
                         @Override
                         protected JRadioButton createRadioButton() {
                             return new JBRadioButton() {
                                 private Graphics2DDelegate graphicsCache = null;
 
-                                @Nonnull
                                 @Override
                                 protected Graphics getComponentGraphics(Graphics g) {
                                     if (g instanceof Graphics2DDelegate) {
@@ -1019,19 +1003,16 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                             };
                         }
 
-                        @Nonnull
                         @Override
                         protected JLabel createLabel() {
                             return new JBLabel();
                         }
 
-                        @Nonnull
                         @Override
                         protected JCheckBox createCheckBox() {
                             return new JBCheckBox() {
                                 private Graphics2DDelegate graphicsCache = null;
 
-                                @Nonnull
                                 @Override
                                 protected Graphics getComponentGraphics(Graphics g) {
                                     if (g instanceof Graphics2DDelegate) {

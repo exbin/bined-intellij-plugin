@@ -18,12 +18,12 @@ package org.exbin.bined.intellij.api;
 import com.intellij.openapi.extensions.PluginAware;
 import com.intellij.openapi.project.DumbAware;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * BinEd View Data Extension Point Interface.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public interface BinaryViewData extends PluginAware, DumbAware {
 
     /**

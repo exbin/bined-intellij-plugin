@@ -41,8 +41,7 @@ import org.exbin.bined.intellij.objectdata.gui.DataDialog;
 import org.exbin.bined.jaguif.objectdata.ObjectValueConvertor;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -51,7 +50,7 @@ import java.util.logging.Logger;
 /**
  * Edit database cell value as binary data action.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class DbEditBinaryAction extends AnAction implements DumbAware, GridAction {
 
     private boolean actionVisible = true;
@@ -62,7 +61,6 @@ public class DbEditBinaryAction extends AnAction implements DumbAware, GridActio
                 integrationOptions.isRegisterEditAsBinaryForDbColumn());
     }
 
-    @Nonnull
     @Override
     public ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;

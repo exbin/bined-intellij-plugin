@@ -18,16 +18,15 @@ package org.exbin.bined.intellij.settings;
 import com.intellij.ide.util.PropertiesComponent;
 import org.exbin.jaguif.options.api.OptionsStorage;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
  * Wrapper for preferences.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class IntelliJOptionsStorage implements OptionsStorage {
 
     private final PropertiesComponent properties;
@@ -43,13 +42,11 @@ public class IntelliJOptionsStorage implements OptionsStorage {
         return properties.isValueSet(prefix + key);
     }
 
-    @Nonnull
     @Override
     public Optional<String> get(String key) {
         return exists(key) ? Optional.ofNullable(properties.getValue(prefix + key)) : Optional.empty();
     }
 
-    @Nonnull
     @Override
     public String get(String key, String def) {
         return properties.getValue(prefix + key, Objects.requireNonNull(def));

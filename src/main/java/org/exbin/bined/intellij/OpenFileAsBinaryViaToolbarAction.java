@@ -28,14 +28,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Open file in binary editor action.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class OpenFileAsBinaryViaToolbarAction extends AnAction implements DumbAware {
 
     private boolean actionVisible = true;
@@ -47,7 +46,6 @@ public class OpenFileAsBinaryViaToolbarAction extends AnAction implements DumbAw
                 integrationOptions.isRegisterOpenFileAsBinaryViaToolbar());
     }
 
-    @Nonnull
     @Override
     public ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;

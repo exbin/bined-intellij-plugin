@@ -20,14 +20,14 @@ import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * File template group descriptor factory.
  */
+@NullMarked
 public class BinEdFileTypeFactory implements FileTemplateGroupDescriptorFactory {
 
-    @Nonnull
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
         final FileTemplateGroupDescriptor descriptor = new FileTemplateGroupDescriptor("Binary File", AllIcons.FileTypes.Any_type);

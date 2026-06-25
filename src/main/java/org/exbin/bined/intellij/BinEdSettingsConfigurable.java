@@ -30,8 +30,8 @@ import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.options.settings.api.SettingsOptionsProvider;
 import org.exbin.jaguif.options.settings.gui.SettingsListPanel;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
-import javax.annotation.Nonnull;
 import javax.swing.JComponent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 /**
  * Settings component.
  */
+@NullMarked
 public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
     private SettingsListPanel settingsListPanel;
@@ -52,7 +53,6 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
     public BinEdSettingsConfigurable() {
     }
 
-    @Nonnull
     @Override
     public String getDisplayName() {
         return resourceBundle.getString("BinEdSettingsConfigurable.displayName");

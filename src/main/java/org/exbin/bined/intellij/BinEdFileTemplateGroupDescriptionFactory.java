@@ -20,18 +20,18 @@ import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptorFactory;
 import com.intellij.openapi.project.DumbAware;
+import org.jspecify.annotations.NullMarked;
 
-import javax.annotation.Nonnull;
 import java.util.ResourceBundle;
 
 /**
  * File template group descriptor factory.
  */
+@NullMarked
 public class BinEdFileTemplateGroupDescriptionFactory implements FileTemplateGroupDescriptorFactory, DumbAware {
 
     private ResourceBundle resourceBundle = BinEdIntelliJPlugin.getResourceBundle();
 
-    @Nonnull
     @Override
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
         final FileTemplateGroupDescriptor descriptor = new FileTemplateGroupDescriptor(resourceBundle.getString("BinEdFileTemplateGroupDescriptionFactory.descriptorName"), AllIcons.FileTypes.Any_type);

@@ -35,9 +35,8 @@ import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.text.encoding.ContextEncoding;
 import org.exbin.jaguif.text.font.ContextFont;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +47,7 @@ import java.util.Optional;
 /**
  * Documents docking mapping for IntelliJ BinEd plugin.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdIntelliJDocking implements MultiDocking {
 
     protected final List<Document> openDocuments = new ArrayList<>();
@@ -91,7 +90,6 @@ public class BinEdIntelliJDocking implements MultiDocking {
         throw new UnsupportedOperationException();
     }
 
-    @Nonnull
     @Override
     public Optional<Document> openNewDocument() {
         throw new UnsupportedOperationException();
@@ -123,7 +121,6 @@ public class BinEdIntelliJDocking implements MultiDocking {
         return true;
     }
 
-    @Nonnull
     @Override
     public Component getComponent() {
         return null;
@@ -143,7 +140,6 @@ public class BinEdIntelliJDocking implements MultiDocking {
         }
     }
 
-    @Nonnull
     @Override
     public Optional<Document> getActiveDocument() {
         return Optional.ofNullable(activeDocument);
@@ -174,7 +170,6 @@ public class BinEdIntelliJDocking implements MultiDocking {
         contextManager.changeActiveState(ContextComponent.class, dataComponent);
         contextManager.changeActiveState(ContextUndoRedo.class, dataComponent);
         contextManager.changeActiveState(DialogParentComponent.class, new DialogParentComponent() {
-            @Nonnull
             @Override
             public Component getComponent() {
                 return parentComponent;
@@ -186,7 +181,6 @@ public class BinEdIntelliJDocking implements MultiDocking {
         } */
     }
 
-    @Nonnull
     @Override
     public List<Document> getDocuments() {
         return openDocuments;

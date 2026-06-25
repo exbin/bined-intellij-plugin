@@ -60,8 +60,7 @@ import org.exbin.jaguif.statusbar.gui.DefaultStatusBar;
 import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.utils.DesktopUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -85,7 +84,7 @@ import java.awt.event.KeyEvent;
 /**
  * Binary editor file panel.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdFilePanel extends JPanel {
 
     protected BinaryFileDocument fileDocument;
@@ -107,7 +106,6 @@ public class BinEdFilePanel extends JPanel {
 
             private Graphics2DDelegate graphicsCache = null;
 
-            @Nonnull
             @Override
             protected Graphics getComponentGraphics(Graphics g) {
                 if (g instanceof Graphics2DDelegate) {
@@ -127,13 +125,11 @@ public class BinEdFilePanel extends JPanel {
                 return graphicsCache;
             }
 
-            @Nonnull
             @Override
             protected JLabel createLabel() {
                 return new JBLabel();
             }
 
-            @Nonnull
             @Override
             protected JLabel createEncodingLabel() {
                 return new JBLabel() {
@@ -199,7 +195,6 @@ public class BinEdFilePanel extends JPanel {
 
         toolbarPanel.setTargetComponent(componentPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
-            @Nonnull
             @Override
             public CodeType getCodeType() {
                 return codeArea.getCodeType();
@@ -302,17 +297,14 @@ public class BinEdFilePanel extends JPanel {
         repaint();
     }
 
-    @Nonnull
     public BinEdToolbarPanel getToolbarPanel() {
         return toolbarPanel;
     }
 
-    @Nonnull
     public SectCodeArea getCodeArea() {
         return (SectCodeArea) fileDocument.getCodeArea();
     }
 
-    @Nonnull
     private AbstractAction createOnlineHelpAction() {
         return new AbstractAction() {
             @Override

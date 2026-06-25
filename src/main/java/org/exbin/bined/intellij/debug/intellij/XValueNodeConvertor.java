@@ -63,8 +63,7 @@ import org.exbin.bined.jaguif.inspector.gui.BasicValuesPanel;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.debugger.VariableView;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.awt.Font;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -79,7 +78,7 @@ import java.util.logging.Logger;
 /**
  * Debug values convertor.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class XValueNodeConvertor {
 
     private static boolean classesDetected = false;
@@ -138,7 +137,6 @@ public class XValueNodeConvertor {
     public XValueNodeConvertor() {
     }
 
-    @Nonnull
     public List<DebugViewDataProvider> identifyAvailableProviders(@Nullable XValueNodeImpl myDataNode, @Nullable String initialValue) {
         if (!classesDetected) detectClasses();
 
@@ -503,13 +501,11 @@ public class XValueNodeConvertor {
         }
 
         providers.add(new DebugViewDataProvider() {
-            @Nonnull
             @Override
             public String getName() {
                 return "toString()";
             }
 
-            @Nonnull
             @Override
             public BinaryData getData() {
                 if (initialValue != null) {
@@ -529,7 +525,6 @@ public class XValueNodeConvertor {
         return providers;
     }
 
-    @Nonnull
     public static Optional<XValueNodeImpl> getDataNode(AnActionEvent event) {
         if (!classesDetected) detectClasses();
 
@@ -711,7 +706,6 @@ public class XValueNodeConvertor {
         return null;
     }
 
-    @Nonnull
     private static Value getPrimitiveValue(ValueDescriptorImpl descriptor) {
         if (descriptor.isPrimitive())
             return descriptor.getValue();
@@ -733,7 +727,6 @@ public class XValueNodeConvertor {
                 || CommonClassNames.JAVA_LANG_CHARACTER.equals(type);
     }
 
-    @Nonnull
     public static String getGoValueText(XValue valueContainer) {
         try {
             java.lang.reflect.Field myVariableField = valueContainer.getClass().getDeclaredField("myVariable");
@@ -746,7 +739,6 @@ public class XValueNodeConvertor {
         }
     }
 
-    @Nonnull
     public static String getVariableViewValueText(XValue valueContainer) {
         try {
             return ((VariableView) valueContainer).getValue().getValueString();
@@ -755,7 +747,6 @@ public class XValueNodeConvertor {
         }
     }
 
-    @Nonnull
     public static String getDotNetValueText(XValue valueContainer) {
         try {
             java.lang.reflect.Field valueField = valueContainer.getClass().getDeclaredField("value");
@@ -780,7 +771,6 @@ public class XValueNodeConvertor {
         }
     }
 
-    @Nonnull
     public static String getCValueText(XValue valueContainer) {
         try {
             if (!((CidrMemberValue) valueContainer).isValueDataAvailable()) {
@@ -795,7 +785,7 @@ public class XValueNodeConvertor {
     }
 
     private static class PyValueFuture extends AbstractFuture<String> {
-        public PyValueFuture(@Nonnull XValueNodeImpl dataNode) {
+        public PyValueFuture(XValueNodeImpl dataNode) {
             super();
 
             XFullValueEvaluator fullValueEvaluator = dataNode.getFullValueEvaluator();
@@ -817,17 +807,17 @@ public class XValueNodeConvertor {
                 }
 
                 @Override
-                public void evaluated(@Nonnull String s) {
+                public void evaluated(String s) {
                     set(s);
                 }
 
                 @Override
-                public void evaluated(@Nonnull String s, @Nullable Font font) {
+                public void evaluated(String s, @Nullable Font font) {
                     set(s);
                 }
 
                 @Override
-                public void errorOccurred(@Nonnull String s) {
+                public void errorOccurred(String s) {
                     set(null);
                 }
             });

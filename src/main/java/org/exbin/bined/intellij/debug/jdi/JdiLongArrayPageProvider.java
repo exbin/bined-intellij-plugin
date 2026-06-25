@@ -20,15 +20,14 @@ import org.exbin.bined.jaguif.objectdata.PageProvider;
 import org.exbin.bined.jaguif.objectdata.PageProviderBinaryData;
 import org.exbin.bined.jaguif.inspector.gui.BasicValuesPanel;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.math.BigInteger;
 import java.util.List;
 
 /**
  * Long array data source for debugger view.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class JdiLongArrayPageProvider implements PageProvider {
 
     private final ArrayReference arrayRef;
@@ -37,7 +36,6 @@ public class JdiLongArrayPageProvider implements PageProvider {
         this.arrayRef = arrayRef;
     }
 
-    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         int pageSize = PageProviderBinaryData.PAGE_SIZE / 8;

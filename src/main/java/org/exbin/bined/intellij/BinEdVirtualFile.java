@@ -41,9 +41,8 @@ import org.exbin.jaguif.options.settings.api.OptionsSettingsManagement;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.options.settings.api.SettingsOptionsProvider;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JComponent;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -57,7 +56,7 @@ import java.util.logging.Logger;
 /**
  * Virtual file for binary editor.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     public static final String PATH_PREFIX = "bined://";
@@ -111,12 +110,10 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         fileDocument.applySettings(settingsOptionsProvider);
     }
 
-    @Nonnull
     public static BinaryFileDocument createBinaryFileDocument() {
         return new BinaryFileDocument(new BinEdDataComponent(new BinEdComponentPanelWrapper()));
     }
 
-    @Nonnull
     private static File extractFile(BinEdVirtualFile virtualFile) {
         String path = virtualFile.getPath();
         if (path.startsWith(PATH_PREFIX)) {
@@ -125,36 +122,30 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return new File(path);
     }
 
-    @Nonnull
     public BinaryFileDocument getEditorFile() {
         return fileDocument;
     }
 
-    @Nonnull
     public JComponent getEditorComponent() {
         // Beware: IntelliJ analysis component if it finds JTextComponent it overrides its document handling
         // Introduce component later
         return filePanel;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return parentFile.getName();
     }
 
-    @Nonnull
     public String getDisplayName() {
         return displayName;
     }
 
-    @Nonnull
     @Override
     public VirtualFileSystem getFileSystem() {
         return BinEdFileSystem.getInstance();
     }
 
-    @Nonnull
     @Override
     public String getPath() {
         return PATH_PREFIX + parentFile.getPath();
@@ -187,13 +178,11 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return parentFile.getChildren();
     }
 
-    @Nonnull
     @Override
     public OutputStream getOutputStream(Object requester, long newModificationStamp, long newTimeStamp) throws IOException {
         return parentFile.getOutputStream(requester, newModificationStamp, newTimeStamp);
     }
 
-    @Nonnull
     @Override
     public byte[] contentsToByteArray() throws IOException {
         return parentFile.contentsToByteArray();
@@ -214,7 +203,6 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         parentFile.refresh(asynchronous, recursive, postRunnable);
     }
 
-    @Nonnull
     @Override
     public InputStream getInputStream() throws IOException {
         return parentFile.getInputStream();
@@ -259,7 +247,6 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         docking.removeDocument(fileDocument);
     }
 
-    @Nonnull
     public JComponent getPreferredFocusedComponent() {
         return getEditorFile().getCodeArea();
     }
@@ -294,13 +281,11 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
      */
     private static class BinEdComponentPanelWrapper extends BinEdComponentPanel {
 
-        @Nonnull
         @Override
         protected SectCodeArea createCodeArea() {
             return new SectCodeArea() {
                 private Graphics2DDelegate graphicsCache = null;
 
-                @Nonnull
                 @Override
                 protected Graphics getComponentGraphics(Graphics g) {
                     if (g instanceof Graphics2DDelegate) {

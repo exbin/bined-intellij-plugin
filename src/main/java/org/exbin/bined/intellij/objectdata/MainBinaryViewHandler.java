@@ -25,27 +25,24 @@ import org.exbin.bined.intellij.debug.gui.DebugViewPanel;
 import org.exbin.bined.intellij.objectdata.gui.DataDialog;
 import org.exbin.bined.jaguif.objectdata.ObjectValueConvertor;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JComponent;
 import java.util.Optional;
 
 /**
  * Main binary viewer handler.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public final class MainBinaryViewHandler implements BinaryViewHandler {
 
     private final ObjectValueConvertor valueConvertor = new ObjectValueConvertor();
 
-    @Nonnull
     @Override
     public Optional<BinaryData> instanceToBinaryData(Object instance) {
         return valueConvertor.process(instance);
     }
 
-    @Nonnull
     @Override
     public JComponent createBinaryViewPanel(@Nullable BinaryData binaryData) {
         DebugViewPanel viewPanel = new DebugViewPanel();
@@ -53,7 +50,6 @@ public final class MainBinaryViewHandler implements BinaryViewHandler {
         return viewPanel;
     }
 
-    @Nonnull
     @Override
     public Optional<JComponent> createBinaryViewPanel(Object instance) {
         Optional<BinaryData> binaryData = valueConvertor.process(instance);
@@ -66,7 +62,6 @@ public final class MainBinaryViewHandler implements BinaryViewHandler {
         return Optional.empty();
     }
 
-    @Nonnull
     @Override
     public DialogWrapper createBinaryViewDialog(@Nullable BinaryData binaryData) {
         Project project = ProjectManager.getInstance().getDefaultProject();
@@ -75,7 +70,6 @@ public final class MainBinaryViewHandler implements BinaryViewHandler {
         return dialog;
     }
 
-    @Nonnull
     @Override
     public DialogWrapper createBinaryViewDialog(Object instance) {
         Optional<BinaryData> binaryData = valueConvertor.process(instance);

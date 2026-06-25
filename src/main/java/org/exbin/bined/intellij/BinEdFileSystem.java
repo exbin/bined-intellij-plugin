@@ -20,9 +20,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ import java.util.List;
 /**
  * Virtual file system for binary editor.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdFileSystem extends VirtualFileSystem implements DumbAware {
 
     private static final String PROTOCOL = "bined";
@@ -41,12 +40,10 @@ public class BinEdFileSystem extends VirtualFileSystem implements DumbAware {
         static final BinEdFileSystem INSTANCE = new BinEdFileSystem();
     }
 
-    @Nonnull
     public static BinEdFileSystem getInstance() {
         return SingletonHelper.INSTANCE;
     }
 
-    @Nonnull
     @Override
     public String getProtocol() {
         return PROTOCOL;
@@ -93,19 +90,16 @@ public class BinEdFileSystem extends VirtualFileSystem implements DumbAware {
         throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
-    @Nonnull
     @Override
     protected VirtualFile createChildFile(Object o, VirtualFile virtualFile, String s) throws IOException {
         throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
-    @Nonnull
     @Override
     protected VirtualFile createChildDirectory(Object o, VirtualFile virtualFile, String s) throws IOException {
         throw new RuntimeException(ERROR_INVALID_OPERATION);
     }
 
-    @Nonnull
     @Override
     protected VirtualFile copyFile(Object o, VirtualFile virtualFile, VirtualFile virtualFile1, String s) throws IOException {
         throw new RuntimeException(ERROR_INVALID_OPERATION);

@@ -21,12 +21,12 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.fileTypes.DirectoryFileType;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Open file in binary editor for Open In submenu action.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class ContextOpenInBinaryEditorAction extends OpenAsBinaryAction {
 
     private boolean actionVisible = true;

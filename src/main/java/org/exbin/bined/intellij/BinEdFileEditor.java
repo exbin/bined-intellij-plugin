@@ -31,9 +31,8 @@ import org.exbin.jaguif.App;
 import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.JComponent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -44,7 +43,7 @@ import java.io.OutputStream;
 /**
  * File editor using BinEd editor component.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdFileEditor implements FileEditor, DumbAware {
 
     private final Project project;
@@ -65,7 +64,6 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
         // editorPanel.invalidate();
     }
 
-    @Nonnull
     @Override
     public JComponent getComponent() {
         return virtualFile.getEditorComponent();
@@ -77,13 +75,11 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
         return virtualFile.getPreferredFocusedComponent();
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return displayName;
     }
 
-    @Nonnull
     @Override
     public FileEditorState getState(FileEditorStateLevel level) {
         return fileEditorState;
@@ -159,37 +155,31 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
         this.displayName = displayName;
     }
 
-    @Nonnull
     public BinEdVirtualFile getVirtualFile() {
         return virtualFile;
     }
 
-    @Nonnull
     @Override
     public VirtualFile getFile() {
         return NULL_VIRTUAL_FILE;
     }
 
-    @Nonnull
     public Project getProject() {
         return project;
     }
 
-    @ParametersAreNonnullByDefault
+    @NullMarked
     private static class NullVirtualFile extends VirtualFile {
-        @Nonnull
         @Override
         public String getName() {
             return "NULL";
         }
 
-        @Nonnull
         @Override
         public VirtualFileSystem getFileSystem() {
             return new BinEdFileSystem();
         }
 
-        @Nonnull
         @Override
         public String getPath() {
             return "";
@@ -216,20 +206,17 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
             return null;
         }
 
-        @Nonnull
         @Override
         public VirtualFile[] getChildren() {
             return new VirtualFile[0];
         }
 
-        @Nonnull
         @Override
         public OutputStream getOutputStream(Object requestor, long newModificationStamp, long newTimeStamp)
                 throws IOException {
             throw new UnsupportedOperationException();
         }
 
-        @Nonnull
         @Override
         public byte[] contentsToByteArray() throws IOException {
             return new byte[0];

@@ -20,16 +20,15 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.Icon;
 import java.util.ResourceBundle;
 
 /**
  * File type for binary files.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinaryFileType implements FileType, DumbAware {
 
     public static final String NAME = "Binary File"; // NO NLS
@@ -40,19 +39,16 @@ public class BinaryFileType implements FileType, DumbAware {
     private BinaryFileType() {
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;
     }
 
-    @Nonnull
     @Override
     public String getDescription() {
         return resourceBundle.getString("BinaryFileType.description");
     }
 
-    @Nonnull
     @Override
     public String getDefaultExtension() {
         return DEFAULT_EXTENSION;

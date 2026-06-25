@@ -18,14 +18,13 @@ package org.exbin.bined.intellij.settings;
 import org.exbin.jaguif.options.api.OptionsStorage;
 import org.exbin.jaguif.options.settings.api.SettingsOptions;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import java.util.Locale;
 
 /**
  * BinEd plugin options.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class IntegrationOptions implements SettingsOptions {
 
     private final OptionsStorage storage;
@@ -49,27 +48,22 @@ public class IntegrationOptions implements SettingsOptions {
         this.storage = storage;
     }
 
-    @Nonnull
     public String getLocaleLanguage() {
         return storage.get(PREFERENCES_LOCALE_LANGUAGE, "");
     }
 
-    @Nonnull
     public String getLocaleCountry() {
         return storage.get(PREFERENCES_LOCALE_COUNTRY, "");
     }
 
-    @Nonnull
     public String getLocaleVariant() {
         return storage.get(PREFERENCES_LOCALE_VARIANT, "");
     }
 
-    @Nonnull
     public String getLocaleTag() {
         return storage.get(PREFERENCES_LOCALE_TAG, "");
     }
 
-    @Nonnull
     public Locale getLanguageLocale() {
         String localeTag = getLocaleTag();
         if (!localeTag.trim().isEmpty()) {
@@ -119,7 +113,6 @@ public class IntegrationOptions implements SettingsOptions {
         setLocaleVariant(locale.getVariant());
     }
 
-    @Nonnull
     public String getIconSet() {
         return storage.get(PREFERENCES_ICONSET, "");
     }

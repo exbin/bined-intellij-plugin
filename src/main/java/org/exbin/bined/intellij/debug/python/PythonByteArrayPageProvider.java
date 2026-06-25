@@ -19,15 +19,14 @@ import org.exbin.bined.jaguif.objectdata.PageProvider;
 import org.exbin.bined.jaguif.objectdata.PageProviderBinaryData;
 import org.exbin.auxiliary.binary_data.OutOfBoundsException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Python bytes/bytearray data source for debugger view.
  * <p>
  * It seems that binary value is currently available only in text encoded form.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class PythonByteArrayPageProvider implements PageProvider {
 
     private static final String BYTEARRAY_PREFIX = "bytearray(";
@@ -41,7 +40,6 @@ public class PythonByteArrayPageProvider implements PageProvider {
         length = computeLength(value);
     }
 
-    @Nonnull
     @Override
     public byte[] getPage(long pageIndex) {
         long documentSize = getDocumentSize();

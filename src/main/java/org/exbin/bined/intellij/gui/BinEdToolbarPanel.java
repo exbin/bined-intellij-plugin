@@ -38,7 +38,7 @@ import org.exbin.jaguif.options.api.OptionsStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
@@ -50,7 +50,7 @@ import java.util.logging.Logger;
 /**
  * Binary editor toolbar panel.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinEdToolbarPanel extends JBPanel {
 
     private final java.util.ResourceBundle componentResourceBundle;
@@ -441,7 +441,7 @@ public class BinEdToolbarPanel extends JBPanel {
         return IconLoader.getIcon(path, getClass());
     }
 
-    @ParametersAreNonnullByDefault
+    @NullMarked
     public interface Control {
 
         @NotNull

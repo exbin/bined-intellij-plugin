@@ -57,9 +57,8 @@ import org.exbin.jaguif.text.encoding.ContextEncoding;
 import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.utils.DesktopUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -72,7 +71,7 @@ import java.util.ResourceBundle;
 /**
  * Data dialog for binary data.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public final class DataDialog extends DialogWrapper {
 
     private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(DataDialog.class);
@@ -113,7 +112,6 @@ public final class DataDialog extends DialogWrapper {
         SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
         toolbarPanel.setTargetComponent(componentPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {
-            @Nonnull
             @Override
             public CodeType getCodeType() {
                 return codeArea.getCodeType();
@@ -205,7 +203,6 @@ public final class DataDialog extends DialogWrapper {
         init();
     }
 
-    @Nonnull
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
     }
@@ -219,7 +216,6 @@ public final class DataDialog extends DialogWrapper {
         }
     }
 
-    @Nonnull
     @Override
     protected Action[] createActions() {
         if (editable) {
@@ -229,19 +225,16 @@ public final class DataDialog extends DialogWrapper {
         return new Action[] { getCancelAction() };
     }
 
-    @Nonnull
     @Override
     public JComponent getPreferredFocusedComponent() {
         return dataComponent.getCodeArea();
     }
 
-    @Nonnull
     @Override
     protected String getDimensionServiceKey() {
         return "#org.exbin.bined.intellij.debug.ViewBinaryAction";
     }
 
-    @Nonnull
     @Override
     protected JComponent createCenterPanel() {
         BorderLayoutPanel centerPanel = JBUI.Panels.simplePanel();
@@ -250,7 +243,6 @@ public final class DataDialog extends DialogWrapper {
         return centerPanel;
     }
 
-    @Nonnull
     private AbstractAction createOnlineHelpAction() {
         return new AbstractAction() {
             @Override

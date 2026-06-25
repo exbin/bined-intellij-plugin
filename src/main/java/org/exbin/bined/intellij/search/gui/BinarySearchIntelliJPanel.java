@@ -50,9 +50,8 @@ import org.exbin.jaguif.utils.TestApplication;
 import org.exbin.jaguif.utils.WindowUtils;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import javax.swing.AbstractAction;
 import javax.swing.ComboBoxEditor;
 import javax.swing.DefaultListCellRenderer;
@@ -76,7 +75,7 @@ import java.util.Objects;
 /**
  * Binary editor search panel.
  */
-@ParametersAreNonnullByDefault
+@NullMarked
 public class BinarySearchIntelliJPanel extends JPanel {
 
     private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(BinarySearchPanel.class);
@@ -138,7 +137,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
                     }
                 })
         ) {
-            @Nonnull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -155,7 +153,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
                 controller.prevMatch();
             }
 
-            @Nonnull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -173,7 +170,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
                 controller.nextMatch();
             }
 
-            @Nonnull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -191,7 +187,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
                 controller.cancelSearch();
             }
 
-            @Nonnull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -207,7 +202,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
         replaceAction = new DefaultCustomComponentAction(
                 () -> replaceButton
         ) {
-            @Nonnull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -225,7 +219,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
         replaceAllAction = new DefaultCustomComponentAction(
                 () -> replaceAllButton
         ) {
-            @Nonnull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -304,11 +297,10 @@ public class BinarySearchIntelliJPanel extends JPanel {
                 new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("closeButton.icon")))
         ) {
             @Override
-            public void actionPerformed(@Nonnull AnActionEvent e) {
+            public void actionPerformed(AnActionEvent e) {
                 controller.close();
             }
 
-            @Nonnull
             @Override
             public ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
@@ -334,7 +326,7 @@ public class BinarySearchIntelliJPanel extends JPanel {
 
         final KeyAdapter editorKeyListener = new KeyAdapter() {
             @Override
-            public void keyPressed(@Nonnull KeyEvent e) {
+            public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     controller.performEscape();
                 }
@@ -350,7 +342,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
             private final JPanel panel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
 
-            @Nonnull
             @Override
             public Component getListCellRendererComponent(JList<? extends SearchCondition> list, @Nullable SearchCondition value, int index, boolean isSelected, boolean cellHasFocus) {
                 if (value == null) {
@@ -376,7 +367,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
             }
         });
         findComboBoxEditor = new ComboBoxEditor() {
-            @Nonnull
             @Override
             public Component getEditorComponent() {
                 return findComboBoxEditorComponent;
@@ -401,7 +391,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
                 }
             }
 
-            @Nonnull
             @Override
             public Object getItem() {
                 return findComboBoxEditorComponent.getItem();
@@ -431,9 +420,8 @@ public class BinarySearchIntelliJPanel extends JPanel {
             private final JPanel panel = new JPanel();
             private final DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer();
 
-            @Nonnull
             @Override
-            public Component getListCellRendererComponent(@Nonnull JList<? extends SearchCondition> list, @Nullable SearchCondition value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<? extends SearchCondition> list, @Nullable SearchCondition value, int index, boolean isSelected, boolean cellHasFocus) {
                 if (value == null) {
                     return panel;
                 }
@@ -457,7 +445,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
             }
         });
         replaceComboBoxEditor = new ComboBoxEditor() {
-            @Nonnull
             @Override
             public Component getEditorComponent() {
                 return replaceComboBoxEditorComponent;
@@ -482,7 +469,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
                 }
             }
 
-            @Nonnull
             @Override
             public Object getItem() {
                 return replaceComboBoxEditorComponent.getItem();
@@ -557,7 +543,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
         });
     }
 
-    @Nonnull
     public SearchParameters getSearchParameters() {
         SearchParameters searchParameters = new SearchParameters();
         searchParameters.setMatchCase(matchCase);
@@ -588,7 +573,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
         return searchParameters;
     }
 
-    @Nonnull
     public ReplaceParameters getReplaceParameters() {
         ReplaceParameters replaceParameters = new ReplaceParameters();
         replaceParameters.setCondition(new SearchCondition(replaceComboBoxEditorComponent.getItem()));
@@ -868,7 +852,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
          */
         void notifySearchChanging();
 
-        @Nonnull
         SearchParameters.SearchDirection getSearchDirection();
 
         void searchOptions();
