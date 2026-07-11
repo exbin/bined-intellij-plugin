@@ -601,6 +601,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
         private final Map<Class<?>, Module> modules = new HashMap<>();
 
         private void createModules() {
+            // Jaguif framework modules
             modules.put(LanguageModuleApi.class, new LanguageModule());
             modules.put(ContributionModuleApi.class, new ContributionModule());
             modules.put(ContextModuleApi.class, new ContextModule());
@@ -623,6 +624,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(FileModuleApi.class, new FileModule());
             modules.put(DockingModuleApi.class, new DockingModule());
             modules.put(HelpOnlineModule.class, new HelpOnlineModule());
+
+            // BinEd modules
             modules.put(BinedComponentModule.class, new BinedComponentModule());
             modules.put(BinedViewerModule.class, new BinedViewerModule());
             modules.put(BinedEditorModule.class, new BinedEditorModule());
@@ -803,8 +806,13 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedViewerModule.registerCodeAreaPopupMenu();
             binedEditorModule.registerCodeAreaPopupMenu();
             binedDocumentModule.registerDocument();
-            binedViewerModule.registerFrameStatusBar();
             binedDocumentModule.registerStatusBar();
+            binedViewerModule.registerCursorPositionStatusMenu();
+            binedViewerModule.registerDataSizeStatusMenu();
+            binedViewerModule.registerBinaryEncodingStatusMenu();
+            binedEditorModule.registerEditModeStatusMenu();
+            binedDocumentModule.registerProcessingModeStatusMenu();
+            binedViewerModule.registerFrameStatusBar();
             binedDocumentModule.registerEncodings();
             binedViewerModule.registerViewModeMenu();
             binedViewerModule.registerCodeTypeMenu();

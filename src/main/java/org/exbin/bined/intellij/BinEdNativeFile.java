@@ -28,6 +28,7 @@ import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.jaguif.document.BinEdFileProcessingMode;
 import org.exbin.bined.jaguif.document.BinedDocumentModule;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.jaguif.App;
@@ -187,8 +188,8 @@ public class BinEdNativeFile {
         });
     }
 
-    public FileProcessingMode getFileProcessingMode() {
-        return FileProcessingMode.DIRECT;
+    public BinEdFileProcessingMode getFileProcessingMode() {
+        return DirectFileProcessingMode.DIRECT;
     }
 
     public void reloadFile() {

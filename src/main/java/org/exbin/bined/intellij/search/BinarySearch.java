@@ -278,7 +278,11 @@ public class BinarySearch {
                         ReplaceParameters dialogReplaceParameters = new ReplaceParameters();
                         dialogReplaceParameters.setFromParameters(findBinaryPanel.getReplaceParameters());
                         boolean performReplace = dialogReplaceParameters.isPerformReplace();
-                        binarySearchPanel.switchPanelMode(performReplace ? BinarySearchPanel.PanelMode.REPLACE : BinarySearchPanel.PanelMode.FIND);
+                        if (performReplace) {
+                            binarySearchPanel.switchToReplaceMode();
+                        } else {
+                            binarySearchPanel.switchToFindMode();
+                        }
                         invokeSearch(performReplace ? SearchOperation.REPLACE : SearchOperation.FIND, dialogSearchParameters, dialogReplaceParameters);
                     }
                     dialog.close();

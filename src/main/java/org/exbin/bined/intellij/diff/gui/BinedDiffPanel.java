@@ -459,19 +459,19 @@ public class BinedDiffPanel extends JBPanel {
     private static void attachContext(SectCodeArea codeArea, ContextComponent contextComponent, ActiveContextManagement contextManagement) {
         contextManagement.changeActiveState(ContextComponent.class, contextComponent);
         codeArea.addDataChangedListener(() -> {
-            contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.DATA_CHANGED);
+            contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.DATA_CONTENT);
         });
 
         ((SelectionCapable) codeArea).addSelectionChangedListener(() -> {
-            contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.SELECTION_CHANGED);
+            contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.SELECTION);
         });
 
         ((CaretCapable) codeArea).addCaretMovedListener((CodeAreaCaretPosition caretPosition) -> {
-            contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.CURSOR_MOVED);
+            contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.CURSOR_POSITION);
         });
 
         ((EditModeCapable) codeArea).addEditModeChangedListener((EditMode mode, EditOperation operation) -> {
-            contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.EDIT_MODE_CHANGED);
+            contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.EDIT_MODE);
         });
 
         OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);

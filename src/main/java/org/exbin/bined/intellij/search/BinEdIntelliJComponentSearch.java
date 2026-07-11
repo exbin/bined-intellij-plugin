@@ -38,7 +38,7 @@ import java.awt.BorderLayout;
 public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
 
     private BinEdComponentPanel componentPanel;
-    private final BinarySearch binarySearch = new BinarySearch();
+    private BinarySearch binarySearch;
     private BinarySearchService binarySearchService;
     private boolean binarySearchPanelVisible = false;
 
@@ -48,19 +48,25 @@ public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
         SectCodeArea codeArea = (SectCodeArea) dataComponent.getCodeArea();
 
         binarySearchService = new DefaultBinarySearchService(codeArea);
-        binarySearch.setBinarySearchService(binarySearchService);
-        binarySearch.setPanelClosingListener(this::hideSearchPanel);
-        binarySearch.setTargetComponent(componentPanel);
-
-        BinedComponentModule binedComponentModule = App.getModule(BinedComponentModule.class);
-        binarySearch.setCodeAreaPopupMenu(binedComponentModule.createCodeAreaPopupMenu());
     }
 
     @Override
     public void onDataChange() {
         if (binarySearchPanelVisible) {
-            binarySearch.dataChanged();
+            getBinarySearch().dataChanged();
         }
+    }
+
+    private BinarySearch getBinarySearch() {
+        if (binarySearch == null) {
+            binarySearch = new BinarySearch();
+            binarySearch.setBinarySearchService(binarySearchService);
+            binarySearch.setPanelClosingListener(this::hideSearchPanel);
+            BinedComponentModule binedComponentModule = App.getModule(BinedComponentModule.class);
+            binarySearch.setCodeAreaPopupMenu(binedComponentModule.createCodeAreaPopupMenu());
+        }
+
+        return binarySearch;
     }
 
     @Override
@@ -68,19 +74,33 @@ public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
     }
 
     @Override
-    public void showSearchPanel(BinarySearchPanel.PanelMode panelMode) {
+    public void showSearchFindPanel() {
         if (!binarySearchPanelVisible) {
-            componentPanel.add(binarySearch.getPanel(), BorderLayout.NORTH);
+            getBinarySearch();
+            componentPanel.add(binarySearch.getPanel(), BorderLayout.SOUTH);
             componentPanel.revalidate();
             binarySearchPanelVisible = true;
             binarySearch.getPanel().requestSearchFocus();
         }
-        binarySearch.getPanel().switchPanelMode(panelMode);
+        binarySearch.getPanel().switchToFindMode();
+    }
+
+    @Override
+    public void showSearchReplacePanel() {
+        if (!binarySearchPanelVisible) {
+            getBinarySearch();
+            componentPanel.add(binarySearch.getPanel(), BorderLayout.SOUTH);
+            componentPanel.revalidate();
+            binarySearchPanelVisible = true;
+            binarySearch.getPanel().requestSearchFocus();
+        }
+        binarySearch.getPanel().switchToReplaceMode();
     }
 
     @Override
     public void hideSearchPanel() {
         if (binarySearchPanelVisible) {
+            getBinarySearch();
             binarySearch.cancelSearch();
             binarySearch.clearSearch();
             componentPanel.remove(binarySearch.getPanel());
@@ -95,20 +115,20 @@ public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
         SearchCondition searchCondition = new SearchCondition();
         searchCondition.setSearchText(text);
         searchParameters.setCondition(searchCondition);
-        binarySearchService.performFind(searchParameters, binarySearch.getSearchStatusListener());
+        binarySearchService.performFind(searchParameters, getBinarySearch().getSearchStatusListener());
     }
 
     @Override
     public void performFindAgain() {
         if (binarySearchPanelVisible) {
-            binarySearchService.performFindAgain(binarySearch.getSearchStatusListener());
+            binarySearchService.performFindAgain(getBinarySearch().getSearchStatusListener());
         } else {
-            showSearchPanel(BinarySearchPanel.PanelMode.FIND);
+            showSearchFindPanel();
         }
     }
 
     @Override
     public void setCodeAreaPopupMenu(JPopupMenu popupMenu) {
-        binarySearch.getPanel().setCodeAreaPopupMenu(popupMenu);
+        getBinarySearch().getPanel().setCodeAreaPopupMenu(popupMenu);
     }
 }

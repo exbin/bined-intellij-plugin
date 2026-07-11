@@ -84,7 +84,7 @@ public class BinarySearchIntelliJPanel extends JPanel {
 
     private final SectCodeArea searchCodeArea = new SectCodeArea();
 
-    private BinarySearchPanel.PanelMode panelMode = BinarySearchPanel.PanelMode.REPLACE;
+    private boolean replaceShown = true;
     private StatusPanelMode statusPanelMode = StatusPanelMode.EMPTY;
     private ComboBoxEditor findComboBoxEditor;
     private BinarySearchComboBoxPanel findComboBoxEditorComponent;
@@ -594,14 +594,19 @@ public class BinarySearchIntelliJPanel extends JPanel {
         replaceComboBox.setModel(new SearchHistoryModel(history));
     }
 
-    public void switchPanelMode(BinarySearchPanel.PanelMode panelMode) {
-        if (this.panelMode != panelMode) {
-            this.panelMode = panelMode;
-            if (panelMode == BinarySearchPanel.PanelMode.REPLACE) {
-                add(replacePanel, BorderLayout.SOUTH);
-            } else {
-                remove(replacePanel);
-            }
+    public void switchToFindMode() {
+        if (replaceShown) {
+            remove(replacePanel);
+            replaceShown = false;
+            revalidate();
+            repaint();
+        }
+    }
+
+    public void switchToReplaceMode() {
+        if (!replaceShown) {
+            add(replacePanel, BorderLayout.SOUTH);
+            replaceShown = true;
             revalidate();
             repaint();
         }
