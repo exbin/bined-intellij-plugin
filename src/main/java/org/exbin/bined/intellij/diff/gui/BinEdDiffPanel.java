@@ -65,7 +65,6 @@ import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.jaguif.App;
-import org.exbin.jaguif.context.ActiveContextManager;
 import org.exbin.jaguif.context.api.ActiveContextManagement;
 import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.context.api.ContextModuleApi;
@@ -78,16 +77,16 @@ import org.exbin.jaguif.options.api.OptionsStorage;
 import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
+import org.exbin.jaguif.statusbar.api.StatusBarComponent;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.text.encoding.CharsetEncodingState;
-import org.exbin.jaguif.text.encoding.ContextEncoding;
 import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingOptions;
 import org.exbin.jaguif.text.font.settings.TextFontOptions;
 import org.exbin.jaguif.utils.DesktopUtils;
-
-import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 import java.awt.BorderLayout;
@@ -105,7 +104,7 @@ import java.util.Optional;
  * BinEd diff support provider to compare binary files.
  */
 @NullMarked
-public class BinedDiffPanel extends JBPanel {
+public class BinEdDiffPanel extends JBPanel {
 
     protected final SectCodeAreaDiffPanel diffPanel = new SectCodeAreaDiffPanel();
 
@@ -125,7 +124,7 @@ public class BinedDiffPanel extends JBPanel {
     protected EncodingsManager encodingsManager;
     protected GoToPositionAction goToPositionAction = new GoToPositionAction();
 
-    public BinedDiffPanel() {
+    public BinEdDiffPanel() {
         setLayout(new java.awt.BorderLayout());
 
         defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
@@ -210,102 +209,6 @@ public class BinedDiffPanel extends JBPanel {
         };
         toolbarPanel.setOptionsAction(wrapperAction);
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
-/*        leftStatusBar = new BinaryStatusPanel() {
-
-            private Graphics2DDelegate graphicsCache = null;
-
-            @Override
-            protected Graphics getComponentGraphics(Graphics g) {
-                if (g instanceof Graphics2DDelegate) {
-                    return g;
-                }
-
-                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                    return graphicsCache;
-                }
-
-                if (graphicsCache != null) {
-                    graphicsCache.dispose();
-                }
-
-                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
-                return graphicsCache;
-            }
-
-            @Override
-            protected JLabel createLabel() {
-                return new JBLabel();
-            }
-
-            @Override
-            protected JLabel createEncodingLabel() {
-                return new JBLabel() {
-                    private final BasicArrowButton basicArrowButton = new BasicArrowButton(SwingConstants.NORTH);
-
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        super.paintComponent(g);
-                        Dimension areaSize = getSize();
-
-                        int h = areaSize.height;
-                        int w = areaSize.width;
-                        int size = Math.min(Math.max((h - 4) / 4, 2), 10);
-                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 - (h / 5), size, SwingConstants.NORTH, true);
-                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 + (h / 5), size, SwingConstants.SOUTH, true);
-                    }
-                };
-            }
-        };
-        leftStatusBar.setMinimumSize(new Dimension(0, getMinimumSize().height));
-        rightStatusBar = new BinaryStatusPanel() {
-
-            private Graphics2DDelegate graphicsCache = null;
-
-            @Override
-            protected Graphics getComponentGraphics(Graphics g) {
-                if (g instanceof Graphics2DDelegate) {
-                    return g;
-                }
-
-                if (graphicsCache != null && graphicsCache.getDelegate() == g) {
-                    return graphicsCache;
-                }
-
-                if (graphicsCache != null) {
-                    graphicsCache.dispose();
-                }
-
-                Graphics2D editorGraphics = IdeBackgroundUtil.withEditorBackground(g, this);
-                graphicsCache = editorGraphics instanceof Graphics2DDelegate ? (Graphics2DDelegate) editorGraphics : new Graphics2DDelegate(editorGraphics);
-                return graphicsCache;
-            }
-
-            @Override
-            protected JLabel createLabel() {
-                return new JBLabel();
-            }
-
-            @Override
-            protected JLabel createEncodingLabel() {
-                return new JBLabel() {
-                    private final BasicArrowButton basicArrowButton = new BasicArrowButton(SwingConstants.NORTH);
-
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        super.paintComponent(g);
-                        Dimension areaSize = getSize();
-
-                        int h = areaSize.height;
-                        int w = areaSize.width;
-                        int size = Math.min(Math.max((h - 4) / 4, 2), 10);
-                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 - (h / 5), size, SwingConstants.NORTH, true);
-                        basicArrowButton.paintTriangle(g, w - size * 2, (h - size) / 2 + (h / 5), size, SwingConstants.SOUTH, true);
-                    }
-                };
-            }
-        };
-        rightStatusBar.setMinimumSize(new Dimension(0, getMinimumSize().height)); */
 
         init();
     }
@@ -552,6 +455,14 @@ public class BinedDiffPanel extends JBPanel {
         };
     }
 
+    public void setLeftContentData(BinaryData contentData) {
+        diffPanel.setLeftContentData(contentData);
+    }
+
+    public void setRightContentData(BinaryData contentData) {
+        diffPanel.setRightContentData(contentData);
+    }
+
     public static class DiffContextComponent implements BinaryDataComponent, CharsetEncodingState {
 
         SectCodeArea codeArea;
@@ -618,6 +529,21 @@ public class BinedDiffPanel extends JBPanel {
         @Override
         public void setShowNonprintables(boolean showNonprintables) {
             throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Optional<ActiveContextManagement> getContextManagement() {
+            return Optional.empty();
+        }
+
+        @Override
+        public <T extends StatusBarComponent> Optional<T> getStatusBarComponent(Class<T> aClass) {
+            return Optional.empty();
+        }
+
+        @Override
+        public void setEditOperation(EditOperation editOperation) {
+            throw new UnsupportedOperationException();
         }
 
         @Override

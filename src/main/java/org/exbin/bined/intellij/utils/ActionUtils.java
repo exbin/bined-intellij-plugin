@@ -16,8 +16,12 @@
 package org.exbin.bined.intellij.utils;
 
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jspecify.annotations.NullMarked;
 import javax.swing.Action;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.exbin.jaguif.App;
@@ -33,8 +37,27 @@ public final class ActionUtils {
     public static void replaceAction(JPopupMenu menu, String actionId, Action action) {
         for (int i = 0; i < menu.getComponentCount(); i++) {
             Component component = menu.getComponent(i);
-            if (component instanceof JMenuItem) {
+            if (component instanceof JMenu) {
+                replaceAction((JMenu) component, actionId, action);
+            } else if (component instanceof JMenuItem) {
                 Action componentAction = ((JMenuItem) component).getAction();
+                if (componentAction != null && actionId.equals(componentAction.getValue(ActionConsts.ACTION_ID))) {
+                    menu.remove(i);
+                    MenuModuleApi actionModule = App.getModule(MenuModuleApi.class);
+                    menu.add(actionModule.actionToMenuItem(action), i);
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void replaceAction(JMenu menu, String actionId, Action action) {
+        for (int i = 0; i < menu.getItemCount(); i++) {
+            JMenuItem component = menu.getItem(i);
+            if (component instanceof JMenu) {
+                replaceAction((JMenu) component, actionId, action);
+            } else if (component != null) {
+                Action componentAction = component.getAction();
                 if (componentAction != null && actionId.equals(componentAction.getValue(ActionConsts.ACTION_ID))) {
                     menu.remove(i);
                     MenuModuleApi actionModule = App.getModule(MenuModuleApi.class);

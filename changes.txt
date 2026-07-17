@@ -1,4 +1,5 @@
 0.2.14
+- Minor fixes
 - Fixed opening read-only file (issue #68)
 - Fixed show as binary on debugger not working (issue #69)
 

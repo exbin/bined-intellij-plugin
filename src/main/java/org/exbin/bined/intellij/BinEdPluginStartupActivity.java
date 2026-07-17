@@ -138,6 +138,8 @@ import org.exbin.jaguif.menu.api.MenuBuilder;
 import org.exbin.jaguif.menu.api.MenuDefinitionManagement;
 import org.exbin.jaguif.menu.api.MenuModuleApi;
 import org.exbin.jaguif.menu.api.MenuShowMethod;
+import org.exbin.jaguif.menu.popup.MenuPopupModule;
+import org.exbin.jaguif.menu.popup.api.MenuPopupModuleApi;
 import org.exbin.jaguif.operation.undo.OperationUndoModule;
 import org.exbin.jaguif.operation.undo.api.OperationUndoModuleApi;
 import org.exbin.jaguif.options.OptionsModule;
@@ -613,6 +615,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(UiThemeModuleApi.class, new UiThemeModule());
             modules.put(HelpModuleApi.class, new HelpModule());
             modules.put(MenuModuleApi.class, new MenuModule());
+            modules.put(MenuPopupModuleApi.class, new MenuPopupModule());
             modules.put(ToolBarModuleApi.class, new ToolBarModule());
             modules.put(StatusBarModuleApi.class, new StatusBarModule());
             modules.put(ComponentModuleApi.class, new ComponentModule());
@@ -774,8 +777,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             BinedEditorModule binedEditorModule = App.getModule(BinedEditorModule.class);
             BinedDocumentModule binedDocumentModule = App.getModule(BinedDocumentModule.class);
             BinedThemeModule binedThemeModule = App.getModule(BinedThemeModule.class);
-
             BinedSearchModule binedSearchModule = App.getModule(BinedSearchModule.class);
+
             BinEdFileManager fileManager = binedDocumentModule.getFileManager();
             fileManager.addBinEdComponentExtension(component -> Optional.of(new BinEdIntelliJComponentSearch()));
 
@@ -812,7 +815,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedViewerModule.registerBinaryEncodingStatusMenu();
             binedEditorModule.registerEditModeStatusMenu();
             binedDocumentModule.registerProcessingModeStatusMenu();
-            binedViewerModule.registerFrameStatusBar();
             binedDocumentModule.registerEncodings();
             binedViewerModule.registerViewModeMenu();
             binedViewerModule.registerCodeTypeMenu();
@@ -828,6 +830,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedToolContentModule.registerClipboardContentMenu();
             binedToolContentModule.registerDragDropContentMenu();
             binedInspectorModule.registerSettings();
+            binedViewerModule.registerFrameStatusBar();
 
             FrameModuleApi frameModuleApi = App.getModule(FrameModuleApi.class);
             ActiveContextManagement contextManagement = frameModuleApi.getFrameController().getContextManager();

@@ -19,7 +19,7 @@ import com.intellij.diff.DiffContext;
 import com.intellij.diff.requests.ContentDiffRequest;
 import com.intellij.diff.tools.util.base.DiffViewerBase;
 import com.intellij.openapi.progress.ProgressIndicator;
-import org.exbin.bined.intellij.diff.gui.BinedDiffPanel;
+import org.exbin.bined.intellij.diff.gui.BinEdDiffPanel;
 
 import org.jspecify.annotations.NullMarked;
 import javax.swing.JComponent;
@@ -30,7 +30,7 @@ import javax.swing.JComponent;
 @NullMarked
 public class BinEdDiffViewer extends DiffViewerBase {
 
-    private final BinedDiffPanel diffPanel = new BinedDiffPanel();
+    private final BinEdDiffPanel diffPanel = new BinEdDiffPanel();
 
     public BinEdDiffViewer(DiffContext context, ContentDiffRequest request) {
         super(context, request);
