@@ -36,6 +36,7 @@ import org.exbin.bined.jaguif.viewer.BinedViewerModule;
 import org.exbin.bined.jaguif.viewer.settings.BinaryEncodingSettingsApplier;
 import org.exbin.bined.jaguif.viewer.settings.CodeAreaOptions;
 import org.exbin.bined.jaguif.viewer.settings.CodeAreaViewerSettingsApplier;
+import org.exbin.bined.jaguif.viewer.status.gui.BinaryDataSizeComponent;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
@@ -58,15 +59,15 @@ import org.exbin.jaguif.options.api.OptionsStorage;
 import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
+import org.exbin.jaguif.statusbar.api.StatusBarComponent;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.text.encoding.ContextEncoding;
-import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.text.encoding.settings.TextEncodingOptions;
 import org.exbin.jaguif.text.font.settings.TextFontOptions;
 import org.exbin.jaguif.utils.DesktopUtils;
-
-import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -173,13 +174,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
         JPopupMenu codeAreaPopupMenu = binedComponentModule.createCodeAreaPopupMenu();
         codeArea.setComponentPopupMenu(codeAreaPopupMenu);
 
-        EncodingsManager encodingsManager = new EncodingsManager();
-        encodingsManager.init();
-
-//        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-//        binaryStatusPanel.loadFromOptions(new CodeAreaStatusOptions(optionsModule.getAppOptions()));
-        // statusPanel.setMinimumSize(new Dimension(0, getMinimumSize().height));
-//        binaryStatus.attachCodeArea(dataComponent);
         StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
 
         // TODO Temporary workaround for unfinished rework of actions
@@ -219,14 +213,8 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
         applyOptions(preferences, codeArea);
 
-//        BinaryStatusPanel statusPanel = statusBar.getBinaryStatusPanel();
-//        CodeAreaStatusOptions statusOptions = new CodeAreaStatusOptions(preferences);
-//        statusPanel.loadFromOptions(statusOptions);
         toolbarPanel.applyFromCodeArea();
         toolbarPanel.loadFromOptions(preferences);
-
-//        BinaryStatusApi.MemoryMode memoryMode = BinaryStatusApi.MemoryMode.READ_ONLY;
-//        statusPanel.setMemoryMode(memoryMode);
     }
 
     private void applyOptions(OptionsStorage optionsStorage, SectCodeArea codeArea) {
@@ -235,7 +223,6 @@ public class DebugViewPanel extends javax.swing.JPanel {
         TextEncodingOptions encodingOptions = new TextEncodingOptions(optionsStorage);
         ((CharsetCapable) codeArea).setCharset(Charset.forName(encodingOptions
                 .getSelectedEncoding()));
-        // TODO encodingsManager.setEncodings(optionsSettings.getEncodingOptions().getEncodings());
         TextFontOptions fontOptions = new TextFontOptions(optionsStorage);
         ((FontCapable) codeArea).setCodeFont(fontOptions.isUseDefaultFont() ?
                 defaultFont :
@@ -316,8 +303,22 @@ public class DebugViewPanel extends javax.swing.JPanel {
 
     public void setContentData(@Nullable BinaryData data) {
         dataComponent.getCodeArea().setContentData(data);
-        long dataSize = data == null ? 0 : data.getDataSize();
-        // TODO statusBar.getBinaryStatusPanel().setCurrentDocumentSize(dataSize, dataSize);
+        dataSync();
+    }
+
+    private void dataSync() {
+        long dataSize = dataComponent.getCodeArea().getDataSize();
+        BinaryDataSizeComponent dataSizeComponent = null;
+        for (int i = 0; i < statusBar.getItemsCount(); i++) {
+            StatusBarComponent component = statusBar.getItem(i);
+            if (component instanceof BinaryDataSizeComponent) {
+                dataSizeComponent = (BinaryDataSizeComponent) component;
+                break;
+            }
+        }
+        if (dataSizeComponent != null) {
+            dataSizeComponent.setOriginalDataSize(dataSize);
+        }
     }
 
     private AbstractAction createOnlineHelpAction() {

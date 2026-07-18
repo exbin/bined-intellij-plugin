@@ -55,6 +55,7 @@ import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.utils.DesktopUtils;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -74,6 +75,7 @@ import java.awt.event.KeyEvent;
 @NullMarked
 public class BinEdFilePanel extends JPanel {
 
+    @Nullable
     protected BinaryFileDocument fileDocument;
     protected BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
     protected StatusBar statusBar;

@@ -33,6 +33,7 @@ import org.exbin.bined.jaguif.document.BinEdFileManager;
 import org.exbin.bined.jaguif.document.BinedDocumentModule;
 import org.exbin.bined.jaguif.viewer.BinedViewerModule;
 import org.exbin.bined.jaguif.viewer.settings.BinaryEncodingSettingsApplier;
+import org.exbin.bined.jaguif.viewer.status.gui.BinaryDataSizeComponent;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
@@ -51,6 +52,7 @@ import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.options.api.OptionsModuleApi;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
+import org.exbin.jaguif.statusbar.api.StatusBarComponent;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.text.encoding.CharsetEncodingState;
 import org.exbin.jaguif.text.encoding.ContextEncoding;
@@ -81,7 +83,6 @@ public final class DataDialog extends DialogWrapper {
     private StatusBar statusBar;
     private final BinEdDataComponent dataComponent;
     private final SetDataListener setDataListener;
-    private long documentOriginalSize = 0;
     private final boolean editable;
 
     public DataDialog(Project project, @Nullable BinaryData binaryData) {
@@ -194,13 +195,26 @@ public final class DataDialog extends DialogWrapper {
         panel.repaint();
 
         dataComponent.getCodeArea().setContentData(binaryData);
-        long dataSize = dataComponent.getCodeArea().getContentData().getDataSize();
-        documentOriginalSize = dataSize;
-        // TODO statusBar.getBinaryStatusPanel().setCurrentDocumentSize(dataSize, documentOriginalSize);
+        dataSync();
         if (!editable) {
             codeArea.setEditMode(EditMode.READ_ONLY);
         }
         init();
+    }
+
+    private void dataSync() {
+        long dataSize = dataComponent.getCodeArea().getDataSize();
+        BinaryDataSizeComponent dataSizeComponent = null;
+        for (int i = 0; i < statusBar.getItemsCount(); i++) {
+            StatusBarComponent component = statusBar.getItem(i);
+            if (component instanceof BinaryDataSizeComponent) {
+                dataSizeComponent = (BinaryDataSizeComponent) component;
+                break;
+            }
+        }
+        if (dataSizeComponent != null) {
+            dataSizeComponent.setOriginalDataSize(dataSize);
+        }
     }
 
     public ResourceBundle getResourceBundle() {

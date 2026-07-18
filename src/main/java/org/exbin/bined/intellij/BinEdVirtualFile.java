@@ -23,26 +23,26 @@ import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
 import com.intellij.ui.Graphics2DDelegate;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
-import org.exbin.bined.jaguif.document.BinedDocumentModule;
-import org.exbin.bined.swing.section.SectCodeArea;
-import org.exbin.jaguif.App;
 import org.exbin.bined.jaguif.component.BinEdDataComponent;
+import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
 import org.exbin.bined.jaguif.document.BinEdFileManager;
 import org.exbin.bined.jaguif.document.BinaryFileDocument;
+import org.exbin.bined.jaguif.document.BinedDocumentModule;
 import org.exbin.bined.jaguif.document.settings.BinaryFileProcessingOptions;
-import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
+import org.exbin.bined.swing.section.SectCodeArea;
+import org.exbin.jaguif.App;
 import org.exbin.jaguif.docking.api.ContextDocking;
-import org.exbin.jaguif.document.api.DocumentSource;
+import org.exbin.jaguif.document.api.StreamDocumentSource;
 import org.exbin.jaguif.file.api.FileDocumentSource;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
-import org.exbin.jaguif.options.api.OptionsStorage;
 import org.exbin.jaguif.options.api.OptionsModuleApi;
+import org.exbin.jaguif.options.api.OptionsStorage;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsManagement;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.options.settings.api.SettingsOptionsProvider;
-
-import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import javax.swing.JComponent;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -96,7 +96,6 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         toolbarPanel.setUndoHandler(fileDocument.getUndoHandler().get());
         toolbarPanel.setSaveAction(e -> {
             fileDocument.saveTo(fileDocument.getDocumentSource().get());
-            fileDocument.fileSync();
             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
             BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(
                     ContextDocking.class);
@@ -108,6 +107,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
         SettingsOptionsProvider settingsOptionsProvider = settingsManager.getSettingsOptionsProvider();
         fileDocument.applySettings(settingsOptionsProvider);
+        fileDocument.fileSync();
     }
 
     public static BinaryFileDocument createBinaryFileDocument() {
@@ -257,14 +257,8 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             fileDocument.clearFile();
             if (file.isFile() && file.exists()) {
                 fileDocument.loadFrom(new FileDocumentSource(file));
-                fileDocument.fileSync();
             } else {
-                try (InputStream stream = getInputStream()) {
-                    fileDocument.loadFrom(new VirtualFileDocumentSource());
-                    fileDocument.fileSync();
-                } catch (IOException ex) {
-                    Logger.getLogger(BinEdVirtualFile.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                fileDocument.loadFrom(new VirtualFileDocumentSource());
             }
         }
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
@@ -272,8 +266,27 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         docking.setActiveDocument(fileDocument);
     }
 
-    public static class VirtualFileDocumentSource implements DocumentSource {
-        // TODO
+    public class VirtualFileDocumentSource implements StreamDocumentSource {
+        @Override
+        public String getDocumentTitle() {
+            return getName();
+        }
+
+        @Override
+        public InputStream openInputStream() {
+            try {
+                return getInputStream();
+            } catch (IOException ex) {
+                Logger.getLogger(BinEdVirtualFile.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public OutputStream openOutputStream() {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**

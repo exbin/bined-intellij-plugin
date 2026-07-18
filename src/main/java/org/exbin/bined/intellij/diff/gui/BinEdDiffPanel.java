@@ -52,6 +52,7 @@ import org.exbin.bined.jaguif.viewer.settings.BinaryEncodingSettingsApplier;
 import org.exbin.bined.jaguif.viewer.settings.CodeAreaOptions;
 import org.exbin.bined.jaguif.viewer.settings.CodeAreaStatusOptions;
 import org.exbin.bined.jaguif.viewer.settings.CodeAreaViewerSettingsApplier;
+import org.exbin.bined.jaguif.viewer.status.gui.BinaryDataSizeComponent;
 import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
 import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
@@ -114,8 +115,8 @@ public class BinEdDiffPanel extends JBPanel {
     protected final CodeAreaColorsProfile defaultColorProfile;
     protected List<String> encodings = new ArrayList<>();
 
-    protected ContextComponent leftContextComponent;
-    protected ContextComponent rightContextComponent;
+    protected DiffContextComponent leftContextComponent;
+    protected DiffContextComponent rightContextComponent;
     protected ContextRegistration leftContextRegistrator;
     protected ContextRegistration rightContextRegistrator;
     protected final BinEdToolbarPanel toolbarPanel;
@@ -241,97 +242,11 @@ public class BinEdDiffPanel extends JBPanel {
             if (leftData != null) {
                 diffPanel.setLeftContentData(leftData);
             }
-            SectCodeArea leftCodeArea = diffPanel.getLeftCodeArea();
-            /*leftCodeArea.setComponentPopupMenu(new JPopupMenu() {
-                @Override
-                public void show(Component invoker, int x, int y) {
-                    FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                    ActiveContextManagement contextManager =
-                            frameModule.getFrameController().getContextManager();
-
-                    BinEdDataComponent leftDataComponent = new BinEdDataComponent(leftCodeArea);
-                    contextManager.changeActiveState(ContextFont.class, leftDataComponent);
-                    contextManager.changeActiveState(ContextEncoding.class, leftDataComponent);
-                    contextManager.changeActiveState(ContextComponent.class, leftDataComponent);
-                    contextManager.changeActiveState(DialogParentComponent.class, () -> leftCodeArea);
-                    contextManager.changeActiveState(ClipboardController.class, leftDataComponent);
-
-                    String popupMenuId = "BinDiffPanel.left";
-                    int clickedX = x;
-                    int clickedY = y;
-                    if (invoker instanceof JViewport) {
-                        clickedX += invoker.getParent().getX();
-                        clickedY += invoker.getParent().getY();
-                    }
-                    BinedModule binedModule = App.getModule(BinedModule.class);
-                    CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
-                            binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
-                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(leftCodeArea, popupMenuId, clickedX, clickedY);
-                    popupMenu.addPopupMenuListener(new PopupMenuListener() {
-                        @Override
-                        public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                        }
-
-                        @Override
-                        public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                            codeAreaPopupMenuHandler.dropPopupMenu(popupMenuId);
-                        }
-
-                        @Override
-                        public void popupMenuCanceled(PopupMenuEvent e) {
-                        }
-                    });
-                    popupMenu.show(invoker, x, y);
-                }
-            }); */
 
             BinaryData rightData = getDiffBinaryData(request, 1);
             if (rightData != null) {
                 diffPanel.setRightContentData(rightData);
             }
-            SectCodeArea rightCodeArea = diffPanel.getRightCodeArea();
-            /* rightCodeArea.setComponentPopupMenu(new JPopupMenu() {
-                @Override
-                public void show(Component invoker, int x, int y) {
-                    FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                    ActiveContextManagement contextManager =
-                            frameModule.getFrameController().getContextManager();
-
-                    BinEdDataComponent rightDataComponent = new BinEdDataComponent(rightCodeArea);
-                    contextManager.changeActiveState(ContextFont.class, rightDataComponent);
-                    contextManager.changeActiveState(ContextEncoding.class, rightDataComponent);
-                    contextManager.changeActiveState(ContextComponent.class, rightDataComponent);
-                    contextManager.changeActiveState(DialogParentComponent.class, () -> rightCodeArea);
-                    contextManager.changeActiveState(ClipboardController.class, rightDataComponent);
-
-                    String popupMenuId = "BinDiffPanel.right";
-                    int clickedX = x;
-                    int clickedY = y;
-                    if (invoker instanceof JViewport) {
-                        clickedX += invoker.getParent().getX();
-                        clickedY += invoker.getParent().getY();
-                    }
-                    BinedModule binedModule = App.getModule(BinedModule.class);
-                    CodeAreaPopupMenuHandler codeAreaPopupMenuHandler =
-                            binedModule.createCodeAreaPopupMenuHandler(BinedModule.PopupMenuVariant.NORMAL);
-                    JPopupMenu popupMenu = codeAreaPopupMenuHandler.createPopupMenu(rightCodeArea, popupMenuId, clickedX, clickedY);
-                    popupMenu.addPopupMenuListener(new PopupMenuListener() {
-                        @Override
-                        public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                        }
-
-                        @Override
-                        public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                            codeAreaPopupMenuHandler.dropPopupMenu(popupMenuId);
-                        }
-
-                        @Override
-                        public void popupMenuCanceled(PopupMenuEvent e) {
-                        }
-                    });
-                    popupMenu.show(invoker, x, y);
-                }
-            }); */
         }
     }
 
@@ -457,10 +372,26 @@ public class BinEdDiffPanel extends JBPanel {
 
     public void setLeftContentData(BinaryData contentData) {
         diffPanel.setLeftContentData(contentData);
+        updateDataSize(leftStatusBar, contentData.getDataSize());
     }
 
     public void setRightContentData(BinaryData contentData) {
         diffPanel.setRightContentData(contentData);
+        updateDataSize(rightStatusBar, contentData.getDataSize());
+    }
+
+    private void updateDataSize(StatusBar statusBar, long dataSize) {
+        BinaryDataSizeComponent dataSizeComponent = null;
+        for (int i = 0; i < statusBar.getItemsCount(); i++) {
+            StatusBarComponent component = statusBar.getItem(i);
+            if (component instanceof BinaryDataSizeComponent) {
+                dataSizeComponent = (BinaryDataSizeComponent) component;
+                break;
+            }
+        }
+        if (dataSizeComponent != null) {
+            dataSizeComponent.setOriginalDataSize(dataSize);
+        }
     }
 
     public static class DiffContextComponent implements BinaryDataComponent, CharsetEncodingState {
