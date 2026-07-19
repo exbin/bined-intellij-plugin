@@ -50,7 +50,7 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
         VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
         for (VirtualFile file : openFiles) {
             if (file instanceof BinEdVirtualFile && !((BinEdVirtualFile) file).isClosing()) {
-                BinaryFileDocument fileDocument = ((BinEdVirtualFile) file).getEditorFile();
+                BinaryFileDocument fileDocument = ((BinEdVirtualFile) file).getFileDocument();
                 if (fileDocument.isModified()) {
                     fileDocuments.add(fileDocument);
                 }

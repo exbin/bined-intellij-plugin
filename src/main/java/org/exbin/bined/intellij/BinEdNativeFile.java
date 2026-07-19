@@ -35,7 +35,9 @@ import org.exbin.jaguif.App;
 import org.exbin.bined.jaguif.document.BinEdFileManager;
 import org.exbin.bined.jaguif.document.BinaryFileDocument;
 import org.exbin.bined.jaguif.document.settings.BinaryFileProcessingOptions;
+import org.exbin.jaguif.context.api.ActiveContextManagement;
 import org.exbin.jaguif.docking.api.ContextDocking;
+import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 import org.exbin.jaguif.options.api.OptionsModuleApi;
 import org.exbin.jaguif.options.api.OptionsStorage;
@@ -118,7 +120,8 @@ public class BinEdNativeFile {
         boolean editable = virtualFile.isWritable();
 
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
+        ActiveContextManagement contextManager = frameModule.getFrameController().getContextManager();
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) contextManager.getActiveState(ContextDocking.class);
 
         ApplicationManager.getApplication().runReadAction(() -> {
             try {
@@ -143,8 +146,9 @@ public class BinEdNativeFile {
         });
 
         opened = true;
-        fileDocument.fileSync();
         docking.setActiveDocument(fileDocument);
+        fileDocument.fileSync();
+        contextManager.updateActiveState(ContextDocument.class, fileDocument, BinaryFileDocument.UpdateType.ORIGINAL_SIZE);
         updateModified();
     }
 
@@ -201,5 +205,12 @@ public class BinEdNativeFile {
     @Nullable
     public JComponent getPreferredFocusedComponent() {
         return filePanel;
+    }
+
+    public void dispose() {
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
+        filePanel.detach();
+        docking.removeDocument(fileDocument);
     }
 }

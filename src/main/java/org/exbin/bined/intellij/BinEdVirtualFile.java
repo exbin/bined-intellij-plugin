@@ -21,6 +21,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
 import com.intellij.ui.Graphics2DDelegate;
+import org.exbin.bined.EditMode;
+import org.exbin.bined.capability.EditModeCapable;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
 import org.exbin.bined.jaguif.component.BinEdDataComponent;
@@ -31,7 +33,9 @@ import org.exbin.bined.jaguif.document.BinedDocumentModule;
 import org.exbin.bined.jaguif.document.settings.BinaryFileProcessingOptions;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.jaguif.App;
+import org.exbin.jaguif.context.api.ActiveContextManagement;
 import org.exbin.jaguif.docking.api.ContextDocking;
+import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.document.api.StreamDocumentSource;
 import org.exbin.jaguif.file.api.FileDocumentSource;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
@@ -107,7 +111,6 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
         SettingsOptionsProvider settingsOptionsProvider = settingsManager.getSettingsOptionsProvider();
         fileDocument.applySettings(settingsOptionsProvider);
-        fileDocument.fileSync();
     }
 
     public static BinaryFileDocument createBinaryFileDocument() {
@@ -122,7 +125,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         return new File(path);
     }
 
-    public BinaryFileDocument getEditorFile() {
+    public BinaryFileDocument getFileDocument() {
         return fileDocument;
     }
 
@@ -244,11 +247,12 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
     public void dispose() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
+        filePanel.detach();
         docking.removeDocument(fileDocument);
     }
 
     public JComponent getPreferredFocusedComponent() {
-        return getEditorFile().getCodeArea();
+        return fileDocument.getCodeArea();
     }
 
     public void openFile(BinaryFileDocument fileDocument) {
@@ -257,13 +261,19 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             fileDocument.clearFile();
             if (file.isFile() && file.exists()) {
                 fileDocument.loadFrom(new FileDocumentSource(file));
+                if (!file.canWrite()) {
+                    ((EditModeCapable) fileDocument.getCodeArea()).setEditMode(EditMode.READ_ONLY);
+                }
             } else {
                 fileDocument.loadFrom(new VirtualFileDocumentSource());
             }
         }
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
+        ActiveContextManagement contextManager = frameModule.getFrameController().getContextManager();
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) contextManager.getActiveState(ContextDocking.class);
         docking.setActiveDocument(fileDocument);
+        fileDocument.fileSync();
+        contextManager.updateActiveState(ContextDocument.class, fileDocument, BinaryFileDocument.UpdateType.ORIGINAL_SIZE);
     }
 
     public class VirtualFileDocumentSource implements StreamDocumentSource {

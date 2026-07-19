@@ -124,6 +124,7 @@ public class BinEdNativeFileEditor implements FileEditor, DumbAware {
 
     @Override
     public void dispose() {
+        // Disposing editor doesn't mean file is disposing - editor could be moved
     }
 
     @Nullable

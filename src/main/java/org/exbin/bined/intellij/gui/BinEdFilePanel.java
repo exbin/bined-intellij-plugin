@@ -41,10 +41,12 @@ import org.exbin.jaguif.action.api.DialogParentComponent;
 import org.exbin.jaguif.context.ActiveContextManager;
 import org.exbin.jaguif.context.api.ActiveContextManagement;
 import org.exbin.jaguif.context.api.ContextChange;
+import org.exbin.jaguif.context.api.ContextChangeListener;
 import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.context.api.ContextModuleApi;
 import org.exbin.jaguif.context.api.ContextRegistration;
 import org.exbin.jaguif.context.api.ContextUpdateManagement;
+import org.exbin.jaguif.context.api.StateUpdateType;
 import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
@@ -53,6 +55,7 @@ import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
+import org.exbin.jaguif.text.encoding.ContextEncoding;
 import org.exbin.jaguif.utils.DesktopUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -78,6 +81,8 @@ public class BinEdFilePanel extends JPanel {
     @Nullable
     protected BinaryFileDocument fileDocument;
     protected BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
+    protected ActiveContextManagement statusContextManager;
+    protected ContextChangeListener contextChangeListener;
     protected StatusBar statusBar;
 
     public BinEdFilePanel() {
@@ -88,13 +93,60 @@ public class BinEdFilePanel extends JPanel {
         StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
         ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
         ActiveContextManagement contextManager = frameModule.getFrameController().getContextManager();
-        ContextUpdateManagement updateManager = frameModule.getFrameController().getUpdateManager();
-        ContextRegistration contextRegistrator = contextModule.createContextRegistrator(FrameModuleApi.MAIN_STATUS_BAR_ID,  updateManager, contextManager);
-        statusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, contextRegistrator);
+        statusContextManager = contextModule.createChildContextManager(contextManager);
+        contextChangeListener = new ContextChangeListener() {
+            @Override
+            public <T> void notifyStateChanged(Class<T> stateClass, @Nullable T activeState) {
+                if (stateClass == ContextDocument.class && activeState != fileDocument) {
+                    return;
+                }
+
+                if (stateClass == ContextComponent.class && activeState != fileDocument.getDataComponent()) {
+                    return;
+                }
+
+                if (stateClass == ContextEncoding.class && activeState != fileDocument.getDataComponent()) {
+                    return;
+                }
+
+                statusContextManager.changeActiveState(stateClass, activeState);
+            }
+
+            @Override
+            public <T> void notifyStateUpdated(Class<T> stateClass, T activeState, StateUpdateType stateUpdateType) {
+                if (stateClass == ContextDocument.class && activeState != fileDocument) {
+                    return;
+                }
+
+                if (stateClass == ContextComponent.class && activeState != fileDocument.getDataComponent()) {
+                    return;
+                }
+
+                if (stateClass == ContextEncoding.class && activeState != fileDocument.getDataComponent()) {
+                    return;
+                }
+
+                statusContextManager.updateActiveState(stateClass, activeState, stateUpdateType);
+            }
+        };
+        contextManager.addChangeListener(contextChangeListener);
+        ContextUpdateManagement statusUpdateManager = contextModule.createContextUpdateManagement(statusContextManager);
+        ContextRegistration statusContextRegistrator = contextModule.createContextRegistrator("",  statusUpdateManager, statusContextManager);
+        statusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, statusContextRegistrator);
+    }
+
+    public void detach() {
+        FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
+        ActiveContextManagement contextManager = frameModule.getFrameController().getContextManager();
+        contextManager.removeChangeListener(contextChangeListener);
     }
 
     public void setDocument(BinaryFileDocument fileDocument) {
         this.fileDocument = fileDocument;
+        statusContextManager.changeActiveState(ContextDocument.class, fileDocument);
+        statusContextManager.changeActiveState(ContextComponent.class, fileDocument.getDataComponent());
+        statusContextManager.changeActiveState(ContextEncoding.class, fileDocument.getDataComponent());
+
         BinEdComponentPanel componentPanel = fileDocument.getComponent();
         SectCodeArea codeArea = (SectCodeArea) fileDocument.getCodeArea();
 

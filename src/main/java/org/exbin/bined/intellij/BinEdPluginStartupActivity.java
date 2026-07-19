@@ -444,7 +444,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 BinaryFileDocument activeFile = null;
                 FileEditor fileEditor = event.getNewEditor();
                 if (fileEditor instanceof BinEdFileEditor) {
-                    activeFile = ((BinEdFileEditor) fileEditor).getVirtualFile().getEditorFile();
+                    activeFile = ((BinEdFileEditor) fileEditor).getVirtualFile().getFileDocument();
                 } else if (fileEditor instanceof BinEdNativeFileEditor) {
                     activeFile = ((BinEdNativeFileEditor) fileEditor).getNativeFile().getDocument();
                 } else if (fileEditor != null) {
@@ -479,7 +479,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
                 if (!((BinEdVirtualFile) file).isClosing()) {
                     ((BinEdVirtualFile) file).setClosing(true);
-                    BinaryFileDocument binaryDocument = ((BinEdVirtualFile) file).getEditorFile();
+                    BinaryFileDocument binaryDocument = ((BinEdVirtualFile) file).getFileDocument();
                     if (binaryDocument.isModified()) {
                         ApplicationManager.getApplication().invokeLater(() -> {
                             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);

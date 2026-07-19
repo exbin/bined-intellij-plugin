@@ -91,7 +91,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
 
     @Override
     public boolean isModified() {
-        return virtualFile.getEditorFile().isModified();
+        return virtualFile.getFileDocument().isModified();
     }
 
     @Override
@@ -104,7 +104,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(
                 ContextDocking.class);
-        docking.setActiveDocument(virtualFile.getEditorFile());
+        docking.setActiveDocument(virtualFile.getFileDocument());
     }
 
     @Override

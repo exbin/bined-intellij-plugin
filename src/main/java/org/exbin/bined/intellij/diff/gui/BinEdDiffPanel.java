@@ -311,10 +311,6 @@ public class BinEdDiffPanel extends JBPanel {
 //        rightStatusPanel.loadFromOptions(statusOptions);
         toolbarPanel.applyFromCodeArea();
         toolbarPanel.loadFromOptions(preferences);
-
-//        BinaryStatusApi.MemoryMode memoryMode = BinaryStatusApi.MemoryMode.READ_ONLY;
-//        leftStatusPanel.setMemoryMode(memoryMode);
-//        rightStatusPanel.setMemoryMode(memoryMode);
     }
 
     private void applyOptions(OptionsStorage optionsStorage, SectCodeArea codeArea) {
