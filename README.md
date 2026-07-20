@@ -17,7 +17,7 @@ Usage
 
   * Use "Open as Binary" action in toolbar of "File/Open" dialog or "Open In/Binary Editor" in project files context menu
   * Use "View as Binary" action in context menu in variables/debug window
-  * Associate file extension with Binary File file type in Options/Editor/File Types
+  * Associate file extension with "Binary File" file type in Options/Editor/File Types
   * Use "Byte-to-byte compare" in Compare files dialog
   * Use "Edit as Binary" in column context menu in DB view
 

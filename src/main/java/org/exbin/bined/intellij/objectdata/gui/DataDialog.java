@@ -38,29 +38,23 @@ import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.jaguif.App;
-import org.exbin.jaguif.action.api.ActionConsts;
-import org.exbin.jaguif.action.api.ActionContextChange;
 import org.exbin.jaguif.context.ActiveContextManager;
 import org.exbin.jaguif.context.api.ActiveContextManagement;
-import org.exbin.jaguif.context.api.ContextChangeRegistration;
 import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.context.api.ContextModuleApi;
 import org.exbin.jaguif.context.api.ContextRegistration;
 import org.exbin.jaguif.context.api.ContextUpdateManagement;
-import org.exbin.jaguif.context.api.StateUpdateType;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.options.api.OptionsModuleApi;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.statusbar.api.StatusBarComponent;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
-import org.exbin.jaguif.text.encoding.CharsetEncodingState;
 import org.exbin.jaguif.text.encoding.ContextEncoding;
-import org.exbin.jaguif.text.encoding.EncodingsManager;
 import org.exbin.jaguif.utils.DesktopUtils;
-
-import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -76,14 +70,14 @@ import java.util.ResourceBundle;
 @NullMarked
 public final class DataDialog extends DialogWrapper {
 
-    private final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(DataDialog.class);
+    protected final java.util.ResourceBundle resourceBundle = App.getModule(LanguageModuleApi.class).getBundle(DataDialog.class);
 
-    private final JPanel panel;
-    private BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
-    private StatusBar statusBar;
-    private final BinEdDataComponent dataComponent;
-    private final SetDataListener setDataListener;
-    private final boolean editable;
+    protected final JPanel panel;
+    protected BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
+    protected StatusBar statusBar;
+    protected final BinEdDataComponent dataComponent;
+    protected final SetDataListener setDataListener;
+    protected final boolean editable;
 
     public DataDialog(Project project, @Nullable BinaryData binaryData) {
         this(project, null, binaryData);
@@ -147,9 +141,6 @@ public final class DataDialog extends DialogWrapper {
         BinedComponentModule binedComponentModule = App.getModule(BinedComponentModule.class);
         JPopupMenu codeAreaPopupMenu = binedComponentModule.createCodeAreaPopupMenu();
         codeArea.setComponentPopupMenu(codeAreaPopupMenu);
-
-        EncodingsManager encodingsManager = new EncodingsManager();
-        encodingsManager.init();
 
         StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
         ContextRegistration contextRegistrator = null; // TODO
