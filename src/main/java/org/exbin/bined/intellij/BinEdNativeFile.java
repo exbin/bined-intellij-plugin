@@ -58,11 +58,11 @@ import java.io.IOException;
 @NullMarked
 public class BinEdNativeFile {
 
-    private final BinEdFilePanel filePanel = new BinEdFilePanel();
-    private final BinaryFileDocument fileDocument;
+    protected final BinEdFilePanel filePanel = new BinEdFilePanel();
+    protected final BinaryFileDocument fileDocument;
 
-    private boolean opened = false;
-    private VirtualFile virtualFile;
+    protected boolean opened = false;
+    protected VirtualFile virtualFile;
 
     public BinEdNativeFile() {
         BinedDocumentModule binedDocumentModule = App.getModule(BinedDocumentModule.class);

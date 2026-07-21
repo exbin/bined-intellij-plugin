@@ -65,11 +65,11 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     public static final String PATH_PREFIX = "bined://";
 
-    private final VirtualFile parentFile;
-    private final BinEdFilePanel filePanel = new BinEdFilePanel();
-    private final BinaryFileDocument fileDocument;
-    private String displayName;
-    private boolean closing = false;
+    protected final VirtualFile parentFile;
+    protected final BinEdFilePanel filePanel = new BinEdFilePanel();
+    protected final BinaryFileDocument fileDocument;
+    protected String displayName;
+    protected boolean closing = false;
 
     public BinEdVirtualFile(VirtualFile parentFile) {
         fileDocument = BinEdVirtualFile.createBinaryFileDocument();
@@ -242,6 +242,10 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     public void setClosing(boolean closing) {
         this.closing = closing;
+    }
+
+    public void closeFile() {
+        fileDocument.closeData();
     }
 
     public void dispose() {

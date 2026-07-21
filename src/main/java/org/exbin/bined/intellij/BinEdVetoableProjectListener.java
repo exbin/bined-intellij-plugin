@@ -79,7 +79,7 @@ public class BinEdVetoableProjectListener implements VetoableProjectManagerListe
 
     public static boolean showAskForSaveDialog(List<Document> fileDocuments,
             Component parentComponent) {
-        ModifiedDocumentsPanel modifiedDocumentsPanel = new ModifiedDocumentsPanel ();
+        ModifiedDocumentsPanel modifiedDocumentsPanel = new ModifiedDocumentsPanel();
         modifiedDocumentsPanel.setDocuments(fileDocuments);
         WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
         final boolean[] result = new boolean[1];

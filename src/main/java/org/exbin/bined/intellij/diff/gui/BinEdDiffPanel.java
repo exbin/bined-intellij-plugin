@@ -34,6 +34,8 @@ import org.exbin.bined.EditOperation;
 import org.exbin.bined.PositionCodeType;
 import org.exbin.bined.capability.CaretCapable;
 import org.exbin.bined.capability.CharsetCapable;
+import org.exbin.bined.capability.CodeCharactersCaseCapable;
+import org.exbin.bined.capability.CodeTypeCapable;
 import org.exbin.bined.capability.EditModeCapable;
 import org.exbin.bined.capability.SelectionCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
@@ -54,6 +56,7 @@ import org.exbin.bined.jaguif.viewer.settings.CodeAreaViewerSettingsApplier;
 import org.exbin.bined.jaguif.viewer.status.gui.BinaryDataSizeComponent;
 import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
+import org.exbin.bined.section.capability.PositionCodeTypeCapable;
 import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.CodeAreaPainter;
@@ -397,6 +400,7 @@ public class BinEdDiffPanel extends JBPanel {
     public class DiffContextComponent implements BinaryDataComponent, CharsetEncodingState, CharsetListEncodingState {
 
         SectCodeArea codeArea;
+        ActiveContextManagement contextManagement;
 
         public DiffContextComponent(SectCodeArea codeArea) {
             this.codeArea = codeArea;
@@ -414,57 +418,66 @@ public class BinEdDiffPanel extends JBPanel {
 
         @Override
         public <T extends BinEdComponentExtension> T getComponentExtension(Class<T> clazz) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public Component getComponent() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public CodeType getCodeType() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            return codeArea.getCodeType();
         }
 
         @Override
         public void setCodeType(CodeType codeType) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            codeArea.setCodeType(codeType);
+            contextManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.CodeTypeState.UpdateType.CODE_TYPE);
         }
 
-        @Override
         public PositionCodeType getPositionCodeType() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            return codeArea.getPositionCodeType();
         }
 
-        @Override
         public void setPositionCodeType(PositionCodeType positionCodeType) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            codeArea.setPositionCodeType(positionCodeType);
+            contextManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.CodeTypeState.UpdateType.POSITION_CODE_TYPE);
         }
 
         @Override
         public CodeCharactersCase getCodeCharactersCase() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            return codeArea.getCodeCharactersCase();
         }
 
         @Override
         public void setCodeCharactersCase(CodeCharactersCase codeCharactersCase) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            codeArea.setCodeCharactersCase(codeCharactersCase);
+            contextManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.CodeTypeState.UpdateType.HEX_CHARACTERS_CASE);
         }
 
-        @Override
         public boolean isShowNonprintables() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            ColorAssessorPainterCapable painter = (ColorAssessorPainterCapable) codeArea.getPainter();
+            NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
+            return nonprintablesCodeAreaAssessor != null && nonprintablesCodeAreaAssessor.isShowNonprintables();
         }
 
-        @Override
         public void setShowNonprintables(boolean showNonprintables) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            ColorAssessorPainterCapable painter = (ColorAssessorPainterCapable) codeArea.getPainter();
+            NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
+            if (nonprintablesCodeAreaAssessor != null) {
+                nonprintablesCodeAreaAssessor.setShowNonprintables(showNonprintables);
+                this.codeArea.repaint();
+                if (this.contextManagement != null) {
+                    this.contextManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.NonprintablesState.UpdateType.NONPRINTABLES);
+                }
+            }
         }
 
         @Override
         public Optional<ActiveContextManagement> getContextManagement() {
-            return Optional.empty();
+            return Optional.of(contextManagement);
         }
 
         @Override
@@ -496,8 +509,8 @@ public class BinEdDiffPanel extends JBPanel {
         public void setEncodings(List<String> encodings) {
             BinEdDiffPanel.this.encodings.clear();
             BinEdDiffPanel.this.encodings.addAll(encodings);
-            leftContextManager.updateActiveState(ContextEncoding.class, this, CharsetListEncodingState.UpdateType.ENCODING_LIST);
-            rightContextManager.updateActiveState(ContextEncoding.class, this, CharsetListEncodingState.UpdateType.ENCODING_LIST);
+            leftContextManager.updateActiveState(ContextEncoding.class, leftContextComponent, CharsetListEncodingState.UpdateType.ENCODING_LIST);
+            rightContextManager.updateActiveState(ContextEncoding.class, rightContextComponent, CharsetListEncodingState.UpdateType.ENCODING_LIST);
         }
     }
 }

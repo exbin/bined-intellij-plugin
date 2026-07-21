@@ -468,11 +468,20 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                 }
 
                 if (!(file instanceof BinEdVirtualFile)) {
+                    FileEditor[] allEditors = FileEditorManager.getInstance(project).getAllEditors(file);
+                    for (FileEditor fileEditor : allEditors) {
+                        if (fileEditor instanceof BinEdNativeFileEditor) {
+                            BinEdNativeFile nativeFile = ((BinEdNativeFileEditor) fileEditor).getNativeFile();
+                            nativeFile.dispose();
+                        }
+                    }
+
                     return;
                 }
 
                 if (discardAllowed) {
                     discardAllowed = false;
+                    ((BinEdVirtualFile) file).closeFile();
                     ((BinEdVirtualFile) file).dispose();
                     return;
                 }
@@ -495,6 +504,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                         throw new ProcessCanceledException();
                     }
                 }
+                ((BinEdVirtualFile) file).closeFile();
                 ((BinEdVirtualFile) file).dispose();
             }
         });
