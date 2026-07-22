@@ -278,6 +278,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         docking.setActiveDocument(fileDocument);
         fileDocument.fileSync();
         contextManager.updateActiveState(ContextDocument.class, fileDocument, BinaryFileDocument.UpdateType.ORIGINAL_SIZE);
+        contextManager.updateActiveState(ContextDocument.class, fileDocument, BinaryFileDocument.UpdateType.PROCESSING_MODE);
     }
 
     public class VirtualFileDocumentSource implements StreamDocumentSource {

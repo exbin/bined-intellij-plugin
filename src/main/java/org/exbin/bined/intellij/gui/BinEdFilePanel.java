@@ -20,10 +20,10 @@ import org.exbin.bined.CodeAreaUtils;
 import org.exbin.bined.CodeType;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
 import org.exbin.bined.intellij.BinEdIntelliJDocking;
+import org.exbin.bined.intellij.action.CompareFilesAction;
 import org.exbin.bined.intellij.utils.ActionUtils;
 import org.exbin.bined.jaguif.bookmarks.BinedBookmarksModule;
 import org.exbin.bined.jaguif.compare.BinedCompareModule;
-import org.exbin.bined.intellij.action.CompareFilesAction;
 import org.exbin.bined.jaguif.component.BinedComponentModule;
 import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
 import org.exbin.bined.jaguif.document.BinaryFileDocument;
@@ -47,18 +47,12 @@ import org.exbin.jaguif.context.api.ContextModuleApi;
 import org.exbin.jaguif.context.api.ContextRegistration;
 import org.exbin.jaguif.context.api.ContextUpdateManagement;
 import org.exbin.jaguif.context.api.StateUpdateType;
-import org.exbin.jaguif.contribution.api.RelativeSequenceContributionRule;
-import org.exbin.jaguif.contribution.api.SeparationSequenceContributionRule;
-import org.exbin.jaguif.contribution.api.SequenceContribution;
 import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
-import org.exbin.jaguif.menu.api.MenuDefinitionManagement;
-import org.exbin.jaguif.menu.api.MenuModuleApi;
 import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
-import org.exbin.jaguif.options.settings.contribution.SettingsContribution;
 import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.text.encoding.ContextEncoding;
@@ -256,14 +250,6 @@ public class BinEdFilePanel extends JPanel {
         BinedCompareModule compareModule = App.getModule(BinedCompareModule.class);
         actionModule.initAction(wrapperCompareAction, compareModule.getResourceBundle(), CompareFilesAction.ACTION_ID);
         wrapperCompareAction.putValue(ActionConsts.ACTION_DIALOG_MODE, true);
-
-        MenuModuleApi menuModule = App.getModule(MenuModuleApi.class);
-        MenuDefinitionManagement mgmt = menuModule.getMainMenuDefinition(BinedComponentModule.CODE_AREA_POPUP_MENU_ID, BinedComponentModule.MODULE_ID);
-
-        SequenceContribution contribution = new SettingsContribution();
-        mgmt.registerMenuContribution(contribution);
-        mgmt.registerMenuRule(contribution, new SeparationSequenceContributionRule(SeparationSequenceContributionRule.SeparationMode.AROUND));
-        mgmt.registerMenuRule(contribution, new RelativeSequenceContributionRule(RelativeSequenceContributionRule.NextToMode.AFTER, "binarySearchReplace"));
 
         BinedComponentModule binedComponentModule = App.getModule(BinedComponentModule.class);
         BinedViewerModule binedViewerModule = App.getModule(BinedViewerModule.class);

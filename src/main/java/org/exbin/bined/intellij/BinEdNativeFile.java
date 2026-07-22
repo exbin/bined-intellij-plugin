@@ -28,25 +28,23 @@ import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.jaguif.document.BinEdFileManager;
 import org.exbin.bined.jaguif.document.BinEdFileProcessingMode;
+import org.exbin.bined.jaguif.document.BinaryFileDocument;
 import org.exbin.bined.jaguif.document.BinedDocumentModule;
+import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.jaguif.App;
-import org.exbin.bined.jaguif.document.BinEdFileManager;
-import org.exbin.bined.jaguif.document.BinaryFileDocument;
-import org.exbin.bined.jaguif.document.settings.BinaryFileProcessingOptions;
 import org.exbin.jaguif.context.api.ActiveContextManagement;
 import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
-import org.exbin.jaguif.options.api.OptionsModuleApi;
-import org.exbin.jaguif.options.api.OptionsStorage;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsManagement;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.options.settings.api.SettingsOptionsProvider;
-
-import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import javax.swing.JComponent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -71,10 +69,6 @@ public class BinEdNativeFile {
         filePanel.setDocument(fileDocument);
         fileManager.initDataComponent(fileDocument.getDataComponent());
         fileManager.initCommandHandler(fileDocument.getDataComponent());
-
-        OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
-        OptionsStorage optionsStorage = optionsModule.getAppOptions();
-        fileDocument.setInitialProcessingMode(new BinaryFileProcessingOptions(optionsStorage).getFileProcessingMode());
 
         OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
         OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
@@ -112,11 +106,6 @@ public class BinEdNativeFile {
     }
 
     public void openFile(VirtualFile virtualFile) {
-        if (this.virtualFile != null) {
-            throw new IllegalStateException("Unable to reopen native file");
-        }
-
-        this.virtualFile = virtualFile;
         boolean editable = virtualFile.isWritable();
 
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
@@ -134,16 +123,25 @@ public class BinEdNativeFile {
             }
         });
         SectCodeArea codeArea = (SectCodeArea) fileDocument.getCodeArea();
-        codeArea.addDataChangedListener(this::saveDocument);
         codeArea.setEditMode(editable ? EditMode.EXPANDING : EditMode.READ_ONLY);
 
-        // TODO Temporary workaround for unfinished status bar messaging
-        codeArea.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                docking.setActiveDocument(fileDocument);
+        if (this.virtualFile == null) {
+            this.virtualFile = virtualFile;
+            codeArea.addDataChangedListener(this::saveDocument);
+
+            // TODO Temporary workaround for unfinished status bar messaging
+            codeArea.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    docking.setActiveDocument(fileDocument);
+                }
+            });
+        } else {
+            BinaryDataUndoRedo undoRedo = fileDocument.getUndoHandler().orElse(null);
+            if (undoRedo != null) {
+                undoRedo.clear();
             }
-        });
+        }
 
         opened = true;
         docking.setActiveDocument(fileDocument);

@@ -99,6 +99,7 @@ import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.jaguif.App;
 import org.exbin.jaguif.Module;
 import org.exbin.jaguif.ModuleProvider;
+import org.exbin.jaguif.contribution.api.RelativeSequenceContributionRule;
 import org.exbin.jaguif.license.LicenseModule;
 import org.exbin.jaguif.license.action.AboutAction;
 import org.exbin.jaguif.license.api.LicenseModuleApi;
@@ -151,6 +152,7 @@ import org.exbin.jaguif.options.settings.api.OptionsSettingsManagement;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.options.settings.api.SettingsPageContribution;
 import org.exbin.jaguif.options.settings.api.SettingsPanelType;
+import org.exbin.jaguif.options.settings.contribution.SettingsContribution;
 import org.exbin.jaguif.plugin.language.cs_CZ.LanguageCsCzModule;
 import org.exbin.jaguif.plugin.language.de_DE.LanguageDeDeModule;
 import org.exbin.jaguif.plugin.language.es_ES.LanguageEsEsModule;
@@ -851,13 +853,19 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             String toolsSubMenuId = BinEdIntelliJPlugin.PLUGIN_PREFIX + "toolsMenu";
             MenuDefinitionManagement menuManagement = menuModule.getMainMenuDefinition(BinedComponentModule.CODE_AREA_POPUP_MENU_ID, BinedComponentModule.MODULE_ID);
-            Action toolsSubMenuAction = new AbstractAction(((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.text")) {
+            SequenceContribution contribution = new SettingsContribution();
+
+            menuManagement.registerMenuContribution(contribution);
+            menuManagement.registerMenuRule(contribution, new SeparationSequenceContributionRule(SeparationSequenceContributionRule.SeparationMode.AROUND));
+            menuManagement.registerMenuRule(contribution, new RelativeSequenceContributionRule(RelativeSequenceContributionRule.NextToMode.AFTER, "binarySearchReplace"));
+
+            Action toolsSubMenuAction = new AbstractAction(frameModule.getResourceBundle().getString("toolsMenu.text")) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                 }
             };
             // toolsSubMenuAction.putValue(Action.SHORT_DESCRIPTION, ((FrameModule) frameModule).getResourceBundle().getString("toolsMenu.shortDescription"));
-            SequenceContribution contribution = menuManagement.registerMenuItem(toolsSubMenuId, toolsSubMenuAction);
+            contribution = menuManagement.registerMenuItem(toolsSubMenuId, toolsSubMenuAction);
             menuManagement.registerMenuRule(contribution, new PositionSequenceContributionRule(PositionSequenceContributionRule.PositionMode.BOTTOM_LAST));
             MenuDefinitionManagement subMenu = menuManagement.getSubMenu(toolsSubMenuId);
             contribution = new DefaultActionMenuContribution(CompareFilesAction.ACTION_ID, binedCompareModule::createCompareFilesAction);
