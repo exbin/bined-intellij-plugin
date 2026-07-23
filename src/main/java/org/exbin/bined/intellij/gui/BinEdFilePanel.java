@@ -31,6 +31,7 @@ import org.exbin.bined.jaguif.macro.BinedMacroModule;
 import org.exbin.bined.jaguif.search.BinedSearchModule;
 import org.exbin.bined.jaguif.search.action.FindReplaceActions;
 import org.exbin.bined.jaguif.viewer.BinedViewerModule;
+import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
@@ -51,6 +52,7 @@ import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
+import org.exbin.jaguif.operation.undo.api.OperationUndoModuleApi;
 import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
@@ -61,8 +63,10 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
@@ -167,8 +171,9 @@ public class BinEdFilePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 FindReplaceActions.EditFindAction editFindAction = findReplaceActions.createEditFindAction();
                 ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-                ActiveContextManagement contextManager = contextModule.createContextManager();
-                contextManager.changeActiveState(ContextDocument.class, fileDocument);
+                ContextRegistration contextRegistrator = contextModule.createContextRegistrator(statusContextManager);
+                contextRegistrator.registerContextChange(editFindAction);
+                contextRegistrator.finish();
                 editFindAction.actionPerformed(e);
             }
         });
@@ -179,13 +184,36 @@ public class BinEdFilePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 FindReplaceActions.EditReplaceAction editReplaceAction = findReplaceActions.createEditReplaceAction();
                 ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-                ActiveContextManagement contextManager = contextModule.createContextManager();
-                contextManager.changeActiveState(ContextDocument.class, fileDocument);
+                ContextRegistration contextRegistrator = contextModule.createContextRegistrator(statusContextManager);
+                contextRegistrator.registerContextChange(editReplaceAction);
+                contextRegistrator.finish();
                 editReplaceAction.actionPerformed(e);
             }
         });
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK, false), IdeActions.ACTION_REPLACE);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.META_DOWN_MASK, false), IdeActions.ACTION_REPLACE);
+        actionMap.put(IdeActions.ACTION_UNDO, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BinaryDataUndoRedo undoRedo = fileDocument.getUndoHandler().orElse(null);
+                if (undoRedo != null) {
+                    undoRedo.performUndo();
+                }
+            }
+        });
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK, false), IdeActions.ACTION_UNDO);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.META_DOWN_MASK, false), IdeActions.ACTION_UNDO);
+        actionMap.put(IdeActions.ACTION_REDO, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BinaryDataUndoRedo undoRedo = fileDocument.getUndoHandler().orElse(null);
+                if (undoRedo != null) {
+                    undoRedo.performRedo();
+                }
+            }
+        });
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK, false), IdeActions.ACTION_REDO);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.META_DOWN_MASK, false), IdeActions.ACTION_REDO);
 
         toolbarPanel.setTargetComponent(componentPanel);
         toolbarPanel.setCodeAreaControl(new BinEdToolbarPanel.Control() {

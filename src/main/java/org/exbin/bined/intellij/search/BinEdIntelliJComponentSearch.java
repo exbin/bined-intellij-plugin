@@ -77,7 +77,7 @@ public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
     public void showSearchFindPanel() {
         if (!binarySearchPanelVisible) {
             getBinarySearch();
-            componentPanel.add(binarySearch.getPanel(), BorderLayout.SOUTH);
+            componentPanel.add(binarySearch.getPanel(), BorderLayout.NORTH);
             componentPanel.revalidate();
             binarySearchPanelVisible = true;
             binarySearch.getPanel().requestSearchFocus();
@@ -89,7 +89,7 @@ public class BinEdIntelliJComponentSearch implements BinEdComponentSearch {
     public void showSearchReplacePanel() {
         if (!binarySearchPanelVisible) {
             getBinarySearch();
-            componentPanel.add(binarySearch.getPanel(), BorderLayout.SOUTH);
+            componentPanel.add(binarySearch.getPanel(), BorderLayout.NORTH);
             componentPanel.revalidate();
             binarySearchPanelVisible = true;
             binarySearch.getPanel().requestSearchFocus();

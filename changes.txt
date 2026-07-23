@@ -1,7 +1,8 @@
-0.2.14
+0.2.14 (2026-07-23)
 - Minor fixes
 - Fixed opening read-only file (issue #68)
 - Fixed show as binary on debugger not working (issue #69)
+- Fixed some file locking regressions
 
 0.2.13 (2026-03-30)
 - Added copy as / paste from dialogs

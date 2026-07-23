@@ -16,6 +16,7 @@
 package org.exbin.bined.intellij.search.gui;
 
 import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -57,6 +58,7 @@ import javax.swing.ComboBoxEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -91,7 +93,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
     private ComboBoxEditor replaceComboBoxEditor;
     private BinarySearchComboBoxPanel replaceComboBoxEditorComponent;
 
-    private static final String TOOLBAR_PLACE = "BinEdBinarySearchPanel";
     private final DefaultActionGroup findToolbarActionGroup;
     private final ActionToolbar findToolbar;
     private final DefaultActionGroup closeToolbarActionGroup;
@@ -117,16 +118,16 @@ public class BinarySearchIntelliJPanel extends JPanel {
 
     public BinarySearchIntelliJPanel() {
         findToolbarActionGroup = new DefaultActionGroup();
-        findToolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".find",
+        findToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR,
                 findToolbarActionGroup, true);
         closeToolbarActionGroup = new DefaultActionGroup();
-        closeToolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".close",
+        closeToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR,
                 closeToolbarActionGroup, true);
         replaceToolbarActionGroup = new DefaultActionGroup();
-        replaceToolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".replace",
+        replaceToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR,
                 replaceToolbarActionGroup, true);
         progressToolbarActionGroup = new DefaultActionGroup();
-        progressToolbar = ActionManager.getInstance().createActionToolbar(TOOLBAR_PLACE + ".progress",
+        progressToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR,
                 progressToolbarActionGroup, true);
 
         optionsAction = new DefaultCustomComponentAction(
@@ -279,6 +280,11 @@ public class BinarySearchIntelliJPanel extends JPanel {
 
         initComponents();
         init();
+
+        findToolbar.setTargetComponent(findComboBox);
+        replaceToolbar.setTargetComponent(replaceComboBox);
+        progressToolbar.setTargetComponent(progressBar);
+        closeToolbar.setTargetComponent(new JLabel());
     }
 
     public void setTargetComponent(JComponent targetComponent) {
