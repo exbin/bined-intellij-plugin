@@ -140,6 +140,8 @@ dependencies {
     implementation(jaguifLibrary("jaguif-options-settings-api"))
     implementation(jaguifLibrary("jaguif-language"))
     implementation(jaguifLibrary("jaguif-language-api"))
+    implementation(jaguifLibrary("jaguif-search"))
+    implementation(jaguifLibrary("jaguif-search-api"))
     implementation(jaguifLibrary("jaguif-text-encoding"))
     implementation(jaguifLibrary("jaguif-text-font"))
     implementation(binedAppLibrary("bined-jaguif-component"))
@@ -187,6 +189,6 @@ dependencies {
     compileOnly(":debugvalue-pycharm-2022.2.1")
     compileOnly(":debugvalue-rider-2022.2.1")
     compileOnly(":database-plugin-2022.2.1")
-    compileOnly("org.jspecify:jspecify:1.0.0")
+    compileOnly("org.jspecify:jspecify:1.0.1")
     compileOnly(":jsr305-2.0.1")
 }

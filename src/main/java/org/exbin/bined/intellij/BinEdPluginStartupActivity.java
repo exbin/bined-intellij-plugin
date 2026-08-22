@@ -165,6 +165,8 @@ import org.exbin.jaguif.plugin.language.ru_RU.LanguageRuRuModule;
 import org.exbin.jaguif.plugin.language.zh_Hans.LanguageZhHansModule;
 import org.exbin.jaguif.plugin.language.zh_Hant.LanguageZhHantModule;
 import org.exbin.jaguif.plugins.iconset.material.IconSetMaterialModule;
+import org.exbin.jaguif.search.SearchModule;
+import org.exbin.jaguif.search.api.SearchModuleApi;
 import org.exbin.jaguif.statusbar.StatusBarModule;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.tabpages.TabPagesModule;
@@ -639,6 +641,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             modules.put(FileModuleApi.class, new FileModule());
             modules.put(DockingModuleApi.class, new DockingModule());
             modules.put(HelpOnlineModule.class, new HelpOnlineModule());
+            modules.put(SearchModuleApi.class, new SearchModule());
 
             // BinEd modules
             modules.put(BinedComponentModule.class, new BinedComponentModule());
@@ -764,6 +767,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
 
             WindowModuleApi windowModule = App.getModule(WindowModuleApi.class);
             windowModule.setHideHeaderPanels(true);
+            SearchModuleApi searchModule = App.getModule(SearchModuleApi.class);
 
             LicenseModuleApi licenseModule = App.getModule(LicenseModuleApi.class);
             licenseModule.registerBasicPages();
@@ -790,6 +794,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             BinedDocumentModule binedDocumentModule = App.getModule(BinedDocumentModule.class);
             BinedThemeModule binedThemeModule = App.getModule(BinedThemeModule.class);
             BinedSearchModule binedSearchModule = App.getModule(BinedSearchModule.class);
+            binedSearchModule.registerSearchComponent();
 
             BinEdFileManager fileManager = binedDocumentModule.getFileManager();
             fileManager.addBinEdComponentExtension(component -> Optional.of(new BinEdIntelliJComponentSearch()));
@@ -837,7 +842,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedEditorModule.registerSettings();
             binedDocumentModule.registerSettings();
             binedThemeModule.registerSettings();
-            binedSearchModule.registerEditFindPopupMenuActions();
+            searchModule.registerEditFindPopupMenuActions(BinedComponentModule.CODE_AREA_POPUP_MENU_ID);
             binedOperationModule.registerBlockEditPopupMenuActions();
             binedToolContentModule.registerClipboardContentMenu();
             binedToolContentModule.registerDragDropContentMenu();

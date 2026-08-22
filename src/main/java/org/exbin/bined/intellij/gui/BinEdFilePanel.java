@@ -28,8 +28,9 @@ import org.exbin.bined.jaguif.component.BinedComponentModule;
 import org.exbin.bined.jaguif.component.gui.BinEdComponentPanel;
 import org.exbin.bined.jaguif.document.BinaryFileDocument;
 import org.exbin.bined.jaguif.macro.BinedMacroModule;
-import org.exbin.bined.jaguif.search.BinedSearchModule;
-import org.exbin.bined.jaguif.search.action.FindReplaceActions;
+import org.exbin.jaguif.action.api.ActionContextChange;
+import org.exbin.jaguif.search.SearchModule;
+import org.exbin.jaguif.search.action.FindReplaceActions;
 import org.exbin.bined.jaguif.viewer.BinedViewerModule;
 import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.swing.CodeAreaSwingUtils;
@@ -52,9 +53,10 @@ import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
-import org.exbin.jaguif.operation.undo.api.OperationUndoModuleApi;
 import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.jaguif.search.api.ContextSearch;
+import org.exbin.jaguif.search.api.SearchModuleApi;
 import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
 import org.exbin.jaguif.text.encoding.ContextEncoding;
@@ -66,7 +68,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
@@ -158,21 +159,22 @@ public class BinEdFilePanel extends JPanel {
         statusContextManager.changeActiveState(ContextDocument.class, fileDocument);
         statusContextManager.changeActiveState(ContextComponent.class, fileDocument.getDataComponent());
         statusContextManager.changeActiveState(ContextEncoding.class, fileDocument.getDataComponent());
+        statusContextManager.changeActiveState(ContextSearch.class, fileDocument.getDataComponent().getSearchController().orElse(null));
 
         BinEdComponentPanel componentPanel = fileDocument.getComponent();
         SectCodeArea codeArea = (SectCodeArea) fileDocument.getCodeArea();
 
-        BinedSearchModule searchModule = App.getModule(BinedSearchModule.class);
+        SearchModule searchModule = (SearchModule) App.getModule(SearchModuleApi.class);
         FindReplaceActions findReplaceActions = searchModule.getFindReplaceActions();
         ActionMap actionMap = codeArea.getActionMap();
         InputMap inputMap = codeArea.getInputMap();
         actionMap.put(IdeActions.ACTION_FIND, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FindReplaceActions.EditFindAction editFindAction = findReplaceActions.createEditFindAction();
+                Action editFindAction = findReplaceActions.createEditFindAction();
                 ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
                 ContextRegistration contextRegistrator = contextModule.createContextRegistrator(statusContextManager);
-                contextRegistrator.registerContextChange(editFindAction);
+                contextRegistrator.registerContextChange((ActionContextChange) editFindAction);
                 contextRegistrator.finish();
                 editFindAction.actionPerformed(e);
             }
@@ -182,10 +184,10 @@ public class BinEdFilePanel extends JPanel {
         actionMap.put(IdeActions.ACTION_REPLACE, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FindReplaceActions.EditReplaceAction editReplaceAction = findReplaceActions.createEditReplaceAction();
+                Action editReplaceAction = findReplaceActions.createEditReplaceAction();
                 ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
                 ContextRegistration contextRegistrator = contextModule.createContextRegistrator(statusContextManager);
-                contextRegistrator.registerContextChange(editReplaceAction);
+                contextRegistrator.registerContextChange((ActionContextChange) editReplaceAction);
                 contextRegistrator.finish();
                 editReplaceAction.actionPerformed(e);
             }

@@ -80,6 +80,7 @@ import org.exbin.jaguif.options.api.OptionsStorage;
 import org.exbin.jaguif.options.settings.action.SettingsAction;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsManagement;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
+import org.exbin.jaguif.search.api.ContextSearch;
 import org.exbin.jaguif.statusbar.api.StatusBar;
 import org.exbin.jaguif.statusbar.api.StatusBarComponent;
 import org.exbin.jaguif.statusbar.api.StatusBarModuleApi;
@@ -401,6 +402,7 @@ public class BinEdDiffPanel extends JBPanel {
 
         SectCodeArea codeArea;
         ActiveContextManagement contextManagement;
+        @Nullable ContextSearch searchController;
 
         public DiffContextComponent(SectCodeArea codeArea) {
             this.codeArea = codeArea;
@@ -463,6 +465,16 @@ public class BinEdDiffPanel extends JBPanel {
             return nonprintablesCodeAreaAssessor != null && nonprintablesCodeAreaAssessor.isShowNonprintables();
         }
 
+        @Override
+        public Optional<ContextSearch> getSearchController() {
+            return Optional.ofNullable(searchController);
+        }
+
+        @Override
+        public void setSearchController(@Nullable ContextSearch contextSearch) {
+            this.searchController = searchController;
+        }
+
         public void setShowNonprintables(boolean showNonprintables) {
             ColorAssessorPainterCapable painter = (ColorAssessorPainterCapable) codeArea.getPainter();
             NonprintablesCodeAreaAssessor nonprintablesCodeAreaAssessor = CodeAreaSwingUtils.findColorAssessor(painter, NonprintablesCodeAreaAssessor.class);
@@ -473,6 +485,8 @@ public class BinEdDiffPanel extends JBPanel {
                     this.contextManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.NonprintablesState.UpdateType.NONPRINTABLES);
                 }
             }
+
+
         }
 
         @Override
