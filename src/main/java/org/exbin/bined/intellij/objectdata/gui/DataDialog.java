@@ -38,12 +38,12 @@ import org.exbin.bined.swing.CodeAreaSwingUtils;
 import org.exbin.bined.swing.capability.ColorAssessorPainterCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.jaguif.App;
-import org.exbin.jaguif.context.ActiveContextManager;
-import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.ContextStateManager;
+import org.exbin.jaguif.context.api.ContextStateManagement;
 import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.context.api.ContextModuleApi;
-import org.exbin.jaguif.context.api.ContextRegistration;
-import org.exbin.jaguif.context.api.ContextUpdateManagement;
+import org.exbin.jaguif.context.api.ContextMonitoringRegistration;
+import org.exbin.jaguif.context.api.ContextMonitoringManagement;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.options.api.OptionsModuleApi;
 import org.exbin.jaguif.options.settings.api.OptionsSettingsModuleApi;
@@ -143,17 +143,17 @@ public final class DataDialog extends DialogWrapper {
         codeArea.setComponentPopupMenu(codeAreaPopupMenu);
 
         StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
-        ContextRegistration contextRegistrator = null; // TODO
+        ContextMonitoringRegistration contextRegistrator = null; // TODO
         statusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, contextRegistrator);
 
         // TODO Temporary workaround for unfinished rework of actions
         {
             ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-            ActiveContextManagement contextManagement = new ActiveContextManager();
-            ContextUpdateManagement updateManagement = contextModule.createContextUpdateManagement(contextManagement);
-            contextManagement.changeActiveState(ContextComponent.class, dataComponent);
-            contextManagement.changeActiveState(ContextEncoding.class, dataComponent);
-            /* ContextRegistration contextRegistrar = contextModule.createContextRegistrator("", updateManagement, contextManagement);
+            ContextStateManagement stateManagement = new ContextStateManager();
+            ContextMonitoringManagement updateManagement = contextModule.createMonitoringManager(stateManagement);
+            stateManagement.changeActiveState(ContextComponent.class, dataComponent);
+            stateManagement.changeActiveState(ContextEncoding.class, dataComponent);
+            /* ContextMonitoringRegistration contextRegistrar = contextModule.createMonitoringRegistrator("", updateManagement, stateManagement);
 
             Action action = new AbstractAction() {
                 public void actionPerformed(ActionEvent ae) {
@@ -170,12 +170,12 @@ public final class DataDialog extends DialogWrapper {
             contextRegistrar.registerActionContext(action);
             contextRegistrar.registerActionContext(encodingsManager.getToolsEncodingMenu().getAction());
             contextRegistrar.registerActionContext(encodingsManager.getManageEncodingsAction()); */
-            dataComponent.setContextManager(contextManagement);
+            dataComponent.setStateManagement(stateManagement);
 
             OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
             BinaryEncodingSettingsApplier settingsApplier = new BinaryEncodingSettingsApplier();
             settingsApplier.applySettings(
-                    contextManagement,
+                    stateManagement,
                     optionsSettingsModule.getMainSettingsManager().getSettingsOptionsProvider());
         }
 

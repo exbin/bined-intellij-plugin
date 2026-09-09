@@ -34,8 +34,6 @@ import org.exbin.bined.EditOperation;
 import org.exbin.bined.PositionCodeType;
 import org.exbin.bined.capability.CaretCapable;
 import org.exbin.bined.capability.CharsetCapable;
-import org.exbin.bined.capability.CodeCharactersCaseCapable;
-import org.exbin.bined.capability.CodeTypeCapable;
 import org.exbin.bined.capability.EditModeCapable;
 import org.exbin.bined.capability.SelectionCapable;
 import org.exbin.bined.highlight.swing.NonprintablesCodeAreaAssessor;
@@ -56,7 +54,6 @@ import org.exbin.bined.jaguif.viewer.settings.CodeAreaViewerSettingsApplier;
 import org.exbin.bined.jaguif.viewer.status.gui.BinaryDataSizeComponent;
 import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.operation.swing.CodeAreaOperationCommandHandler;
-import org.exbin.bined.section.capability.PositionCodeTypeCapable;
 import org.exbin.bined.section.layout.SectionCodeAreaLayoutProfile;
 import org.exbin.bined.swing.CodeAreaCore;
 import org.exbin.bined.swing.CodeAreaPainter;
@@ -68,11 +65,11 @@ import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.jaguif.App;
-import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.api.ContextStateManagement;
 import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.context.api.ContextModuleApi;
-import org.exbin.jaguif.context.api.ContextRegistration;
-import org.exbin.jaguif.context.api.ContextUpdateManagement;
+import org.exbin.jaguif.context.api.ContextMonitoringRegistration;
+import org.exbin.jaguif.context.api.ContextMonitoringManagement;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.options.api.OptionsModuleApi;
@@ -122,10 +119,10 @@ public class BinEdDiffPanel extends JBPanel {
 
     protected DiffContextComponent leftContextComponent;
     protected DiffContextComponent rightContextComponent;
-    protected ActiveContextManagement leftContextManager;
-    protected ActiveContextManagement rightContextManager;
-    protected ContextRegistration leftContextRegistrator;
-    protected ContextRegistration rightContextRegistrator;
+    protected ContextStateManagement leftContextManager;
+    protected ContextStateManagement rightContextManager;
+    protected ContextMonitoringRegistration leftContextRegistrator;
+    protected ContextMonitoringRegistration rightContextRegistrator;
     protected final BinEdToolbarPanel toolbarPanel;
     protected final StatusBar leftStatusBar;
     protected final StatusBar rightStatusBar;
@@ -154,18 +151,18 @@ public class BinEdDiffPanel extends JBPanel {
         rightContextComponent = new DiffContextComponent(rightCodeArea);
         StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
         ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-        leftContextManager = contextModule.createContextManager();
+        leftContextManager = contextModule.createStateManager();
         leftContextManager.changeActiveState(ContextComponent.class, leftContextComponent);
-        rightContextManager = contextModule.createContextManager();
+        rightContextManager = contextModule.createStateManager();
         rightContextManager.changeActiveState(ContextComponent.class, rightContextComponent);
         attachContext(leftCodeArea, leftContextComponent, leftContextManager);
         attachContext(rightCodeArea, rightContextComponent, rightContextManager);
-        ContextUpdateManagement leftUpdateManagement = contextModule.createContextUpdateManagement(leftContextManager);
-        leftUpdateManagement.addGroup(BinedComponentModule.BINARY_STATUS_BAR_ID);
-        ContextUpdateManagement rightUpdateManagement = contextModule.createContextUpdateManagement(rightContextManager);
-        rightUpdateManagement.addGroup(BinedComponentModule.BINARY_STATUS_BAR_ID);
-        leftContextRegistrator = contextModule.createContextRegistrator(BinedComponentModule.BINARY_STATUS_BAR_ID, leftUpdateManagement, leftContextManager);
-        rightContextRegistrator = contextModule.createContextRegistrator(BinedComponentModule.BINARY_STATUS_BAR_ID, rightUpdateManagement, rightContextManager);
+        ContextMonitoringManagement leftMonitoringManagement = contextModule.createMonitoringManager(leftContextManager);
+        leftMonitoringManagement.addGroup(BinedComponentModule.BINARY_STATUS_BAR_ID);
+        ContextMonitoringManagement rightMonitoringManagement = contextModule.createMonitoringManager(rightContextManager);
+        rightMonitoringManagement.addGroup(BinedComponentModule.BINARY_STATUS_BAR_ID);
+        leftContextRegistrator = contextModule.createMonitoringRegistrator(leftMonitoringManagement, leftContextManager);
+        rightContextRegistrator = contextModule.createMonitoringRegistrator(rightMonitoringManagement, rightContextManager);
         leftStatusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, leftContextRegistrator);
         rightStatusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, rightContextRegistrator);
         toolbarPanel.setTargetComponent(diffPanel);
@@ -282,7 +279,7 @@ public class BinEdDiffPanel extends JBPanel {
         return null;
     }
 
-    private static void attachContext(SectCodeArea codeArea, ContextComponent contextComponent, ActiveContextManagement contextManagement) {
+    private static void attachContext(SectCodeArea codeArea, ContextComponent contextComponent, ContextStateManagement contextManagement) {
         contextManagement.changeActiveState(ContextComponent.class, contextComponent);
         codeArea.addDataChangedListener(() -> {
             contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.DATA_CONTENT);
@@ -401,7 +398,7 @@ public class BinEdDiffPanel extends JBPanel {
     public class DiffContextComponent implements BinaryDataComponent, CharsetEncodingState, CharsetListEncodingState {
 
         SectCodeArea codeArea;
-        ActiveContextManagement contextManagement;
+        ContextStateManagement stateManagement;
         @Nullable ContextSearch searchController;
 
         public DiffContextComponent(SectCodeArea codeArea) {
@@ -436,7 +433,7 @@ public class BinEdDiffPanel extends JBPanel {
         @Override
         public void setCodeType(CodeType codeType) {
             codeArea.setCodeType(codeType);
-            contextManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.CodeTypeState.UpdateType.CODE_TYPE);
+            stateManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.CodeTypeState.UpdateType.CODE_TYPE);
         }
 
         public PositionCodeType getPositionCodeType() {
@@ -445,7 +442,7 @@ public class BinEdDiffPanel extends JBPanel {
 
         public void setPositionCodeType(PositionCodeType positionCodeType) {
             codeArea.setPositionCodeType(positionCodeType);
-            contextManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.CodeTypeState.UpdateType.POSITION_CODE_TYPE);
+            stateManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.CodeTypeState.UpdateType.POSITION_CODE_TYPE);
         }
 
         @Override
@@ -456,7 +453,7 @@ public class BinEdDiffPanel extends JBPanel {
         @Override
         public void setCodeCharactersCase(CodeCharactersCase codeCharactersCase) {
             codeArea.setCodeCharactersCase(codeCharactersCase);
-            contextManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.CodeTypeState.UpdateType.HEX_CHARACTERS_CASE);
+            stateManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.CodeTypeState.UpdateType.HEX_CHARACTERS_CASE);
         }
 
         public boolean isShowNonprintables() {
@@ -481,8 +478,8 @@ public class BinEdDiffPanel extends JBPanel {
             if (nonprintablesCodeAreaAssessor != null) {
                 nonprintablesCodeAreaAssessor.setShowNonprintables(showNonprintables);
                 this.codeArea.repaint();
-                if (this.contextManagement != null) {
-                    this.contextManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.NonprintablesState.UpdateType.NONPRINTABLES);
+                if (this.stateManagement != null) {
+                    this.stateManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.NonprintablesState.UpdateType.NONPRINTABLES);
                 }
             }
 
@@ -490,8 +487,8 @@ public class BinEdDiffPanel extends JBPanel {
         }
 
         @Override
-        public Optional<ActiveContextManagement> getContextManagement() {
-            return Optional.of(contextManagement);
+        public Optional<ContextStateManagement> getStateManagement() {
+            return Optional.of(stateManagement);
         }
 
         @Override

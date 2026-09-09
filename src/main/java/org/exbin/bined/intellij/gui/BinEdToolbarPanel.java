@@ -444,7 +444,6 @@ public class BinEdToolbarPanel extends JBPanel {
     @NullMarked
     public interface Control {
 
-        @NotNull
         CodeType getCodeType();
 
         void setCodeType(CodeType codeType);

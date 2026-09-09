@@ -46,12 +46,12 @@ import org.exbin.bined.swing.capability.FontCapable;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.bined.swing.section.theme.SectionCodeAreaThemeProfile;
 import org.exbin.jaguif.App;
-import org.exbin.jaguif.context.ActiveContextManager;
-import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.ContextStateManager;
+import org.exbin.jaguif.context.api.ContextStateManagement;
 import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.context.api.ContextModuleApi;
-import org.exbin.jaguif.context.api.ContextRegistration;
-import org.exbin.jaguif.context.api.ContextUpdateManagement;
+import org.exbin.jaguif.context.api.ContextMonitoringRegistration;
+import org.exbin.jaguif.context.api.ContextMonitoringManagement;
 import org.exbin.jaguif.frame.api.FrameModuleApi;
 import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.options.api.OptionsModuleApi;
@@ -179,17 +179,17 @@ public class DebugViewPanel extends javax.swing.JPanel {
         // TODO Temporary workaround for unfinished rework of actions
         {
             ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-            ActiveContextManagement contextManagement = new ActiveContextManager();
-            ContextUpdateManagement updateManagement = contextModule.createContextUpdateManagement(contextManagement);
-            ContextRegistration contextRegistrar = contextModule.createContextRegistrator("", updateManagement, contextManagement);
-            contextManagement.changeActiveState(ContextComponent.class, dataComponent);
-            contextManagement.changeActiveState(ContextEncoding.class, dataComponent);
+            ContextStateManagement stateManagement = new ContextStateManager();
+            ContextMonitoringManagement updateManagement = contextModule.createMonitoringManager(stateManagement);
+            ContextMonitoringRegistration contextRegistrar = contextModule.createMonitoringRegistrator(updateManagement, stateManagement);
+            stateManagement.changeActiveState(ContextComponent.class, dataComponent);
+            stateManagement.changeActiveState(ContextEncoding.class, dataComponent);
             statusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, contextRegistrar);
-            dataComponent.setContextManager(contextManagement);
+            dataComponent.setStateManagement(stateManagement);
 
             BinaryEncodingSettingsApplier settingsApplier = new BinaryEncodingSettingsApplier();
             settingsApplier.applySettings(
-                    contextManagement,
+                    stateManagement,
                     optionsSettingsModule.getMainSettingsManager().getSettingsOptionsProvider());
         }
 

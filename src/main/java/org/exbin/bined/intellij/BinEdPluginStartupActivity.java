@@ -109,7 +109,7 @@ import org.exbin.jaguif.action.api.DialogParentComponent;
 import org.exbin.jaguif.component.ComponentModule;
 import org.exbin.jaguif.component.api.ComponentModuleApi;
 import org.exbin.jaguif.context.ContextModule;
-import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.api.ContextStateManagement;
 import org.exbin.jaguif.context.api.ContextModuleApi;
 import org.exbin.jaguif.contribution.ContributionModule;
 import org.exbin.jaguif.contribution.api.ContributionModuleApi;
@@ -444,7 +444,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             @Override
             public void selectionChanged(FileEditorManagerEvent event) {
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
+                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(ContextDocking.class);
                 BinaryFileDocument activeFile = null;
                 FileEditor fileEditor = event.getNewEditor();
                 if (fileEditor instanceof BinEdFileEditor) {
@@ -496,7 +496,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     if (binaryDocument.isModified()) {
                         ApplicationManager.getApplication().invokeLater(() -> {
                             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
+                            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(ContextDocking.class);
                             boolean released = docking.releaseDocument(binaryDocument);
                             ((BinEdVirtualFile) file).setClosing(false);
                             if (released) {
@@ -572,8 +572,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             // Try to match to IDE locale
             Locale ideLocale = com.intellij.DynamicBundle.getLocale();
             List<Locale> locales = new ArrayList<>();
-            for (LanguageProvider languageRecord : languageModule.getLanguagePlugins()) {
-                locales.add(languageRecord.getLocale());
+            for (LanguageProvider languagePlugin : languageModule.getLanguagePlugins()) {
+                locales.add(languagePlugin.getLocale());
             }
             List<Locale.LanguageRange> localeRange = new ArrayList<>();
             String languageTag = ideLocale.toLanguageTag();
@@ -850,7 +850,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedViewerModule.registerFrameStatusBar();
 
             FrameModuleApi frameModuleApi = App.getModule(FrameModuleApi.class);
-            ActiveContextManagement contextManagement = frameModuleApi.getFrameController().getContextManager();
+            ContextStateManagement contextManagement = frameModuleApi.getFrameController().getStateManager();
             settingsManager.registerInferenceOptions(TextEncodingInference.class, new TextEncodingContextInference(contextManagement));
             settingsManager.registerInferenceOptions(TextEncodingsInference.class, new TextEncodingsContextInference(contextManagement));
             settingsManager.registerInferenceOptions(TextFontInference.class, new TextFontContextInference((contextManagement)));
@@ -894,8 +894,8 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             menuManagement.registerMenuContribution(contribution);
             menuManagement.registerMenuRule(contribution, new GroupSequenceContributionRule(aboutMenuGroup));
 
-            ActiveContextManagement contextManager =
-                    frameModule.getFrameController().getContextManager();
+            ContextStateManagement contextManager =
+                    frameModule.getFrameController().getStateManager();
             contextManager.changeActiveState(ContextDocking.class, docking);
             contextManager.changeActiveState(DialogParentComponent.class, () -> frameModule.getFrame());
 

@@ -40,14 +40,14 @@ import org.exbin.jaguif.App;
 import org.exbin.jaguif.action.api.ActionConsts;
 import org.exbin.jaguif.action.api.ActionModuleApi;
 import org.exbin.jaguif.action.api.DialogParentComponent;
-import org.exbin.jaguif.context.ActiveContextManager;
-import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.ContextStateManager;
+import org.exbin.jaguif.context.api.ContextStateManagement;
 import org.exbin.jaguif.context.api.ContextChange;
 import org.exbin.jaguif.context.api.ContextChangeListener;
 import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.context.api.ContextModuleApi;
-import org.exbin.jaguif.context.api.ContextRegistration;
-import org.exbin.jaguif.context.api.ContextUpdateManagement;
+import org.exbin.jaguif.context.api.ContextMonitoringRegistration;
+import org.exbin.jaguif.context.api.ContextMonitoringManagement;
 import org.exbin.jaguif.context.api.StateUpdateType;
 import org.exbin.jaguif.docking.api.ContextDocking;
 import org.exbin.jaguif.document.api.ContextDocument;
@@ -86,7 +86,7 @@ public class BinEdFilePanel extends JPanel {
     @Nullable
     protected BinaryFileDocument fileDocument;
     protected BinEdToolbarPanel toolbarPanel = new BinEdToolbarPanel();
-    protected ActiveContextManagement statusContextManager;
+    protected ContextStateManagement statusContextManager;
     protected ContextChangeListener contextChangeListener;
     protected StatusBar statusBar;
 
@@ -97,8 +97,8 @@ public class BinEdFilePanel extends JPanel {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
         ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-        ActiveContextManagement contextManager = frameModule.getFrameController().getContextManager();
-        statusContextManager = contextModule.createChildContextManager(contextManager);
+        ContextStateManagement contextManager = frameModule.getFrameController().getStateManager();
+        statusContextManager = contextModule.createChildStateManager(contextManager);
         contextChangeListener = new ContextChangeListener() {
             @Override
             public <T> void notifyStateChanged(Class<T> stateClass, @Nullable T activeState) {
@@ -143,14 +143,14 @@ public class BinEdFilePanel extends JPanel {
             }
         };
         contextManager.addChangeListener(contextChangeListener);
-        ContextUpdateManagement statusUpdateManager = contextModule.createContextUpdateManagement(statusContextManager);
-        ContextRegistration statusContextRegistrator = contextModule.createContextRegistrator("",  statusUpdateManager, statusContextManager);
+        ContextMonitoringManagement statusUpdateManager = contextModule.createMonitoringManager(statusContextManager);
+        ContextMonitoringRegistration statusContextRegistrator = contextModule.createMonitoringRegistrator(statusUpdateManager, statusContextManager);
         statusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, statusContextRegistrator);
     }
 
     public void detach() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ActiveContextManagement contextManager = frameModule.getFrameController().getContextManager();
+        ContextStateManagement contextManager = frameModule.getFrameController().getStateManager();
         contextManager.removeChangeListener(contextChangeListener);
     }
 
@@ -173,8 +173,8 @@ public class BinEdFilePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Action editFindAction = findReplaceActions.createEditFindAction();
                 ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-                ContextRegistration contextRegistrator = contextModule.createContextRegistrator(statusContextManager);
-                contextRegistrator.registerContextChange((ActionContextChange) editFindAction);
+                ContextMonitoringRegistration contextRegistrator = contextModule.createMonitoringRegistrator(statusContextManager);
+                contextRegistrator.registerContextMonitoring((ActionContextChange) editFindAction);
                 contextRegistrator.finish();
                 editFindAction.actionPerformed(e);
             }
@@ -186,8 +186,8 @@ public class BinEdFilePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 Action editReplaceAction = findReplaceActions.createEditReplaceAction();
                 ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-                ContextRegistration contextRegistrator = contextModule.createContextRegistrator(statusContextManager);
-                contextRegistrator.registerContextChange((ActionContextChange) editReplaceAction);
+                ContextMonitoringRegistration contextRegistrator = contextModule.createMonitoringRegistrator(statusContextManager);
+                contextRegistrator.registerContextMonitoring((ActionContextChange) editReplaceAction);
                 contextRegistrator.finish();
                 editReplaceAction.actionPerformed(e);
             }
@@ -251,7 +251,7 @@ public class BinEdFilePanel extends JPanel {
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
 
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getContextManager().getActiveState(ContextDocking.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(ContextDocking.class);
         OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
         SettingsAction settingsAction = (SettingsAction) optionsSettingsModule.createSettingsAction();
         settingsAction.setDialogParentComponent(() -> frameModule.getFrame());
@@ -299,19 +299,19 @@ public class BinEdFilePanel extends JPanel {
                 // TODO Temporary workaround for unfinished rework of actions
                 {
                     ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-                    ActiveContextManagement contextManagement = new ActiveContextManager();
-                    ContextUpdateManagement updateManagement = contextModule.createContextUpdateManagement(contextManagement);
+                    ContextStateManagement contextManagement = new ContextStateManager();
+                    ContextMonitoringManagement updateManagement = contextModule.createMonitoringManager(contextManagement);
                     contextManagement.changeActiveState(ContextComponent.class, fileDocument.getDataComponent());
                     contextManagement.changeActiveState(DialogParentComponent.class, () -> frameModule.getFrame());
 
                     BinedBookmarksModule binedBookmarksModule = App.getModule(BinedBookmarksModule.class);
                     AbstractAction manageBookmarksAction = binedBookmarksModule.getManageBookmarksAction();
-                    ContextRegistration contextRegistrar = contextModule.createContextRegistrator("", updateManagement, contextManagement);
-                    contextRegistrar.registerContextChange((ContextChange) manageBookmarksAction.getValue(ActionConsts.ACTION_CONTEXT_CHANGE));
+                    ContextMonitoringRegistration contextRegistrar = contextModule.createMonitoringRegistrator(updateManagement, contextManagement);
+                    contextRegistrar.registerContextMonitoring((ContextChange) manageBookmarksAction.getValue(ActionConsts.ACTION_CONTEXT_CHANGE));
 
                     BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
-                    // ContextUpdateManagement updateManagement = frameModule.getFrameController().getUpdateManager();
-                    contextRegistrar.registerContextChange((ContextChange) binedMacroModule.getMacroManager().getMacrosMenu().getAction().getValue(ActionConsts.ACTION_CONTEXT_CHANGE));
+                    // ContextMonitoringManagement updateManagement = frameModule.getFrameController().getUpdateManager();
+                    contextRegistrar.registerContextMonitoring((ContextChange) binedMacroModule.getMacroManager().getMacrosMenu().getAction().getValue(ActionConsts.ACTION_CONTEXT_CHANGE));
                     contextRegistrar.finish();
                 }
 

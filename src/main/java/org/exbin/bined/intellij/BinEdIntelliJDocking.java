@@ -20,7 +20,7 @@ import org.exbin.jaguif.context.api.ContextComponent;
 import org.exbin.jaguif.action.api.DialogParentComponent;
 import org.exbin.bined.jaguif.component.BinEdDataComponent;
 import org.exbin.bined.jaguif.document.BinaryFileDocument;
-import org.exbin.jaguif.context.api.ActiveContextManagement;
+import org.exbin.jaguif.context.api.ContextStateManagement;
 import org.exbin.jaguif.docking.multi.api.MultiDocking;
 import org.exbin.jaguif.document.api.ContextDocument;
 import org.exbin.jaguif.document.api.Document;
@@ -154,8 +154,8 @@ public class BinEdIntelliJDocking implements MultiDocking {
 
     public void activeDocumentChanged() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ActiveContextManagement contextManager =
-                frameModule.getFrameController().getContextManager();
+        ContextStateManagement contextManager =
+                frameModule.getFrameController().getStateManager();
 
         BinEdDataComponent dataComponent = null;
         if (activeDocument != null) {
