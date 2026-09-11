@@ -23,7 +23,6 @@ import org.exbin.bined.jaguif.search.ReplaceParameters;
 import org.exbin.bined.jaguif.search.SearchCondition;
 import org.exbin.bined.jaguif.search.SearchParameters;
 import org.exbin.bined.jaguif.search.gui.BinaryMultilinePanel;
-import org.exbin.bined.jaguif.search.gui.BinarySearchPanel;
 import org.exbin.bined.jaguif.search.gui.FindBinaryPanel;
 import org.exbin.bined.jaguif.search.service.BinarySearchService;
 import org.exbin.jaguif.help.api.HelpLink;

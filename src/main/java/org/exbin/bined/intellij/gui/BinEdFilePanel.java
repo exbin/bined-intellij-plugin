@@ -97,7 +97,7 @@ public class BinEdFilePanel extends JPanel {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
         StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
         ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
-        ContextStateManagement contextManager = frameModule.getFrameController().getStateManager();
+        ContextStateManagement contextManager = frameModule.getFrameStateManager();
         statusContextManager = contextModule.createChildStateManager(contextManager);
         contextChangeListener = new ContextChangeListener() {
             @Override
@@ -150,7 +150,7 @@ public class BinEdFilePanel extends JPanel {
 
     public void detach() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ContextStateManagement contextManager = frameModule.getFrameController().getStateManager();
+        ContextStateManagement contextManager = frameModule.getFrameStateManager();
         contextManager.removeChangeListener(contextChangeListener);
     }
 
@@ -251,7 +251,7 @@ public class BinEdFilePanel extends JPanel {
         toolbarPanel.setOnlineHelpAction(createOnlineHelpAction());
 
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(ContextDocking.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameStateManager().getActiveState(ContextDocking.class);
         OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
         SettingsAction settingsAction = (SettingsAction) optionsSettingsModule.createSettingsAction();
         settingsAction.setDialogParentComponent(() -> frameModule.getFrame());
@@ -310,7 +310,7 @@ public class BinEdFilePanel extends JPanel {
                     contextRegistrar.registerContextMonitoring((ContextChange) manageBookmarksAction.getValue(ActionConsts.ACTION_CONTEXT_CHANGE));
 
                     BinedMacroModule binedMacroModule = App.getModule(BinedMacroModule.class);
-                    // ContextMonitoringManagement updateManagement = frameModule.getFrameController().getUpdateManager();
+                    // ContextMonitoringManagement updateManagement = frameModule.getFrameMonitoringManager();
                     contextRegistrar.registerContextMonitoring((ContextChange) binedMacroModule.getMacroManager().getMacrosMenu().getAction().getValue(ActionConsts.ACTION_CONTEXT_CHANGE));
                     contextRegistrar.finish();
                 }

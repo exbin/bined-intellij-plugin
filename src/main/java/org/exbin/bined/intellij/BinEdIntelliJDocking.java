@@ -154,8 +154,7 @@ public class BinEdIntelliJDocking implements MultiDocking {
 
     public void activeDocumentChanged() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ContextStateManagement contextManager =
-                frameModule.getFrameController().getStateManager();
+        ContextStateManagement contextManager = frameModule.getFrameStateManager();
 
         BinEdDataComponent dataComponent = null;
         if (activeDocument != null) {

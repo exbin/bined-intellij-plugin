@@ -444,7 +444,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             @Override
             public void selectionChanged(FileEditorManagerEvent event) {
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(ContextDocking.class);
+                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameStateManager().getActiveState(ContextDocking.class);
                 BinaryFileDocument activeFile = null;
                 FileEditor fileEditor = event.getNewEditor();
                 if (fileEditor instanceof BinEdFileEditor) {
@@ -496,7 +496,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
                     if (binaryDocument.isModified()) {
                         ApplicationManager.getApplication().invokeLater(() -> {
                             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(ContextDocking.class);
+                            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameStateManager().getActiveState(ContextDocking.class);
                             boolean released = docking.releaseDocument(binaryDocument);
                             ((BinEdVirtualFile) file).setClosing(false);
                             if (released) {
@@ -793,8 +793,6 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             BinedEditorModule binedEditorModule = App.getModule(BinedEditorModule.class);
             BinedDocumentModule binedDocumentModule = App.getModule(BinedDocumentModule.class);
             BinedThemeModule binedThemeModule = App.getModule(BinedThemeModule.class);
-            BinedSearchModule binedSearchModule = App.getModule(BinedSearchModule.class);
-            binedSearchModule.registerSearchComponent();
 
             BinEdFileManager fileManager = binedDocumentModule.getFileManager();
             fileManager.addBinEdComponentExtension(component -> Optional.of(new BinEdIntelliJComponentSearch()));
@@ -850,7 +848,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             binedViewerModule.registerFrameStatusBar();
 
             FrameModuleApi frameModuleApi = App.getModule(FrameModuleApi.class);
-            ContextStateManagement contextManagement = frameModuleApi.getFrameController().getStateManager();
+            ContextStateManagement contextManagement = frameModuleApi.getFrameStateManager();
             settingsManager.registerInferenceOptions(TextEncodingInference.class, new TextEncodingContextInference(contextManagement));
             settingsManager.registerInferenceOptions(TextEncodingsInference.class, new TextEncodingsContextInference(contextManagement));
             settingsManager.registerInferenceOptions(TextFontInference.class, new TextFontContextInference((contextManagement)));
@@ -895,7 +893,7 @@ public final class BinEdPluginStartupActivity implements ProjectActivity, Startu
             menuManagement.registerMenuRule(contribution, new GroupSequenceContributionRule(aboutMenuGroup));
 
             ContextStateManagement contextManager =
-                    frameModule.getFrameController().getStateManager();
+                    frameModule.getFrameStateManager();
             contextManager.changeActiveState(ContextDocking.class, docking);
             contextManager.changeActiveState(DialogParentComponent.class, () -> frameModule.getFrame());
 

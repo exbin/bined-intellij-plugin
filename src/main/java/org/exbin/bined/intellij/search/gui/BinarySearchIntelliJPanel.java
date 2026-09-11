@@ -106,6 +106,7 @@ public class BinarySearchIntelliJPanel extends JPanel {
     private final AnActionButton prevMatchAction;
     private final AnActionButton nextMatchAction;
     private final AnActionButton cancelSearchAction;
+    private final AnActionButton closeAction;
     private final ToggleAction matchCaseToggleAction;
     private boolean matchCase = false;
     private boolean matchCaseEnabled = true;
@@ -278,6 +279,23 @@ public class BinarySearchIntelliJPanel extends JPanel {
             }
         };
 
+        closeAction = new AnActionButton(
+                resourceBundle.getString("closeButton.toolTipText"),
+                resourceBundle.getString("closeButton.toolTipText"),
+                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("closeButton.icon")))
+        ) {
+            @Override
+            public void actionPerformed(AnActionEvent e) {
+                controller.close();
+            }
+
+            @Override
+            public ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.EDT;
+            }
+        };
+        closeToolbarActionGroup.addAction(closeAction);
+
         initComponents();
         init();
 
@@ -297,21 +315,6 @@ public class BinarySearchIntelliJPanel extends JPanel {
     private void init() {
         findPanel.add(findToolbar.getComponent(), BorderLayout.CENTER);
 
-        closeToolbarActionGroup.addAction(new AnAction(
-                resourceBundle.getString("closeButton.toolTipText"),
-                null,
-                new javax.swing.ImageIcon(getClass().getResource(resourceBundle.getString("closeButton.icon")))
-        ) {
-            @Override
-            public void actionPerformed(AnActionEvent e) {
-                controller.close();
-            }
-
-            @Override
-            public ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
-        });
         add(closeToolbar.getComponent(), BorderLayout.EAST);
 
         SectionCodeAreaLayoutProfile layoutProfile = Objects.requireNonNull(searchCodeArea.getLayoutProfile());

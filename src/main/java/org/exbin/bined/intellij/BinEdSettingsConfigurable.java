@@ -117,7 +117,6 @@ public class BinEdSettingsConfigurable implements Configurable, DumbAware {
 
         // TODO Run in top context
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        FrameController frameController = frameModule.getFrameController();
-        mainSettingsManager.applyAllOptions(frameController.getStateManager(), mainSettingsManager.getSettingsOptionsProvider());
+        mainSettingsManager.applyAllOptions(frameModule.getFrameStateManager(), mainSettingsManager.getSettingsOptionsProvider());
     }
 }

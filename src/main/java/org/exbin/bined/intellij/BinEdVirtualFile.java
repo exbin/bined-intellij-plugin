@@ -31,6 +31,7 @@ import org.exbin.bined.jaguif.document.BinEdFileManager;
 import org.exbin.bined.jaguif.document.BinaryFileDocument;
 import org.exbin.bined.jaguif.document.BinedDocumentModule;
 import org.exbin.bined.jaguif.document.settings.BinaryFileProcessingOptions;
+import org.exbin.bined.jaguif.search.BinedSearchModule;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.jaguif.App;
 import org.exbin.jaguif.context.api.ContextStateManagement;
@@ -89,8 +90,11 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         BinedDocumentModule binedDocumentModule = App.getModule(BinedDocumentModule.class);
         BinEdFileManager fileManager = binedDocumentModule.getFileManager();
         filePanel.setDocument(fileDocument);
-        fileManager.initDataComponent(fileDocument.getDataComponent());
-        fileManager.initCommandHandler(fileDocument.getDataComponent());
+        BinEdDataComponent dataComponent = fileDocument.getDataComponent();
+        fileManager.initDataComponent(dataComponent);
+        fileManager.initCommandHandler(dataComponent);
+        BinedSearchModule searchModule = App.getModule(BinedSearchModule.class);
+        dataComponent.setSearchController(searchModule.createBinarySearchController(dataComponent));
 
         OptionsModuleApi optionsModule = App.getModule(OptionsModuleApi.class);
         OptionsStorage optionsStorage = optionsModule.getAppOptions();
@@ -101,7 +105,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
         toolbarPanel.setSaveAction(e -> {
             fileDocument.saveTo(fileDocument.getDocumentSource().get());
             FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(
+            BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameStateManager().getActiveState(
                     ContextDocking.class);
             docking.setActiveDocument(fileDocument);
         });
@@ -250,7 +254,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
 
     public void dispose() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(ContextDocking.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameStateManager().getActiveState(ContextDocking.class);
         filePanel.detach();
         docking.removeDocument(fileDocument);
     }
@@ -273,7 +277,7 @@ public class BinEdVirtualFile extends VirtualFile implements DumbAware {
             }
         }
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ContextStateManagement contextManager = frameModule.getFrameController().getStateManager();
+        ContextStateManagement contextManager = frameModule.getFrameStateManager();
         BinEdIntelliJDocking docking = (BinEdIntelliJDocking) contextManager.getActiveState(ContextDocking.class);
         docking.setActiveDocument(fileDocument);
         fileDocument.fileSync();

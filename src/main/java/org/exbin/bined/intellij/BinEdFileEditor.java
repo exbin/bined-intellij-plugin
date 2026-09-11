@@ -102,7 +102,7 @@ public class BinEdFileEditor implements FileEditor, DumbAware {
     @Override
     public void selectNotify() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameStateManager().getActiveState(
                 ContextDocking.class);
         docking.setActiveDocument(virtualFile.getFileDocument());
     }

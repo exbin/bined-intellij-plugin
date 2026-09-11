@@ -468,8 +468,9 @@ public class BinEdDiffPanel extends JBPanel {
         }
 
         @Override
-        public void setSearchController(@Nullable ContextSearch contextSearch) {
+        public void setSearchController(@Nullable ContextSearch searchController) {
             this.searchController = searchController;
+            stateManagement.changeActiveState(ContextSearch.class, searchController);
         }
 
         public void setShowNonprintables(boolean showNonprintables) {

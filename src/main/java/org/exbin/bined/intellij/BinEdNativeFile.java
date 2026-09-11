@@ -28,10 +28,12 @@ import org.exbin.auxiliary.binary_data.paged.PagedData;
 import org.exbin.bined.EditMode;
 import org.exbin.bined.intellij.gui.BinEdFilePanel;
 import org.exbin.bined.intellij.gui.BinEdToolbarPanel;
+import org.exbin.bined.jaguif.component.BinEdDataComponent;
 import org.exbin.bined.jaguif.document.BinEdFileManager;
 import org.exbin.bined.jaguif.document.BinEdFileProcessingMode;
 import org.exbin.bined.jaguif.document.BinaryFileDocument;
 import org.exbin.bined.jaguif.document.BinedDocumentModule;
+import org.exbin.bined.jaguif.search.BinedSearchModule;
 import org.exbin.bined.operation.command.BinaryDataUndoRedo;
 import org.exbin.bined.swing.section.SectCodeArea;
 import org.exbin.jaguif.App;
@@ -67,8 +69,11 @@ public class BinEdNativeFile {
         BinEdFileManager fileManager = binedDocumentModule.getFileManager();
         fileDocument = BinEdVirtualFile.createBinaryFileDocument();
         filePanel.setDocument(fileDocument);
-        fileManager.initDataComponent(fileDocument.getDataComponent());
-        fileManager.initCommandHandler(fileDocument.getDataComponent());
+        BinEdDataComponent dataComponent = fileDocument.getDataComponent();
+        fileManager.initDataComponent(dataComponent);
+        fileManager.initCommandHandler(dataComponent);
+        BinedSearchModule searchModule = App.getModule(BinedSearchModule.class);
+        dataComponent.setSearchController(searchModule.createBinarySearchController(dataComponent));
 
         OptionsSettingsModuleApi optionsSettingsModule = App.getModule(OptionsSettingsModuleApi.class);
         OptionsSettingsManagement settingsManager = optionsSettingsModule.getMainSettingsManager();
@@ -79,7 +84,7 @@ public class BinEdNativeFile {
     public void registerUndoRedo(BinaryIntelliJUndoRedo undoIntelliJHandler) {
         // TODO Doesn't work ATM
         /* FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ContextStateManagement contextManager = frameModule.getFrameController().getStateManager();
+        ContextStateManagement contextManager = frameModule.getFrameStateManager();
         fileDocument.setUndoHandler(undoIntelliJHandler);
         undoIntelliJHandler.addChangeListener(() -> {
             ContextDocument document = contextManager.getActiveState(ContextDocument.class);
@@ -109,7 +114,7 @@ public class BinEdNativeFile {
         boolean editable = virtualFile.isWritable();
 
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        ContextStateManagement contextManager = frameModule.getFrameController().getStateManager();
+        ContextStateManagement contextManager = frameModule.getFrameStateManager();
         BinEdIntelliJDocking docking = (BinEdIntelliJDocking) contextManager.getActiveState(ContextDocking.class);
 
         ApplicationManager.getApplication().runReadAction(() -> {
@@ -146,7 +151,6 @@ public class BinEdNativeFile {
         opened = true;
         docking.setActiveDocument(fileDocument);
         fileDocument.fileSync();
-        contextManager.updateActiveState(ContextDocument.class, fileDocument, BinaryFileDocument.UpdateType.ORIGINAL_SIZE);
         updateModified();
     }
 
@@ -161,10 +165,11 @@ public class BinEdNativeFile {
         application.runWriteAction(() -> {
             try {
                 virtualFile.setBinaryContent(fileContent);
-                fileDocument.fileSync();
                 FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(ContextDocking.class);
+                BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameStateManager().getActiveState(ContextDocking.class);
                 docking.setActiveDocument(fileDocument);
+                fileDocument.fileSync();
+                updateModified();
             } catch (IOException e) {
                 throw createBrokenVirtualFileException(e);
             }
@@ -207,7 +212,7 @@ public class BinEdNativeFile {
 
     public void dispose() {
         FrameModuleApi frameModule = App.getModule(FrameModuleApi.class);
-        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameController().getStateManager().getActiveState(ContextDocking.class);
+        BinEdIntelliJDocking docking = (BinEdIntelliJDocking) frameModule.getFrameStateManager().getActiveState(ContextDocking.class);
         filePanel.detach();
         docking.removeDocument(fileDocument);
     }
