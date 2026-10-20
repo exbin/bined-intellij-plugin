@@ -16,8 +16,6 @@
 package org.exbin.bined.intellij.utils;
 
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
 import javax.swing.Action;

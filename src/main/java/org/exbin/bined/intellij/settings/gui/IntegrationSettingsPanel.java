@@ -34,7 +34,7 @@ import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.options.settings.api.SettingsComponent;
 import org.exbin.jaguif.options.settings.api.SettingsModifiedListener;
 import org.exbin.jaguif.options.settings.api.SettingsOptionsProvider;
-import org.exbin.jaguif.ui.model.LanguageRecord;
+import org.exbin.jaguif.ui.LanguageRecord;
 import org.exbin.jaguif.utils.TestApplication;
 import org.exbin.jaguif.utils.WindowUtils;
 

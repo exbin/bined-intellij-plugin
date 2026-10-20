@@ -22,7 +22,7 @@ import org.exbin.jaguif.language.api.LanguageModuleApi;
 import org.exbin.jaguif.language.api.LanguageProvider;
 import org.exbin.jaguif.options.settings.api.SettingsComponent;
 import org.exbin.jaguif.options.settings.api.SettingsComponentProvider;
-import org.exbin.jaguif.ui.model.LanguageRecord;
+import org.exbin.jaguif.ui.LanguageRecord;
 import org.exbin.jaguif.ui.settings.gui.LanguageSettingsPanel;
 import org.exbin.jaguif.ui.theme.UiThemeModule;
 import org.exbin.jaguif.ui.theme.api.UiThemeModuleApi;
@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
  */
 @NullMarked
 public class IntegrationSettingsComponent implements SettingsComponentProvider {
+
     @Override
     public SettingsComponent createComponent() {
         IntegrationSettingsPanel panel = new IntegrationSettingsPanel();
