@@ -147,14 +147,15 @@ public class BinEdDiffPanel extends JBPanel {
         defaultThemeProfile = leftCodeArea.getThemeProfile();
         defaultColorProfile = leftCodeArea.getColorsProfile();
         toolbarPanel = new BinEdToolbarPanel();
-        leftContextComponent = new DiffContextComponent(leftCodeArea);
-        rightContextComponent = new DiffContextComponent(rightCodeArea);
-        StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
         ContextModuleApi contextModule = App.getModule(ContextModuleApi.class);
         leftContextManager = contextModule.createStateManager();
-        leftContextManager.changeActiveState(ContextComponent.class, leftContextComponent);
         rightContextManager = contextModule.createStateManager();
+        leftContextComponent = new DiffContextComponent(leftCodeArea, leftContextManager, Side.LEFT);
+        rightContextComponent = new DiffContextComponent(rightCodeArea, rightContextManager, Side.RIGHT);
+        leftContextManager.changeActiveState(ContextComponent.class, leftContextComponent);
+        leftContextManager.changeActiveState(ContextEncoding.class, leftContextComponent);
         rightContextManager.changeActiveState(ContextComponent.class, rightContextComponent);
+        rightContextManager.changeActiveState(ContextEncoding.class, rightContextComponent);
         attachContext(leftCodeArea, leftContextComponent, leftContextManager);
         attachContext(rightCodeArea, rightContextComponent, rightContextManager);
         ContextMonitoringManagement leftMonitoringManagement = contextModule.createMonitoringManager(leftContextManager);
@@ -163,6 +164,7 @@ public class BinEdDiffPanel extends JBPanel {
         rightMonitoringManagement.addGroup(BinedComponentModule.BINARY_STATUS_BAR_ID);
         leftContextRegistrator = contextModule.createMonitoringRegistrator(leftMonitoringManagement, leftContextManager);
         rightContextRegistrator = contextModule.createMonitoringRegistrator(rightMonitoringManagement, rightContextManager);
+        StatusBarModuleApi statusBarModule = App.getModule(StatusBarModuleApi.class);
         leftStatusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, leftContextRegistrator);
         rightStatusBar = statusBarModule.createStatusBar(BinedComponentModule.BINARY_STATUS_BAR_ID, rightContextRegistrator);
         toolbarPanel.setTargetComponent(diffPanel);
@@ -395,14 +397,18 @@ public class BinEdDiffPanel extends JBPanel {
         }
     }
 
+    @NullMarked
     public class DiffContextComponent implements BinaryDataComponent, CharsetEncodingState, CharsetListEncodingState {
 
-        SectCodeArea codeArea;
-        ContextStateManagement stateManagement;
+        final SectCodeArea codeArea;
+        final ContextStateManagement stateManagement;
+        final Side side;
         @Nullable ContextSearch searchController;
 
-        public DiffContextComponent(SectCodeArea codeArea) {
+        public DiffContextComponent(SectCodeArea codeArea, ContextStateManagement stateManagement, Side side) {
             this.codeArea = codeArea;
+            this.stateManagement = stateManagement;
+            this.side = side;
         }
 
         @Override
@@ -483,8 +489,6 @@ public class BinEdDiffPanel extends JBPanel {
                     this.stateManagement.updateActiveState(ContextComponent.class, this, org.exbin.bined.jaguif.component.NonprintablesState.UpdateType.NONPRINTABLES);
                 }
             }
-
-
         }
 
         @Override
@@ -493,7 +497,14 @@ public class BinEdDiffPanel extends JBPanel {
         }
 
         @Override
-        public <T extends StatusBarComponent> Optional<T> getStatusBarComponent(Class<T> aClass) {
+        public <T extends StatusBarComponent> Optional<T> getStatusBarComponent(Class<T> clazz) {
+            StatusBar statusBar = side == Side.LEFT ? leftStatusBar : rightStatusBar;
+            for (int i = 0; i < statusBar.getItemsCount(); i++) {
+                StatusBarComponent component = statusBar.getItem(i);
+                if (clazz.isInstance(component)) {
+                    return Optional.of(clazz.cast(component));
+                }
+            }
             return Optional.empty();
         }
 
@@ -510,6 +521,11 @@ public class BinEdDiffPanel extends JBPanel {
         @Override
         public void setEncoding(String encodingName) {
             ((CharsetCapable) getCodeArea()).setCharset(Charset.forName(encodingName));
+            if (side == Side.LEFT) {
+                leftContextManager.updateActiveState(ContextEncoding.class, leftContextComponent, CharsetEncodingState.UpdateType.ENCODING);
+            } else {
+                rightContextManager.updateActiveState(ContextEncoding.class, rightContextComponent, CharsetEncodingState.UpdateType.ENCODING);
+            }
         }
 
         @Override
@@ -524,5 +540,9 @@ public class BinEdDiffPanel extends JBPanel {
             leftContextManager.updateActiveState(ContextEncoding.class, leftContextComponent, CharsetListEncodingState.UpdateType.ENCODING_LIST);
             rightContextManager.updateActiveState(ContextEncoding.class, rightContextComponent, CharsetListEncodingState.UpdateType.ENCODING_LIST);
         }
+    }
+
+    public enum Side {
+        LEFT, RIGHT
     }
 }
