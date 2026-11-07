@@ -152,10 +152,6 @@ public class BinEdDiffPanel extends JBPanel {
         rightContextManager = contextModule.createStateManager();
         leftContextComponent = new DiffContextComponent(leftCodeArea, leftContextManager, Side.LEFT);
         rightContextComponent = new DiffContextComponent(rightCodeArea, rightContextManager, Side.RIGHT);
-        leftContextManager.changeActiveState(ContextComponent.class, leftContextComponent);
-        leftContextManager.changeActiveState(ContextEncoding.class, leftContextComponent);
-        rightContextManager.changeActiveState(ContextComponent.class, rightContextComponent);
-        rightContextManager.changeActiveState(ContextEncoding.class, rightContextComponent);
         attachContext(leftCodeArea, leftContextComponent, leftContextManager);
         attachContext(rightCodeArea, rightContextComponent, rightContextManager);
         ContextMonitoringManagement leftMonitoringManagement = contextModule.createMonitoringManager(leftContextManager);
@@ -281,8 +277,9 @@ public class BinEdDiffPanel extends JBPanel {
         return null;
     }
 
-    private static void attachContext(SectCodeArea codeArea, ContextComponent contextComponent, ContextStateManagement contextManagement) {
+    private static void attachContext(SectCodeArea codeArea, DiffContextComponent contextComponent, ContextStateManagement contextManagement) {
         contextManagement.changeActiveState(ContextComponent.class, contextComponent);
+        contextManagement.changeActiveState(ContextEncoding.class, contextComponent);
         codeArea.addDataChangedListener(() -> {
             contextManagement.updateActiveState(ContextComponent.class, contextComponent, UpdateType.DATA_CONTENT);
         });
